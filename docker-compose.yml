@@ -1,0 +1,11 @@
+version: '3.7'
+services:
+  httpd:
+    container_name: httpd
+    build: ./httpd
+    image: rmsy.me/httpd
+    ports:
+      - 800:80
+    volumes:
+      - ./httpd/htdocs:/usr/local/apache2/htdocs
+      - ./httpd/conf:/usr/local/apache2/conf
