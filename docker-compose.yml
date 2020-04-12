@@ -12,10 +12,11 @@ services:
       - ./httpd/conf:/usr/local/apache2/conf
       - ./httpd/logs:/usr/local/apache2/logs
     secrets:
-      - crt
-      - key
-secrets:
-  crt:
-    file: ./httpd/ssl/localhost.crt
-  key:
-    file: ./httpd/ssl/localhost.key
+      - rmsy.me.crt
+      - rmsy.me.key
+      - el-naggar.co.uk.crt
+      - el-naggar.co.uk.key
+      - elnaggar.co.uk.crt
+      - elnaggar.co.uk.key
+      - relnaggar.com.crt
+      - relnaggar.com.key
