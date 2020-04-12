@@ -4,6 +4,7 @@ services:
     container_name: httpd
     build: ./httpd
     image: rmsy.me/httpd
+    init: true
     ports:
       - 80:80
       - 443:443
