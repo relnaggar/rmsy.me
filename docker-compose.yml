@@ -5,7 +5,17 @@ services:
     build: ./httpd
     image: rmsy.me/httpd
     ports:
-      - 800:80
+      - 80:80
+      - 443:443
     volumes:
       - ./httpd/htdocs:/usr/local/apache2/htdocs
       - ./httpd/conf:/usr/local/apache2/conf
+      - ./httpd/logs:/usr/local/apache2/logs
+    secrets:
+      - crt
+      - key
+secrets:
+  crt:
+    file: ./httpd/ssl/localhost.crt
+  key:
+    file: ./httpd/ssl/localhost.key

@@ -1,0 +1,12 @@
+### Vim ###
+*.sw[a-p]
+
+### System Files ###
+*.DS_Store
+
+### Secure Files ###
+*.key
+*.crt
+
+### Logging ###
+httpd/logs/
