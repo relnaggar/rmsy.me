@@ -3,7 +3,7 @@ services:
   apache2:
     container_name: apache2
     build: ./apache2
-    image: rmsy.me/apache2
+    image: relnaggar/rmsy.me-apache2
     init: true
     user: apache2
     ports:
