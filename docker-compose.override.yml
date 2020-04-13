@@ -1,18 +1,18 @@
 version: '3.7'
 secrets:
   rmsy.me.crt:
-    file: ./httpd/ssl/localhost.crt
+    file: ./apache2/ssl/localhost.crt
   rmsy.me.key:
-    file: ./httpd/ssl/localhost.key
+    file: ./apache2/ssl/localhost.key
   el-naggar.co.uk.crt:
-    file: ./httpd/ssl/localhost.crt
+    file: ./apache2/ssl/localhost.crt
   el-naggar.co.uk.key:
-    file: ./httpd/ssl/localhost.key
+    file: ./apache2/ssl/localhost.key
   elnaggar.co.uk.crt:
-    file: ./httpd/ssl/localhost.crt
+    file: ./apache2/ssl/localhost.crt
   elnaggar.co.uk.key:
-    file: ./httpd/ssl/localhost.key
+    file: ./apache2/ssl/localhost.key
   relnaggar.com.crt:
-    file: ./httpd/ssl/localhost.crt
+    file: ./apache2/ssl/localhost.crt
   relnaggar.com.key:
-    file: ./httpd/ssl/localhost.key
+    file: ./apache2/ssl/localhost.key

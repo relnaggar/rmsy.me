@@ -1,17 +1,17 @@
 version: '3.7'
 services:
-  httpd:
-    container_name: httpd
-    build: ./httpd
-    image: rmsy.me/httpd
+  apache2:
+    container_name: apache2
+    build: ./apache2
+    image: rmsy.me/apache2
     init: true
     ports:
       - 80:80
       - 443:443
     volumes:
-      - ./httpd/htdocs:/usr/local/apache2/htdocs
-      - ./httpd/conf:/usr/local/apache2/conf
-      - ./httpd/logs:/usr/local/apache2/logs
+      - ./apache2/www:/var/www
+      - ./apache2/conf:/etc/apache2
+      - ./apache2/logs:/var/log/apache2
     secrets:
       - rmsy.me.crt
       - rmsy.me.key

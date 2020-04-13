@@ -9,4 +9,4 @@
 *.crt
 
 ### Logging ###
-httpd/logs/
+apache2/logs/
