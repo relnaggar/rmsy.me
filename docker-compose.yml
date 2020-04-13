@@ -5,14 +5,15 @@ services:
     build: ./apache2
     image: rmsy.me/apache2
     init: true
+    user: apache2
     ports:
-      - 80:80
-      - 443:443
+      - 80:8080
+      - 443:8443
     volumes:
       - ./apache2/www:/var/www
       - ./apache2/conf:/etc/apache2
       - ./apache2/logs:/var/log/apache2
-      - ./apache2/php:/etc/php/7.3/apache2
+      - ./apache2/ini:/etc/php/7.3/apache2
     secrets:
       - rmsy.me.crt
       - rmsy.me.key
