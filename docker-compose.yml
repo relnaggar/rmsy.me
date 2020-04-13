@@ -12,6 +12,7 @@ services:
       - ./apache2/www:/var/www
       - ./apache2/conf:/etc/apache2
       - ./apache2/logs:/var/log/apache2
+      - ./apache2/php:/etc/php/7.3/apache2
     secrets:
       - rmsy.me.crt
       - rmsy.me.key
