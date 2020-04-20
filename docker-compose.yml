@@ -7,6 +7,8 @@ services:
     ports:
       - 80:8080
       - 443:8443
+    networks:
+      - rmsy-me
     volumes:
       - ./apache2/www:/var/www
       - ./apache2/conf:/etc/apache2
@@ -21,3 +23,20 @@ services:
       - elnaggar.co.uk.key
       - relnaggar.com.crt
       - relnaggar.com.key
+      - PGPASSWORD
+  postgres:
+    container_name: postgres
+    image: relnaggar/rmsy.me-postgres
+    init: true
+    ports:
+      - 5432:5432
+    networks:
+      - rmsy-me
+    volumes:
+      - ./postgres/conf:/etc/postgresql/11/main
+      - ./postgres/data:/var/lib/postgresql/11/main
+    secrets:
+      - PGPASSWORD
+networks:
+  rmsy-me:
+    name: rmsy-me

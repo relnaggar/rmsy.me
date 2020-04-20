@@ -3,7 +3,7 @@ use PHPUnit\Framework\TestCase;
 
 final class DummyTest extends TestCase
 {
-    public function testDeliberateFail(): void
+    public function testTrueIsTrue(): void
     {
         $this->assertTrue(true);
     }

@@ -4,9 +4,13 @@
 ### System Files ###
 *.DS_Store
 
-### Secure Files ###
+### Secrets ###
 *.key
 *.crt
+PGPASSWORD
+
+### Data ###
+postgres/data/
 
 ### Logging ###
 apache2/logs/
