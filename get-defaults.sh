@@ -9,7 +9,7 @@ fi
 
 cd $1
 
-FILE_TO_SOURCE="args"
+FILE_TO_SOURCE="args.sh"
 
 if [ ! -f "$FILE_TO_SOURCE" ]; then
     echo "no $FILE_TO_SOURCE file found"

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 if docker-compose exec apache2 echo 0 &> /dev/null ; then
     APACHE2=1
