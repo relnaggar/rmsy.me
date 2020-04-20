@@ -2,18 +2,18 @@ version: '3.7'
 services:
   apache2:
     container_name: apache2
-    image: relnaggar/rmsy.me-apache2
+    image: relnaggar/rmsy-me-apache2
     init: true
     ports:
-      - 80:8080
-      - 443:8443
+      - "80:8080"
+      - "443:8443"
     networks:
       - rmsy-me
     volumes:
-      - ./apache2/www:/var/www
-      - ./apache2/conf:/etc/apache2
-      - ./apache2/logs:/var/log/apache2
-      - ./apache2/ini:/etc/php/7.3/apache2
+      - "./apache2/www:/var/www"
+      - "./apache2/conf:/etc/apache2"
+      - "./apache2/logs:/var/log/apache2"
+      - "./apache2/ini:/etc/php/7.3/apache2"
     secrets:
       - rmsy.me.crt
       - rmsy.me.key
@@ -26,15 +26,14 @@ services:
       - PGPASSWORD
   postgres:
     container_name: postgres
-    image: relnaggar/rmsy.me-postgres
+    image: relnaggar/rmsy-me-postgres
     init: true
-    ports:
-      - 5432:5432
+    hostname: postgres
     networks:
       - rmsy-me
     volumes:
-      - ./postgres/conf:/etc/postgresql/11/main
-      - ./postgres/data:/var/lib/postgresql/11/main
+      - "./postgres/conf:/etc/postgresql/11/main"
+      - "./postgres/data:/var/lib/postgresql/11/main"
     secrets:
       - PGPASSWORD
 networks:
