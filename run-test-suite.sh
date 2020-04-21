@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # if the docker stack is up
-if docker stack ls | grep "rmsy-me"; then
+if docker stack ls | grep -q "rmsy-me"; then
     SWARM=1
     COMPOSE=0
 # if docker-compose is up

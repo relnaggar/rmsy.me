@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # if the docker stack is up
-if docker stack ls | grep "rmsy-me"; then
+if docker stack ls | grep -q "rmsy-me"; then
     CONTAINER=`docker ps -a | grep -o "rmsy-me_apache2.*"`
     docker exec -t $CONTAINER bash -c /var/www/tests/php-unit.sh
 # if docker-compose is up
