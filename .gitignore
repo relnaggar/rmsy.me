@@ -4,6 +4,9 @@
 ### System Files ###
 *.DS_Store
 
+### Packages ###
+vendor
+
 ### Secrets ###
 *.key
 *.crt
