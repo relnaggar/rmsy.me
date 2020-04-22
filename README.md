@@ -36,13 +36,8 @@ cd rmsy.me/script
 ### Building
 
 * services
-<<<<<<< HEAD
   * apache2 [![Docker image size](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https://img.shields.io/docker/image-size/relnaggar/rmsy-me-apache2)](https://hub.docker.com/repository/docker/relnaggar/rmsy-me-apache2/tags)
   * postgres [![Docker image size](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https://img.shields.io/docker/image-size/relnaggar/rmsy-me-postgres)](https://hub.docker.com/repository/docker/relnaggar/rmsy-me-postgres/tags)
-=======
-  * apache2 [![Docker image size](https://img.shields.io/docker/image-size/relnaggar/rmsy-me-apache2)](https://hub.docker.com/repository/docker/relnaggar/rmsy-me-apache2/tags)
-  * postgres [![Docker image size](https://img.shields.io/docker/image-size/relnaggar/rmsy-me-postgres)](https://hub.docker.com/repository/docker/relnaggar/rmsy-me-postgres/tags)
->>>>>>> 3ec22cd... Separate Dockerfiles for development vs production
 
 <!-- additional steps for the developer to build the project after some code changes -->
 
