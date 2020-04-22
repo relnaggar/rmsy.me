@@ -1,0 +1,80 @@
+#!/bin/bash
+#
+# TODO: description
+# Launch the application and any extra required processes locally.
+#
+# using github boilerplate:
+# https://github.com/github/scripts-to-rule-them-all
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+# full directory name of the script, no matter where it is called from
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+readonly SCRIPT_NAME="${0##*/}"
+readonly STACK_NAME="rmsy-me"
+declare -a SERVICES
+readonly SERVICES=("apache2" "postgres")
+
+# all error messages to STDERR
+err() {
+  echo "-${SCRIPT_NAME}: $*" >&2
+}
+
+usage() {
+  err "$(cat <<END
+usage: ${SCRIPT_NAME} cmd [service]
+END
+  )"
+}
+
+main() {
+  cd "${SCRIPT_DIR}/.."
+
+  # parse command line arguments
+  local cmd="${1:-}"
+  local service="${2:-}"
+
+  # always required
+  if [[ -z "${cmd}" ]]; then
+    usage
+    exit 1
+  fi
+
+  case "${cmd}" in
+    up)
+      docker stack deploy -c docker-compose.yml -c docker-compose.override.yml \
+      ${STACK_NAME}
+      ;;
+    down)
+      docker stack rm ${STACK_NAME}
+      ;;
+    logs) # TODO: move to console script
+      for s in "${SERVICES[@]}"; do
+        docker service logs "${STACK_NAME}_${s}"
+      done
+      ;;
+    bash) # TODO move to console script
+      if [[ -n "${service}" ]]; then
+        local container=$(docker ps -a | grep -o "${STACK_NAME}_${service}.*")
+        exec docker exec -it ${container} bash
+      else
+        err "service required when using cmd=bash"
+        usage
+        exit 1
+      fi
+      ;;
+    *)
+      usage
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

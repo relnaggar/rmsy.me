@@ -1,0 +1,63 @@
+#!/bin/bash
+#
+# TODO: description
+# Run test suite for application. Optionally pass in a path to an individual
+# test file to run a single test.
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+# full directory name of the script, no matter where it is called from
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+readonly SCRIPT_NAME="${0##*/}"
+readonly STACK_NAME="rmsy-me"
+declare -a SERVICES
+readonly SERVICES=("apache2" "postgres")
+
+usage() {
+  err "$(cat <<END
+usage: ${SCRIPT_NAME} 
+END
+  )"
+}
+
+# all error messages to STDERR
+err() {
+  echo "-${SCRIPT_NAME}: $*" >&2
+}
+
+main() {
+  cd "${SCRIPT_DIR}/.."
+
+  # if the docker stack is up
+  if docker stack ls | grep -q "${STACK_NAME}"; then
+    local started_locally=false
+  # if docker-compose is up
+  #elif docker-compose exec "${SERVICES[0]}" date &> /dev/null ; then
+  elif docker-compose exec -T "${SERVICES[0]}" date; then
+    local started_locally=false
+  else
+    local started_locally=true
+    script/server up
+  fi
+
+  set +e
+  apache2/www/tests/run
+  local success="$?"
+  set -e
+
+  # cleanup if the server was started by this script
+  if [[ "${started_locally}" == "true" ]]; then
+      script/server down
+  fi
+
+  exit "${success}"
+}
+
+main "$@"

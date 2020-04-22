@@ -11,10 +11,10 @@ RUN apt-get update -y \
 ENV PATH $PATH:/usr/lib/postgresql/$PGVERSION/bin/
 ENV PGCONF /etc/postgresql/$PGVERSION/main
 ENV PGDATA /var/lib/postgresql/$PGVERSION/main
-COPY docker-entrypoint.sh /
+COPY docker-entrypoint /
 
 USER postgres
 VOLUME ["/etc/postgresql/11/main", "/var/lib/postgresql/11/main"]
 EXPOSE 5432
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/docker-entrypoint"]
 CMD ["postgres"]

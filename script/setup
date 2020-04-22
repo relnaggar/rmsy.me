@@ -1,0 +1,40 @@
+#!/bin/bash
+#
+# TODO: description
+# Set up application for the first time after cloning, or set it back to the
+# initial first unused state.
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+# full directory name of the script, no matter where it is called from
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+readonly SCRIPT_NAME="${0##*/}"
+
+usage() {
+  err "$(cat <<END
+usage: ${SCRIPT_NAME} 
+END
+  )"
+}
+
+# all error messages to STDERR
+err() {
+  echo "-${SCRIPT_NAME}: $*" >&2
+}
+
+main() {
+  cd "${SCRIPT_DIR}/.."
+
+  for hook in githooks/*; do
+    ln -sf "../../githooks/${hook##*/}" .git/hooks
+  done
+}
+
+main "$@"

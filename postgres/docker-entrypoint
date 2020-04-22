@@ -1,0 +1,50 @@
+#!/bin/bash
+#
+# Entrypoint for relnaggar/rmsy-me-postgres
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+# full directory name of the script, no matter where it is called from
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+readonly SCRIPT_NAME="${0##*/}"
+
+usage() {
+  err "$(cat <<END
+usage: ${SCRIPT_NAME} 
+END
+  )"
+}
+
+# all error messages to STDERR
+err() {
+  echo "-${SCRIPT_NAME}: $*" >&2
+}
+
+main() {
+  local cmd=${1:-}
+
+  if [[ "${cmd}" == "postgres" ]]; then
+    chmod 700 "${PGDATA}"
+
+    # running internally first to configure
+    pg_ctl start -o \
+      "--config-file=${PGCONF}/postgresql.conf --listen_addresses=''"
+    psql -c \
+      "alter user postgres with password '$(cat /run/secrets/PGPASSWORD)';"
+    pg_ctl stop
+
+    # running externally
+    exec postgres "--config-file=${PGCONF}/postgresql.conf"
+  else
+    exec "$@"
+  fi
+}
+
+main "$@"

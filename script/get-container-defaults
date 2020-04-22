@@ -1,0 +1,86 @@
+#!/bin/bash
+#
+# Copies a directory of files from a container (that has just been started) to
+# a given host directory.
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+# full directory name of the script, no matter where it is called from
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+readonly SCRIPT_NAME="${0##*/}"
+readonly STACK_NAME="rmsy-me"
+
+usage() {
+  err "$(cat <<END
+usage: ${SCRIPT_NAME} host_directory
+  where directory contains a shell script named default that defines:
+  SERVICE   the name of the service from which the defaults will be copied
+  SRC       the container path to the directory containing the defaults
+  DIR       the name of the directory containing the defaults
+END
+  )"
+}
+
+# all error messages to STDERR
+err() {
+  echo "-${SCRIPT_NAME}: $*" >&2
+}
+
+main() {
+  # parse command line arguments
+  local host_directory="${1:-}"
+
+  # always required
+  if [[ -z "${host_directory}" ]]; then
+    usage
+    exit 1
+  fi
+
+  cd "${host_directory}"
+
+  set +e
+    mkdir old 2>/dev/null
+    result="$?"
+  set -e
+  if [[ "${result}" -ne 0 ]]; then
+    local message="${SCRIPT_NAME} has been run recently: the old folder must be"
+    message+=" removed before running ${SCRIPT_NAME} again" 
+    err "${message}"
+    exit 1
+  fi
+  
+  local file_to_source="default"
+  if [[ ! -f "${file_to_source}" ]]; then
+    err "${file_to_source}: file not found"
+    exit 1
+  fi
+  . "${file_to_source}"
+
+  # just in case it's running, stop the service
+  set +e
+    docker stop "default-${SERVICE}" >/dev/null 2>&1
+  set -e
+
+  docker run --rm -d --name "default-${SERVICE}" \
+    "relnaggar/${STACK_NAME}-${SERVICE}" >/dev/null
+
+  set +e
+    mv * old 2>/dev/null
+  set -e
+
+  mv "old/${file_to_source}" .
+  docker cp "default-${SERVICE}:${SRC}/${DIR}/" . >/dev/null
+  echo "copy successful"
+  mv "${DIR}"/* .
+  rmdir "${DIR}"
+  docker stop "default-${SERVICE}" >/dev/null
+}
+
+main "$@"

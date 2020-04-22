@@ -24,6 +24,8 @@ USER apache2
 # PHPUnit
 RUN composer global require phpunit/phpunit ^9.1
 
+ENV PATH $PATH:/home/apache2/.composer/vendor/bin/
+
 VOLUME ["/var/www", "/etc/apache2", "/var/log/apache2", "/etc/php/7.3/apache2"]
 EXPOSE 8080
 EXPOSE 8443

@@ -14,7 +14,7 @@ PGPASSWORD
 
 ### Data ###
 postgres/data/*
-!postgres/data/args.sh
+!postgres/data/default
 
 ### Logging ###
 apache2/logs/*
