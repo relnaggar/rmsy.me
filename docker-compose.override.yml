@@ -1,25 +1,33 @@
 version: '3.7'
 services:
   apache2:
-    build: ./apache2
+    build: apache2
+    volumes:
+      - "secrets:/run/secrets"
+      - "apache2/www:/var/www"
+      - "apache2/conf:/etc/apache2"
+      - "apache2/ini:/etc/php/7.3/apache2"
   postgres:
-    build: ./postgres
+    build: postgres
+    volumes:
+      - "secrets:/run/secrets"
+      - "postgres/conf:/etc/postgresql/11/main"
 secrets:
   rmsy.me.crt:
-    file: ./apache2/ssl/localhost.crt
+    file: secrets/localhost.crt
   rmsy.me.key:
-    file: ./apache2/ssl/localhost.key
+    file: secrets/localhost.key
   el-naggar.co.uk.crt:
-    file: ./apache2/ssl/localhost.crt
+    file: secrets/localhost.crt
   el-naggar.co.uk.key:
-    file: ./apache2/ssl/localhost.key
+    file: secrets/localhost.key
   elnaggar.co.uk.crt:
-    file: ./apache2/ssl/localhost.crt
+    file: secrets/localhost.crt
   elnaggar.co.uk.key:
-    file: ./apache2/ssl/localhost.key
+    file: secrets/localhost.key
   relnaggar.com.crt:
-    file: ./apache2/ssl/localhost.crt
+    file: secrets/localhost.crt
   relnaggar.com.key:
-    file: ./apache2/ssl/localhost.key
+    file: secrets/localhost.key
   PGPASSWORD:
-    file: ./postgres/PGPASSWORD
+    file: secrets/PGPASSWORD

@@ -4,18 +4,12 @@
 ### System Files ###
 *.DS_Store
 
+## Default configurations ###
+defaults
+
 ### Packages ###
 vendor
 
 ### Secrets ###
-*.key
-*.crt
-PGPASSWORD
+secrets
 
-### Data ###
-postgres/data/*
-!postgres/data/default
-
-### Logging ###
-apache2/logs/*
-!apache2/logs/.keep

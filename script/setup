@@ -16,6 +16,8 @@ IFS=$'\n\t'
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
 readonly SCRIPT_NAME="${0##*/}"
+declare -a DEVELOPMENT_DOMAINS
+readonly DEVELOPMENT_DOMAINS=( "localhost" )
 
 usage() {
   err "$(cat <<END
@@ -29,12 +31,37 @@ err() {
   echo "-${SCRIPT_NAME}: $*" >&2
 }
 
-main() {
-  cd "${SCRIPT_DIR}/.."
+generate_self_signed_certificate() {
+  domain=${1:-}
+  dir=${2:-}
+  openssl req -x509 -newkey rsa:4096 -nodes -out "${dir}/${domain}.crt" -keyout \
+    "${dir}/${domain}.key" -days 825 -sha256 -subj "/CN=${domain}" -extensions \
+    EXT -config <( printf \
+"[dn]\nCN=${domain}\n[req]\ndistinguished_name=dn\n[EXT]\nsubjectAltName=DNS:${domain}\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth" )
+}
 
+setup_secrets() {
+  local secrets_dir=secrets
+
+  for domain in "${DEVELOPMENT_DOMAINS[@]}"; do
+    generate_self_signed_certificate "$domain" "$secrets_dir"
+  done
+
+  echo "password" > "$secrets_dir"/PGPASSWORD
+}
+
+setup_githooks() {
+  # symlink git hooks
+  rm .git/hooks/*
   for hook in githooks/*; do
     ln -sf "../../githooks/${hook##*/}" .git/hooks
   done
+}
+
+main() {
+  cd "${SCRIPT_DIR}/.."
+  setup_githooks
+  generate_development_secrets
 }
 
 main "$@"
