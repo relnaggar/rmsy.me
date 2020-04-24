@@ -1,3 +1,48 @@
 #!/bin/bash
+#
+# Run all available development tests on development and production builds
+#
+# Don't allow the push if there are any problems building or running either
+# build, or if any test fails
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
 
-script/test
+# full directory name of the script, no matter where it is called from
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+readonly SCRIPT_NAME="${0##*/}"
+
+usage() {
+  err "$(cat <<END
+usage: ${SCRIPT_NAME} 
+END
+  )"
+  exit 1
+}
+
+# all error messages to STDERR
+err() {
+  echo "-${SCRIPT_NAME}: $*" >&2
+}
+
+main() {
+  
+  script/server down >/dev/null
+  echo "Running tests on development build:"
+  script/server up
+  script/test
+  script/server down
+
+  echo "Running tests on production build:"
+  script/server up prod
+  script/test e2e
+  script/server down
+}
+
+main "$@"

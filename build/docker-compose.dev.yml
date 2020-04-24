@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  apache2:
+    image: rmsy-me-apache2
+    build: "./apache2"
+    volumes:
+      - "./apache2/www:/var/www"
+      - "./apache2/conf:/etc/apache2"
+      - "./apache2/ini:/etc/php/7.3/apache2"
+  postgres:
+    image: rmsy-me-postgres
+    build: "./postgres"
+    volumes:
+      - "./postgres/conf:/etc/postgresql/11/main"

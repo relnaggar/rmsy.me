@@ -1,0 +1,71 @@
+#!/bin/bash
+#
+# Launch a console for the applicatio
+#
+# inspired by github boilerplate:
+# https://github.com/github/scripts-to-rule-them-all
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+. "${SCRIPT_DIR}/lib/shared"
+
+usage() {
+  die "$(cat <<END
+usage: ${SCRIPT_NAME} service [--root]
+END
+  )"
+}
+
+parse_args() {
+  # required
+  service="${1:-}"
+  if [[ -z "${service}" ]]; then
+    usage
+  fi
+  
+  # optional with validation
+  root="${2:-}"
+  if [[ -n "${root}" ]]; then
+    if [[ "${root}" != "--root" ]]; then
+      usage
+    else
+      root=("-u" "root")
+    fi
+  fi
+
+  log "arguments (\
+service: ${service} \
+)"
+}
+
+main() {
+  log "start"
+  cd "${SCRIPT_DIR}/.."
+  parse_args "$@"
+
+  if is_stack_up; then
+    local container="$(docker ps -a | grep -o "${STACK_NAME}_${service}.*")"
+    logfun docker exec -it ${root[@]} "${container}" bash
+  elif is_compose_up; then
+    logfun docker-compose \
+      -f docker-compose.yml \
+      -f build/docker-compose.dev.yml \
+      exec ${root[@]} "${service}" bash
+  else
+    die "the server is not running"
+  fi
+
+  log "end"
+}
+
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi

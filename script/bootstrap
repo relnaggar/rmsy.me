@@ -1,0 +1,58 @@
+#!/bin/bash
+#
+# Resolve all dependencies that the application requires to run 
+#
+# inspired by github boilerplate:
+# https://github.com/github/scripts-to-rule-them-all
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+. "${SCRIPT_DIR}/lib/shared"
+
+usage() {
+  die "$(cat <<END
+usage: ${SCRIPT_NAME} 
+END
+  )"
+}
+
+install_docker() {
+  case "${OSTYPE}" in
+    darwin*) 
+      log "Installing Docker for OS X:"
+      logfun curl https://download.docker.com/mac/stable/Docker.dmg --output \
+        Docker.dmg
+      logfun hdiutil attach Docker.dmg
+      logfun cp -r /Volumes/Docker/Docker.app /Applications
+      logfun hdiutil detach /Volumes/Docker
+      logfun rm Docker.dmg
+      logfun open /Applications/Docker.app/
+      ;;
+    *)
+      log "OS ${OSTYPE} not yet supported"
+      ;;
+  esac
+}
+
+main() {
+  log "start"
+  cd "${SCRIPT_DIR}/.."
+
+  if ! docker --version 2>/dev/null; then
+    install_docker
+  fi
+
+  log "end"
+}
+
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi

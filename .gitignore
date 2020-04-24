@@ -5,11 +5,13 @@
 *.DS_Store
 
 ## Default configurations ###
-defaults
+defaults/
 
 ### Packages ###
-vendor
+vendor/
 
 ### Secrets ###
-secrets
+secrets/
 
+### Volume backups ###
+backup/

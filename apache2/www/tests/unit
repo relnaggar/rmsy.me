@@ -1,0 +1,46 @@
+#!/bin/bash
+#
+# Run PHPUnit tests on the currently running server and return the result
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+. "${SCRIPT_DIR}/../../../script/lib/shared"
+
+usage() {
+  die "$(cat <<END
+usage: ${SCRIPT_NAME} 
+END
+  )"
+}
+
+main() {
+  log "start"
+  cd "${SCRIPT_DIR}/../../.."
+  local runphpunit=/var/www/tests/runphpunit
+
+  if is_stack_up; then
+    local container="$(docker ps -a | grep -o "${STACK_NAME}_apache2.*")"
+    logfun docker exec -t "${container}" bash -c "${runphpunit}"
+  elif is_compose_up; then
+    logfun docker-compose \
+      -f docker-compose.yml \
+      -f build/docker-compose.dev.yml \
+      exec -T apache2 bash -c "${runphpunit}" --exit-code-from apache2
+  else
+    die "the server is not running"
+  fi
+
+  log "end"
+}
+
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi

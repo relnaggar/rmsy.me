@@ -1,0 +1,79 @@
+#!/bin/bash
+#
+# Collate all available logging information from all services
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+. "${SCRIPT_DIR}/lib/shared"
+
+usage() {
+  die "$(cat <<END
+usage: ${SCRIPT_NAME} [environment]
+
+environment can be:
+  -d    development, default
+  -s    staging
+  -p    production
+END
+  )"
+}
+
+parse_args() {
+  environment="${1:-}"
+
+  # default
+  if [[ -z "${environment}" ]]; then
+    environment=-d
+  fi
+
+  # validation
+  case "${environment}" in
+    -d | -p | -s) ;;
+    *) usage ;;
+  esac
+
+  log "arguments (\
+environment: ${environment} \
+)"
+}
+
+main() {
+  log "start"
+  cd "${SCRIPT_DIR}/.."
+  parse_args "$@"
+
+  for service in "${STACK_SERVICES[@]}"; do
+    log "foreground logs for ${service}:"
+
+    case "${environment}" in
+      -d)
+        logfun docker-compose \
+          -f docker-compose.yml \
+          -f build/docker-compose.dev.yml \
+          logs "${service}"
+        ;;
+      -s | -p)
+        logfun docker service logs "${service}"
+        ;;
+    esac
+
+    if script/backup "${service}-logs" 2>/dev/null; then
+      log "log files for ${service}:"
+      cat "backup/${service}-logs/"*".log"
+    fi
+  done
+
+  log "end"
+}
+
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi

@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+  apache2:
+    image: relnaggar/rmsy-me-apache2
+    build:
+      context: "./apache2"
+      dockerfile: Dockerfile.prod
+  postgres:
+    image: relnaggar/rmsy-me-postgres
+    build:
+      context: "./postgres"
+      dockerfile: Dockerfile.prod

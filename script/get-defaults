@@ -1,7 +1,6 @@
 #!/bin/bash
 #
-# Copies a directory of files from a container that has just been started to
-# a given host directory.
+# Copy default directories (e.g. config files) from a newly started container
 #
 # using Google Shell Style Guide:
 # https://google.github.io/styleguide/shellguide.html
@@ -11,28 +10,22 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# full directory name of the script, no matter where it is called from
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
-readonly SCRIPT_NAME="${0##*/}"
-readonly STACK_NAME="rmsy-me"
+. "${SCRIPT_DIR}/lib/shared"
 
 usage() {
-  err "$(cat <<END
+  die "$(cat <<END
 usage: ${SCRIPT_NAME} host_directory
-  host_directory must contain a shell script named .defaults-info that defines:
+  host_directory must contain a shell script named .defaults-info that exports:
   SERVICE   the name of the service from which the defaults will be copied
   SRC       the container path to the directory containing the defaults
 END
   )"
 }
 
-# all error messages to STDERR
-err() {
-  echo "-${SCRIPT_NAME}: $*" >&2
-}
-
 main() {
+  log "start"
   cd "${SCRIPT_DIR}/.."
 
 # parse command line arguments
@@ -41,7 +34,6 @@ main() {
   # always required
   if [[ -z "${host_directory}" ]]; then
     usage
-    exit 1
   fi
 
   cd ${host_directory}
@@ -63,11 +55,18 @@ main() {
   set -e
 
   docker run --rm -d --name "default-${SERVICE}" \
-    "relnaggar/${STACK_NAME}-${SERVICE}" >/dev/null
+    "${STACK_NAME}-${SERVICE}" >/dev/null
 
   docker cp "default-${SERVICE}:${SRC}/." defaults >/dev/null
 
   docker stop "default-${SERVICE}" >/dev/null
+
+  # cleanup just in case
+  unset SERVICE; unset SOURCE
+
+  log "end"
 }
 
-main "$@"
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi

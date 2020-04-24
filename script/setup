@@ -1,8 +1,10 @@
 #!/bin/bash
 #
-# TODO: description
-# Set up application for the first time after cloning, or set it back to the
-# initial first unused state.
+# Set up the application for the first time after cloning, or set it back to the
+# initial first unused state
+#
+# using github boilerplate:
+# https://github.com/github/scripts-to-rule-them-all
 #
 # using Google Shell Style Guide:
 # https://google.github.io/styleguide/shellguide.html
@@ -12,56 +14,114 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# full directory name of the script, no matter where it is called from
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
-readonly SCRIPT_NAME="${0##*/}"
-declare -a DEVELOPMENT_DOMAINS
-readonly DEVELOPMENT_DOMAINS=( "localhost" )
+. "${SCRIPT_DIR}/lib/shared"
 
 usage() {
-  err "$(cat <<END
+  die "$(cat <<END
 usage: ${SCRIPT_NAME} 
 END
   )"
 }
 
-# all error messages to STDERR
-err() {
-  echo "-${SCRIPT_NAME}: $*" >&2
-}
-
-generate_self_signed_certificate() {
-  domain=${1:-}
-  dir=${2:-}
-  openssl req -x509 -newkey rsa:4096 -nodes -out "${dir}/${domain}.crt" -keyout \
-    "${dir}/${domain}.key" -days 825 -sha256 -subj "/CN=${domain}" -extensions \
-    EXT -config <( printf \
-"[dn]\nCN=${domain}\n[req]\ndistinguished_name=dn\n[EXT]\nsubjectAltName=DNS:${domain}\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth" )
+generate_self_signed_certificates() {
+  domain="${1:-}"
+  dir="${2:-}"
+  logfun openssl req -x509 -newkey rsa:4096 -nodes -out "${dir}/${domain}.crt" \
+    -keyout "${dir}/${domain}.key" -days 825 -sha256 -subj "/CN=localhost" \
+    -extensions EXT -config <( cat<<END
+[dn]
+CN=localhost
+[req]
+distinguished_name=dn
+[EXT]
+subjectAltName=DNS:localhost
+keyUsage=digitalSignature
+extendedKeyUsage=serverAuth
+END
+    )
 }
 
 setup_secrets() {
   local secrets_dir=secrets
 
-  for domain in "${DEVELOPMENT_DOMAINS[@]}"; do
-    generate_self_signed_certificate "$domain" "$secrets_dir"
+  echo "password" > "$secrets_dir"/PGPASSWORD
+
+  log "Attempting to remove old localhost certificates from Keychain..."
+  case "$OSTYPE" in
+    darwin*) 
+      set +e
+        logfun sudo security delete-certificate -c localhost
+        local result="$?"
+      set -e
+      ;;
+    *)
+      log "..OS not yet supported"
+  esac
+  if [[ "${result}" -eq 0 ]]; then
+    log "...success!"
+  fi
+
+  for domain in "${STACK_DOMAINS[@]}"; do
+    generate_self_signed_certificates "$domain" "$secrets_dir"
   done
 
-  echo "password" > "$secrets_dir"/PGPASSWORD
+  log "Attempting to add self-signed localhost certificates to Keychain..."
+  case "$OSTYPE" in
+    darwin*) 
+      logfun sudo security add-trusted-cert -d -r trustRoot \
+        -k /Library/Keychains/System.keychain secrets/rmsy.me.crt
+      ;;
+    *)
+      log "...OS not yet supported"
+  esac
+  if [[ "${result}" -eq 0 ]]; then
+    log "...success!"
+  fi
 }
 
-setup_githooks() {
-  # symlink git hooks
-  rm .git/hooks/*
-  for hook in githooks/*; do
-    ln -sf "../../githooks/${hook##*/}" .git/hooks
+create_volumes() {
+  for volume in "${STACK_VOLUMES[@]}"; do
+    cat << END |
+version: '3.7'
+services:
+  v:
+    image: debian:10.3-slim
+    volumes:
+      - "${volume}:/${volume}"
+volumes:
+  ${volume}:
+END
+    logfun docker-compose -f - run --rm v bash -c "chown -R 999:999 /${volume}"
   done
+}
+
+symlink_githooks() {
+  for hook in githooks/*; do
+    logfun ln -sf "../../githooks/${hook##*/}" .git/hooks
+  done
+}
+
+initialise_swarm() {
+  logfun script/server down 2>/dev/null
+  set +e
+    logfun docker swarm init 2>/dev/null
+  set -e
 }
 
 main() {
+  log "start"
   cd "${SCRIPT_DIR}/.."
-  setup_githooks
-  generate_development_secrets
+
+  initialise_swarm
+  symlink_githooks
+  create_volumes
+  setup_secrets
+
+  log "end"
 }
 
-main "$@"
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi

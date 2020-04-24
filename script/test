@@ -1,8 +1,9 @@
 #!/bin/bash
 #
-# TODO: description
-# Run test suite for application. Optionally pass in a path to an individual
-# test file to run a single test.
+# Run test suite on the running application
+#
+# using github boilerplate:
+# https://github.com/github/scripts-to-rule-them-all
 #
 # using Google Shell Style Guide:
 # https://google.github.io/styleguide/shellguide.html
@@ -12,52 +13,70 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# full directory name of the script, no matter where it is called from
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
-readonly SCRIPT_NAME="${0##*/}"
-readonly STACK_NAME="rmsy-me"
-declare -a SERVICES
-readonly SERVICES=("apache2" "postgres")
+. "${SCRIPT_DIR}/lib/shared"
 
 usage() {
-  err "$(cat <<END
-usage: ${SCRIPT_NAME} 
+  die "$(cat <<END
+usage: ${SCRIPT_NAME} [tests] ...
+
+tests can be:
+  unit  all PHPUnit tests
+  e2e   not implemented yet
+the default is to run all available tests
+
+unit tests are not available for the production build
 END
   )"
 }
 
-# all error messages to STDERR
-err() {
-  echo "-${SCRIPT_NAME}: $*" >&2
+parse_args() {
+  # defaults
+  if [[ $# -eq 0 ]]; then
+    tests=("unit" "e2e")
+  else
+    tests=("$@")
+  fi
+
+  log "arguments (\
+tests: ${tests[@]}\
+)" 
 }
 
 main() {
+  log "start"
   cd "${SCRIPT_DIR}/.."
+  parse_args "$@"
 
-  # if the docker stack is up
-  if docker stack ls | grep -q "${STACK_NAME}"; then
-    local started_locally=false
-  # if docker-compose is up
-  #elif docker-compose exec "${SERVICES[0]}" date &> /dev/null ; then
-  elif docker-compose exec -T "${SERVICES[0]}" date; then
-    local started_locally=false
-  else
-    local started_locally=true
-    script/server up
+  if ! is_server_up; then
+    err "no server running"
+    exit 1
   fi
 
-  set +e
-  apache2/www/tests/run
-  local success="$?"
-  set -e
-
-  # cleanup if the server was started by this script
-  if [[ "${started_locally}" == "true" ]]; then
-      script/server down
-  fi
-
-  exit "${success}"
+  for t in "${tests[@]}"; do
+    case "${t}" in
+      unit) 
+        log "running unit tests:"
+        set +e
+          apache2/www/tests/unit
+          result="$?"
+        set -e
+        if [[ "${result}" -eq 127 ]]; then
+          log "unit tests not available (are you using the production build?)"
+        fi
+        ;;
+      e2e)
+        log "running end-to-end tests:"
+        log "no end-to-end tests yet"
+        ;;
+      *)
+        usage
+    esac
+  done
+  log "end"
 }
 
-main "$@"
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi

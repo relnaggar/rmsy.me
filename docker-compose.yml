@@ -2,7 +2,6 @@ version: '3.7'
 services:
   apache2:
     container_name: apache2
-    image: relnaggar/rmsy-me-apache2
     init: true
     ports:
       - "80:8080"
@@ -13,17 +12,15 @@ services:
       - "apache2-logs:/var/log/apache2"
   postgres:
     container_name: postgres
-    image: relnaggar/rmsy-me-postgres
     init: true
     hostname: postgres
     networks:
       - rmsy-me
     volumes:
-      - "postgres-data:/var/lib/postgresql/11/main"
+      - "db:/var/lib/postgresql/11/main"
 networks:
   rmsy-me:
     name: rmsy-me
 volumes:
-  postgres-data:
+  db:
   apache2-logs:
-

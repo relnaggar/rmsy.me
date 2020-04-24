@@ -1,9 +1,8 @@
 #!/bin/bash
 #
-# TODO: description
-# Launch the application and any extra required processes locally.
+# Launch the application and any extra required processes locally
 #
-# using github boilerplate:
+# inspired by github boilerplate:
 # https://github.com/github/scripts-to-rule-them-all
 #
 # using Google Shell Style Guide:
@@ -14,67 +13,137 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# full directory name of the script, no matter where it is called from
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
-readonly SCRIPT_NAME="${0##*/}"
-readonly STACK_NAME="rmsy-me"
-declare -a SERVICES
-readonly SERVICES=("apache2" "postgres")
-
-# all error messages to STDERR
-err() {
-  echo "-${SCRIPT_NAME}: $*" >&2
-}
+. "${SCRIPT_DIR}/lib/shared"
 
 usage() {
-  err "$(cat <<END
-usage: ${SCRIPT_NAME} cmd [service]
+  die "$(cat <<END
+usage: ${SCRIPT_NAME} up|down [environment] [build]
+
+environment can be:
+  -d    development, default
+  -s    staging
+  -p    production
+
+build can be:
+  dev   development, default for development environment
+  prod  production, mandatory for staging/production environments
 END
   )"
 }
 
-main() {
-  cd "${SCRIPT_DIR}/.."
-
-  # parse command line arguments
-  local cmd="${1:-}"
-  local service="${2:-}"
-
-  # always required
+parse_args() {
+  # required arguments
+  cmd="${1:-}"
   if [[ -z "${cmd}" ]]; then
     usage
-    exit 1
   fi
+  shift
+
+  # optional arguments
+  environment=""
+  build=""
+  while (( $# > 0 )); do
+    local arg="${1:-}"
+    case "${arg}" in
+      d | p | s)
+        if [[ -z "${environment}" ]]; then
+          environment="${arg}"
+        else
+          usage
+        fi
+        ;;
+      dev | prod)
+        if [[ -z "${build}" ]]; then
+          build="${arg}"
+        else
+          usage
+        fi
+        ;;
+      *)
+        usage
+        ;;
+    esac
+    shift
+  done
+
+  # defaults
+  if [[ -z "${environment}" ]]; then
+    environment=d
+  fi
+  if [[ -z "${build}" ]]; then
+    build=dev
+  fi
+
+  log "arguments (\
+cmd: ${cmd}, \
+environment: ${environment}, \
+build: ${build}\
+)"
+}
+
+main() {
+  log "start"
+  cd "${SCRIPT_DIR}/.."
+  parse_args "$@"
 
   case "${cmd}" in
     up)
-      docker stack deploy -c docker-compose.yml -c docker-compose.override.yml \
-      ${STACK_NAME}
+      case "${environment}" in
+        d)
+          script/build "${build}"
+          logfun docker-compose \
+            -f docker-compose.yml \
+            -f "build/docker-compose.${build}.yml" \
+            -f build/docker-compose.dev.secrets.yml \
+            up -d
+          ;;
+        s)
+          if [[ "${build}" == "dev" ]]; then
+            echo "warning: ignoring build option and using production image" \
+              "anyway"
+          fi
+          # TODO prompt to ensure have already pushed the production image
+          logfun docker stack deploy \
+            -c docker-compose.yml \
+            -c build/docker-compose.prod.yml \
+            -c build/docker-compose.stage.secrets.yml \
+            "${STACKNAME}"
+          ;;
+        p)
+          if [[ "${build}" == "dev" ]]; then
+            echo "warning: ignoring build option and using production image" \
+              "anyway"
+          fi
+          logfun sudo docker stack deploy \
+            -c docker-compose.yml \
+            -c build/docker-compose.prod.yml \
+            -c build/docker-compose.prod.secrets.yml \
+           "${STACKNAME}"
+          ;;
+      esac
       ;;
     down)
-      docker stack rm ${STACK_NAME}
-      ;;
-    logs) # TODO: move to console script
-      for s in "${SERVICES[@]}"; do
-        docker service logs "${STACK_NAME}_${s}"
-      done
-      ;;
-    bash) # TODO move to console script
-      if [[ -n "${service}" ]]; then
-        local container=$(docker ps -a | grep -o "${STACK_NAME}_${service}.*")
-        exec docker exec -it ${container} bash
-      else
-        err "service required when using cmd=bash"
-        usage
-        exit 1
-      fi
+      case "${environment}" in
+        d)
+          logfun docker-compose \
+            -f docker-compose.yml \
+            -f build/docker-compose.dev.yml down
+          ;;
+        s | p)
+          logfun docker stack rm ${STACK_NAME}
+          ;;
+      esac
       ;;
     *)
       usage
-      exit 1
       ;;
   esac
+
+  log "end"
 }
 
-main "$@"
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi

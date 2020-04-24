@@ -1,0 +1,52 @@
+#!/bin/bash
+#
+# Build the Docker images for the application
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+. "${SCRIPT_DIR}/lib/shared"
+
+usage() {
+  die "$(cat <<END
+usage: ${SCRIPT_NAME} build
+
+build can be:
+  dev   development, default
+  prod  production
+END
+  )"
+}
+
+main() {
+  log "start"
+  cd "${SCRIPT_DIR}/.."
+  
+  local build="${1:-}"
+  log "arguments (\
+build: ${build} \
+)"
+  case "${build}" in
+    dev | prod)
+      logfun docker-compose \
+        -f docker-compose.yml \
+        -f "build/docker-compose.${build}.yml" \
+        build
+      ;;
+    *)
+      usage
+  esac
+
+  log "end"
+}
+
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi
