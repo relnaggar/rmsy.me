@@ -12,7 +12,7 @@ IFS=$'\n\t'
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
-. "${SCRIPT_DIR}/lib/shared"
+. "${SCRIPT_DIR}/lib/shared.sh"
 
 usage() {
   die "$(cat <<END
@@ -61,6 +61,7 @@ services:
       - "${volume}:/${volume}"
 volumes:
   ${volume}:
+    external: true
 END
   logfun docker-compose -f - run --rm backup cp -r "${volume}" backup/
 

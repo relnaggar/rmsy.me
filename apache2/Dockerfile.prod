@@ -3,8 +3,9 @@ RUN groupadd -r -g 999 apache2 && useradd -r -m -g apache2 -u 999 apache2
 
 ENV PHPVERSION 7.3
 RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends gosu \
   # Apache 
-  && apt-get install -y --no-install-recommends apache2 \
+  apache2 \
   # PHP                                                     
   libapache2-mod-php$PHPVERSION \
   # PHP Postgres
@@ -16,9 +17,9 @@ COPY --chown=apache2:apache2 www /var/www
 COPY conf /etc/apache2
 COPY ini /etc/php/$PHPVERSION/apache2
 
-USER apache2
-
+COPY docker-entrypoint /
 VOLUME ["/var/log/apache2"]
 EXPOSE 8080
 EXPOSE 8443
-CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+ENTRYPOINT ["/docker-entrypoint"]
+CMD ["apache2"]

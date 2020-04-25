@@ -12,7 +12,7 @@ IFS=$'\n\t'
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
-. "${SCRIPT_DIR}/../../../script/lib/shared"
+. "${SCRIPT_DIR}/../../../script/lib/shared.sh"
 
 usage() {
   die "$(cat <<END
@@ -27,7 +27,11 @@ main() {
   local runphpunit=/var/www/tests/runphpunit
 
   if is_stack_up; then
-    local container="$(docker ps -a | grep -o "${STACK_NAME}_apache2.*")"
+    local container="$( \
+      docker ps -a \
+      | grep -o "${STACK_NAME}_apache2.*" \
+      | head -1 \
+    )"
     logfun docker exec -t "${container}" bash -c "${runphpunit}"
   elif is_compose_up; then
     logfun docker-compose \

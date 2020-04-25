@@ -15,7 +15,7 @@ IFS=$'\n\t'
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
-. "${SCRIPT_DIR}/lib/shared"
+. "${SCRIPT_DIR}/lib/shared.sh"
 
 usage() {
   die "$(cat <<END
@@ -52,7 +52,11 @@ main() {
   parse_args "$@"
 
   if is_stack_up; then
-    local container="$(docker ps -a | grep -o "${STACK_NAME}_${service}.*")"
+    local container="$( \
+      docker ps -a \
+      | grep -o "${STACK_NAME}_${service}.*" \
+      | head -1 \
+    )"
     logfun docker exec -it ${root[@]} "${container}" bash
   elif is_compose_up; then
     logfun docker-compose \

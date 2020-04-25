@@ -15,11 +15,11 @@ IFS=$'\n\t'
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
-. "${SCRIPT_DIR}/lib/shared"
+. "${SCRIPT_DIR}/lib/shared.sh"
 
 usage() {
   die "$(cat <<END
-usage: ${SCRIPT_NAME} up|down [environment] [build]
+usage: ${SCRIPT_NAME} down | up|restart [environment] [build]
 
 environment can be:
   -d    development, default
@@ -47,7 +47,7 @@ parse_args() {
   while (( $# > 0 )); do
     local arg="${1:-}"
     case "${arg}" in
-      d | p | s)
+      -d | -p | -s)
         if [[ -z "${environment}" ]]; then
           environment="${arg}"
         else
@@ -70,7 +70,7 @@ parse_args() {
 
   # defaults
   if [[ -z "${environment}" ]]; then
-    environment=d
+    environment=-d
   fi
   if [[ -z "${build}" ]]; then
     build=dev
@@ -91,7 +91,7 @@ main() {
   case "${cmd}" in
     up)
       case "${environment}" in
-        d)
+        -d)
           script/build "${build}"
           logfun docker-compose \
             -f docker-compose.yml \
@@ -99,19 +99,18 @@ main() {
             -f build/docker-compose.dev.secrets.yml \
             up -d
           ;;
-        s)
+        -s)
           if [[ "${build}" == "dev" ]]; then
-            echo "warning: ignoring build option and using production image" \
+            log "warning: ignoring build option and using production image" \
               "anyway"
           fi
-          # TODO prompt to ensure have already pushed the production image
           logfun docker stack deploy \
             -c docker-compose.yml \
             -c build/docker-compose.prod.yml \
             -c build/docker-compose.stage.secrets.yml \
-            "${STACKNAME}"
+            "${STACK_NAME}"
           ;;
-        p)
+        -p)
           if [[ "${build}" == "dev" ]]; then
             echo "warning: ignoring build option and using production image" \
               "anyway"
@@ -120,21 +119,20 @@ main() {
             -c docker-compose.yml \
             -c build/docker-compose.prod.yml \
             -c build/docker-compose.prod.secrets.yml \
-           "${STACKNAME}"
+           "${STACK_NAME}"
           ;;
       esac
       ;;
     down)
-      case "${environment}" in
-        d)
-          logfun docker-compose \
-            -f docker-compose.yml \
-            -f build/docker-compose.dev.yml down
-          ;;
-        s | p)
-          logfun docker stack rm ${STACK_NAME}
-          ;;
-      esac
+      logfun docker stack rm ${STACK_NAME}
+      sleep 3
+      logfun  docker-compose \
+        -f docker-compose.yml \
+        -f build/docker-compose.dev.yml down
+      ;;
+    restart)
+      script/server down
+      script/server up "${environment}" "${build}"
       ;;
     *)
       usage

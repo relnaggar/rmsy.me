@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Build the Docker images for the application
+# TODO
 #
 # using Google Shell Style Guide:
 # https://google.github.io/styleguide/shellguide.html
@@ -15,34 +15,32 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
 . "${SCRIPT_DIR}/lib/shared.sh"
 
 usage() {
-  die "$(cat <<END
-usage: ${SCRIPT_NAME} build
-
-build can be:
-  dev   development, default
-  prod  production
+  die"$(cat <<END
+usage: ${SCRIPT_NAME} 
 END
   )"
 }
 
 main() {
-  log "start"
+  log "starting"
   cd "${SCRIPT_DIR}/.."
   
-  local build="${1:-}"
-  log "arguments (\
-build: ${build} \
-)"
-  case "${build}" in
-    dev | prod)
-      logfun docker-compose \
-        -f docker-compose.yml \
-        -f "build/docker-compose.${build}.yml" \
-        build
-      ;;
-    *)
-      usage
-  esac
+  log "development status:"
+  docker-compose \
+    -f docker-compose.yml \
+    -f build/docker-compose.dev.yml \
+    images
+  docker-compose \
+    -f docker-compose.yml \
+    -f build/docker-compose.dev.yml \
+    ps
+  docker-compose \
+    -f docker-compose.yml \
+    -f build/docker-compose.dev.yml \
+    top
+  
+  log "staging/production status:"
+  docker stack ps "${STACK_NAME}"
 
   log "end"
 }

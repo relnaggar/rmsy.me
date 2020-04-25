@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+# Entrypoint for relnaggar/rmsy-me-apache2
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+main() {
+  chown -R apache2:apache2 /var/log/apache2
+
+  local cmd=${1:-}
+  if [[ "${cmd}" == "apache2" ]]; then
+    exec gosu apache2 /usr/sbin/apache2ctl -D FOREGROUND
+  else
+    exec gosu apache2 "$@"
+  fi
+}
+
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi

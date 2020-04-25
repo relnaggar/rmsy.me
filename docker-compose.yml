@@ -23,4 +23,6 @@ networks:
     name: rmsy-me
 volumes:
   db:
+    external: true
   apache2-logs:
+    external: true
