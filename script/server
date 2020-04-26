@@ -125,7 +125,7 @@ main() {
       ;;
     down)
       logfun docker stack rm ${STACK_NAME}
-      sleep 3
+      sleep 4
       logfun  docker-compose \
         -f docker-compose.yml \
         -f build/docker-compose.dev.yml down

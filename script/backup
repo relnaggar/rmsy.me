@@ -46,8 +46,23 @@ main() {
   parse_args "$@"
   log "start"
 
+  while true; do
+    log "continue with removing backup of ${volume}? [y/n]"
+    local yn;
+    read yn
+    case "${yn}" in
+        y)
+          break
+          ;;
+        n)
+          log "aborting"
+          die
+          ;;
+    esac
+  done
+
   set +e
-    logfun rm -r backup/${volume} 2>/dev/null
+    logfun sudo rm -r "backup/${volume}" 2>/dev/null
   set -e
 
   log "Attempting backup..."
@@ -64,6 +79,7 @@ volumes:
     external: true
 END
   logfun docker-compose -f - run --rm backup cp -r "${volume}" backup/
+  logfun sudo chmod -R +r "backup/${volume}"
 
   log "end"
 }

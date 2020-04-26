@@ -45,23 +45,20 @@ END
 
 setup_secrets() {
   local secrets_dir=secrets
-
+  set +e
+    mkdir "$secrets_dir" 2>/dev/null
+  set -e
   echo "password" > "$secrets_dir"/PGPASSWORD
 
   log "Attempting to remove old localhost certificates from Keychain..."
   case "$OSTYPE" in
     darwin*) 
-      set +e
-        logfun sudo security delete-certificate -c localhost
-        local result="$?"
-      set -e
+      logfun sudo security delete-certificate -c localhost
+      log "...success"
       ;;
     *)
-      log "..OS not yet supported"
+      log "...OS not yet supported"
   esac
-  if [[ "${result}" -eq 0 ]]; then
-    log "...success!"
-  fi
 
   for domain in "${STACK_DOMAINS[@]}"; do
     generate_self_signed_certificates "$domain" "$secrets_dir"
@@ -72,13 +69,11 @@ setup_secrets() {
     darwin*) 
       logfun sudo security add-trusted-cert -d -r trustRoot \
         -k /Library/Keychains/System.keychain secrets/rmsy.me.crt
+      log "...success"
       ;;
     *)
       log "...OS not yet supported"
   esac
-  if [[ "${result}" -eq 0 ]]; then
-    log "...success!"
-  fi
 }
 
 create_volumes() {

@@ -67,7 +67,7 @@ main() {
 
     if script/backup "${service}-logs" 2>/dev/null; then
       log "log files for ${service}:"
-      cat "backup/${service}-logs/"*".log"
+      sudo cat "backup/${service}-logs/"*".log"
     fi
   done
 
