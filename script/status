@@ -26,21 +26,23 @@ main() {
   cd "${SCRIPT_DIR}/.."
   
   log "development status:"
-  docker-compose \
+  logfun docker-compose \
     -f docker-compose.yml \
     -f build/docker-compose.dev.yml \
     images
-  docker-compose \
+  logfun docker-compose \
     -f docker-compose.yml \
     -f build/docker-compose.dev.yml \
     ps
-  docker-compose \
+  logfun docker-compose \
     -f docker-compose.yml \
     -f build/docker-compose.dev.yml \
     top
   
   log "staging/production status:"
-  docker stack ps "${STACK_NAME}"
+  set +e
+    logfun docker stack ps "${STACK_NAME}"
+  set -e
 
   log "end"
 }

@@ -25,30 +25,37 @@ END
 }
 
 install_docker() {
-  case "${OSTYPE}" in
-    darwin*) 
-      log "Installing Docker for OS X:"
-      logfun curl https://download.docker.com/mac/stable/Docker.dmg --output \
-        Docker.dmg
-      logfun hdiutil attach Docker.dmg
-      logfun cp -r /Volumes/Docker/Docker.app /Applications
-      logfun hdiutil detach /Volumes/Docker
-      logfun rm Docker.dmg
-      logfun open /Applications/Docker.app/
-      ;;
-    *)
-      log "OS ${OSTYPE} not yet supported"
-      ;;
-  esac
+  if ! docker --version 2>/dev/null; then
+    case "${OSTYPE}" in
+      darwin*) 
+        log "installing Docker Desktop for Mac"
+        logfun curl https://download.docker.com/mac/stable/Docker.dmg --output \
+          Docker.dmg
+        logfun hdiutil attach Docker.dmg
+        logfun cp -r /Volumes/Docker/Docker.app /Applications
+        logfun hdiutil detach /Volumes/Docker
+        logfun rm Docker.dmg
+        logfun open /Applications/Docker.app/
+        ;;
+      *)
+        log "OS ${OSTYPE} not yet supported"
+        ;;
+    esac
+  fi
 }
 
 main() {
   log "start"
   cd "${SCRIPT_DIR}/.."
 
-  if ! docker --version 2>/dev/null; then
-    install_docker
-  fi
+  case "${OSTYPE}" in
+    darwin*) 
+      install_docker
+      ;;
+    *)
+      die "OS ${OSTYPE} not yet supported"
+      ;;
+  esac
 
   log "end"
 }

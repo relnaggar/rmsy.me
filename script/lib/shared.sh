@@ -22,10 +22,16 @@ declare -a STACK_VOLUMES; readonly STACK_VOLUMES=("db" "apache2-logs")
 declare -a STACK_DOMAINS; readonly STACK_DOMAINS=("rmsy.me" \
   "el-naggar.co.uk" "elnaggar.co.uk" "relnaggar.com")
 
+# constants for colour display
+SC="\x1B["
+RED="${SC}31m"
+YELLOW="${SC}33m"
+NC="${SC}0m"
+
 # functions for error reporting
 
 err() {
-  echo -e "-${SCRIPT_NAME}: $@" >&2
+  echo -e "-${SCRIPT_NAME}: ${RED}$@${NC}" >&2
 }
 
 die() {
@@ -41,7 +47,7 @@ log_prefix() {
 
 log() {
   log_prefix
-  echo -e "$@"
+  echo -e "${YELLOW}$@${NC}"
 }
 
 logfun() {
@@ -49,8 +55,9 @@ logfun() {
   exec 3>&2 2>&1
   set -x
     "$@"
-  { set +x; } 2>/dev/null
+  { local result="$?"; set +x; } 2>/dev/null
   exec 2>&3
+  return "${result}"
 } 
 
 # functions for checking server status

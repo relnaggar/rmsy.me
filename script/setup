@@ -50,29 +50,27 @@ setup_secrets() {
   set -e
   echo "password" > "$secrets_dir"/PGPASSWORD
 
-  log "Attempting to remove old localhost certificates from Keychain..."
   case "$OSTYPE" in
     darwin*) 
+      log "removing old localhost certificates from Keychain..."
       logfun sudo security delete-certificate -c localhost
       log "...success"
       ;;
-    *)
-      log "...OS not yet supported"
   esac
 
   for domain in "${STACK_DOMAINS[@]}"; do
     generate_self_signed_certificates "$domain" "$secrets_dir"
   done
 
-  log "Attempting to add self-signed localhost certificates to Keychain..."
   case "$OSTYPE" in
     darwin*) 
+      log "adding self-signed localhost certificates to Keychain..."
       logfun sudo security add-trusted-cert -d -r trustRoot \
         -k /Library/Keychains/System.keychain secrets/rmsy.me.crt
       log "...success"
       ;;
     *)
-      log "...OS not yet supported"
+      log "warning: SSL certificates remain untrusted"
   esac
 }
 
@@ -83,15 +81,14 @@ create_volumes() {
 }
 
 symlink_githooks() {
-  for hook in githooks/*; do
-    logfun ln -sf "../../githooks/${hook##*/}" .git/hooks
-  done
+  logfun rm -r .git/hooks
+  logfun ln -vs ../githooks/ .git/hooks
 }
 
 initialise_swarm() {
-  logfun script/server down 2>/dev/null
   set +e
-    logfun docker swarm init 2>/dev/null
+    logfun script/server down
+    logfun docker swarm init
   set -e
 }
 

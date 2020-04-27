@@ -16,59 +16,32 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
 
 usage() {
   die "$(cat <<END
-usage: ${SCRIPT_NAME} [environment]
-
-environment can be:
-  -d    development, default
-  -s    staging
-  -p    production
+usage: ${SCRIPT_NAME}
 END
   )"
-}
-
-parse_args() {
-  environment="${1:-}"
-
-  # default
-  if [[ -z "${environment}" ]]; then
-    environment=-d
-  fi
-
-  # validation
-  case "${environment}" in
-    -d | -p | -s) ;;
-    *) usage ;;
-  esac
-
-  log "arguments (\
-environment: ${environment} \
-)"
 }
 
 main() {
   log "start"
   cd "${SCRIPT_DIR}/.."
-  parse_args "$@"
 
   for service in "${STACK_SERVICES[@]}"; do
     log "foreground logs for ${service}:"
 
-    case "${environment}" in
-      -d)
-        logfun docker-compose \
-          -f docker-compose.yml \
-          -f build/docker-compose.dev.yml \
-          logs "${service}"
-        ;;
-      -s | -p)
-        logfun docker service logs "${STACK_NAME}_${service}"
-        ;;
-    esac
-
-    if script/backup "${service}-logs" 2>/dev/null; then
-      log "log files for ${service}:"
-      sudo cat "backup/${service}-logs/"*".log"
+    if is_stack_up; then
+      logfun docker service logs "${STACK_NAME}_${service}"
+    elif is_compose_up; then
+      logfun docker-compose \
+        -f docker-compose.yml \
+        -f build/docker-compose.dev.yml \
+        logs "${service}"
     fi
+
+    set +e
+      script/backup "${service}-logs" 2>/dev/null
+      log "log files for ${service}:"
+      sudo cat "backup/${service}-logs/"*".log" 2>/dev/null
+    set -e
   done
 
   log "end"

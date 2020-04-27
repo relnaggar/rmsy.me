@@ -10,6 +10,12 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# constants for colour display
+SC="\x1B["
+RED="${SC}31m"
+YELLOW="${SC}33m"
+NC="${SC}0m"
+
 # constants and functions for logging
 readonly SCRIPT_NAME="${BASH_SOURCE[0]##*/}"
 log_prefix() {
@@ -17,15 +23,16 @@ log_prefix() {
 }
 log() {
   log_prefix
-  echo -e "$@"
+  echo -e "${YELLOW}$@${NC}"
 }
 logfun() {
   log_prefix
   exec 3>&2 2>&1
   set -x
     "$@"
-  { set +x; } 2>/dev/null
+  { local result="$?"; set +x; } 2>/dev/null
   exec 2>&3
+  return "${result}"
 } 
 
 main() {
@@ -36,9 +43,9 @@ main() {
   logfun composer dumpautoload
   
   set +e
-    phpunit --bootstrap vendor/autoload.php --testdox tests \
+    logfun phpunit --bootstrap vendor/autoload.php --testdox tests \
       --do-not-cache-result
-    result="$?"
+    local result="$?"
   set -e
   
   log "cleaning up autoload"

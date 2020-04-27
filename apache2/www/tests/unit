@@ -32,17 +32,24 @@ main() {
       | grep -o "${STACK_NAME}_apache2.*" \
       | head -1 \
     )"
-    logfun docker exec -t "${container}" bash -c "${runphpunit}"
+    set +e
+      logfun docker exec -t "${container}" bash -c "${runphpunit}"
+      local result="$?"
+    set -e
   elif is_compose_up; then
-    logfun docker-compose \
-      -f docker-compose.yml \
-      -f build/docker-compose.dev.yml \
-      exec -T apache2 bash -c "${runphpunit}" --exit-code-from apache2
+    set +e
+      logfun docker-compose \
+        -f docker-compose.yml \
+        -f build/docker-compose.dev.yml \
+        exec -T apache2 bash -c "${runphpunit}" --exit-code-from apache2
+      local result="$?"
+    set -e
   else
     die "the server is not running"
   fi
 
-  log "end"
+  log "exiting"
+  exit "${result}"
 }
 
 if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
