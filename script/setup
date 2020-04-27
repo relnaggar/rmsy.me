@@ -70,7 +70,7 @@ setup_secrets() {
       log "...success"
       ;;
     *)
-      log "warning: SSL certificates remain untrusted"
+      log "warning: development SSL certificates remain untrusted"
   esac
 }
 

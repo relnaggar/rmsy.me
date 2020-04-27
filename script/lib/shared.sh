@@ -68,10 +68,7 @@ is_stack_up() {
 
 is_compose_up() {
   # -T prevents an issue with shell forwarding
-  docker-compose \
-    -f docker-compose.yml \
-    -f build/docker-compose.dev.yml \
-    exec -T "${STACK_SERVICES[0]}" date &>/dev/null
+  docker-compose exec -T "${STACK_SERVICES[0]}" date &>/dev/null
 }
 
 is_server_up() {

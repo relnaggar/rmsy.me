@@ -59,10 +59,7 @@ main() {
     )"
     logfun docker exec -it ${root[@]} "${container}" bash
   elif is_compose_up; then
-    logfun docker-compose \
-      -f docker-compose.yml \
-      -f build/docker-compose.dev.yml \
-      exec ${root[@]} "${service}" bash
+    logfun docker-compose exec ${root[@]} "${service}" bash
   else
     die "the server is not running"
   fi

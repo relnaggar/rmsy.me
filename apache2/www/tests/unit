@@ -39,8 +39,6 @@ main() {
   elif is_compose_up; then
     set +e
       logfun docker-compose \
-        -f docker-compose.yml \
-        -f build/docker-compose.dev.yml \
         exec -T apache2 bash -c "${runphpunit}" --exit-code-from apache2
       local result="$?"
     set -e

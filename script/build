@@ -37,11 +37,18 @@ build: ${build} \
     dev | prod)
       logfun docker-compose \
         -f docker-compose.yml \
-        -f "build/docker-compose.${build}.yml" \
+        -f docker-compose.override.yml \
+        build
+      ;;
+    prod)
+      logfun docker-compose \
+        -f docker-compose.yml \
+        -f build/docker-compose.prod.yml \
         build
       ;;
     *)
       usage
+      ;;
   esac
 
   log "end"

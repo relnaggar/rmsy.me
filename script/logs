@@ -31,17 +31,20 @@ main() {
     if is_stack_up; then
       logfun docker service logs "${STACK_NAME}_${service}"
     elif is_compose_up; then
-      logfun docker-compose \
-        -f docker-compose.yml \
-        -f build/docker-compose.dev.yml \
-        logs "${service}"
+      logfun docker-compose logs "${service}"
     fi
 
     set +e
       script/backup "${service}-logs" 2>/dev/null
       log "log files for ${service}:"
-      sudo cat "backup/${service}-logs/"*".log" 2>/dev/null
+      cat "backup/${service}-logs/"*".log" 2>/dev/null
+      local result="$?"
     set -e
+    if [[ "$result" -ne 0 ]]; then
+      set +e
+        sudo cat "backup/${service}-logs/"*".log" 2>/dev/null
+      set -e
+    fi
   done
 
   log "end"

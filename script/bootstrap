@@ -26,6 +26,7 @@ END
 
 install_docker() {
   if ! docker --version 2>/dev/null; then
+    local unsupported=false;
     case "${OSTYPE}" in
       darwin*) 
         log "installing Docker Desktop for Mac"
@@ -37,10 +38,40 @@ install_docker() {
         logfun rm Docker.dmg
         logfun open /Applications/Docker.app/
         ;;
+      linux-gnu)
+        if [[ "$(uname -r)" =~ *.amzn2.* ]]; then
+          log "installing Docker"
+          sudo yum update -y
+          sudo amazon-linux-extras install docker -y
+
+          # start the docker daemon
+          sudo service docker start
+
+          # to allow docker commands to be executed without sudo
+          sudo usermod -a -G docker ec2-user  
+          
+          # make docker auto-start
+          sudo chkconfig docker on
+
+          local docker_compose_version="1.25.4"
+          log "installing Docker Compose v${docker_compose_version}"
+          sudo curl -L "https://github.com/docker/compose/releases/download/\
+  ${docker_compose_version}/docker-compose-$(uname -s)-$(uname -m)" \
+            -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          log "please reboot with sudo reboot to complete the installation"
+        else
+          unsupported=true;
+        fi
+        ;;
       *)
-        log "OS ${OSTYPE} not yet supported"
+        unsupported=true;
         ;;
     esac
+    if [[ "${unsupported}" == true ]]; then
+        log "OS ${OSTYPE} not yet supported, please manually install Docker and\
+ Docker Compose"
+    fi
   fi
 }
 
@@ -48,14 +79,7 @@ main() {
   log "start"
   cd "${SCRIPT_DIR}/.."
 
-  case "${OSTYPE}" in
-    darwin*) 
-      install_docker
-      ;;
-    *)
-      die "OS ${OSTYPE} not yet supported"
-      ;;
-  esac
+  install_docker
 
   log "end"
 }

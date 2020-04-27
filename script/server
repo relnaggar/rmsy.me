@@ -88,9 +88,7 @@ build: ${build}\
 
 compose_down() {
   if is_compose_up; then
-    logfun docker-compose \
-      -f docker-compose.yml \
-      -f build/docker-compose.dev.yml down
+    logfun docker-compose down
   fi
 }
 
@@ -105,14 +103,29 @@ main() {
         -d)
           script/server down
           script/build "${build}"
-          set +e
-            logfun docker-compose \
-              -f docker-compose.yml \
-              -f "build/docker-compose.${build}.yml" \
-              -f build/docker-compose.dev.secrets.yml \
-              up -d
-            result="$?"
-          set -e
+          
+          case "${build}" in
+            dev)
+              set +e
+                logfun docker-compose \
+                  -f docker-compose.yml \
+                  -f docker-compose.override.yml \
+                  -f build/docker-compose.dev.secrets.yml \
+                  up -d
+                result="$?"
+              set -e
+              ;;
+            *)
+              set +e
+                logfun docker-compose \
+                  -f docker-compose.yml \
+                  -f build/docker-compose.prod.yml \
+                  -f build/docker-compose.dev.secrets.yml \
+                  up -d
+                result="$?"
+              set -e
+              ;;
+          esac
           if [[ "${result}" -eq 1 ]]; then
             die "error starting: have you run the setup script?"
           fi
