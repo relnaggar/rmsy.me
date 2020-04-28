@@ -39,7 +39,7 @@ install_docker() {
         logfun open /Applications/Docker.app/
         ;;
       linux-gnu)
-        if [[ "$(uname -r)" =~ *.amzn2.* ]]; then
+        if [[ "$(uname -r)" =~ .*amzn2.* ]]; then
           log "installing Docker"
           sudo yum update -y
           sudo amazon-linux-extras install docker -y

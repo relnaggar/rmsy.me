@@ -57,7 +57,7 @@ setup_secrets() {
       log "...success"
       ;;
     linux-gnu)
-      if [[ "$(uname -r)" =~ *.amzn2.* ]]; then
+      if [[ "$(uname -r)" =~ .*amzn2.* ]]; then
         log "removing old localhost certificates..."
         sudo rm /etc/pki/ca-trust/source/anchors/rmsy.me.crt 2>/dev/null
         log "...success"
@@ -77,10 +77,12 @@ setup_secrets() {
       log "...success"
       ;;
     linux-gnu)
-      if [[ "$(uname -r)" =~ *.amzn2.* ]]; then
+      if [[ "$(uname -r)" =~ .*amzn2.* ]]; then
+        log "adding self-signed localhost certificates..."
         sudo update-ca-trust force-enable
         sudo cp "${secrets_dir}/rmsy.me.crt" /etc/pki/ca-trust/source/anchors
         sudo update-ca-trust extract
+        log "...success"
       else
         log "warning: development SSL certificates remain untrusted"
       fi
