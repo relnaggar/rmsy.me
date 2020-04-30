@@ -34,11 +34,8 @@ main() {
 build: ${build} \
 )"
   case "${build}" in
-    dev | prod)
-      logfun docker-compose \
-        -f docker-compose.yml \
-        -f docker-compose.override.yml \
-        build
+    dev)
+      logfun docker-compose build
       ;;
     prod)
       logfun docker-compose \
