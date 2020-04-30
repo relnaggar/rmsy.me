@@ -92,7 +92,7 @@ cd script
 ## Staging
 
 ```shell
-# a pre-push hook ensures all tests are running on both builds before pushing
+# a pre-push hook ensures all tests are passing on both builds before pushing
 git push
 ```
 
@@ -100,7 +100,7 @@ After pushing, the production images are automatically rebuilt on Docker hub:
 * apache2 : [![Docker image size](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https://img.shields.io/docker/image-size/relnaggar/rmsy-me-apache2)](https://hub.docker.com/repository/docker/relnaggar/rmsy-me-apache2/tags)
 * postgres : [![Docker image size](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https://img.shields.io/docker/image-size/relnaggar/rmsy-me-postgres)](https://hub.docker.com/repository/docker/relnaggar/rmsy-me-postgres/tags)
 
-Development mode runs the application with Docker Compose but in production the application runs using Docker Swarm. There are a few differences between the two (mostly to do with passing secrets) so test the application locally in staging mode before deploying:
+Development mode runs the application with Docker Compose but production runs the application with Docker Swarm. There are a few differences between the two (mostly to do with passing secrets) so test the application locally in staging mode before deploying:
 
 ```shell
 cd script
