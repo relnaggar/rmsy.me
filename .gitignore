@@ -1,5 +1,6 @@
 ### Vim ###
 *.sw[a-p]
+.syntastic_javac_config
 
 ### System Files ###
 *.DS_Store

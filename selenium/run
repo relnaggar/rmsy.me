@@ -1,0 +1,7 @@
+#!/bin/bash
+
+CLASSPATH=.:/usr/local/Cellar/selenium-server-standalone/3.141.59_1/libexec/selenium-server-standalone-3.141.59.jar
+echo "let g:syntastic_java_javac_classpath = '${CLASSPATH}'" > \
+  .syntastic_javac_config
+javac -cp "${CLASSPATH}" *.java
+java -cp "${CLASSPATH}" Main
