@@ -53,7 +53,9 @@ setup_secrets() {
   case "$OSTYPE" in
     darwin*) 
       log "removing old localhost certificates from Keychain..."
-      logfun sudo security delete-certificate -c localhost
+      set +e
+        logfun sudo security delete-certificate -c localhost
+      set -e
       log "...success"
       ;;
     linux-gnu)
