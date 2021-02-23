@@ -16,3 +16,6 @@ secrets/
 
 ### Volume backups ###
 backup/
+
+### Java ###
+*.class
