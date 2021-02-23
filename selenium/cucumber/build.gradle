@@ -27,13 +27,21 @@ configurations {
     }
 }
 
+sourceSets {
+    test {
+        java {
+            srcDirs = ['java']
+        }
+    }
+}
+
 task cucumber() {
     dependsOn assemble, testClasses
     doLast {
         javaexec {
             main = "io.cucumber.core.cli.Main"
-            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--glue', 'cucumber', 'src/test/resources']
+            classpath = configurations.cucumberRuntime + sourceSets.test.output
+            args = ['--plugin', 'pretty', 'features']
         }
     }
 }
