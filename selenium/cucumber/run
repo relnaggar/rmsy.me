@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# local setup:
+# brew install gradle
+
+export TEST_URL="https://rmsy.me"
+gradle cucumber
+export TEST_URL="https://localhost"
+gradle cucumber
