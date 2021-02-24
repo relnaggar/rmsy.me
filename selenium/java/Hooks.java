@@ -1,7 +1,10 @@
 import java.util.concurrent.TimeUnit;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import io.cucumber.java.*;
 
@@ -12,7 +15,7 @@ public class Hooks {
   private String baseUrl;
 
   @Before
-  public void beforeAll() {
+  public void beforeAll() throws MalformedURLException {
     if (!initialized) {
       // get environment variable
       baseUrl = System.getenv().get("TEST_URL");
@@ -23,9 +26,10 @@ public class Hooks {
         System.out.println("Running tests for " + baseUrl);
       }
 
+      ChromeOptions chromeOptions = new ChromeOptions();
+      driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), chromeOptions);
+
       // open window
-      System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
-      driver = new ChromeDriver();
       driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
       driver.manage().window().maximize();
 

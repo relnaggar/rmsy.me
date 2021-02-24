@@ -3,7 +3,12 @@
 # local setup:
 # brew install gradle
 
+docker run -d -p 4444:4444 -v /dev/shm:/dev/shm --name selenium \
+  selenium/standalone-chrome
+sleep 3
 export TEST_URL="https://rmsy.me"
 gradle cucumber
 export TEST_URL="https://localhost"
 gradle cucumber
+docker stop selenium
+docker container rm selenium
