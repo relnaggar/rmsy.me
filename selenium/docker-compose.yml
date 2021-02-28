@@ -27,7 +27,7 @@ services:
     image: rmsy-me-cucumber
     build: "."
     depends_on:
-      - selenium-chrome
+      - selenium-chrome-video
     networks:
       - e2e
 networks:

@@ -22,9 +22,10 @@ usage() {
 usage: ${SCRIPT_NAME} [tests] ...
 
 tests can be:
-  unit  all PHPUnit tests
-  e2e   not implemented yet
-the default is to run all available tests
+  unit  all PHPUnit tests (on the locally running application)
+  e2e   all Cucumber tests (on the locally running application)
+  live  all Cucumber tests (on the live application)
+the default is to run all available local tests
 
 unit tests are not available for the production build
 END
@@ -70,8 +71,26 @@ main() {
         fi
         ;;
       e2e)
-        log "running end-to-end tests:"
-        log "no end-to-end tests yet"
+        log "running local end-to-end tests:"
+        set +e
+          cd selenium
+          logfun docker-compose run cucumber
+          local result="$?"
+        set -e
+        if [[ "${result}" -ne 0 ]]; then
+          exit "${result}"
+        fi
+        ;;
+      live)
+        log "running live end-to-end tests:"
+        set +e
+          cd selenium
+          logfun docker-compose run cucumber cucumber https://rmsy.me
+          local result="$?"
+        set -e
+        if [[ "${result}" -ne 0 ]]; then
+          exit "${result}"
+        fi
         ;;
       *)
         usage

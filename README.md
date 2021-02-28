@@ -142,6 +142,7 @@ Before deploying, it's also necessary to generate production secrets:
 
 ### Deploying
 
+On the production server:
 ```shell
 cd script
 
@@ -151,12 +152,17 @@ cd script
 # run/update the application in production mode
 # (using the production secrets and database)
 ./server up -p
+```
 
+### Verifying
+
+On the development machine:
+```shell
 # verify the website is running
 curl https://rmsy.me/
 
 # run end-to-end tests on the live application
-./test
+./test live
 ```
 
 ## Debugging
