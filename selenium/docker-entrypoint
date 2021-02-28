@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# Entrypoint for relnaggar/rmsy-me-cucumber
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+main() {
+  local cmd=${1:-}
+
+  if [[ "${cmd}" == "cucumber" ]]; then
+    local test_url=${2:-}
+    cd /home/cucumber
+    export TEST_URL="${test_url}"
+    gradle cucumber
+  else
+    exec "$@"
+  fi
+}
+
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi

@@ -1,0 +1,35 @@
+version: '3.7'
+services:
+  selenium-chrome:
+    container_name: selenium-chrome
+    image: selenium/standalone-chrome:4.0.0-beta-1-20210215
+    ports:
+      - "4444:4444"
+      - "6900:5900"
+    networks:
+      - e2e
+    volumes:
+      - "/dev/shm:/dev/shm"
+  selenium-chrome-video:
+    container_name: selenium-chrome-video
+    image: selenium/video:ffmpeg-4.3.1-20210215
+    depends_on:
+      - selenium-chrome
+    networks:
+      - e2e
+    volumes:
+      - "./videos:/videos"
+    environment:
+      - DISPLAY_CONTAINER_NAME=selenium-chrome
+      - FILE_NAME=chrome_video.mp4
+  cucumber:
+    container_name: cucumber
+    image: rmsy-me-cucumber
+    build: "."
+    depends_on:
+      - selenium-chrome
+    networks:
+      - e2e
+networks:
+  e2e:
+    name: e2e

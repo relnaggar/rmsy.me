@@ -27,7 +27,8 @@ public class Hooks {
       }
 
       ChromeOptions chromeOptions = new ChromeOptions();
-      driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), chromeOptions);
+      chromeOptions.addArguments("--ignore-certificate-errors");
+      driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), chromeOptions);
 
       // open window
       driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);

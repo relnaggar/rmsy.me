@@ -1,3 +1,5 @@
+import java.util.concurrent.TimeUnit;
+
 import org.openqa.selenium.WebDriver;
 
 import io.cucumber.java.en.*;
@@ -17,6 +19,9 @@ public class StepDefinitions {
     WebDriver driver = hooks.getDriver();
     String baseUrl = hooks.getBaseUrl();
     driver.get(baseUrl);
+    try {
+      TimeUnit.SECONDS.sleep(3);
+    } catch (InterruptedException e) {}
   }
 
   @Then("the page title should be {string}")
