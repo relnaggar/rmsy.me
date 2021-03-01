@@ -1,0 +1,85 @@
+#!/bin/bash
+#
+#
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+. "${SCRIPT_DIR}/lib/shared.sh"
+
+usage() {
+  die "$(cat <<END
+usage: ${SCRIPT_NAME} [resume]
+
+resume can be:
+  tutor
+the default is to update the tutor resume
+END
+  )"
+}
+
+parse_args() {
+  # optional arguments
+  resume=""
+  while (( $# > 0 )); do
+    local arg="${1:-}"
+    case "${arg}" in
+      tutor)
+        if [[ -z "${resume}" ]]; then
+          resume="${arg}"
+        else
+          usage
+        fi
+        ;;
+      *)
+        usage
+        ;;
+    esac
+    shift
+  done
+
+  # defaults
+  if [[ -z "${resume}" ]]; then
+    resume=tutor
+  fi
+
+  log "arguments (\
+resume: ${resume}\
+)" 
+}
+
+main() {
+  log "start"
+  cd "${SCRIPT_DIR}/.."
+  parse_args "$@"
+
+  case "${resume}" in
+    tutor)
+      resume_path="apache2/www/public/tutor/tutor-resume.pdf"
+      ;;
+  esac
+
+  logfun cd selenium
+  logfun docker-compose down
+  logfun docker-compose build webdriver
+  logfun docker-compose run --name webdriver webdriver
+  logfun docker-compose down
+  logfun cd ..
+  set +e
+    logfun rm "${resume_path}"
+  set -e
+  logfun mv selenium/downloads/resume.pdf "${resume_path}"
+  log "success"
+}
+
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi

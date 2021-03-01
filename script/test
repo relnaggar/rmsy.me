@@ -35,7 +35,11 @@ END
 parse_args() {
   # defaults
   if [[ $# -eq 0 ]]; then
-    tests=("unit" "e2e")
+    if is_compose_up; then
+      tests=("unit" "e2e")
+    else
+      tests=("e2e")
+    fi
   else
     tests=("$@")
   fi
@@ -91,7 +95,7 @@ main() {
         cd selenium
         logfun docker-compose down
         logfun docker-compose run -d \
-          -e FILE_NAME="chrome_live__$(date '+%Y_%m_%d__%H_%M_%S').mp4"
+          -e FILE_NAME="chrome_live__$(date '+%Y_%m_%d__%H_%M_%S').mp4" \
           selenium-video
         set +e
           logfun docker-compose run cucumber cucumber https://rmsy.me
