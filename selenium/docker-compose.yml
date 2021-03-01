@@ -7,29 +7,44 @@ services:
       - "4444:4444"
       - "6900:5900"
     networks:
-      - e2e
+      - selenium
     volumes:
       - "/dev/shm:/dev/shm"
+      - "./downloads:/home/seluser/Downloads"
   selenium-chrome-video:
-    container_name: selenium-chrome-video
     image: selenium/video:ffmpeg-4.3.1-20210215
     depends_on:
       - selenium-chrome
     networks:
-      - e2e
+      - selenium
     volumes:
       - "./videos:/videos"
     environment:
       - DISPLAY_CONTAINER_NAME=selenium-chrome
-      - FILE_NAME=chrome_video.mp4
   cucumber:
     container_name: cucumber
     image: rmsy-me-cucumber
-    build: "."
+    build:
+      context: "."
+      args:
+        GRADLE_PROJECT: cucumber
+    command: ["cucumber", "https://host.docker.internal"]
     depends_on:
-      - selenium-chrome-video
+      - selenium-chrome
     networks:
-      - e2e
+      - selenium
+  webdriver:
+    container_name: webdriver
+    image: rmsy-me-webdriver
+    build:
+      context: "."
+      args:
+        GRADLE_PROJECT: webdriver
+    command: ["webdriver"]
+    depends_on:
+      - selenium-chrome
+    networks:
+      - selenium
 networks:
-  e2e:
-    name: e2e
+  selenium:
+    name: selenium

@@ -10,15 +10,15 @@ RUN apt-get update -y \
   # cleanup
   && rm -rf /var/lib/apt/lists/*
 
-ENV GRADLE_PROJECT=/home/cucumber
-COPY cucumber/build.gradle ${GRADLE_PROJECT}/build.gradle
-COPY cucumber/settings.gradle ${GRADLE_PROJECT}/settings.gradle
+ARG GRADLE_PROJECT
+ENV GRADLE_DIR=/home/gradle
 
-WORKDIR ${GRADLE_PROJECT}
+COPY ${GRADLE_PROJECT}/build.gradle ${GRADLE_DIR}/build.gradle
+
+WORKDIR ${GRADLE_DIR}
 RUN ["gradle", "build"]
 
-COPY cucumber ${GRADLE_PROJECT}
-COPY docker-entrypoint /
+COPY ${GRADLE_PROJECT} ${GRADLE_DIR}
 
+COPY docker-entrypoint /
 ENTRYPOINT ["/docker-entrypoint"]
-CMD ["cucumber", "https://host.docker.internal"]

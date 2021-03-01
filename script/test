@@ -72,22 +72,32 @@ main() {
         ;;
       e2e)
         log "running local end-to-end tests:"
+        cd selenium
+        logfun docker-compose down
+        logfun docker-compose run -d \
+          -e FILE_NAME="chrome_localhost__$(date '+%Y_%m_%d__%H_%M_%S').mp4" \
+          selenium-chrome-video
         set +e
-          cd selenium
           logfun docker-compose run cucumber
           local result="$?"
         set -e
+        logfun docker-compose down
         if [[ "${result}" -ne 0 ]]; then
           exit "${result}"
         fi
         ;;
       live)
         log "running live end-to-end tests:"
+        cd selenium
+        logfun docker-compose down
+        logfun docker-compose run -d \
+          -e FILE_NAME="chrome_live__$(date '+%Y_%m_%d__%H_%M_%S').mp4"
+          selenium-video
         set +e
-          cd selenium
           logfun docker-compose run cucumber cucumber https://rmsy.me
           local result="$?"
         set -e
+        logfun docker-compose down
         if [[ "${result}" -ne 0 ]]; then
           exit "${result}"
         fi

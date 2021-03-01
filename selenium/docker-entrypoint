@@ -12,12 +12,16 @@ IFS=$'\n\t'
 
 main() {
   local cmd=${1:-}
+  local GRADLE_DIR=/home/gradle
 
   if [[ "${cmd}" == "cucumber" ]]; then
     local test_url=${2:-}
-    cd /home/cucumber
+    cd "${GRADLE_DIR}"
     export TEST_URL="${test_url}"
     gradle cucumber
+  elif [[ "${cmd}" == "webdriver" ]]; then
+    cd "${GRADLE_DIR}"
+    gradle run
   else
     exec "$@"
   fi
