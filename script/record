@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+#
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+. "${SCRIPT_DIR}/lib/shared.sh"
+
+is_selenium_up() {
+  set +e
+    # -T prevents an issue with shell forwarding
+    docker-compose exec -T selenium-chrome date &>/dev/null
+    selenium_up="$?"
+  set -e
+}
+
+main() {
+  log "start"
+
+  local start_dir=$(pwd)
+
+  logfun cd "${SCRIPT_DIR}/../selenium"
+
+  # check to see if selenium-chrome is up before starting
+  is_selenium_up
+
+  # start recording
+  logfun docker-compose stop selenium-chrome-video
+  logfun docker-compose run -d \
+    --name selenium-chrome-video \
+    -e FILE_NAME="chrome__$(date '+%Y_%m_%d__%H_%M_%S').mp4" \
+    selenium-chrome-video
+
+  # execute
+  logfun cd "${start_dir}"
+
+  set +e
+    logfun "$@"
+  set -e
+
+  logfun cd "${SCRIPT_DIR}/../selenium"
+
+  # stop recording
+  logfun docker container stop selenium-chrome-video
+  logfun docker container rm selenium-chrome-video
+
+  # if selenium-chrome wasn't up before, then take it down
+  if [[ "${selenium_up}" -eq 1 ]]; then
+    logfun docker container stop selenium-chrome
+    logfun docker container rm selenium-chrome
+  fi
+
+  log "success"
+}
+
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi

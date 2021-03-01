@@ -68,10 +68,12 @@ main() {
   esac
 
   logfun cd selenium
-  logfun docker-compose down
+  set +e
+    logfun docker container stop webdriver && docker container rm webdriver
+  set -e
   logfun docker-compose build webdriver
   logfun docker-compose run --name webdriver webdriver
-  logfun docker-compose down
+  logfun docker container stop webdriver && docker container rm webdriver
   logfun cd ..
   set +e
     logfun rm "${resume_path}"

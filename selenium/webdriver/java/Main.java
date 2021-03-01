@@ -1,56 +1,61 @@
-import java.util.*;
-import java.util.concurrent.*;
-import java.io.*;
-import java.nio.file.*;
-import java.time.*;
-import java.net.*;
+import java.util.concurrent.TimeUnit;
+import java.time.Duration;
+import java.net.URL;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.*;
+import java.net.MalformedURLException;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.By;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 
 class Main {
   private static WebDriver driver;
 
+  private static void print(String message) {
+    System.out.println("[webdriver] " + message);
+    
+  }
+
   public static void startWebDriver() throws MalformedURLException {
-    System.out.println("Starting web driver");
+    System.out.println("start web driver");
 
     ChromeOptions chromeOptions = new ChromeOptions();
     chromeOptions.addArguments("--ignore-certificate-errors");
     driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), chromeOptions);
 
     driver.manage().window().maximize();
-
-    System.out.println("Web driver started");
   }
 
   public static void endWebDriver() {
-    System.out.println("Stopping web driver");
+    System.out.println("stop web driver");
     driver.quit();
-    System.out.println("Web driver stopped");
   }
 
-  public static void downloadOverleafPdf(String overleafUrl) throws IOException, InterruptedException {
+  public static void downloadOverleafPdf(String overleafUrl) throws InterruptedException {
     System.out.println("GET " + overleafUrl);
     driver.get(overleafUrl);
     String xPath = "//*[@class='fa fa-fw fa-download']";
 
-    System.out.println("Waiting for download link to be clickable");
+    System.out.println("wait for download link to be clickable");
     new FluentWait<WebDriver>(driver)
       .withTimeout(Duration.ofSeconds(10))
       .pollingEvery(Duration.ofSeconds(1))
       .ignoring(StaleElementReferenceException.class)
-      .ignoring(org.openqa.selenium.NoSuchElementException.class)
+      .ignoring(NoSuchElementException.class)
       .until(ExpectedConditions.attributeContains(By.xpath(xPath + "/.."), "href","https://www.overleaf.com/download/project/"));
 
-    System.out.println("Downloading PDF");
+    System.out.println("download PDF");
     driver.findElement(By.xpath(xPath)).click();
-
     TimeUnit.SECONDS.sleep(5);
   }
   
-  public static void main(String[] args) throws MalformedURLException, IOException, InterruptedException {
+  public static void main(String[] args) throws MalformedURLException, InterruptedException {
     startWebDriver();
     downloadOverleafPdf("https://www.overleaf.com/read/kpqmdmzrsrvn");
     endWebDriver();
