@@ -10,6 +10,7 @@ defaults/
 
 ### Packages ###
 vendor/
+node_modules/
 
 ### Secrets ###
 secrets/
