@@ -6,7 +6,6 @@
 // Include custom variable default overrides here
 //$body-bg: #000;
 
-
 // Configuration
 @import "../bootstrap/scss/utilities";
 
@@ -46,3 +45,24 @@
 
 // Utilities
 @import "../bootstrap/scss/utilities/api";
+
+@include media-breakpoint-down(xl) {
+  .display-none-xl-down {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-only(xs) {
+  .display-none-xs-only {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-up(sm) {
+  .display-none-sm-up {
+    display: none !important;
+  }
+}
+
+@import 'index';
+

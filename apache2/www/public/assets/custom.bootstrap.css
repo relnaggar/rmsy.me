@@ -10719,5 +10719,32 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+@media (max-width: 1199.98px) {
+  .display-none-xl-down {
+    display: none !important;
+  }
+}
+@media (max-width: 575.98px) {
+  .display-none-xs-only {
+    display: none !important;
+  }
+}
+@media (min-width: 576px) {
+  .display-none-sm-up {
+    display: none !important;
+  }
+}
+header, footer {
+  background-color: #fff;
+  z-index: 1;
+}
+
+b {
+  font-weight: 900;
+}
+
+section {
+  scroll-margin-top: 56px;
+}
 
 /*# sourceMappingURL=custom.bootstrap.css.map */
