@@ -18,7 +18,7 @@ COPY ${GRADLE_PROJECT}/build.gradle ${GRADLE_DIR}/build.gradle
 WORKDIR ${GRADLE_DIR}
 RUN ["gradle", "build"]
 
-COPY ${GRADLE_PROJECT} ${GRADLE_DIR}
+VOLUME ["/home/gradle/java"]
 
 COPY docker-entrypoint /
 ENTRYPOINT ["/docker-entrypoint"]

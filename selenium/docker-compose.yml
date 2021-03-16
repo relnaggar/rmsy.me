@@ -28,6 +28,10 @@ services:
       context: "."
       args:
         GRADLE_PROJECT: cucumber
+    volumes:
+      - "./cucumber/java:/home/gradle/java"
+      - "./cucumber/features:/home/gradle/features"
+      - "./cucumber/src:/home/gradle/src"
     command: ["cucumber", "https://host.docker.internal"]
     depends_on:
       - selenium-chrome
@@ -40,6 +44,8 @@ services:
       context: "."
       args:
         GRADLE_PROJECT: webdriver
+    volumes:
+      - "./webdriver/java:/home/gradle/java"
     command: ["webdriver"]
     depends_on:
       - selenium-chrome
