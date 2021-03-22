@@ -1,12 +1,87 @@
-header, footer {
-  background-color: #fff;
-  z-index: 1;
+@include media-breakpoint-up(xl) {
+  .display-none-xl-up {
+    display: none !important;
+  }
 }
 
-b {
-  font-weight: 900;
+@include media-breakpoint-down(xl) {
+  .display-none-xl-down {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-only(xs) {
+  .display-none-xs-only {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-up(sm) {
+  .display-none-sm-up {
+    display: none !important;
+  }
+}
+
+.bg-contrast-primary {
+  background-color: color-contrast($primary);
+}
+
+.banner {
+  padding: 0 12px 12px;
+  &:hover, &:focus {
+    // banner-link color changes when hover/focus on parent as well
+    .banner-link {
+      color: color-contrast($light) !important;
+    }
+  }
+
+  b {
+    font-weight: 900;
+  }
+}
+
+.banner-link {
+  color: $primary;
+}
+
+#subbanner {
+  height: 98px; // to vertically center subbanner within header
+  padding: 12px;
+  border-left: 1px solid $gray-300;
+}
+
+header {
+  z-index: 1021; // for box-shadow to appear over navbar
+  box-shadow: 0 0 1rem rgba(0,0,0,0.2);
+  background-color: $light;
+  color: color-contrast($light);
+}
+
+.navbar-brand-subbanner {
+  background-color: color-contrast($primary);
+  color: $primary !important;  
+  &:hover, &:focus {
+    color: if(color-contrast($primary) == $color-contrast-light, shade-color($primary, $link-shade-percentage), tint-color($primary, $link-shade-percentage)) !important;
+  }
+}
+
+:root {
+  --nav-height: 56px;
+}
+
+.sidebar {
+  position: sticky;
+  align-self: flex-start; // for sticky to work within flexbox
+  top: var(--nav-height);
+  height: calc(100vh - var(--nav-height));
+  overflow-y: scroll;
 }
 
 section {
-  scroll-margin-top: 56px;
+  scroll-margin-top: var(--nav-height);
+}
+
+footer {
+  background-color: $primary;
+  color: color-contrast($primary);
 }

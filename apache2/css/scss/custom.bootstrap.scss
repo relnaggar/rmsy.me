@@ -4,7 +4,13 @@
 @import "../bootstrap/scss/mixins";
 
 // Include custom variable default overrides here
-//$body-bg: #000;
+
+$primary: $purple;
+//$primary: $green;
+$custom-colors: (
+  "primary": $primary
+);
+$theme-colors: map-merge($theme-colors, $custom-colors);
 
 // Configuration
 @import "../bootstrap/scss/utilities";
@@ -46,23 +52,5 @@
 // Utilities
 @import "../bootstrap/scss/utilities/api";
 
-@include media-breakpoint-down(xl) {
-  .display-none-xl-down {
-    display: none !important;
-  }
-}
-
-@include media-breakpoint-only(xs) {
-  .display-none-xs-only {
-    display: none !important;
-  }
-}
-
-@include media-breakpoint-up(sm) {
-  .display-none-sm-up {
-    display: none !important;
-  }
-}
-
 @import 'index';
-
+@import 'navbar';
