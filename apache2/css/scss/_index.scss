@@ -45,8 +45,9 @@
 }
 
 #subbanner {
-  height: 98px; // to vertically center subbanner within header
-  padding: 12px;
+  //height: 86px; // to vertically center subbanner within header
+  padding: 0 12px 12px;
+  //padding: 12px;
   border-left: 1px solid $gray-300;
 }
 

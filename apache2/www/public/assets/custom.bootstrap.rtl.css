@@ -10735,8 +10735,7 @@ textarea.form-control-lg {
 }
 
 #subbanner {
-  height: 98px;
-  padding: 12px;
+  padding: 0 12px 12px;
   border-right: 1px solid #dee2e6;
 }
 
