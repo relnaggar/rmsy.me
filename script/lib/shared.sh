@@ -20,7 +20,7 @@ readonly STACK_NAME="rmsy-me"
 declare -a STACK_SERVICES; readonly STACK_SERVICES=("apache2" "postgres")
 declare -a STACK_VOLUMES; readonly STACK_VOLUMES=("db" "apache2-logs")
 declare -a STACK_DOMAINS; readonly STACK_DOMAINS=("rmsy.me" \
-  "el-naggar.co.uk" "elnaggar.co.uk" "relnaggar.com")
+  "el-naggar.co.uk")
 
 # constants for colour display
 SC="\x1B["
