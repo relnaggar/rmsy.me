@@ -1,7 +1,7 @@
 <!-- TODO ![Logo of the project](./images/logo.png)-->
 
 # [rmsy.me](https://rmsy.me)
-[![website status](https://img.shields.io/website?url=https://rmsy.me)](https://rmsy.me) [![7 day uptime ratio (Uptime Robot)](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https://img.shields.io/uptimerobot/ratio/7/m784796051-da0b2757e43473b1f9d676b0)](https://status.rmsy.me) [![Mozilla HTTP Observatory Grade](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https://img.shields.io/mozilla-observatory/grade-score/rmsy.me?publish)](https://observatory.mozilla.org/analyze/rmsy.me) [![Github License](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https://img.shields.io/github/license/relnaggar/rmsy.me)](https://github.com/relnaggar/rmsy.me/blob/master/LICENSE)
+[![website status](https://img.shields.io/website?url=https://rmsy.me)](https://rmsy.me) [![7 day uptime ratio (Uptime Robot)](https://img.shields.io/uptimerobot/ratio/7/m784796051-da0b2757e43473b1f9d676b0)](https://status.rmsy.me) [![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade-score/rmsy.me?publish)](https://observatory.mozilla.org/analyze/rmsy.me) [![Github License](https://img.shields.io/github/license/relnaggar/rmsy.me)](https://github.com/relnaggar/rmsy.me/blob/master/LICENSE)
 
 > A personal website
 
@@ -97,8 +97,8 @@ git push
 ```
 
 After pushing, the production images are automatically rebuilt on Docker hub:
-* apache2 : [![Docker image size](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https://img.shields.io/docker/image-size/relnaggar/rmsy-me-apache2)](https://hub.docker.com/repository/docker/relnaggar/rmsy-me-apache2/tags)
-* postgres : [![Docker image size](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https://img.shields.io/docker/image-size/relnaggar/rmsy-me-postgres)](https://hub.docker.com/repository/docker/relnaggar/rmsy-me-postgres/tags)
+* apache2 : [![Docker image size](https://img.shields.io/docker/image-size/relnaggar/rmsy-me-apache2)](https://hub.docker.com/repository/docker/relnaggar/rmsy-me-apache2/tags)
+* postgres : [![Docker image size](https://img.shields.io/docker/image-size/relnaggar/rmsy-me-postgres)](https://hub.docker.com/repository/docker/relnaggar/rmsy-me-postgres/tags)
 
 Development mode runs the application with Docker Compose but production runs the application with Docker Swarm. There are a few differences between the two (mostly to do with passing secrets) so test the application locally in staging mode before deploying:
 
