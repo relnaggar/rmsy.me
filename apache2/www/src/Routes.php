@@ -1,21 +1,29 @@
 <?php declare(strict_types=1);
-
-class Routes {
-  /* @var \MenuController */
+class Routes implements \Framework\RoutesInterface {
+  /* @var \Controllers\Menu */
   private $menuController;
 
-  /* @var \SidebarController */
+  /* @var \Controllers\Sidebar */
   private $sidebarController;
+  
+  /* @var \Controllers\Front */
+  private $frontController;
+
+  /* @var \Controllers\Engineer */
+  private $engineerController;
+
+  /* @var \Controllers\Project1 */
+  private $project1Controller;
 
   /* @var \Controller */
   private $controller;
 
   public function __construct() {
-    $this->menuController = new \MenuController();
-    $this->sidebarController = new \SidebarController();
-    $this->frontController = new \FrontController();
-    $this->engineerController= new \EngineerController($this->menuController, $this->sidebarController);
-    $this->project1Controller = new \Project1Controller($this->menuController, $this->sidebarController);
+    $this->menuController = new \Controllers\Menu();
+    $this->sidebarController = new \Controllers\Sidebar();
+    $this->frontController = new \Controllers\Front();
+    $this->engineerController= new \Controllers\Engineer($this->menuController, $this->sidebarController);
+    $this->project1Controller = new \Controllers\Project1($this->menuController, $this->sidebarController);
   }
 
   public function getRoutes(): array {

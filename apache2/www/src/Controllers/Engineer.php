@@ -1,24 +1,22 @@
 <?php declare(strict_types=1);
-
-class EngineerController {
+namespace Controllers;
+class Engineer {
   /* @var string */
   private $templateDir;
 
-  /* @var \MenuController */
+  /* @var \Controllers\Menu */
   private $menu;
 
-  /* @var \SidebarController */
-  private $sidebar;
-
-  public function __construct(\MenuController $menuController, \SidebarController $sidebarController) {
+  public function __construct(\Controllers\Menu $menuController, \Controllers\Sidebar $sidebarController) {
     $this->templateDir = '/engineer/';
     $this->menu = $menuController->engineer();
-    $this->sidebar = $sidebarController->project1();
   }
 
   public function home(): array {
+    $title = 'Home';
+    $this->menu['activeItemText'] = $title;
     return [
-      'title' => 'Home',
+      'title' => $title,
       'menu' => $this->menu,
       'html' => loadTemplate($this->templateDir . __FUNCTION__)
     ];

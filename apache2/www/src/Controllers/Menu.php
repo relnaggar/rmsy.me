@@ -1,14 +1,15 @@
 <?php declare(strict_types=1);
-
-class MenuController {
+namespace Controllers;
+class Menu {
   public function engineer(): array {
+    $homePath = '/engineer/';
     return [
       'title' => 'software engineer',
-      'homePath' => '/engineer/',
+      'homePath' => $homePath,
       'items' => [
         [
           'text' => 'Home',
-          'path' => '/engineer/'
+          'path' => $homePath
         ], [
           'text' => 'Project 1',
           'path' => '/engineer/project1/'

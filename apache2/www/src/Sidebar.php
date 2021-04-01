@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 class Sidebar {
   /* @var string */
   private $title;
@@ -7,8 +6,8 @@ class Sidebar {
   /* @var array */
   private $items;
 
-  /* @var i */
-  private $i;
+  /* @var int */
+  private $activeItemNumber;
 
   public function __construct(string $title, array $items) {
     $this->title = $title;
@@ -23,19 +22,23 @@ class Sidebar {
     return $this->items;
   }
 
-  public function setI(int $i): void {
-    $this->i = $i;
+  public function setActiveItemText(string $itemText): void {
+    foreach ($this->items as $itemNumber => $item) {
+      if ($item['text'] === $itemText) {
+        $this->activeItemNumber = $itemNumber;
+      }
+    }
   }
 
-  public function isActive(int $i): bool {
-    return $i === $this->i;
+  public function isActive(int $itemNumber): bool {
+    return $itemNumber === $this->activeItemNumber;
   }
 
   public function getNextPath(): string {
-    return $this->items[$this->i+1]['path'] ?? "";
+    return $this->items[$this->activeItemNumber+1]['path'] ?? "";
   }
 
   public function getPreviousPath(): string {
-    return $this->items[$this->i-1]['path'] ?? "";
+    return $this->items[$this->activeItemNumber-1]['path'] ?? "";
   }
 }

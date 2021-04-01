@@ -9,5 +9,5 @@ require($sourceDirectory . 'autoload.php');
 require($sourceDirectory . 'loadTemplate.php');
 
 $routes = new \Routes();
-$entryPoint = new \EntryPoint($routes);
+$entryPoint = new \Framework\EntryPoint($routes);
 $entryPoint->run();

@@ -1,25 +1,27 @@
 <?php declare(strict_types=1);
-
-class Project1Controller {
+namespace Controllers;
+class Project1 {
   /* @var string */
   private $templateDir;
 
-  /* @var \MenuController */
+  /* @var \Controllers\Menu */
   private $menu;
 
-  /* @var \SidebarController */
+  /* @var \Controllers\Sidebar */
   private $sidebar;
 
-  public function __construct(\MenuController $menuController, \SidebarController $sidebarController) {
+  public function __construct(\Controllers\Menu $menuController, \Controllers\Sidebar $sidebarController) {
     $this->templateDir = '/project1/';
     $this->menu = $menuController->engineer();
     $this->sidebar = $sidebarController->project1();
+    $this->menu['activeItemText'] = 'Project 1';
   }
 
   public function intro(): array {
-    $this->sidebar->setI(0);
+    $title = "Introduction";
+    $this->sidebar->setActiveItemText($title);
     return [
-      'title' => 'Introduction',
+      'title' => $title,
       'menu' => $this->menu,
       'sidebar' => $this->sidebar,
       'html' => loadTemplate($this->templateDir . __FUNCTION__)
@@ -27,6 +29,9 @@ class Project1Controller {
   }
 
   public function feature1(): array {
+    $title = "Feature 1";
+    $this->sidebar->setActiveItemText($title);
+
     $sections = [
       [
         'title' => 'Section 1',
@@ -35,9 +40,8 @@ class Project1Controller {
       ]
     ];
 
-    $this->sidebar->setI(1);
     return [
-      'title' => 'Feature 1',
+      'title' => $title,
       'menu' => $this->menu,
       'sidebar' => $this->sidebar,
       'sections' => $sections
@@ -45,17 +49,30 @@ class Project1Controller {
   }
 
   public function feature2(): array {
+    $title = "Feature 2";
+    $this->sidebar->setActiveItemText($title);
+
     $sections = [
       [
         'title' => 'Section 1',
         'id' => 'section-1',
-        'html' => loadTemplate($this->templateDir . __FUNCTION__)
+        'html' => loadTemplate($this->templateDir . __FUNCTION__),
+        'subsections' => [
+          [
+            'title' => 'A',
+            'id' => 'a',
+            'html' => loadTemplate($this->templateDir . __FUNCTION__ . '-a')
+          ], [
+            'title' => 'B',
+            'id' => 'b',
+            'html' => loadTemplate($this->templateDir . __FUNCTION__ . '-a')
+          ]
+        ]
       ]
     ];
 
-    $this->sidebar->setI(2);
     return [
-      'title' => 'Feature 2',
+      'title' => $title,
       'menu' => $this->menu,
       'sidebar' => $this->sidebar,
       'sections' => $sections

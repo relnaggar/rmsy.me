@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
-
+namespace Framework;
 class EntryPoint {
-  /* @var \Routes */
+  /* @var \Framework\RoutesInterface */
   private $routes;
 
-  public function __construct(\Routes $routes) {
+  public function __construct(\Framework\RoutesInterface $routes) {
     $this->routes = $routes;
   }
 

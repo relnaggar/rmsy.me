@@ -31,7 +31,7 @@
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <?php foreach ($menu['items'] as $menuItem) { ?>
               <li class="nav-item">
-                <a class="nav-link<?php if (false) { ?> active<?php } ?>"<?php if (false) { ?> aria-current="location"<?php } ?> href="<?=$menuItem['path']?>"><?=$menuItem['text']?></a>
+                <a class="nav-link<?php if ($menuItem['text'] === $menu['activeItemText']) { ?> active<?php } ?>"<?php if ($menuItem['text'] === $menu['activeItemText']) { ?> aria-current="location"<?php } ?> href="<?=$menuItem['path']?>"><?=$menuItem['text']?></a>
               </li>
             <?php } ?>
           </ul>
@@ -47,9 +47,9 @@
           <span class="navbar-brand-custom"><?=$sidebar->getTitle()?></span>
           <div class="collapse navbar-collapse" id="sidebar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <?php foreach ($sidebar->getItems() as $i => $sidebarItem) { ?>
+              <?php foreach ($sidebar->getItems() as $itemNumber => $sidebarItem) { ?>
                 <li class="nav-item">
-                  <a class="nav-link<?php if ($sidebar->isActive($i)) {?> active<?php }?>"<?php if ($sidebar->isActive($i)) { ?> aria-current="page"<?php } ?> href="<?=$sidebarItem['path']?>"><?=$sidebarItem['text']?></a>
+                  <a class="nav-link<?php if ($sidebar->isActive($itemNumber)) {?> active<?php }?>"<?php if ($sidebar->isActive($itemNumber)) { ?> aria-current="page"<?php } ?> href="<?=$sidebarItem['path']?>"><?=$sidebarItem['text']?></a>
                 </li>
               <?php } ?>
             </ul>
@@ -62,9 +62,9 @@
             <nav class="navbar flex-column navbar-light justify-content-start bg-light navbar-vertical sidebar">
               <span class="navbar-brand p-3"><?=$sidebar->getTitle()?></span>
               <ul class="navbar-nav w-100">
-                <?php foreach ($sidebar->getItems() as $i => $sidebarItem) { ?>
+                <?php foreach ($sidebar->getItems() as $itemNumber => $sidebarItem) { ?>
                   <li class="nav-item">
-                  <a class="nav-link<?php if ($sidebar->isActive($i)) {?> active<?php }?>"<?php if ($sidebar->isActive($i)) { ?> aria-current="page"<?php } ?> href="<?=$sidebarItem['path']?>"><?=$sidebarItem['text']?></a>
+                  <a class="nav-link<?php if ($sidebar->isActive($itemNumber)) {?> active<?php }?>"<?php if ($sidebar->isActive($itemNumber)) { ?> aria-current="page"<?php } ?> href="<?=$sidebarItem['path']?>"><?=$sidebarItem['text']?></a>
                   </li>
                 <?php } ?>
               </ul>
@@ -93,13 +93,30 @@
                   <li class="nav-item">
                     <a class="nav-link" href="#<?=$section['id']?>"><?=$section['title']?></a>
                   </li>
+                  <?php if (isset($section['subsections'])) { ?>
+                    <ul class="nav navbar-nav">
+                      <?php foreach ($section['subsections'] as $subsection) { ?>
+                        <li class="nav-item">
+                          <a class="nav-link ms-3" href="#<?=$section['id']?>-<?=$subsection['id']?>"><?=$subsection['title']?></a>
+                        </li>
+                      <?php } ?>                    
+                    </ul>
+                  <?php } ?>
                 <?php } ?>
               </ul>
             </nav>
             <?php foreach ($sections as $section) { ?>
               <section id="<?=$section['id']?>">
                 <h2><?=$section['title']?></h2>
-                <?=$section['html']?>
+                <?=$section['html'] ?? ''?>
+                <?php if (isset($section['subsections'])) { ?>
+                  <?php foreach ($section['subsections'] as $subsection) { ?>
+                    <section id="<?=$section['id']?>-<?=$subsection['id']?>">
+                      <h3><?=$subsection['title']?></h3>
+                      <?=$subsection['html']?>
+                    </section>
+                  <?php } ?>
+                <?php } ?>
               </section>
             <?php } ?>
           <?php } else { ?>
@@ -131,6 +148,15 @@
                   <li class="nav-item">
                     <a class="nav-link" href="#<?=$section['id']?>"><?=$section['title']?></a>
                   </li>
+                  <?php if (isset($section['subsections'])) { ?>
+                    <ul class="nav navbar-nav">
+                      <?php foreach ($section['subsections'] as $subsection) { ?>
+                        <li class="nav-item">
+                          <a class="nav-link ms-3" href="#<?=$section['id']?>-<?=$subsection['id']?>"><?=$subsection['title']?></a>
+                        </li>
+                      <?php } ?>                    
+                    </ul>
+                  <?php } ?>
                 <?php } ?>
               </ul>
             </nav>
@@ -138,7 +164,7 @@
         </div>
       </div>
       <footer class="text-center bg-primary p-5">
-        Copyright 2021 by Ramsey El-Naggar.  
+        Copyright &copy; 2021 by Ramsey El-Naggar.  
       </footer>
     </div>
     <script src="/assets/bootstrap.bundle.min.js"></script>

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
-
-class FrontController {
+namespace Controllers;
+class Front {
   public function home(): void {
     header('Location: /engineer/');
     die(); 

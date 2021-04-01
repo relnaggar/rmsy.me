@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
-
-class SidebarController {
+namespace Controllers;
+class Sidebar {
   public function project1(): \Sidebar {
     return new \Sidebar(
       $title = 'Project 1',
