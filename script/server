@@ -19,7 +19,7 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
 
 usage() {
   die "$(cat <<END
-usage: ${SCRIPT_NAME} down | up [environment] [build]
+usage: ${SCRIPT_NAME} down | up [environment] [build] [ground]
 
 environment can be:
   -d    development, default
@@ -29,6 +29,10 @@ environment can be:
 build can be:
   dev   development, default for development environment
   prod  production, mandatory for staging/production environments
+
+ground can be:
+  -b  background, default, mandatory for stagin/production environments
+  -f  foreground
 END
   )"
 }
@@ -44,6 +48,7 @@ parse_args() {
   # optional arguments
   environment=""
   build=""
+  ground=""
   while (( $# > 0 )); do
     local arg="${1:-}"
     case "${arg}" in
@@ -57,6 +62,13 @@ parse_args() {
       dev | prod)
         if [[ -z "${build}" ]]; then
           build="${arg}"
+        else
+          usage
+        fi
+        ;;
+      -b | -f)
+        if [[ -z "${ground}" ]]; then
+          ground="${arg}"
         else
           usage
         fi
@@ -78,11 +90,15 @@ parse_args() {
       -s|-p) build=prod ;;
     esac
   fi
+  if [[ -z "${ground}" ]]; then
+    ground=-b
+  fi
 
   log "arguments (\
 cmd: ${cmd}, \
 environment: ${environment}, \
-build: ${build}\
+build: ${build}, \
+ground: ${ground}\
 )"
 }
 
@@ -103,6 +119,10 @@ main() {
         -d)
           script/server down
           script/build "${build}"
+
+          if [[ "${ground}" == "-b" ]]; then
+            local end=-d
+          fi
           
           case "${build}" in
             dev)
@@ -111,7 +131,7 @@ main() {
                   -f docker-compose.yml \
                   -f docker-compose.override.yml \
                   -f build/docker-compose.dev.secrets.yml \
-                  up -d
+                  up ${end:-}
                 result="$?"
               set -e
               ;;
@@ -121,7 +141,7 @@ main() {
                   -f docker-compose.yml \
                   -f build/docker-compose.prod.yml \
                   -f build/docker-compose.dev.secrets.yml \
-                  up -d
+                  up ${end:-}
                 result="$?"
               set -e
               ;;
