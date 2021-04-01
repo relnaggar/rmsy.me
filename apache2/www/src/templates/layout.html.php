@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" href="/assets/custom.bootstrap.min.css">
+
+    <title><?=$title?> | <?php if (isset($sidebar)) { ?><?=$sidebar->getTitle()?> | <?php } ?>Ramsey El-Naggar</title>
+  </head>
+  <!-- offest of 56 pixels for the unexpanded navbar height -->
+  <body data-bs-spy="scroll" data-bs-target="#sidebarMenu" data-bs-offset="56" tabindex="0" class="position-relative">
+    <div class="container-fluid d-flex flex-column p-0">
+      <header>
+          <div class="display-none-xs-only d-flex">
+            <a href="/" class="display-4 flex-grow-1 text-reset banner"><b>r</b>a<b>ms</b>e<b>y</b> el&#8209;naggar<b class="banner-link">.me</b></a>
+            <a href="<?=$menu['homePath']?>" class="display-4 link-primary bg-contrast-primary text-decoration-none display-none-xl-down" id="subbanner"><?=$menu['title']?></a>
+          </div>
+          <div class="display-none-sm-up text-center">
+            <a href="/" class="display-2 text-reset banner"><b>rmsy</b><b class="banner-link">.me</b></a>
+          </div>
+      </header>
+      <nav class="navbar navbar-expand-sm sticky-top navbar-dark bg-dark navbar-horizontal">
+        <a class="navbar-brand-custom navbar-brand-subbanner" href="<?=$menu['homePath']?>"><?=$menu['title']?></a>
+        <button class="navbar-toggler-custom" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+          <div class="navbar-toggler-icon-manual"></div>
+          <div class="navbar-toggler-icon-manual"></div>
+          <div class="navbar-toggler-icon-manual"></div>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <?php foreach ($menu['items'] as $menuItem) { ?>
+              <li class="nav-item">
+                <a class="nav-link<?php if (false) { ?> active<?php } ?>"<?php if (false) { ?> aria-current="location"<?php } ?> href="<?=$menuItem['path']?>"><?=$menuItem['text']?></a>
+              </li>
+            <?php } ?>
+          </ul>
+        </div>
+      </nav>
+      <?php if (isset($sidebar)) { ?>
+        <nav class="navbar navbar-expand-sm navbar-light bg-light navbar-horizontal display-none-sm-up">
+          <button class="navbar-toggler-custom" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
+            <div class="navbar-toggler-icon-manual"></div>
+            <div class="navbar-toggler-icon-manual"></div>
+            <div class="navbar-toggler-icon-manual"></div>
+          </button>
+          <span class="navbar-brand-custom"><?=$sidebar->getTitle()?></span>
+          <div class="collapse navbar-collapse" id="sidebar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <?php foreach ($sidebar->getItems() as $i => $sidebarItem) { ?>
+                <li class="nav-item">
+                  <a class="nav-link<?php if ($sidebar->isActive($i)) {?> active<?php }?>"<?php if ($sidebar->isActive($i)) { ?> aria-current="page"<?php } ?> href="<?=$sidebarItem['path']?>"><?=$sidebarItem['text']?></a>
+                </li>
+              <?php } ?>
+            </ul>
+          </div>
+        </nav>
+      <?php } ?>
+      <div class="d-flex flex-row">
+        <div class="col-2 display-none-xs-only">
+          <?php if (isset($sidebar)) { ?>
+            <nav class="navbar flex-column navbar-light justify-content-start bg-light navbar-vertical sidebar">
+              <span class="navbar-brand p-3"><?=$sidebar->getTitle()?></span>
+              <ul class="navbar-nav w-100">
+                <?php foreach ($sidebar->getItems() as $i => $sidebarItem) { ?>
+                  <li class="nav-item">
+                  <a class="nav-link<?php if ($sidebar->isActive($i)) {?> active<?php }?>"<?php if ($sidebar->isActive($i)) { ?> aria-current="page"<?php } ?> href="<?=$sidebarItem['path']?>"><?=$sidebarItem['text']?></a>
+                  </li>
+                <?php } ?>
+              </ul>
+            </nav>
+          <?php } ?>
+        </div>
+        <main class="flex-grow-1 m-5 d-flex flex-column min-vh-100">
+          <h1><?=$title?></h1>
+          <?php if (isset($sidebar) && ($sidebar->getPreviousPath() || $sidebar->getNextPath())) { ?>
+            <div class="text-center">
+              <div class="btn-group">
+                <?php if ($sidebar->getPreviousPath()) { ?>
+                  <a href="<?=$sidebar->getPreviousPath()?>" class="btn btn-primary">&#8592; Previous</a>
+                <?php } ?>
+                <?php if ($sidebar->getNextPath()) { ?>
+                  <a href="<?=$sidebar->getNextPath()?>" class="btn btn-primary">Next &#8594;</a>
+                <?php } ?>
+              </div>
+            </div>
+          <?php } ?>
+          <?php if (isset($sections)) { ?>
+            <nav class="navbar flex-column justify-content-start navbar-light bg-light display-none-sm-up border m-3 navbar-vertical">
+              <span class="border-bottom text-muted p-3">On this page</span>
+              <ul class="navbar-nav">
+                <?php foreach ($sections as $section) { ?>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#<?=$section['id']?>"><?=$section['title']?></a>
+                  </li>
+                <?php } ?>
+              </ul>
+            </nav>
+            <?php foreach ($sections as $section) { ?>
+              <section id="<?=$section['id']?>">
+                <h2><?=$section['title']?></h2>
+                <?=$section['html']?>
+              </section>
+            <?php } ?>
+          <?php } else { ?>
+            <div class="mt-3">
+              <?=$html?>
+            </div>
+          <?php } ?>
+          <?php if (isset($sidebar) && ($sidebar->getPreviousPath() || $sidebar->getNextPath())) { ?>
+            <div class="flex-grow-1"></div>
+            <div class="text-center">
+              <div class="btn-group">
+                <?php if ($sidebar->getPreviousPath()) { ?>
+                  <a href="<?=$sidebar->getPreviousPath()?>" class="btn btn-primary">&#8592; Previous</a>
+                <?php } ?>
+                <?php if ($sidebar->getNextPath()) { ?>
+                  <a href="<?=$sidebar->getNextPath()?>" class="btn btn-primary">Next &#8594;</a>
+                <?php } ?>
+              </div>
+            </div>
+          <?php } ?>
+        </main>
+        <a href="#" class="btn btn-primary position-fixed bottom-0 end-0 display-none-sm-up">^</a>
+        <div class="col-2 display-none-xs-only">
+          <?php if (isset($sections)) { ?>
+            <nav id="sidebarMenu" class="navbar navbar-light flex-column justify-content-start bg-light navbar-vertical sidebar">
+              <span class="border-bottom w-100 text-muted p-3">On this page</span>
+              <ul class="navbar-nav w-100">
+                <?php foreach ($sections as $section) { ?>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#<?=$section['id']?>"><?=$section['title']?></a>
+                  </li>
+                <?php } ?>
+              </ul>
+            </nav>
+          <?php } ?>
+        </div>
+      </div>
+      <footer class="text-center bg-primary p-5">
+        Copyright 2021 by Ramsey El-Naggar.  
+      </footer>
+    </div>
+    <script src="/assets/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
