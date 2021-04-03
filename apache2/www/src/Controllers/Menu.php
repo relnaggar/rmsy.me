@@ -2,7 +2,7 @@
 namespace Controllers;
 class Menu {
   public function engineer(): array {
-    $homePath = '/engineer/';
+    $homePath = '/' . __FUNCTION__ . '/';
     return [
       'title' => 'software engineer',
       'homePath' => $homePath,
@@ -11,11 +11,28 @@ class Menu {
           'text' => 'Home',
           'path' => $homePath
         ], [
-          'text' => 'Project 1',
-          'path' => '/engineer/project1/'
+          'text' => 'About',
+          'path' => $homePath . 'about'
+        //], [
+          //'text' => 'Resume',
+          //'path' => $homePath . 'resume',
+          //'target' => '_blank'
         ], [
-          'text' => 'Project 2',
-          'path' => '/engineer/project2/'
+          'text' => 'Projects',
+          'id' => 'projects',
+          'dropdown' => [
+            [
+              'text' => 'Personal Website',
+              'path' => $homePath . 'website/'
+            ]
+          ]
+        ], [
+          'text' => 'LinkedIn',
+          'path' => '/linkedin',
+          'target' => '_blank'
+        ], [
+          'text' => 'Contact',
+          'path' => $homePath . 'contact'
         ]
       ]
     ];

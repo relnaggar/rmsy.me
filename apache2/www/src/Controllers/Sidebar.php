@@ -1,19 +1,20 @@
 <?php declare(strict_types=1);
 namespace Controllers;
 class Sidebar {
-  public function project1(): \Sidebar {
+  public function website(): \Sidebar {
+    $homePath = '/engineer/' . __FUNCTION__ . '/';
     return new \Sidebar(
-      $title = 'Project 1',
+      $title = 'Personal Website',
       $items = [
         [
           'text' => 'Introduction',
-          'path' => '/engineer/project1/'
+          'path' => $homePath
         ], [
           'text' => 'Feature 1',
-          'path' => '/engineer/project1/feature1'
+          'path' => $homePath . 'feature1'
         ], [
           'text' => 'Feature 2',
-          'path' => '/engineer/project1/feature2'
+          'path' => $homePath . 'feature2'
         ]
       ]
     );

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 namespace Controllers;
-class Project1 {
+class Website {
   /* @var string */
   private $templateDir;
 
@@ -11,10 +11,10 @@ class Project1 {
   private $sidebar;
 
   public function __construct(\Controllers\Menu $menuController, \Controllers\Sidebar $sidebarController) {
-    $this->templateDir = '/project1/';
+    $this->templateDir = '/website/';
     $this->menu = $menuController->engineer();
-    $this->sidebar = $sidebarController->project1();
-    $this->menu['activeItemText'] = 'Project 1';
+    $this->sidebar = $sidebarController->website();
+    $this->menu['activeItemText'] = 'Website';
   }
 
   public function intro(): array {
@@ -65,7 +65,7 @@ class Project1 {
           ], [
             'title' => 'B',
             'id' => 'b',
-            'html' => loadTemplate($this->templateDir . __FUNCTION__ . '-a')
+            'html' => loadTemplate($this->templateDir . __FUNCTION__ . '-b')
           ]
         ]
       ]

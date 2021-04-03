@@ -12,8 +12,8 @@ class Routes implements \Framework\RoutesInterface {
   /* @var \Controllers\Engineer */
   private $engineerController;
 
-  /* @var \Controllers\Project1 */
-  private $project1Controller;
+  /* @var \Controllers\Website*/
+  private $websiteController;
 
   /* @var \Controller */
   private $controller;
@@ -23,7 +23,7 @@ class Routes implements \Framework\RoutesInterface {
     $this->sidebarController = new \Controllers\Sidebar();
     $this->frontController = new \Controllers\Front();
     $this->engineerController= new \Controllers\Engineer($this->menuController, $this->sidebarController);
-    $this->project1Controller = new \Controllers\Project1($this->menuController, $this->sidebarController);
+    $this->websiteController = new \Controllers\Website($this->menuController, $this->sidebarController);
   }
 
   public function getRoutes(): array {
@@ -40,21 +40,33 @@ class Routes implements \Framework\RoutesInterface {
           'functionName' => 'home'
         ]
       ],
-      '/engineer/project1/' => [
+      '/engineer/about' => [
+        'GET'  => [
+          'controller' => $this->engineerController,
+          'functionName' => 'about'
+        ]
+      ],
+      '/engineer/contact' => [
+        'GET'  => [
+          'controller' => $this->engineerController,
+          'functionName' => 'contact'
+        ]
+      ],
+      '/engineer/website/' => [
         'GET' => [
-          'controller' => $this->project1Controller,
+          'controller' => $this->websiteController,
           'functionName' => 'intro'
         ]
       ],
-      '/engineer/project1/feature1' => [
+      '/engineer/website/feature1' => [
         'GET' => [
-          'controller' => $this->project1Controller,
+          'controller' => $this->websiteController,
           'functionName' => 'feature1'
         ]
       ],
-      '/engineer/project1/feature2' => [
+      '/engineer/website/feature2' => [
         'GET' => [
-          'controller' => $this->project1Controller,
+          'controller' => $this->websiteController,
           'functionName' => 'feature2'
         ]
       ]
