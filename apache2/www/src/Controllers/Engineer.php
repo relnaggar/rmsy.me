@@ -13,7 +13,7 @@ class Engineer {
   }
 
   private function basic($function_name) {
-    $title = mb_convert_case($function_name, MB_CASE_TITLE, 'UTF-8');
+    $title = ucfirst($function_name);
     $this->menu['activeItemText'] = $title;
     return [
       'title' => $title,
