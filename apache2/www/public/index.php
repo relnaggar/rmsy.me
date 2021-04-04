@@ -7,6 +7,7 @@
 $sourceDirectory = '../src/';
 require($sourceDirectory . 'autoload.php');
 require($sourceDirectory . 'loadTemplate.php');
+require($sourceDirectory . 'includeIcon.php');
 
 $routes = new \Routes();
 $entryPoint = new \Framework\EntryPoint($routes);
