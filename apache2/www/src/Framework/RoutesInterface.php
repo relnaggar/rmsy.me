@@ -2,4 +2,5 @@
 namespace Framework;
 interface RoutesInterface {
   public function getRoutes(): array;
+  public function getDefaultRoute(): array;
 }

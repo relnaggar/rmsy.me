@@ -72,4 +72,12 @@ class Routes implements \Framework\RoutesInterface {
       ]
     ];
   }
+
+  public function getDefaultRoute(): array {
+    http_response_code(404);
+    return [
+      'controller' => $this->engineerController,
+      'functionName' => 'pageNotFound'
+    ];
+  }
 }

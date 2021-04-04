@@ -13,7 +13,9 @@ class Engineer {
   }
 
   private function basic($function_name) {
-    $title = ucfirst($function_name);
+    $words = preg_split('/(?=[A-Z])/', $function_name);
+    $words[0] = ucfirst($words[0]);
+    $title = implode(' ', $words);
     $this->menu['activeItemText'] = $title;
     return [
       'title' => $title,
@@ -32,6 +34,10 @@ class Engineer {
   }
 
   public function contact(): array {
+    return $this->basic(__FUNCTION__);
+  }
+
+  public function pageNotFound(): array {
     return $this->basic(__FUNCTION__);
   }
 }
