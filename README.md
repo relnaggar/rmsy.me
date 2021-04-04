@@ -144,6 +144,8 @@ Before deploying, it's also necessary to generate production secrets:
 
 On the production server:
 ```shell
+git pull
+
 cd script
 
 # backup the production database to backup/:
