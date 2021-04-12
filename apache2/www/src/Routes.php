@@ -35,19 +35,23 @@ class Routes implements \Framework\RoutesInterface {
         ]
       ],
       '/engineer/' => [
-        'GET'  => [
+        'GET' => [
           'controller' => $this->engineerController,
           'functionName' => 'home'
         ]
       ],
       '/engineer/about' => [
-        'GET'  => [
+        'GET' => [
           'controller' => $this->engineerController,
           'functionName' => 'about'
         ]
       ],
       '/engineer/contact' => [
-        'GET'  => [
+        'GET' => [
+          'controller' => $this->engineerController,
+          'functionName' => 'contact'
+        ],
+        'POST' => [
           'controller' => $this->engineerController,
           'functionName' => 'contact'
         ]
