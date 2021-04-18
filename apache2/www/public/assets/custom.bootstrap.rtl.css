@@ -10836,4 +10836,8 @@ footer {
   background-color: #6f42c1 !important;
   color: #fff !important;
 }
+
+.invalid {
+  border: 1px solid #dc3545;
+}
 /*# sourceMappingURL=custom.bootstrap.rtl.css.map */

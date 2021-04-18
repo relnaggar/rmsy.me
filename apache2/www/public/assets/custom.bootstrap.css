@@ -10860,4 +10860,8 @@ footer {
   color: #fff !important;
 }
 
+.invalid {
+  border: 1px solid #dc3545;
+}
+
 /*# sourceMappingURL=custom.bootstrap.css.map */

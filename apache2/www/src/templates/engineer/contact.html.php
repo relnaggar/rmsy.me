@@ -1,7 +1,7 @@
 <p class="lead">Any questions, feedback or general enquiries are welcome. To get in touch, you can send me an email or submit the contact form below. You can also send me an invitation on Linkedin.</p>
 
-<script src="https://www.google.com/recaptcha/api.js" async defer nonce="<?=$recaptcha['nonce']?>"></script>
-<script src="/assets/bootstrap-form.js" defer></script>
+<script src="/assets/contact-form.js" async defer></script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback" async defer nonce="<?=$recaptcha['nonce']?>"></script>
 
 <div class="row">
   <div class="col-xl-8 mb-3">
@@ -36,7 +36,12 @@
               This field cannot be blank.
             </div>
           </div>
-          <div class="g-recaptcha mb-3" data-sitekey="<?=$recaptcha['sitekey']?>"></div>
+          <div class="mb-3">
+            <div class="g-recaptcha" data-sitekey="<?=$recaptcha['sitekey']?>" data-callback="successfulResponseCallback"></div>
+            <div class="invalid-feedback">
+              The reCAPTCHA box must be checked.
+            </div>
+          </div>
           <input class="btn btn-primary" type="submit" value="Submit">
         </form>
       </div>
