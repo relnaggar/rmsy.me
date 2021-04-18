@@ -13,10 +13,6 @@ class Menu {
         ], [
           'text' => 'About',
           'path' => $homePath . 'about'
-        //], [
-          //'text' => 'Resume',
-          //'path' => $homePath . 'resume',
-          //'target' => '_blank'
         ], [
           'text' => 'Projects',
           'id' => 'projects',
@@ -27,7 +23,12 @@ class Menu {
             ]
           ]
         ], [
-          'text' => 'LinkedIn',
+          'text' => 'Resume',
+          'path' => '/tutor/resume',
+          //'path' => $homePath . 'resume',
+          'target' => '_blank'
+        ], [
+          'text' => 'Linkedin',
           'path' => '/linkedin',
           'target' => '_blank'
         ], [
