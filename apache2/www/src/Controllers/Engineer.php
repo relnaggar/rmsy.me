@@ -35,12 +35,10 @@ class Engineer {
   }
 
   private function getRecaptchaDetails(): array {
-    $recaptcha['nonce'] = base64_encode(random_bytes(18)); // number of bytes must be a multiple of 3 greater than 16
-    if (isset($GLOBALS['PRODUCTION'])) {
-      $recaptcha['sitekey'] = '***REMOVED***';
-    } else {
-      $recaptcha['sitekey'] = '***REMOVED***';
-    }
+    $recaptcha = [
+      'nonce' => base64_encode(random_bytes(18)), // number of bytes must be a multiple of 3 greater than 16
+      'sitekey' => rtrim(file_get_contents('/run/secrets/RECAPTCHA_SITE_KEY'))
+    ];
     header("Content-Security-Policy: TO_BE_REPLACED; script-src 'self' 'nonce-" . $recaptcha['nonce'] . "'; frame-src https://www.google.com/recaptcha/, https://recaptcha.google.com/recaptcha/");
     return $recaptcha;
   }
@@ -67,51 +65,38 @@ class Engineer {
   private function validateRecaptcha() {
     $url = 'https://www.google.com/recaptcha/api/siteverify';
     $data = [
-      'response' => $_POST['g-recaptcha-response']
+      'response' => $_POST['g-recaptcha-response'],
+      'secret' => rtrim(file_get_contents('/run/secrets/RECAPTCHA_SECRET_KEY'))
     ];
-    if (isset($GLOBALS['PRODUCTION'])) {
-      $data['secret'] = '***REMOVED***';
-    } else {                                                     
-      $data['secret'] = '***REMOVED***';
-    }
     return $this->sendPostRequest($url, $data);
   }
 
-  private function sendEmail(string $fromEmail, string $fromName, string $toEmail, string $toName, string $subject, string $htmlBody): bool {
+  private function sendEmail(string $fromEmail, string $fromName, string $toEmail, string $toName, string $ccEmail, string $ccName, string $subject, string $htmlBody): bool {
     $mail = new PHPMailer(true);
     $mail->Debugoutput = 'error_log';
     try {
-      //Server settings
-      $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
-      $mail->isSMTP();                                            //Send using SMTP
-      $mail->Host = '***REMOVED***';                     //Set the SMTP server to send through
-      $mail->SMTPAuth = true;                                   //Enable SMTP authentication
-      $mail->Username = '***REMOVED***';                     //SMTP username
-      $mail->Password = '***REMOVED***';                               //SMTP password
-      $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;         //Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
-      $mail->Port = 465;                                    //TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+      // Server settings
+      $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+      $mail->isSMTP();
+      $mail->Host = rtrim(file_get_contents('/run/secrets/SMTP_HOST'));
+      $mail->SMTPAuth = true;
+      $mail->Username = rtrim(file_get_contents('/run/secrets/SMTP_USERNAME'));
+      $mail->Password = rtrim(file_get_contents('/run/secrets/SMTP_PASSWORD'));
+      $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+      $mail->Port = 465;
 
-      //Recipients
+      // Recipients
       $mail->setFrom($fromEmail, $fromName);
-      $mail->addAddress($toEmail, $toName);     //Add a recipient
-      //$mail->addAddress('ellen@example.com');               //Name is optional
-      //$mail->addReplyTo('info@example.com', 'Information');
-      //$mail->addCC('cc@example.com');
-      //$mail->addBCC('bcc@example.com');
+      $mail->addAddress($toEmail, $toName);
+      $mail->addCC($ccEmail, $ccName);
 
-      //Attachments
-      //$mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
-      //$mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
-
-      //Content
-      $mail->isHTML(true);                                  //Set email format to HTML
+      // Content
+      $mail->isHTML(true);
       $mail->Subject = $subject;
       $mail->Body = $htmlBody;
-      //$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
       $mail->send();
       return true;
-      echo 'Message has been sent';
     } catch (Exception $e) {
       return false;
     }
@@ -126,13 +111,13 @@ class Engineer {
         if ($result['success']) {
           $message['sent'] = $this->sendEmail(
             'engineer@rmsy.me',
-            'Engineer Contact Form',
+            'Ramsey El-Naggar',
             'engineer@rmsy.me',
             'Ramsey El-Naggar',
-            'Engineer contact form message',
-            loadTemplate('/engineer/email', [
-              'message' => $_POST['message']
-            ])
+            $_POST['message']['email'],
+            $_POST['message']['name'],
+            'rmsy.me engineer contact form message',
+            $_POST['message']['message']
           );
           if (!$message['sent']) {
             $message['error-code'] = 'PHPMailer';
