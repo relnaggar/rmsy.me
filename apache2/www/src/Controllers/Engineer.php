@@ -34,13 +34,8 @@ class Engineer {
     ];
   }
 
-  private function getRecaptchaDetails(): array {
-    $recaptcha = [
-      'nonce' => base64_encode(random_bytes(18)), // number of bytes must be a multiple of 3 greater than 16
-      'sitekey' => rtrim(file_get_contents('/run/secrets/RECAPTCHA_SITE_KEY'))
-    ];
-    header("Content-Security-Policy: TO_BE_REPLACED; script-src 'self' 'nonce-" . $recaptcha['nonce'] . "'; frame-src https://www.google.com/recaptcha/, https://recaptcha.google.com/recaptcha/");
-    return $recaptcha;
+  public function pageNotFound(): array {
+    return $this->basic(__FUNCTION__);
   }
 
   public function home(): array {
@@ -49,6 +44,15 @@ class Engineer {
 
   public function about(): array {
     return $this->basic(__FUNCTION__);
+  }
+
+  private function getRecaptchaDetails(): array {
+    $recaptcha = [
+      'nonce' => base64_encode(random_bytes(18)), // number of bytes must be a multiple of 3 greater than 16
+      'sitekey' => rtrim(file_get_contents('/run/secrets/RECAPTCHA_SITE_KEY'))
+    ];
+    header("Content-Security-Policy: TO_BE_REPLACED; script-src 'self' 'nonce-" . $recaptcha['nonce'] . "'; frame-src https://www.google.com/recaptcha/, https://recaptcha.google.com/recaptcha/");
+    return $recaptcha;
   }
 
   private function sendPostRequest(string $url, array $data) {
@@ -136,9 +140,5 @@ class Engineer {
     }
     $vars['message'] = $message;
     return $this->basic(__FUNCTION__, $vars);
-  }
-
-  public function pageNotFound(): array {
-    return $this->basic(__FUNCTION__);
   }
 }
