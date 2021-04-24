@@ -28,7 +28,7 @@ main() {
   log "start"
   cd "${SCRIPT_DIR}/.."
 
-# parse command line arguments
+  # parse command line arguments
   local host_directory="${1:-}"
 
   # always required
@@ -36,33 +36,35 @@ main() {
     usage
   fi
 
-  cd ${host_directory}
+  logfun cd ${host_directory}
   local file_to_source=".defaults-info"
   if [[ ! -f "${file_to_source}" ]]; then
     err "${file_to_source}: file not found"
     exit 1
   fi
-  . "${file_to_source}"
+  logfun . "${file_to_source}"
 
   set +e
     rm -r "defaults" 2>/dev/null
   set -e
-  mkdir "defaults"
+  logfun mkdir "defaults"
 
   # just in case it's running, stop the service
   set +e
-    docker stop "default-${SERVICE}" >/dev/null 2>&1
+    logfun docker stop "default-${SERVICE}"
+    logfun docker rm "default-${SERVICE}"
   set -e
 
-  docker run --rm -d --name "default-${SERVICE}" \
-    "${STACK_NAME}-${SERVICE}" >/dev/null
+  logfun docker run -d --name "default-${SERVICE}" \
+    "${STACK_NAME}-${SERVICE}"
 
-  docker cp "default-${SERVICE}:${SRC}/." defaults >/dev/null
+  logfun docker cp "default-${SERVICE}:${SRC}/." defaults
 
-  docker stop "default-${SERVICE}" >/dev/null
+  logfun docker stop "default-${SERVICE}" 
 
   # cleanup just in case
-  unset SERVICE; unset SOURCE
+  logfun unset SERVICE
+  logfun unset SOURCE
 
   log "end"
 }
