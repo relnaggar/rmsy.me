@@ -6,7 +6,7 @@ services:
     volumes:
       - "./apache2/www:/var/www"
       - "./apache2/conf:/etc/apache2"
-      - "./apache2/ini:/etc/php/7.3/apache2"
+      - "./apache2/apache2-ini:/etc/php/7.3/apache2"
   postgres:
     image: rmsy-me-postgres
     build: "./postgres"

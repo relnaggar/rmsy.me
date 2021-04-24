@@ -7,15 +7,19 @@ RUN apt-get update -y \
   # Apache 
   apache2 \
   # PHP                                                     
-  libapache2-mod-php$PHPVERSION \
+  libapache2-mod-php${PHPVERSION} \
+  #OpenSSL
+  openssl \
   # PHP Postgres
-  php$PHPVERSION-pgsql \
+  php${PHPVERSION}-pgsql \
   # cleanup
   && rm -rf /var/lib/apt/lists/*
 
+COPY certs /usr/lib/ssl/certs
+
 COPY --chown=apache2:apache2 www /var/www
 COPY conf /etc/apache2
-COPY ini /etc/php/$PHPVERSION/apache2
+COPY apache2-ini /etc/php/${PHPVERSION}/apache2
 
 COPY docker-entrypoint /
 VOLUME ["/var/log/apache2"]
