@@ -1,5 +1,10 @@
 <?php declare(strict_types=1);
 namespace Controllers;
+
+use \PHPMailer\PHPMailer\PHPMailer;
+use \PHPMailer\PHPMailer\Exception;
+use \PHPMailer\PHPMailer\SMTP;
+
 class Engineer {
   /* @var string */
   private $templateDir;
@@ -54,9 +59,6 @@ class Engineer {
         'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
         'method'  => 'POST',
         'content' => http_build_query($data)
-      ],
-      'ssl' => [
-        'cafile' => '../cacert.cer',
       ]
     ];
     return file_get_contents($url, false, stream_context_create($options));
@@ -75,6 +77,46 @@ class Engineer {
     return $this->sendPostRequest($url, $data);
   }
 
+  private function sendEmail(string $fromEmail, string $fromName, string $toEmail, string $toName, string $subject, string $htmlBody): bool {
+    $mail = new PHPMailer(true);
+    $mail->Debugoutput = 'error_log';
+    try {
+      //Server settings
+      $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+      $mail->isSMTP();                                            //Send using SMTP
+      $mail->Host = '***REMOVED***';                     //Set the SMTP server to send through
+      $mail->SMTPAuth = true;                                   //Enable SMTP authentication
+      $mail->Username = '***REMOVED***';                     //SMTP username
+      $mail->Password = '***REMOVED***';                               //SMTP password
+      $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;         //Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
+      $mail->Port = 465;                                    //TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+
+      //Recipients
+      $mail->setFrom($fromEmail, $fromName);
+      $mail->addAddress($toEmail, $toName);     //Add a recipient
+      //$mail->addAddress('ellen@example.com');               //Name is optional
+      //$mail->addReplyTo('info@example.com', 'Information');
+      //$mail->addCC('cc@example.com');
+      //$mail->addBCC('bcc@example.com');
+
+      //Attachments
+      //$mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
+      //$mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
+
+      //Content
+      $mail->isHTML(true);                                  //Set email format to HTML
+      $mail->Subject = $subject;
+      $mail->Body = $htmlBody;
+      //$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+      $mail->send();
+      return true;
+      echo 'Message has been sent';
+    } catch (Exception $e) {
+      return false;
+    }
+  }
+
   public function contact(): array {
     $message['sent'] = false;
     if (isset($_POST['submit'])) {
@@ -82,14 +124,26 @@ class Engineer {
       if ($result_string) {
         $result = json_decode($result_string, true);
         if ($result['success']) {
-          $message['sent'] = true;
+          $message['sent'] = $this->sendEmail(
+            'engineer@rmsy.me',
+            'Engineer Contact Form',
+            'engineer@rmsy.me',
+            'Ramsey El-Naggar',
+            'Engineer contact form message',
+            loadTemplate('/engineer/email', [
+              'message' => $_POST['message']
+            ])
+          );
+          if (!$message['sent']) {
+            $message['error-code'] = 'PHPMailer';
+          }
         } else if (count($result['error-codes']) === 1 && $result['error-codes'][0] === 'timeout-or-duplicate') {
           $message['error-code'] = 'timeout-or-duplicate';
         } else {
-          $message['error-code'] = 'internal';
+          $message['error-code'] = 'reCAPTCHA';
         }
       } else {
-        $message['error-code'] = 'internal';
+        $message['error-code'] = 'file_get_contents';
       }
     }
     if (!$message['sent']) {
