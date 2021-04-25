@@ -32,6 +32,7 @@
 .navbar {
   padding: 0 !important;
   align-items: normal !important; // for navbar items with background
+  user-select: none !important;
 }
 
 .navbar-nav {
@@ -64,5 +65,4 @@
     background-color: $primary !important;
     color: color-contrast($primary) !important;
   }
-
 }
