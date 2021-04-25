@@ -7,7 +7,7 @@ RUN apt-get update -y \
   # Apache 
   apache2 \
   # PHP                                                     
-  libapache2-mod-php$PHPVERSION \
+  libapache2-mod-php${PHPVERSION} \
   #OpenSSL
   openssl \
   # PHP Postgres
