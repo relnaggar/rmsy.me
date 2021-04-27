@@ -75,7 +75,7 @@
       <div class="d-flex flex-row">
         <div class="col-2 display-none-xs-only">
           <?php if (isset($sidebar)) { ?>
-            <nav class="navbar flex-column navbar-light justify-content-start bg-light navbar-vertical sidebar">
+            <nav class="navbar flex-column navbar-light justify-content-start bg-light navbar-vertical sidebar flex-nowrap">
               <span class="navbar-brand p-3"><?=$sidebar->getTitle()?></span>
               <ul class="navbar-nav w-100">
                 <?php foreach ($sidebar->getItems() as $itemNumber => $sidebarItem) { ?>
@@ -84,6 +84,7 @@
                   </li>
                 <?php } ?>
               </ul>
+              <div class="mb-5"></div>
             </nav>
           <?php } ?>
         </div>

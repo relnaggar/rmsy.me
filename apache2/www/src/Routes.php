@@ -62,16 +62,10 @@ class Routes implements \Framework\RoutesInterface {
           'functionName' => 'intro'
         ]
       ],
-      '/engineer/website/feature1' => [
+      '/engineer/website/aws' => [
         'GET' => [
           'controller' => $this->websiteController,
-          'functionName' => 'feature1'
-        ]
-      ],
-      '/engineer/website/feature2' => [
-        'GET' => [
-          'controller' => $this->websiteController,
-          'functionName' => 'feature2'
+          'functionName' => 'aws'
         ]
       ]
     ];

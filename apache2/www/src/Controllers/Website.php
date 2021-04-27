@@ -28,54 +28,65 @@ class Website {
     ];
   }
 
-  public function feature1(): array {
-    $title = "Feature 1";
+  public function aws(): array {
+    $title = "AWS";
     $this->sidebar->setActiveItemText($title);
-
-    $sections = [
-      [
-        'title' => 'Section 1',
-        'id' => 'section-1',
-        'html' => loadTemplate($this->templateDir . __FUNCTION__)
-      ]
-    ];
-
     return [
       'title' => $title,
       'menu' => $this->menu,
       'sidebar' => $this->sidebar,
-      'sections' => $sections
+      'html' => loadTemplate($this->templateDir . __FUNCTION__)
     ];
   }
 
-  public function feature2(): array {
-    $title = "Feature 2";
-    $this->sidebar->setActiveItemText($title);
+  //public function feature1(): array {
+    //$title = "Feature 1";
+    //$this->sidebar->setActiveItemText($title);
 
-    $sections = [
-      [
-        'title' => 'Section 1',
-        'id' => 'section-1',
-        'html' => loadTemplate($this->templateDir . __FUNCTION__),
-        'subsections' => [
-          [
-            'title' => 'A',
-            'id' => 'a',
-            'html' => loadTemplate($this->templateDir . __FUNCTION__ . '-a')
-          ], [
-            'title' => 'B',
-            'id' => 'b',
-            'html' => loadTemplate($this->templateDir . __FUNCTION__ . '-b')
-          ]
-        ]
-      ]
-    ];
+    //$sections = [
+      //[
+        //'title' => 'Section 1',
+        //'id' => 'section-1',
+        //'html' => loadTemplate($this->templateDir . __FUNCTION__)
+      //]
+    //];
 
-    return [
-      'title' => $title,
-      'menu' => $this->menu,
-      'sidebar' => $this->sidebar,
-      'sections' => $sections
-    ];
-  }
+    //return [
+      //'title' => $title,
+      //'menu' => $this->menu,
+      //'sidebar' => $this->sidebar,
+      //'sections' => $sections
+    //];
+  //}
+
+  //public function feature2(): array {
+    //$title = "Feature 2";
+    //$this->sidebar->setActiveItemText($title);
+
+    //$sections = [
+      //[
+        //'title' => 'Section 1',
+        //'id' => 'section-1',
+        //'html' => loadTemplate($this->templateDir . __FUNCTION__),
+        //'subsections' => [
+          //[
+            //'title' => 'A',
+            //'id' => 'a',
+            //'html' => loadTemplate($this->templateDir . __FUNCTION__ . '-a')
+          //], [
+            //'title' => 'B',
+            //'id' => 'b',
+            //'html' => loadTemplate($this->templateDir . __FUNCTION__ . '-b')
+          //]
+        //]
+      //]
+    //];
+
+    //return [
+      //'title' => $title,
+      //'menu' => $this->menu,
+      //'sidebar' => $this->sidebar,
+      //'sections' => $sections
+    //];
+  //}
 }
