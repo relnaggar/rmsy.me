@@ -108,6 +108,7 @@ symlink_githooks() {
 initialise_swarm() {
   set +e
     logfun script/server down
+    logfun docker swarm leave
     logfun docker swarm init
   set -e
 }
