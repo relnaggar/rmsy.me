@@ -1,35 +1,70 @@
 <?php declare(strict_types=1);
 namespace Controllers;
 class Website extends Segment {
-  /* @var \Controllers\Sidebar */
-  private $sidebar;
-
   public function __construct(\Controllers\Menu $menuController, \Controllers\Sidebar $sidebarController) {
-    parent::__construct($templateDir='/website/', $menu=$menuController->engineer());
-    $this->sidebar = $sidebarController->website();
+    parent::__construct($templateDir='/website/', $menu=$menuController->engineer(), $sidebar=$sidebarController->website());
     $this->menu['activeItemText'] = 'Website';
   }
 
-  public function intro(): array {
-    $title = "Introduction";
-    $this->sidebar->setActiveItemText($title);
-    return [
-      'title' => $title,
-      'menu' => $this->menu,
-      'sidebar' => $this->sidebar,
-      'html' => loadTemplate($this->templateDir . __FUNCTION__)
-    ];
+  public function introduction(): array {
+    return $this->basic(__FUNCTION__);
   }
 
   public function aws(): array {
-    $title = "AWS";
-    $this->sidebar->setActiveItemText($title);
-    return [
-      'title' => $title,
-      'menu' => $this->menu,
-      'sidebar' => $this->sidebar,
-      'html' => loadTemplate($this->templateDir . __FUNCTION__)
-    ];
+    return $this->basic(__FUNCTION__, $vars=[], $title=strtoupper(__FUNCTION__));
+  }
+
+  public function docker(): array {
+    return $this->basic(__FUNCTION__);
+  }
+
+  public function apache(): array {
+    return $this->basic(__FUNCTION__);
+  }
+
+  public function bash(): array {
+    return $this->basic(__FUNCTION__);
+  }
+
+
+  public function ssl(): array {
+    return $this->basic(__FUNCTION__, $vars=[], $title=strtoupper(__FUNCTION__));
+  }
+
+  public function postgres(): array {
+    return $this->basic(__FUNCTION__, $vars=[], $title='PostgreSQL');
+  }
+
+  public function phpunit(): array {
+    return $this->basic(__FUNCTION__, $vars=[], $title='PHPUnit');
+  }
+
+  public function selenium(): array {
+    return $this->basic(__FUNCTION__);
+  }
+
+  public function cucumber(): array {
+    return $this->basic(__FUNCTION__);
+  }
+
+  public function latex(): array {
+    return $this->basic(__FUNCTION__, $vars=[], $title='LaTeX');
+  }
+
+  public function bootstrap(): array {
+    return $this->basic(__FUNCTION__);
+  }
+
+  public function php(): array {
+    return $this->basic(__FUNCTION__, $vars=[], $title='PHP Framework');
+  }
+
+  public function form(): array {
+    return $this->basic(__FUNCTION__, $vars=[], $title='Contact Form');
+  }
+
+  public function jira(): array {
+    return $this->basic(__FUNCTION__);
   }
 
   //public function feature1(): array {

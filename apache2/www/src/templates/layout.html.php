@@ -156,8 +156,8 @@
           <?php } ?>
         </main>
         <a href="#" class="btn btn-primary position-fixed bottom-0 end-0 display-none-md-up">^</a>
-        <?php if (isset($sections)) { ?>
-          <div class="col-2 display-none-md-down">
+        <div class="col-2 display-none-md-down">
+          <?php if (isset($sections)) { ?>
             <nav id="sidebarMenu" class="navbar navbar-light flex-column justify-content-start bg-light navbar-vertical sidebar">
               <span class="border-bottom w-100 text-muted p-3">On this page</span>
               <ul class="navbar-nav w-100">
@@ -177,8 +177,8 @@
                 <?php } ?>
               </ul>
             </nav>
-          </div>
-        <?php } ?>
+          <?php } ?>
+        </div>
       </div>
       <footer class="text-center bg-primary p-5">
         Copyright &copy; 2021 by Ramsey El-Naggar.  

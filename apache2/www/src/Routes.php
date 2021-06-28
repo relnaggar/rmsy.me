@@ -59,13 +59,91 @@ class Routes implements \Framework\RoutesInterface {
       '/engineer/website/' => [
         'GET' => [
           'controller' => $this->websiteController,
-          'functionName' => 'intro'
+          'functionName' => 'introduction'
         ]
       ],
       '/engineer/website/aws' => [
         'GET' => [
           'controller' => $this->websiteController,
           'functionName' => 'aws'
+        ]
+      ],
+      '/engineer/website/docker' => [
+        'GET' => [
+          'controller' => $this->websiteController,
+          'functionName' => 'docker'
+        ]
+      ],
+      '/engineer/website/apache' => [
+        'GET' => [
+          'controller' => $this->websiteController,
+          'functionName' => 'apache'
+        ]
+      ],
+      '/engineer/website/bash' => [
+        'GET' => [
+          'controller' => $this->websiteController,
+          'functionName' => 'bash'
+        ]
+      ],
+      '/engineer/website/ssl' => [
+        'GET' => [
+          'controller' => $this->websiteController,
+          'functionName' => 'ssl'
+        ]
+      ],
+      '/engineer/website/postgres' => [
+        'GET' => [
+          'controller' => $this->websiteController,
+          'functionName' => 'postgres'
+        ]
+      ],
+      '/engineer/website/phpunit' => [
+        'GET' => [
+          'controller' => $this->websiteController,
+          'functionName' => 'phpunit'
+        ]
+      ],
+      '/engineer/website/selenium' => [
+        'GET' => [
+          'controller' => $this->websiteController,
+          'functionName' => 'selenium'
+        ]
+      ],
+      '/engineer/website/cucumber' => [
+        'GET' => [
+          'controller' => $this->websiteController,
+          'functionName' => 'cucumber'
+        ]
+      ],
+      '/engineer/website/latex' => [
+        'GET' => [
+          'controller' => $this->websiteController,
+          'functionName' => 'latex'
+        ]
+      ],
+      '/engineer/website/bootstrap' => [
+        'GET' => [
+          'controller' => $this->websiteController,
+          'functionName' => 'bootstrap'
+        ]
+      ],
+      '/engineer/website/php' => [
+        'GET' => [
+          'controller' => $this->websiteController,
+          'functionName' => 'php'
+        ]
+      ],
+      '/engineer/website/form' => [
+        'GET' => [
+          'controller' => $this->websiteController,
+          'functionName' => 'form'
+        ]
+      ],
+      '/engineer/website/jira' => [
+        'GET' => [
+          'controller' => $this->websiteController,
+          'functionName' => 'jira'
         ]
       ]
     ];
