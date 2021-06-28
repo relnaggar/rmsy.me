@@ -96,7 +96,7 @@ main() {
         logfun docker-compose down
         logfun docker-compose run -d \
           -e FILE_NAME="chrome_live__$(date '+%Y_%m_%d__%H_%M_%S').mp4" \
-          selenium-video
+          selenium-chrome-video
         set +e
           logfun docker-compose run cucumber cucumber https://rmsy.me
           local result="$?"
