@@ -5,33 +5,9 @@ use \PHPMailer\PHPMailer\PHPMailer;
 use \PHPMailer\PHPMailer\Exception;
 use \PHPMailer\PHPMailer\SMTP;
 
-class Engineer {
-  /* @var string */
-  private $templateDir;
-
-  /* @var \Controllers\Menu */
-  private $menu;
-
+class Engineer extends Segment {
   public function __construct(\Controllers\Menu $menuController, \Controllers\Sidebar $sidebarController) {
-    $this->templateDir = '/engineer/';
-    $this->menu = $menuController->engineer();
-  }
-
-  private function getTitle(string $function_name): string {
-    $words = preg_split('/(?=[A-Z])/', $function_name);
-    $words[0] = ucfirst($words[0]);
-    $title = implode(' ', $words);
-    return $title;
-  }
-
-  private function basic(string $function_name, array $vars=[]): array {
-    $title = $this->getTitle($function_name);
-    $this->menu['activeItemText'] = $title;
-    return [
-      'title' => $title,
-      'menu' => $this->menu,
-      'html' => loadTemplate($this->templateDir . $function_name, $vars)
-    ];
+    parent::__construct($templateDir='/engineer/', $menu=$menuController->engineer());
   }
 
   public function pageNotFound(): array {
