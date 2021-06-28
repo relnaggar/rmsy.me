@@ -10730,12 +10730,27 @@ textarea.form-control-lg {
   }
 }
 @media (max-width: 575.98px) {
+  .display-none-sm-down {
+    display: none !important;
+  }
+}
+@media (max-width: 767.98px) {
+  .display-none-md-down {
+    display: none !important;
+  }
+}
+@media (max-width: 575.98px) {
   .display-none-xs-only {
     display: none !important;
   }
 }
 @media (min-width: 576px) {
   .display-none-sm-up {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) {
+  .display-none-md-up {
     display: none !important;
   }
 }

@@ -54,7 +54,7 @@
         </div>
       </nav>
       <?php if (isset($sidebar)) { ?>
-        <nav class="navbar navbar-expand-sm navbar-light bg-light navbar-horizontal display-none-sm-up">
+        <nav class="navbar navbar-expand-md navbar-light bg-light navbar-horizontal display-none-md-up">
           <button class="navbar-toggler-custom" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
             <div class="navbar-toggler-icon-manual"></div>
             <div class="navbar-toggler-icon-manual"></div>
@@ -73,7 +73,7 @@
         </nav>
       <?php } ?>
       <div class="d-flex flex-row">
-        <div class="col-2 display-none-xs-only">
+        <div class="col-2 display-none-md-down">
           <?php if (isset($sidebar)) { ?>
             <nav class="navbar flex-column navbar-light justify-content-start bg-light navbar-vertical sidebar flex-nowrap">
               <span class="navbar-brand p-3"><?=$sidebar->getTitle()?></span>
@@ -103,7 +103,7 @@
             </div>
           <?php } ?>
           <?php if (isset($sections)) { ?>
-            <nav class="navbar flex-column justify-content-start navbar-light bg-light display-none-sm-up border m-3 navbar-vertical">
+            <nav class="navbar flex-column justify-content-start navbar-light bg-light display-none-md-up border m-3 navbar-vertical">
               <span class="border-bottom text-muted p-3">On this page</span>
               <ul class="navbar-nav">
                 <?php foreach ($sections as $section) { ?>
@@ -155,9 +155,9 @@
             </div>
           <?php } ?>
         </main>
-        <a href="#" class="btn btn-primary position-fixed bottom-0 end-0 display-none-sm-up">^</a>
-        <div class="col-2 display-none-xs-only">
-          <?php if (isset($sections)) { ?>
+        <a href="#" class="btn btn-primary position-fixed bottom-0 end-0 display-none-md-up">^</a>
+        <?php if (isset($sections)) { ?>
+          <div class="col-2 display-none-md-down">
             <nav id="sidebarMenu" class="navbar navbar-light flex-column justify-content-start bg-light navbar-vertical sidebar">
               <span class="border-bottom w-100 text-muted p-3">On this page</span>
               <ul class="navbar-nav w-100">
@@ -177,8 +177,8 @@
                 <?php } ?>
               </ul>
             </nav>
-          <?php } ?>
-        </div>
+          </div>
+        <?php } ?>
       </div>
       <footer class="text-center bg-primary p-5">
         Copyright &copy; 2021 by Ramsey El-Naggar.  
