@@ -142,6 +142,8 @@ Before deploying, it's also necessary to generate production secrets:
 
 ### Deploying
 
+Change Cloudfare 'Development Mode' to 'On' to force Cloudfare's cache to clear.
+
 On the production server:
 ```shell
 git pull
@@ -155,6 +157,8 @@ cd script
 # (using the production secrets and database)
 ./server up -p
 ```
+
+Change Cloudfare 'Development Mode' back to 'Off'.
 
 ### Verifying
 
