@@ -1,4 +1,5 @@
-<p class="lead">This is the about page for the software engineering part of the site.</p>
-<?php for ($i = 0; $i < 3; $i++) { ?>
-  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. At varius vel pharetra vel turpis nunc. Consectetur adipiscing elit duis tristique sollicitudin nibh sit amet. Sit amet mauris commodo quis imperdiet massa. Porta nibh venenatis cras sed felis eget velit aliquet sagittis. Arcu ac tortor dignissim convallis aenean et. Sed felis eget velit aliquet sagittis id consectetur. Sit amet luctus venenatis lectus magna fringilla. Libero justo laoreet sit amet cursus sit. Praesent tristique magna sit amet purus gravida quis blandit turpis. Phasellus vestibulum lorem sed risus ultricies tristique. Lacus luctus accumsan tortor posuere ac ut consequat semper. Massa sed elementum tempus egestas sed sed risus pretium.</p>
-<?php } ?>
+<p class="lead">I'm still crafting the story I want to publish here.</p>
+<p>In the meantime, you could check out <a href="/linkedin" target="_blank">my LinkedIn profile</a> <?=includeIcon('box-arrow-up-right')?>. It's due an update and some streamlining, but you'll find all of the main highlights of my career so far.
+<blockquote class="blockquote pt-3">
+<p class="blockquote-footer">Ramsey El-Naggar, June 2020</p>
+</blockquote>
