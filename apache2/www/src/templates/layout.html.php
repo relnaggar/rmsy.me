@@ -181,7 +181,7 @@
         </div>
       </div>
       <footer class="text-center bg-primary p-5">
-        Copyright &copy; 2021 by Ramsey El-Naggar.  
+        Copyright &copy; 2020-<?=date("Y")?> by Ramsey El-Naggar.  
       </footer>
     </div>
     <script src="/assets/bootstrap.bundle.min.js"></script>
