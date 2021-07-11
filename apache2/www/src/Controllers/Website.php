@@ -7,7 +7,31 @@ class Website extends Segment {
   }
 
   public function introduction(): array {
-    return $this->basic(__FUNCTION__);
+    $title = $this->getTitle(__FUNCTION__);
+    $this->sidebar->setActiveItemText($title);
+
+    $sections = [
+      [
+        'title' => 'Project purpose',
+        'id' => 'purpose',
+        'html' => loadTemplate($this->templateDir . __FUNCTION__ . '/purpose')
+      ], [
+        'title' => 'Web-development skills',
+        'id' => 'skills',
+        'html' => loadTemplate($this->templateDir . __FUNCTION__ . '/skills')
+      ], [
+        'title' => 'Source code',
+        'id' => 'source',
+        'html' => loadTemplate($this->templateDir . __FUNCTION__ . '/source')
+      ]
+    ];
+
+    return [
+      'title' => $title,
+      'menu' => $this->menu,
+      'sidebar' => $this->sidebar,
+      'sections' => $sections
+    ];
   }
 
   public function aws(): array {
@@ -67,30 +91,6 @@ class Website extends Segment {
     return $this->basic(__FUNCTION__);
   }
 
-  //public function feature1(): array {
-    //$title = "Feature 1";
-    //$this->sidebar->setActiveItemText($title);
-
-    //$sections = [
-      //[
-        //'title' => 'Section 1',
-        //'id' => 'section-1',
-        //'html' => loadTemplate($this->templateDir . __FUNCTION__)
-      //]
-    //];
-
-    //return [
-      //'title' => $title,
-      //'menu' => $this->menu,
-      //'sidebar' => $this->sidebar,
-      //'sections' => $sections
-    //];
-  //}
-
-  //public function feature2(): array {
-    //$title = "Feature 2";
-    //$this->sidebar->setActiveItemText($title);
-
     //$sections = [
       //[
         //'title' => 'Section 1',
@@ -109,12 +109,4 @@ class Website extends Segment {
         //]
       //]
     //];
-
-    //return [
-      //'title' => $title,
-      //'menu' => $this->menu,
-      //'sidebar' => $this->sidebar,
-      //'sections' => $sections
-    //];
-  //}
 }
