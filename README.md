@@ -94,9 +94,12 @@ cd script
 ```shell
 # a pre-push hook ensures all tests are passing on both builds before pushing
 git push
+
+docker push relnaggar/rmsy-me-apache2
+docker push relnaggar/rmsy-me-postgres
 ```
 
-After pushing, the production images are automatically rebuilt on Docker hub:
+After pushing, the production images will be rebuilt on Docker hub:
 * apache2 : [![Docker image size](https://img.shields.io/docker/image-size/relnaggar/rmsy-me-apache2)](https://hub.docker.com/repository/docker/relnaggar/rmsy-me-apache2/tags)
 * postgres : [![Docker image size](https://img.shields.io/docker/image-size/relnaggar/rmsy-me-postgres)](https://hub.docker.com/repository/docker/relnaggar/rmsy-me-postgres/tags)
 
