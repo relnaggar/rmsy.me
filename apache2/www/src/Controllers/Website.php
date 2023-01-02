@@ -71,10 +71,6 @@ class Website extends Segment {
     return $this->basic(__FUNCTION__);
   }
 
-  public function latex(): array {
-    return $this->basic(__FUNCTION__, $vars=[], $title='LaTeX');
-  }
-
   public function bootstrap(): array {
     return $this->basic(__FUNCTION__);
   }
@@ -85,10 +81,6 @@ class Website extends Segment {
 
   public function form(): array {
     return $this->basic(__FUNCTION__, $vars=[], $title='Contact Form');
-  }
-
-  public function jira(): array {
-    return $this->basic(__FUNCTION__);
   }
 
     //$sections = [

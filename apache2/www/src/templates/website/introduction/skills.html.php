@@ -9,11 +9,9 @@
     <dd>Creating and configuring a database service for the application.</dd>
     <dt>Software testing: <a href="/engineer/website/phpunit">PHPUnit</a>, <a href="/engineer/website/selenium">Selenium</a>, <a href="/engineer/website/cucumber">Cucumber</a></dt>
     <dd>Unit testing and end-to-end testing with browser automation.</dd>
-    <dt>Front-end development: <a href="/engineer/website/latex">LaTeX</a>, <a href="/engineer/website/bootstrap">Bootstrap</a></dt>
+    <dt>Front-end development: <a href="/engineer/website/bootstrap">Bootstrap</a></dt>
     <dd>Designing a responsive front-end for the application.</dd>
     <dt>Back-end development: <a href="/engineer/website/php">PHP Framework</a>, <a href="/engineer/website/form">Contact Form</a></dt>
     <dd>Building a back-end PHP framework from scratch; creating a spam-free contact form.</dd>
-    <dt>Project management: <a href="/engineer/website/jira">Jira</a></dt>
-    <dd>Managing the backlog; sprint planning and execution.</dd>
   </dl>
 </p>

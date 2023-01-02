@@ -37,9 +37,6 @@ class Sidebar {
           'text' => 'Cucumber',
           'path' => $homePath . 'cucumber'
         ], [
-          'text' => 'LaTeX',
-          'path' => $homePath . 'latex'
-        ], [
           'text' => 'Bootstrap',
           'path' => $homePath . 'bootstrap'
         ], [
@@ -48,9 +45,6 @@ class Sidebar {
         ], [
           'text' => 'Contact Form',
           'path' => $homePath . 'form'
-        ], [
-          'text' => 'Jira',
-          'path' => $homePath . 'jira'
         ]
       ]
     );

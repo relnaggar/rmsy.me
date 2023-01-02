@@ -116,12 +116,6 @@ class Routes implements \Framework\RoutesInterface {
           'functionName' => 'cucumber'
         ]
       ],
-      '/engineer/website/latex' => [
-        'GET' => [
-          'controller' => $this->websiteController,
-          'functionName' => 'latex'
-        ]
-      ],
       '/engineer/website/bootstrap' => [
         'GET' => [
           'controller' => $this->websiteController,
@@ -138,12 +132,6 @@ class Routes implements \Framework\RoutesInterface {
         'GET' => [
           'controller' => $this->websiteController,
           'functionName' => 'form'
-        ]
-      ],
-      '/engineer/website/jira' => [
-        'GET' => [
-          'controller' => $this->websiteController,
-          'functionName' => 'jira'
         ]
       ]
     ];
