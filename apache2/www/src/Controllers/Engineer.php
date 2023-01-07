@@ -27,7 +27,7 @@ class Engineer extends Segment {
       'nonce' => base64_encode(random_bytes(18)), // number of bytes must be a multiple of 3 greater than 16
       'sitekey' => rtrim(file_get_contents('/run/secrets/RECAPTCHA_SITE_KEY'))
     ];
-    header("Content-Security-Policy: TO_BE_REPLACED; script-src 'self' 'nonce-" . $recaptcha['nonce'] . "'; frame-src https://www.google.com/recaptcha/, https://recaptcha.google.com/recaptcha/");
+    header("Content-Security-Policy: TO_BE_REPLACED; script-src 'self' https://platform.linkedin.com/badges/js/profile.js https://badges.linkedin.com/ 'nonce-" . $recaptcha['nonce'] . "'; frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/");
     return $recaptcha;
   }
 

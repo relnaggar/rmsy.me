@@ -92,6 +92,10 @@
         &nbsp;
         <a href="/linkedin" target="_blank">rmsy.me/linkedin</a>
         <?=includeIcon('box-arrow-up-right')?>
+        <br><br>
+        <!-- LinkedIn Badge from https://www.linkedin.com/badges/profile/create?vanityname=relnaggar&preferredlocale=en_US&trk=public_profile-settings_badge -->
+        <script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
+        <div class="badge-base LI-profile-badge" data-locale="en_US" data-size="medium" data-theme="light" data-type="VERTICAL" data-vanity="relnaggar" data-version="v1"></div>
       </div>
     </div>
     <div class="card mb-3">
@@ -101,7 +105,7 @@
       <div class="card-body">
         <?=includeIcon('geo-alt-fill')?>
         &nbsp;
-        <a href="https://goo.gl/maps/EaM2LmAu92nDceht8" target="_blank">Alicante, Spain</a>
+        <a href="https://goo.gl/maps/eeSPJTazPYXkYpQj6" target="_blank">Valencia, Spain</a>
         <?=includeIcon('box-arrow-up-right')?>
       </div>
     </div>
