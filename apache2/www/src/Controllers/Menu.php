@@ -24,8 +24,7 @@ class Menu {
           ]
         ], [
           'text' => 'Resume',
-          'path' => '/tutor/resume',
-          //'path' => $homePath . 'resume',
+          'path' => $homePath . 'resume',
           'target' => '_blank'
         ], [
           'text' => 'Linkedin',

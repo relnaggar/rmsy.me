@@ -117,7 +117,7 @@
       <div class="card-body">
         <?=includeIcon('file-person')?>
         &nbsp;
-        <a href="/tutor/resume" target="_bank">PDF</a>
+        <a href="resume" target="_bank">PDF</a>
         <?=includeIcon('box-arrow-up-right')?>
       </div>
     </div>
