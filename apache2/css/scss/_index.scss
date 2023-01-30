@@ -46,6 +46,7 @@
 
 .banner {
   padding: 0 12px 12px;
+  text-decoration: none;
   &:hover, &:focus {
     // banner-link color changes when hover/focus on parent as well
     .banner-link {

@@ -10760,6 +10760,7 @@ textarea.form-control-lg {
 
 .banner {
   padding: 0 12px 12px;
+  text-decoration: none;
 }
 .banner:hover .banner-link, .banner:focus .banner-link {
   color: #000 !important;
