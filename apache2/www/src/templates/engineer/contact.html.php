@@ -98,29 +98,5 @@
         <div class="badge-base LI-profile-badge" data-locale="en_US" data-size="medium" data-theme="light" data-type="VERTICAL" data-vanity="relnaggar" data-version="v1"></div>
       </div>
     </div>
-    <div class="card mb-3">
-      <div class="card-header">
-        <h6 class="mb-0">Location</h6>
-      </div>
-      <div class="card-body">
-        <?=includeIcon('geo-alt-fill')?>
-        &nbsp;
-        <a href="https://goo.gl/maps/eeSPJTazPYXkYpQj6" target="_blank">Valencia, Spain</a>
-        <?=includeIcon('box-arrow-up-right')?>
-      </div>
-    </div>
-    <!--
-    <div class="card mb-3">
-      <div class="card-header">
-        <h6 class="mb-0">Resume</h6>
-      </div>
-      <div class="card-body">
-        <?=includeIcon('file-person')?>
-        &nbsp;
-        <a href="resume" target="_bank">PDF</a>
-        <?=includeIcon('box-arrow-up-right')?>
-      </div>
-    </div>
-    -->
   </div>
 </div>
