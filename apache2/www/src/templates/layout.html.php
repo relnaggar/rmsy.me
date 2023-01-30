@@ -13,11 +13,11 @@
     <div class="container-fluid d-flex flex-column p-0">
       <header>
           <div class="display-none-xs-only d-flex">
-          <a href="/" class="display-4 flex-grow-1 text-reset banner">&lt;<b>r</b>a<b>ms</b>e<b>y</b> el&#8209;naggar <b class="banner-link">.me</b>&gt;</a>
+          <a href="/" class="display-4 flex-grow-1 text-reset banner">&lt;Ramsey El&#8209;Naggar<b class="banner-link">.me</b>&gt;</a>
             <a href="<?=$menu['homePath']?>" class="display-4 link-primary bg-contrast-primary text-decoration-none display-none-xl-down" id="subbanner"><?=$menu['title']?></a>
           </div>
           <div class="display-none-sm-up text-center">
-            <a href="/" class="display-2 text-reset banner">&lt;<b>rmsy</b><b class="banner-link">.me</b>&gt;</a>
+            <a href="/" class="display-2 text-reset banner">&lt;rmsy<b class="banner-link">.me</b>&gt;</a>
           </div>
       </header>
       <nav class="navbar navbar-expand-md sticky-top navbar-dark bg-dark navbar-horizontal">
