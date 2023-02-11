@@ -4,6 +4,7 @@ namespace Controllers;
 use \PHPMailer\PHPMailer\PHPMailer;
 use \PHPMailer\PHPMailer\Exception;
 use \PHPMailer\PHPMailer\SMTP;
+use \DateTime;
 
 class Engineer extends Segment {
   public function __construct(\Controllers\Menu $menuController, \Controllers\Sidebar $sidebarController) {
@@ -19,7 +20,11 @@ class Engineer extends Segment {
   }
 
   public function about(): array {
-    return $this->basic(__FUNCTION__);
+    $todayDate = new DateTime();
+    $birthdayDate = new DateTime("1995-11-22");
+    $ageInterval = $todayDate->diff($birthdayDate);
+    $vars['age'] = $ageInterval->y;
+    return $this->basic(__FUNCTION__, $vars);
   }
 
   private function getRecaptchaDetails(): array {

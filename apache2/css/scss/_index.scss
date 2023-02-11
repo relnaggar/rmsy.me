@@ -4,8 +4,20 @@
   }
 }
 
+@include media-breakpoint-down(xxl) {
+  .display-none-xxl-down {
+    display: none !important;
+  }
+}
+
 @include media-breakpoint-down(xl) {
   .display-none-xl-down {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-down(lg) {
+  .display-none-lg-down {
     display: none !important;
   }
 }
@@ -44,7 +56,7 @@
   background-color: color-contrast($primary);
 }
 
-.banner {
+.left-banner {
   padding: 0 12px 12px;
   text-decoration: none;
   &:hover, &:focus {
@@ -63,7 +75,11 @@
   color: $primary;
 }
 
-#subbanner {
+#center-banner {
+  border-left: 1px solid $gray-300;
+}
+
+#right-banner {
   padding: 0 12px 12px;
   border-left: 1px solid $gray-300;
 }
@@ -75,7 +91,7 @@ header {
   color: color-contrast($light);
 }
 
-.navbar-brand-subbanner {
+.navbar-brand-right-banner {
   background-color: color-contrast($primary);
   color: $primary !important;  
   &:hover, &:focus {

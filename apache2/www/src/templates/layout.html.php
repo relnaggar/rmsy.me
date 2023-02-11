@@ -11,17 +11,18 @@
   <!-- offest of 56 pixels for the unexpanded navbar height -->
   <body data-bs-spy="scroll" data-bs-target="#sidebarMenu" data-bs-offset="56" tabindex="0" class="position-relative">
     <div class="container-fluid d-flex flex-column p-0">
-      <header>
-          <div class="display-none-xs-only d-flex">
-          <a href="/" class="display-4 flex-grow-1 text-reset banner">&lt;Ramsey El&#8209;Naggar<b class="banner-link">.me</b>&gt;</a>
-            <a href="<?=$menu['homePath']?>" class="display-4 link-primary bg-contrast-primary text-decoration-none display-none-xl-down" id="subbanner"><?=$menu['title']?></a>
-          </div>
-          <div class="display-none-sm-up text-center">
-            <a href="/" class="display-2 text-reset banner">&lt;rmsy<b class="banner-link">.me</b>&gt;</a>
-          </div>
+      <header class="text-center">
+        <div class="display-none-md-down d-flex">
+          <a href="/" class="display-4 flex-fill text-reset left-banner bg-contrast-primary">&lt;<b>r</b>a<b>ms</b>e<b>y</b><b class="banner-link">.me</b>&gt;</a>
+          <span class="display-none-md-down display-4 flex-fill" id="center-banner">Ramsey El&#8209;Naggar</span>
+          <a href="<?=$menu['homePath']?>" class="display-none-xxl-down display-4 link-primary bg-contrast-primary text-decoration-none flex-fill" id="right-banner"><?=$menu['title']?></a>
+        </div>
+        <div class="display-none-md-up">
+          <a href="/" class="display-2 text-reset left-banner">&lt;<b>rmsy</b><b class="banner-link">.me</b>&gt;</a>
+        </div>
       </header>
       <nav class="navbar navbar-expand-md sticky-top navbar-dark bg-dark navbar-horizontal">
-        <a class="navbar-brand-custom navbar-brand-subbanner" href="<?=$menu['homePath']?>"><?=$menu['title']?></a>
+        <a class="navbar-brand-custom navbar-brand-right-banner" href="<?=$menu['homePath']?>"><?=$menu['title']?></a>
         <button class="navbar-toggler-custom" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
           <div class="navbar-toggler-icon-manual"></div>
           <div class="navbar-toggler-icon-manual"></div>

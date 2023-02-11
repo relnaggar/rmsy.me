@@ -4707,12 +4707,6 @@ textarea.form-control-lg {
   color: #101214;
 }
 
-@-webkit-keyframes progress-bar-stripes {
-  0% {
-    background-position-x: 1rem;
-  }
-}
-
 @keyframes progress-bar-stripes {
   0% {
     background-position-x: 1rem;
@@ -4750,12 +4744,10 @@ textarea.form-control-lg {
 }
 
 .progress-bar-animated {
-  -webkit-animation: 1s linear infinite progress-bar-stripes;
   animation: 1s linear infinite progress-bar-stripes;
 }
 @media (prefers-reduced-motion: reduce) {
   .progress-bar-animated {
-    -webkit-animation: none;
     animation: none;
   }
 }
@@ -5137,7 +5129,6 @@ textarea.form-control-lg {
 }
 
 .toast-container {
-  width: -webkit-max-content;
   width: -moz-max-content;
   width: max-content;
   max-width: 100%;
@@ -5889,12 +5880,6 @@ textarea.form-control-lg {
   color: #000;
 }
 
-@-webkit-keyframes spinner-border {
-  to {
-    transform: rotate(360deg) ;
-  }
-}
-
 @keyframes spinner-border {
   to {
     transform: rotate(360deg) ;
@@ -5908,7 +5893,6 @@ textarea.form-control-lg {
   border: 0.25em solid currentColor;
   border-left-color: transparent;
   border-radius: 50%;
-  -webkit-animation: 0.75s linear infinite spinner-border;
   animation: 0.75s linear infinite spinner-border;
 }
 
@@ -5916,16 +5900,6 @@ textarea.form-control-lg {
   width: 1rem;
   height: 1rem;
   border-width: 0.2em;
-}
-
-@-webkit-keyframes spinner-grow {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    opacity: 1;
-    transform: none;
-  }
 }
 
 @keyframes spinner-grow {
@@ -5945,7 +5919,6 @@ textarea.form-control-lg {
   background-color: currentColor;
   border-radius: 50%;
   opacity: 0;
-  -webkit-animation: 0.75s linear infinite spinner-grow;
   animation: 0.75s linear infinite spinner-grow;
 }
 
@@ -5957,7 +5930,6 @@ textarea.form-control-lg {
 @media (prefers-reduced-motion: reduce) {
   .spinner-border,
 .spinner-grow {
-    -webkit-animation-duration: 1.5s;
     animation-duration: 1.5s;
   }
 }
@@ -10701,8 +10673,18 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+@media (max-width: 1399.98px) {
+  .display-none-xxl-down {
+    display: none !important;
+  }
+}
 @media (max-width: 1199.98px) {
   .display-none-xl-down {
+    display: none !important;
+  }
+}
+@media (max-width: 991.98px) {
+  .display-none-lg-down {
     display: none !important;
   }
 }
@@ -10735,14 +10717,14 @@ textarea.form-control-lg {
   background-color: #fff;
 }
 
-.banner {
+.right-banner {
   padding: 0 12px 12px;
   text-decoration: none;
 }
-.banner:hover .banner-link, .banner:focus .banner-link {
+.right-banner:hover .banner-link, .right-banner:focus .banner-link {
   color: #000 !important;
 }
-.banner b {
+.right-banner b {
   font-weight: 900;
 }
 
@@ -10750,7 +10732,11 @@ textarea.form-control-lg {
   color: #6f42c1;
 }
 
-#subbanner {
+#center-banner {
+  border-right: 1px solid #dee2e6;
+}
+
+#right-banner {
   padding: 0 12px 12px;
   border-right: 1px solid #dee2e6;
 }
@@ -10762,11 +10748,11 @@ header {
   color: #000;
 }
 
-.navbar-brand-subbanner {
+.navbar-brand-left-banner {
   background-color: #fff;
   color: #6f42c1 !important;
 }
-.navbar-brand-subbanner:hover, .navbar-brand-subbanner:focus {
+.navbar-brand-left-banner:hover, .navbar-brand-left-banner:focus {
   color: #59359a !important;
 }
 
