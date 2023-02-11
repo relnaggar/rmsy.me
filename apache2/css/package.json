@@ -7,7 +7,7 @@
     "css": "npm-run-all css-compile css-prefix css-rtl css-minify",
     "css-compile": "sass --style expanded --source-map --embed-sources --no-error-css ${npm_package_config_source}/:${npm_package_config_destination}/",
     "css-prefix": "postcss --config build/postcss.config.js --replace \"${npm_package_config_destination}/*.css\" \"!${npm_package_config_destination}/*.rtl*.css\" \"!${npm_package_config_destination}/*.min.css\"",
-    "css-rtl": "cross-env NODE_ENV=RTL postcss --config build/postcss.config.js --dir \"${npm_package_config_destination}\" --ext \".rtl.css\" \"${npm_package_config_destination}/*.css\" \"!${npm_package_config_destination}/*.min.css\" \"!${npm_package_config_destination}/*.rtl.css\"",
+    "css-rtl": "cross-env NODE_ENV=RTL postcss --config build/postcss.config.js --dir \"${npm_package_config_destination}\" --ext \".rtl.css\" \"${npm_package_config_destination}/custom.bootstrap.css\"",
     "css-minify": "npm-run-all --parallel css-minify-*",
     "css-minify-main": "cleancss -O1 --format breakWith=lf --with-rebase --source-map --source-map-inline-sources --output ${npm_package_config_destination}/ --batch --batch-suffix \".min\" \"${npm_package_config_destination}/*.css\" \"!${npm_package_config_destination}/*.min.css\" \"!${npm_package_config_destination}/*rtl*.css\"",
     "css-minify-rtl": "cleancss -O1 --format breakWith=lf --with-rebase --source-map --source-map-inline-sources --output ${npm_package_config_destination}/ --batch --batch-suffix \".min\" \"${npm_package_config_destination}/*rtl.css\" \"!${npm_package_config_destination}/*.min.css\"",
