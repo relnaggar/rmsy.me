@@ -3,7 +3,7 @@
 </p>
 
 <p>  
-  I specialise in full stack web application development with PHP and Django.
+  I specialise in full stack web application development with Python (Django) and PHP.
   I've worked to upgrade and improve a large existing codebase, and I've built a reusable back-end PHP framework from scratch.
   In addition to my work as an engineer, I privately tutor computer science and programming, especially to undergraduate students.
   I've taught a wide range of university topics: from web development, to OOP, to algorithms and data structures.
