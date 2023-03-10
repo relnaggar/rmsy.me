@@ -6,7 +6,13 @@
 
     <link rel="stylesheet" type="text/css" href="/assets/custom.bootstrap.min.css">
 
-    <title><?=$title?> | <?php if (isset($sidebar)) { ?><?=$sidebar->getTitle()?> | <?php } ?>Ramsey El-Naggar</title>
+    <title><?=$meta['title']?> | <?php if (isset($sidebar)) { ?><?=$sidebar->getTitle()?> | <?php } ?>Ramsey El-Naggar</title>
+    <?php if (isset($meta['description'])) { ?>
+      <meta name="description" content="<?=$meta['description']?>">
+    <?php } ?>
+    <?php if (isset($meta['noindex']) && $meta['noindex']) { ?>
+      <meta name="robots" content="noindex">
+    <?php } ?>
   </head>
   <!-- offest of 56 pixels for the unexpanded navbar height -->
   <body data-bs-spy="scroll" data-bs-target="#sidebarMenu" data-bs-offset="56" tabindex="0" class="position-relative">
@@ -90,7 +96,7 @@
           <?php } ?>
         </div>
         <main class="flex-grow-1 m-5 d-flex flex-column min-vh-100">
-          <h1><?=$title?></h1>
+          <h1><?=$meta['title']?></h1>
           <?php if (isset($sidebar) && ($sidebar->getPreviousPath() || $sidebar->getNextPath())) { ?>
             <div class="text-center">
               <div class="btn-group">

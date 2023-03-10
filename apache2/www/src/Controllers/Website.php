@@ -27,7 +27,7 @@ class Website extends Segment {
     ];
 
     return [
-      'title' => $title,
+      'meta' => ['title' => $title],
       'menu' => $this->menu,
       'sidebar' => $this->sidebar,
       'sections' => $sections
@@ -35,52 +35,52 @@ class Website extends Segment {
   }
 
   public function aws(): array {
-    return $this->basic(__FUNCTION__, $vars=[], $title=strtoupper(__FUNCTION__));
+    return $this->basic(__FUNCTION__, $meta=['title' => strtoupper(__FUNCTION__), 'noindex' => true]);
   }
 
   public function docker(): array {
-    return $this->basic(__FUNCTION__);
+    return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
   }
 
   public function apache(): array {
-    return $this->basic(__FUNCTION__);
+    return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
   }
 
   public function bash(): array {
-    return $this->basic(__FUNCTION__);
+    return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
   }
 
 
   public function ssl(): array {
-    return $this->basic(__FUNCTION__, $vars=[], $title=strtoupper(__FUNCTION__));
+    return $this->basic(__FUNCTION__, $meta=['title' => strtoupper(__FUNCTION__), 'noindex' => true]);
   }
 
   public function postgres(): array {
-    return $this->basic(__FUNCTION__, $vars=[], $title='PostgreSQL');
+    return $this->basic(__FUNCTION__, $meta=['title' => 'PostgreSQL', 'noindex' => true]);
   }
 
   public function phpunit(): array {
-    return $this->basic(__FUNCTION__, $vars=[], $title='PHPUnit');
+    return $this->basic(__FUNCTION__, $meta=['title' => 'PHPUnit', 'noindex' => true]);
   }
 
   public function selenium(): array {
-    return $this->basic(__FUNCTION__);
+    return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
   }
 
   public function cucumber(): array {
-    return $this->basic(__FUNCTION__);
+    return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
   }
 
   public function bootstrap(): array {
-    return $this->basic(__FUNCTION__);
+    return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
   }
 
   public function php(): array {
-    return $this->basic(__FUNCTION__, $vars=[], $title='PHP Framework');
+    return $this->basic(__FUNCTION__, $meta=['title' => 'PHP Framework', 'noindex' => true]);
   }
 
   public function form(): array {
-    return $this->basic(__FUNCTION__, $vars=[], $title='Contact Form');
+    return $this->basic(__FUNCTION__, $meta=['title' => 'Contact Form', 'noindex' => true]);
   }
 
     //$sections = [

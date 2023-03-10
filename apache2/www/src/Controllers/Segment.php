@@ -24,18 +24,19 @@ abstract class Segment {
     return $title;
   }
 
-  protected function basic(string $function_name, array $vars=[], string $title=""): array {
-    if (!$title) {
-      $title = $this->getTitle($function_name);
+  protected function basic(string $function_name, array $meta=[], array $vars=[]): array {
+    if (!isset($meta['title'])) {
+      $meta['title'] = $this->getTitle($function_name);
     }
-    $this->menu['activeItemText'] = $title;
+    $this->menu['activeItemText'] = $meta['title'];
+    
     $page = [
-      'title' => $title,
+      'meta' => $meta,
       'menu' => $this->menu,
       'html' => loadTemplate($this->templateDir . $function_name, $vars)
     ];
     if (isset($this->sidebar)) {
-      $this->sidebar->setActiveItemText($title);
+      $this->sidebar->setActiveItemText($meta['title']);
       $page['sidebar'] = $this->sidebar;
     }
     return $page;
