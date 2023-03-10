@@ -4,11 +4,13 @@
 
 <p>
   Hi, I'm Ramsey and I'm a software engineer. I built this website from scratch to showcase some of the skills I've developed after:
-  <ul>
-    <li>studying informatics at the University of Edinburgh for five years (Master of Informatics with First Class Honours),</li>
-    <li>privately teaching university students for four years (top 'Computing University' tutor in the UK on the leading tuition platform <a href="https://www.mytutor.co.uk/tutors/24851/">MyTutor</a>), and</li>
-    <li>working professionally as a full stack developer (at a leading IT service management provider).</li>
-  </ul>
+  <div data-nosnippet>
+    <ul>
+      <li>studying informatics at the University of Edinburgh for five years (Master of Informatics with First Class Honours),</li>
+      <li>privately teaching university students for four years (top 'Computing University' tutor in the UK on the leading tuition platform <a href="https://www.mytutor.co.uk/tutors/24851/">MyTutor</a>), and</li>
+      <li>working professionally as a full stack developer (at a leading IT service management provider).</li>
+    </ul>
+  </div>
 </p>
 
 <p>

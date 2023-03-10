@@ -7,6 +7,7 @@ class Website extends Segment {
   }
 
   public function introduction(): array {
+    $description = "This project is the website you are about to view!";
     $title = $this->getTitle(__FUNCTION__);
     $this->sidebar->setActiveItemText($title);
 
@@ -27,7 +28,7 @@ class Website extends Segment {
     ];
 
     return [
-      'meta' => ['title' => $title],
+      'meta' => ['title' => $title, 'description' => $description],
       'menu' => $this->menu,
       'sidebar' => $this->sidebar,
       'sections' => $sections

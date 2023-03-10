@@ -16,15 +16,17 @@ class Engineer extends Segment {
   }
 
   public function home(): array {
-    return $this->basic(__FUNCTION__);
+    $description = "I built this website from scratch to showcase my front- and back-end development skills.";
+    return $this->basic(__FUNCTION__, $meta=['description' => $description]);
   }
 
   public function about(): array {
+    $description = "I'm a software engineer, specialising in full stack web application development.";
     $todayDate = new DateTime();
     $birthdayDate = new DateTime("1995-11-22");
     $ageInterval = $todayDate->diff($birthdayDate);
     $vars['age'] = $ageInterval->y;
-    return $this->basic(__FUNCTION__, $meta=[], $vars);
+    return $this->basic(__FUNCTION__, $meta=['description' => $description], $vars);
   }
 
   private function getRecaptchaDetails(): array {
@@ -88,6 +90,7 @@ class Engineer extends Segment {
   }
 
   public function contact(): array {
+    $description = "Any questions, feedback or general enquiries are welcome.";
     $message['sent'] = false;
     if (isset($_POST['submit'])) {
       $result_string = $this->validateRecaptcha();
@@ -120,6 +123,6 @@ class Engineer extends Segment {
       $vars['recaptcha'] = $this->getRecaptchaDetails();
     }
     $vars['message'] = $message;
-    return $this->basic(__FUNCTION__, $meta=[], $vars);
+    return $this->basic(__FUNCTION__, $meta=['description' => $description], $vars);
   }
 }
