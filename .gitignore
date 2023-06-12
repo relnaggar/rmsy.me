@@ -5,8 +5,11 @@
 ### System Files ###
 *.DS_Store
 
-## Default configurations ###
+### Default configurations ###
 defaults/
+
+### MS Word ###
+~*.docx
 
 ### Packages ###
 vendor/
