@@ -13,13 +13,12 @@ class EntryPoint {
     $method = $_SERVER['REQUEST_METHOD'];
     $routes = $this->routes->getRoutes();
     if (isset($routes[$route][$method])) {
-      $controller = $routes[$route][$method]['controller'];
-      $functionName = $routes[$route][$method]['functionName'];
+      $route = $routes[$route][$method];      
     } else {
-      $defaultRoute = $this->routes->getDefaultRoute();
-      $controller = $defaultRoute['controller'];
-      $functionName = $defaultRoute['functionName'];
+      $route = $this->routes->getDefaultRoute();
     }
+    $controller = $route['controller'];
+    $functionName = $route['functionName'];
     $layoutVars = $controller->$functionName();
     $output = loadTemplate('/layout', $layoutVars);
     echo $output;
