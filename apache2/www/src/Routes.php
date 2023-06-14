@@ -15,7 +15,7 @@ class Routes implements \Framework\RoutesInterface {
   public function __construct() {
     $this->frontController = new \Controllers\Front();
     $this->projects = $this->getProjects();
-    $this->engineerMenu = $this->getEngineerMenu($this->projects);
+    $this->engineerMenu = $this->getEngineerMenu();
     $this->addProjectControllers();    
     $this->engineerController= new \Controllers\Engineer($this->engineerMenu, $this->projects);
   }
@@ -173,7 +173,6 @@ class Routes implements \Framework\RoutesInterface {
       }
       $routes = array_merge($routes, $projectRoutes);
     }
-    // echo '<pre>'; var_dump($routes); echo '</pre>'; exit();
     return $routes;
   }
 
