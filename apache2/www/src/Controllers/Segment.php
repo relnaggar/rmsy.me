@@ -28,7 +28,9 @@ abstract class Segment {
     if (!isset($meta['title'])) {
       $meta['title'] = $this->getTitle($function_name);
     }
-    $this->menu['activeItemText'] = $meta['title'];
+    if (!isset($this->menu['activeItemText'])) {
+      $this->menu['activeItemText'] = $meta['title'];
+    }
     
     $page = [
       'meta' => $meta,

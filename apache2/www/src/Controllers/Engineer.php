@@ -4,11 +4,14 @@ namespace Controllers;
 use \PHPMailer\PHPMailer\PHPMailer;
 use \PHPMailer\PHPMailer\Exception;
 use \PHPMailer\PHPMailer\SMTP;
-use \DateTime;
 
 class Engineer extends Segment {
-  public function __construct(\Controllers\Menu $menuController, \Controllers\Sidebar $sidebarController) {
-    parent::__construct($templateDir='/engineer/', $menu=$menuController->engineer());
+  /* @var array */
+  private $projects;
+
+  public function __construct(array $menu, array $projects) {
+    parent::__construct($templateDir='/engineer/', $menu=$menu);
+    $this->projects = $projects;
   }
 
   public function pageNotFound(): array {
@@ -17,16 +20,12 @@ class Engineer extends Segment {
 
   public function home(): array {
     $description = "I built this website from scratch to showcase my front- and back-end development skills.";
-    return $this->basic(__FUNCTION__, $meta=['description' => $description]);
+    return $this->basic(__FUNCTION__, $meta=['description' => $description], $vars=['projects' => $this->projects]);
   }
 
   public function about(): array {
     $description = "I'm a software engineer, specialising in full stack web application development.";
-    $todayDate = new DateTime();
-    $birthdayDate = new DateTime("1995-11-22");
-    $ageInterval = $todayDate->diff($birthdayDate);
-    $vars['age'] = $ageInterval->y;
-    return $this->basic(__FUNCTION__, $meta=['description' => $description], $vars);
+    return $this->basic(__FUNCTION__, $meta=['description' => $description]);
   }
 
   private function getRecaptchaDetails(): array {

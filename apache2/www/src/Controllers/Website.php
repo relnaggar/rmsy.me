@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
 namespace Controllers;
-class Website extends Segment {
-  public function __construct(\Controllers\Menu $menuController, \Controllers\Sidebar $sidebarController) {
-    parent::__construct($templateDir='/website/', $menu=$menuController->engineer(), $sidebar=$sidebarController->website());
-    $this->menu['activeItemText'] = 'Website';
+class Website extends Project {
+  public function __construct(array $menu, array $project) {
+    parent::__construct($templateDir='/website/', $menu=$menu, $project=$project);
   }
 
   public function introduction(): array {
@@ -51,37 +50,16 @@ class Website extends Segment {
     return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
   }
 
-
-  public function ssl(): array {
-    return $this->basic(__FUNCTION__, $meta=['title' => strtoupper(__FUNCTION__), 'noindex' => true]);
-  }
-
-  public function postgres(): array {
-    return $this->basic(__FUNCTION__, $meta=['title' => 'PostgreSQL', 'noindex' => true]);
-  }
-
-  public function phpunit(): array {
-    return $this->basic(__FUNCTION__, $meta=['title' => 'PHPUnit', 'noindex' => true]);
-  }
-
-  public function selenium(): array {
-    return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
-  }
-
-  public function cucumber(): array {
-    return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
-  }
-
   public function bootstrap(): array {
     return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
   }
 
   public function php(): array {
-    return $this->basic(__FUNCTION__, $meta=['title' => 'PHP Framework', 'noindex' => true]);
+    return $this->basic(__FUNCTION__, $meta=['title' => strtoupper(__FUNCTION__), 'noindex' => true]);
   }
 
-  public function form(): array {
-    return $this->basic(__FUNCTION__, $meta=['title' => 'Contact Form', 'noindex' => true]);
+  public function contactForm(): array {
+    return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
   }
 
     //$sections = [
