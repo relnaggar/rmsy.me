@@ -21,35 +21,33 @@
   <a href="/engineer/about" class="btn btn-primary">Read my story</a>
 </p>
 
-<div class="card mb-3">
+<!-- <div class="card mb-3">
   <img src="/assets/img/hero-shot.jpg" class="w-100" alt="Hero shot">
   <div class="card-body">
     <p class="card-text text-center">Me (left) restarting the robot I built for my Master's project (right). We're trying to outsmart the dung beetle.</p>
   </div>
-</div>
+</div> -->
 
 <div class="row">
-  <div class="col-sm-6 mb-3">
-    <div class="card">
-      <!--<img src="" class="card-img-top" alt="Personal Website project main image">-->
-      <div class="card-body">
-        <h5 class="card-title">Personal Website project</h5>
-        <p class="card-text">
-          The first draft of this website is now complete.
-        </p>
-        <a href="/engineer/website/" class="btn btn-primary">Find out more</a>
+  <?php foreach ($projects as $project) { ?>
+    <div class="col-sm-6 mb-3">
+      <div class="card">
+        <a href="<?=$project['path']?>"><img class="card-img-top" src="<?=$project['imagePath']?>" alt="<?=$project['title']?>"></a>
+        <div class="card-body">
+          <h5 class="card-title"><?=$project['title']?> project</h5>
+          <p class="card-text"><?=$project['description']?></p>   
+          <p class="card-text text-center"><a href="<?=$project['path']?>" class="btn btn-primary">Learn more</a></p>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="col-sm-6">
+  <?php } ?>
+  <div class="col-sm-6 mb-3">
     <div class="card">
-      <!--<img src="" class="card-img-top" alt="project main image">-->
+      <img class="card-img-top" src="/assets/img/coming-soon.jpeg" alt="Coming Soon">
       <div class="card-body">
-        <h5 class="card-title">More projects to be uploaded</h5>
-        <p class="card-text">
-          ...
-        </p>
-        <a class="btn btn-primary disabled">Coming soon</a>
+        <h5 class="card-title">More projects pending write-up.</h5>
+        <!-- <p class="card-text">...</p> -->
+        <p class="card-text text-center"><a class="btn btn-primary disabled">Coming soon</a></p>
       </div>
     </div>
   </div>
