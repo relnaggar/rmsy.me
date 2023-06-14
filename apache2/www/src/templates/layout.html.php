@@ -38,7 +38,7 @@
             <?php foreach ($menu['items'] as $menuItem) { ?>
               <li class="nav-item<?php if (isset($menuItem['dropdown'])) { ?> dropdown<?php } ?>">
                 <?php if (isset($menuItem['dropdown'])) { ?>
-                  <a class="nav-link dropdown-toggle" href="#" id="<?=$menuItem['id']?>Dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <a class="nav-link dropdown-toggle<?php if ($menuItem['text'] === $menu['activeItemText']) { ?> active<?php } ?>" href="#" id="<?=$menuItem['id']?>Dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <?=$menuItem['text'] ?>
                   </a>
                   <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="<?=$menuItem['id']?>Dropdown">
