@@ -2,8 +2,13 @@
 namespace Controllers;
 
 abstract class Project extends Segment {
+
+  /* @var array */
+  protected $project;
+
   public function __construct(string $templateDir, array $menu, array $project) {
     parent::__construct($templateDir=$templateDir, $menu=$menu, $sidebar=$this->getSidebar($project));
+    $this->project = $project;
     $this->menu['activeItemText'] = 'Projects';
   }
 

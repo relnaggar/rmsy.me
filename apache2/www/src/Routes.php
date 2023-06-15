@@ -23,10 +23,10 @@ class Routes implements \Framework\RoutesInterface {
   private function getProjects(): array {
     $projects = [
       'Website' => [
-        'title' => 'Personal Website',
-        'path' => '/engineer/website/',
-        'imagePath' => '/assets/img/hero-shot.jpg',
-        'description' => "Find out how I made this website from scratch.",
+        'title' => 'My Mona Lisa: A Personal Website',
+        'path' => '/projects/website/',
+        'imagePath' => '/assets/img/website-project.png',
+        'description' => "Find out how I gave birth to this technological tapestry of blood, tears and Dockerfiles: curiosity is better than regret!",
         'rootFunctionName' => 'introduction',
         'pages' => [
           'aws' => [
@@ -53,12 +53,19 @@ class Routes implements \Framework\RoutesInterface {
         ]
       ],
       'Beetle' => [
-        'title' => 'Dung Beetle Biorobot',
-        'path' => '/engineer/beetle/',
-        'imagePath' => '/assets/img/hero-shot.jpg',
-        'description' => "Beetle vs man vs robot: who will win?",
+        'title' => 'Pooptimus Prime: The World\'s First Dung Beetle Biorobot',
+        'path' => '/projects/beetle/',
+        'imagePath' => '/assets/img/robot-vs-beetle.jpg',
+        'description' => "Robot vs beetle: who will be the ultimate fighting champion?",
         'rootFunctionName' => 'introduction'
-      ]
+      ],
+      'SDP' => [
+        'title' => 'Robo-Messi: When Silicon Met Soccer',
+        'path' => '/projects/sdp/',
+        'imagePath' => '/assets/img/robot-hug.jpg',
+        'description' => "Robo-Messi wants a hug. Will you give him one?",
+        'rootFunctionName' => 'introduction'
+      ]      
     ];
     foreach ($projects as &$project) {
       if (isset($project['pages'])) {

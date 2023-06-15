@@ -6,7 +6,7 @@ class Website extends Project {
   }
 
   public function introduction(): array {
-    $description = "This project is the website you are about to view!";
+    $description = $this->project['description'];
     $title = $this->getTitle(__FUNCTION__);
     $this->sidebar->setActiveItemText($title);
 
