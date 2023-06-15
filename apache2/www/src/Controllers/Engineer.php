@@ -19,12 +19,12 @@ class Engineer extends Segment {
   }
 
   public function home(): array {
-    $description = "I built this website from scratch to showcase my front- and back-end development skills.";
+    $description = "I carved this space with my raw and bleeding fingers to serve as a testament to the proficiencies I've garnered throughout my professional odyssey.";
     return $this->basic(__FUNCTION__, $meta=['description' => $description], $vars=['projects' => $this->projects]);
   }
 
   public function about(): array {
-    $description = "I'm a software engineer, specialising in full stack web application development.";
+    $description = "Not just your average software engineer, but a virtuoso conducting symphonies of syntax and semicolons.";
     return $this->basic(__FUNCTION__, $meta=['description' => $description]);
   }
 
@@ -89,7 +89,7 @@ class Engineer extends Segment {
   }
 
   public function contact(): array {
-    $description = "Any questions, feedback or general enquiries are welcome.";
+    $description = "I'm always game to talk tech, tutoring, or even dung beetles!";
     $message['sent'] = false;
     if (isset($_POST['submit'])) {
       $result_string = $this->validateRecaptcha();
