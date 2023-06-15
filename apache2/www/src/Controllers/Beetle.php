@@ -6,6 +6,6 @@ class Beetle extends Project {
   }
 
   public function introduction(): array {
-    return $this->basic(__FUNCTION__, $meta=['title' => 'Dung Beetle Biorobot project', 'noindex' => true]);
+    return $this->basic(__FUNCTION__, $meta=['title' => $this->project['title'], 'noindex' => true]);
   }
 }
