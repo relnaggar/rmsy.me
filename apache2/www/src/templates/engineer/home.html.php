@@ -1,32 +1,31 @@
 <p class="lead">
-  Welcome to the home page of my personal website.
+  Welcome to my slice of the internet pie!
 </p>
 
 <p>
-  Hi, I'm Ramsey and I'm a software engineer. I built this website from scratch to showcase some of the skills I've developed after:
-  <div data-nosnippet>
-    <ul>
-      <li>studying informatics at the University of Edinburgh for five years (Master of Informatics with First Class Honours),</li>
-      <li>privately teaching university students for four years (top 'Computing University' tutor in the UK on the leading tuition platform <a href="https://www.mytutor.co.uk/tutors/24851/">MyTutor</a>), and</li>
-      <li>working professionally as a full stack developer (at a leading IT service management provider).</li>
-    </ul>
-  </div>
-</p>
-
+  Hello there, I'm Ramsey -- not just your average software engineer, but a virtuoso conducting symphonies of syntax and semicolons. Without exaggerating in the slightest, this website is <a href="/projects/website/">my Mona Lisa</a>.
+  My digital masterpiece, constructed brick by binary brick with the sweat from my brow as its everlasting mortar.
+  I carved this space with my raw and bleeding fingers to serve as a testament to the proficiencies I've honed throughout my professional odyssey.
 <p>
   
+<p>
+  Pull up a chair and dive into my digital saga, featuring:
+  <ul>
+    <li>Five transformative years at the University of Edinburgh, resulting in a Master of Informatics with First Class Honours and a newfound appreciation for the sanctity of sleep.</li>
+    <li>
+      Four enlightening years as a private tutor for university students, where I earned the rather grand title of the UK's top 'Computing University' tutor on the esteemed platform, <a href="https://www.mytutor.co.uk/tutors/24851/" target="_blank">MyTutor</a> <?=includeIcon('box-arrow-up-right')?>.
+      No undergrads were harmed in the making of this story.
+    </li>
+    <li>
+      A thrilling tenure as a full stack developer at a leading IT service management provider: I laughed, I cried, I debugged.
+      It was there that I sharpened my skills and grew a thick skin for real-world coding dramas.
+    </li>
+  </ul>  
 </p>
 
-<p class="text-center">
-  <a href="/engineer/about" class="btn btn-primary">Read my story</a>
+<p>
+  Feel free to explore and discover more <a href="/engineer/about">about me</a>, my projects, and my passion for software engineering.
 </p>
-
-<!-- <div class="card mb-3">
-  <img src="/assets/img/hero-shot.jpg" class="w-100" alt="Hero shot">
-  <div class="card-body">
-    <p class="card-text text-center">Me (left) restarting the robot I built for my Master's project (right). We're trying to outsmart the dung beetle.</p>
-  </div>
-</div> -->
 
 <div class="row">
   <?php foreach ($projects as $project) { ?>
@@ -34,7 +33,7 @@
       <div class="card">
         <a href="<?=$project['path']?>"><img class="card-img-top" src="<?=$project['imagePath']?>" alt="<?=$project['title']?>"></a>
         <div class="card-body">
-          <h5 class="card-title"><?=$project['title']?> project</h5>
+          <h5 class="card-title"><?=$project['title']?></h5>
           <p class="card-text"><?=$project['description']?></p>   
           <p class="card-text text-center"><a href="<?=$project['path']?>" class="btn btn-primary">Learn more</a></p>
         </div>
@@ -45,9 +44,9 @@
     <div class="card">
       <img class="card-img-top" src="/assets/img/coming-soon.jpeg" alt="Coming Soon">
       <div class="card-body">
-        <h5 class="card-title">More projects pending write-up.</h5>
-        <!-- <p class="card-text">...</p> -->
-        <p class="card-text text-center"><a class="btn btn-primary disabled">Coming soon</a></p>
+      <h5 class="card-title">Top Secret</h5>
+        <p class="card-text">A project so secret, even my compiler doesn't know about it yet!</p>
+        <p class="card-text text-center"><a class="btn btn-primary disabled">Stay tuned</a></p>
       </div>
     </div>
   </div>

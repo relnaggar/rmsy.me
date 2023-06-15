@@ -1,4 +1,6 @@
-<p class="lead">Any questions, feedback or general enquiries are welcome. To get in touch, you can send me an email or submit the contact form below. You can also send me an invitation on Linkedin.</p>
+<p class="lead">Got a burning question? Constructive criticism? Just want to chat about dung beetles?</p>
+
+<p>Feel free to ping me an email, submit the beautifully formatted form below, or even send me a LinkedIn invitation. I've never lost a patient!</p>
 
 <div class="row">
   <div class="col-xl-8 mb-3">
@@ -80,7 +82,7 @@
       <div class="card-body">
         <?=includeIcon('envelope')?>
         &nbsp;
-        <a href="mailto:engineer@rmsy.me">engineer@rmsy.me</a>
+        <a href="mailto:ramsey.el-naggar@outlook.com">ramsey.el&#8209;naggar@outlook.com</a>
       </div>
     </div>
     <div class="card mb-3">
@@ -94,7 +96,7 @@
         <?=includeIcon('box-arrow-up-right')?>
       </div>
     </div>
-    <div class="card mb-3">
+    <!-- <div class="card mb-3">
       <div class="card-header">
         <h6 class="mb-0">Wellfound (formerly AngelList Talent)</h6>
       </div>
@@ -104,6 +106,6 @@
         <a href="/wellfound" target="_blank">rmsy.me/wellfound</a>
         <?=includeIcon('box-arrow-up-right')?>
       </div>
-    </div>
+    </div> -->
   </div>
 </div>
