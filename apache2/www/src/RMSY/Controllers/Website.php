@@ -64,15 +64,16 @@ class Website extends Project {
       ], [
         'title' => 'Say Hello: The Contact Form',
         'id' => 'contactForm'
-      ], [
-        'title' => 'Lessons from the Frontier',
-        'id' => 'lessons'
       ]
     ]
   );
   }
 
   public function front(): array {
+    return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
+  }
+
+  public function takeaways(): array {
     return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
   }
 

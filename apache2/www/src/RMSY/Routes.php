@@ -38,6 +38,9 @@ class Routes implements \Framework\RoutesInterface {
           ],
           'front' => [
             'title' => 'Front-end'
+          ],
+          'takeaways' => [
+            'title' => 'Takeaways'
           ]
         ]
       ],
