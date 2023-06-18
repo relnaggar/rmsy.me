@@ -28,14 +28,14 @@ From the magic of web development, to the elegance of OOP, to the intellectual p
 
 <p>
   Don't worry though, it's not all work and no play.
-  I've also embraced the thrill of the unknown by hitchhiking from London to Vienna in a mere 4 days, and honed my warrior spirit through 3 months of intense Muay Thai training in Thailand.
+  I've also embraced the thrill of the unknown by hitchhiking from London to Vienna in 4 days, and honed my warrior spirit through 3 months of intense Muay Thai training in Thailand.
   Plus, as a singer, I led my a capella group of 9 to the semi-finals of the national competition Voice Festival UK -- it was Pitch Perfect!
   Currently, I'm mixing syntax with salsa, living a spicy adventure in Valencia where my Spanish is improving one bachata beat at a time.
 </p>
 
 <p>
 Still curious?
-Dive into <a href="/linkedin" target="_blank">my LinkedIn profile</a> <?=includeIcon('box-arrow-up-right')?>, which offers a treasure trove of highlights and achievements.
+Check out <a href="/linkedin" target="_blank">my LinkedIn profile</a> <?=includeIcon('box-arrow-up-right')?>, which offers a treasure trove of highlights and achievements.
 It's the story of my professional life in all its glory.
 Or better yet, feel free to <a href="/engineer/contact">reach out for a chat</a> -- I'm always game to talk tech, tutoring, or even dung beetles! 
 </p>
