@@ -1,6 +1,6 @@
-<!-- TODO ![Logo of the project](./images/logo.png)-->
+![Logo of the project](./apache2/www/public/favicon.ico)
 
-# [rmsy.me](https://rmsy.me)
+# [My Mona Lisa: A Personal Website](https://rmsy.me)
 [![7 day uptime ratio (Uptime Robot)](https://img.shields.io/uptimerobot/ratio/7/m784796051-da0b2757e43473b1f9d676b0)](https://stats.uptimerobot.com/Dwjv4hBo98) [![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade-score/rmsy.me?publish)](https://observatory.mozilla.org/analyze/rmsy.me) [![GitHub License](https://img.shields.io/badge/license-MIT-green)](https://github.com/relnaggar/rmsy.me/blob/master/LICENSE)
 
 > A personal website
