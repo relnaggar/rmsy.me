@@ -1,5 +1,5 @@
-<figure class="figure w-50 float-start m-3">
-<img src="/assets/img/contact-form-success.png" class="figure-img img-fluid" alt="Successful 'Message sent' message.">
+<figure class="figure m-3 text-center col-lg-6 float-end">
+  <img src="/assets/img/contact-form-success.png" class="figure-img img-fluid" alt="Successful 'Message sent' message.">
   <img src="/assets/img/contact-form-cool.png" class="figure-img img-fluid" alt="A really cool person sending me a valuable and important message.">
   <figcaption class="figure-caption text-center">A really cool person sending me a valuable and important message.</figcaption>
 </figure>
@@ -19,7 +19,7 @@
   If our overlord Google is satisfied with your humanity, your message will be PHPMailer'd to me, and CC'd to the definitely-not-fake email address you provided.
 </p>
 
-<figure class="figure w-50 float-end m-3">
+<figure class="figure m-3 text-center col-lg-6 float-end">
   <img src="/assets/img/smtp-secrets.png" class="figure-img img-fluid" alt="/run/secrets demonstration">
   <figcaption class="figure-caption text-center">The probably-50-hour detour to get <code>/run/secrets</code> working both in development and production is one of the many reasons <a href="/projects/website/devops#docker">Docker became my arch-nemesis</a>.</figcaption>
 </figure>
@@ -31,9 +31,7 @@
   But I'll never tell you what they are so don't even ask. 
 </p>
 
-<hr><br>
-
-<figure class="figure w-50 float-start m-3">
+<figure class="figure m-3 text-center col-lg-6 float-end">
   <img src="/assets/img/contact-form-spam.png" class="figure-img img-fluid" alt="A nasty little spambot getting its just comeuppance.">
   <figcaption class="figure-caption text-center">A nasty little spambot getting its just comeuppance.</figcaption>
 </figure>
@@ -49,7 +47,7 @@
 
 <p>
   And for all you aspiring spambots out there -- take a good look at what awaits you and reconsider your life choices.
-  The humilation suffered by the spambot on the left caused it to immediately change its ways and decide to become a generative AI model instead.
+  The humilation suffered by the spambot on the right caused it to immediately change its ways and decide to become a generative AI model instead.
   Now it's making millions of dollars a year and living in the Cloud.
   You could be next!
 </p>

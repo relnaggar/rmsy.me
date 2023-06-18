@@ -1,4 +1,4 @@
-<figure class="figure w-25 float-start m-3">
+<figure class="figure m-3 text-center col-lg-3 float-start">
   <img src="/assets/img/class-diagram.png" class="figure-img img-fluid" alt="UML Class Diagram">
   <figcaption class="figure-caption text-center">UML Class Diagram (attributes and methods ommitted). A is for Abstract Class, C is for Class.</figcaption>
 </figure>

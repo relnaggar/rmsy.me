@@ -26,7 +26,7 @@
               </p>
               <p>
                 If you're definitely not a robot, try submitting the form again.
-                But how can you really be sure you're not?
+                But if you are, don't bother -- our gnomes are on to you!
               </p>
             <?php } else if ($message['error-code'] === 'email') { ?>
               <p>
