@@ -27,7 +27,7 @@
 <p>    
   By the way, just in case you were trying to totally hack my email password, you should know that my <code>sendMail</code> function uses credentials secured away from the public source code repository.
   In other words, you can't see my email password even if you brought out your snazziest hacker shades and looked at the <a href="/projects/website/#source">source code</a> in green-on-black.
-  Check it out on the right: <code>/run/secrets/</code> is where all my secrets are stored.
+  Check it out: <code>/run/secrets/</code> is where all my secrets are stored.
   But I'll never tell you what they are so don't even ask. 
 </p>
 
@@ -47,7 +47,7 @@
 
 <p>
   And for all you aspiring spambots out there -- take a good look at what awaits you and reconsider your life choices.
-  The humilation suffered by the spambot on the right caused it to immediately change its ways and decide to become a generative AI model instead.
+  The humilation suffered by the spambot shown here caused it to immediately change its ways and decide to become a generative AI model instead.
   Now it's making millions of dollars a year and living in the Cloud.
   You could be next!
 </p>
