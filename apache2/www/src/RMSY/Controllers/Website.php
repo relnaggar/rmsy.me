@@ -12,7 +12,9 @@ class Website extends Project {
   }
 
   public function introduction(): array {
-    return $this->basic(__FUNCTION__, $meta=[], $vars=[], $sections=[
+    return $this->basic(__FUNCTION__, $meta=[
+      'description' => 'Don\'t miss out on this coding rodeo! Ride into the sunset with this software engineer\'s personal website project, showcasing a wild west of DevOps, front-end, and back-end skills.'
+    ], $vars=[], $sections=[
         [
           'title' => 'Executive Summary',
           'id' => 'summary'
@@ -41,7 +43,9 @@ class Website extends Project {
     $frameworkUrl = $sourceUrl . $frameworkDirectory;
     $controllersUrl = $sourceUrl . __NAMESPACE__ . '/';
     
-    return $this->basic(__FUNCTION__, $meta=[], $vars=[
+    return $this->basic(__FUNCTION__, $meta=[
+      'description' => 'Explore the backstage of a website\'s back-end! From PHP framework creation to template engine implementation, controller hierarchy setup, and contact form engineering. Join this thrilling dive into PHP single-page application development!'
+    ], $vars=[
       'publicUrl' => $publicUrl,
       'frameworkUrl' => $frameworkUrl,
       'controllersUrl' => $controllersUrl

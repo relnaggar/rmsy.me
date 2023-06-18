@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
+// Set this to true to disable error reporting
 $GLOBALS['PRODUCTION'] = true;
-
 if (!isset($GLOBALS['PRODUCTION'])) {
   ini_set('display_errors', '1');
   ini_set('display_startup_errors', '1');
@@ -9,10 +9,5 @@ if (!isset($GLOBALS['PRODUCTION'])) {
 }
 
 $sourceDirectory = '../src/';
-require($sourceDirectory . 'autoload.php');
-require($sourceDirectory . 'loadTemplate.php');
-require($sourceDirectory . 'includeIcon.php');
-
-$routes = new \Routes();
-$entryPoint = new \Framework\EntryPoint($routes);
-$entryPoint->run();
+$projectNamespace = "RMSY";
+require($sourceDirectory . 'Framework/framework.php');

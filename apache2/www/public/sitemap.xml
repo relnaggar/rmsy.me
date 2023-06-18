@@ -12,4 +12,16 @@
   <url>
     <loc>https://rmsy.me/engineer/contact</loc>
   </url>
+  <url>
+    <loc>https://rmsy.me/projects/website/</loc>
+  </url>
+  <!-- <url>
+    <loc>https://rmsy.me/projects/website/devops</loc>
+  </url> -->
+  <url>
+    <loc>https://rmsy.me/projects/website/back</loc>
+  </url>
+  <!-- <url>
+    <loc>https://rmsy.me/projects/website/front</loc>
+  </url> -->
 </urlset>
