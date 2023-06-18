@@ -1,6 +1,6 @@
 <figure class="figure w-25 float-end m-3">
   <img src="/assets/img/profile.jpg" class="figure-img img-fluid" alt="Ramsey El-Naggar">
-  <figcaption class="figure-caption text-center">The fake graduation scroll prop was worth the five-year wait!</figcaption>
+  <figcaption class="figure-caption text-center">The fake graduation scroll prop was well worth the five-year wait!</figcaption>
 </figure>
 
 <p class="lead">
@@ -9,7 +9,7 @@
 
 <p>
 My specialty? Well, I dive into the depths of full-stack web application development.
-My journey has taken me from sprucing up hefty existing codebases, to crafting a reusable <a href="/projects/website/php">back-end framework</a> from scratch - and all the nitty-gritty coding challenges in between.
+My journey has taken me from sprucing up hefty existing codebases, to crafting a reusable <a href="/projects/website/back">back-end framework</a> from scratch - and all the nitty-gritty coding challenges in between.
 Let me tell you, it's been quite the ride so far!
 </p>
 
@@ -29,19 +29,17 @@ From the magic of web development, to the elegance of OOP, to the intellectual p
 <p>
   Don't worry though, it's not all work and no play.
   I've also embraced the thrill of the unknown by hitchhiking from London to Vienna in a mere 4 days, and honed my warrior spirit through 3 months of intense Muay Thai training in Thailand.
-  Plus, as a singer, I led my all-boy a capella group of 9 to the semi-finals of the national competition Voice Festival UK.
-  You could say I was the 'Pitch Perfect' orchestrator before becoming a 'syntax symphony' conductor!
-  Currently, I'm mixing syntax and salsa, living a spicy adventure in Valencia where my Spanish is improving one bachata beat at a time.
+  Plus, as a singer, I led my a capella group of 9 to the semi-finals of the national competition Voice Festival UK -- it was Pitch Perfect!
+  Currently, I'm mixing syntax with salsa, living a spicy adventure in Valencia where my Spanish is improving one bachata beat at a time.
 </p>
 
 <p>
 Still curious?
 Dive into <a href="/linkedin" target="_blank">my LinkedIn profile</a> <?=includeIcon('box-arrow-up-right')?>, which offers a treasure trove of highlights and achievements.
-It's the story of my professional life in all its glory. Or better yet, feel free to <a href="/engineer/contact">reach out for a chat</a> -- I'm always game to talk tech, tutoring, or even dung beetles! 
+It's the story of my professional life in all its glory.
+Or better yet, feel free to <a href="/engineer/contact">reach out for a chat</a> -- I'm always game to talk tech, tutoring, or even dung beetles! 
 </p>
 
 <blockquote class="blockquote pt-3">
 <p class="blockquote-footer">Ramsey El-Naggar, <?=date('F')?> <?=date('Y')?></p>
 </blockquote>
-
-<!-- <p>TODO For the very few who might be interested, here's a superfluously detailed and completely undeserved autobiography.</p> -->
