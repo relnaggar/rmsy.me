@@ -4,7 +4,7 @@
   </div>
 </p>
 
-<h6>Achievements</h6>
+<h2>Executive Summary</h2>
 <ul>
   <li>
     Led group of 4 to design and build a football-playing robot, winning 2nd place in annual competition.

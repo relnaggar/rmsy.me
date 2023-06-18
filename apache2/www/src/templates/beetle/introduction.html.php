@@ -4,7 +4,20 @@
   </div>
 </p>
 
-<h6>Achievements</h6>
+<h2>Executive Summary</h2>
+<ul>
+  <li>
+    Pioneered creation of dung beetle biorobot; adapted sophisticated neural model into the robot's programming.
+  </li>
+  <li>
+    Secured exclusive research grant to travel to South Africa to test the robot alongside real dung beetles.
+  </li>
+  <li>
+    Achieved average grade of 82% and acknowledged as one of the ~20 "outstanding" projects in the year.
+  </li>
+</ul>
+
+<!-- <h2>Achievements</h2>
 <ul>
   <li>
     Pioneered creation of dung beetle biorobot during 2-year Master's dissertation project, achieving average grade of 82% and acknowledged as one of the ~20 "outstanding" projects in the year.
@@ -24,9 +37,9 @@
   <li>
     Demonstrated biorobot's ability to accurately mimic dung beetle behaviour, thus validating hypotheses concerning neural encoding and combination of visual cues.
   </li>
-</ul>
+</ul> -->
 
-<h6>Summary</h6>
+<h6>More Details</h6>
 <p>
   For my two-year Master's dissertation project for the School of Informatics at the University of Edinburgh, supervised by Professor Barbara Webb, I built a dung beetle biorobot, programmed the robot with a neural model of navigational behaviour, and received a grant to travel to South Africa to perform behavioural experiments on the robot alongside real dung beetles.
 </p>

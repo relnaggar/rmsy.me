@@ -14,6 +14,9 @@ class Website extends Project {
   public function introduction(): array {
     return $this->basic(__FUNCTION__, $meta=[], $vars=[], $sections=[
         [
+          'title' => 'Executive Summary',
+          'id' => 'summary'
+        ], [
           'title' => 'Purpose',
           'id' => 'purpose'
         ], [
