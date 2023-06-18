@@ -14,7 +14,7 @@
 
 <p>
   The contact form's lifecycle begins with an extremely awesome and super physically attractive user, just like you, filling out their name, email, and message.
-  These are POSTed to the server when the form is submitted.
+  These are POSTed to the server when the form is submitted and validated to make sure you didn't forget anything.
   The server then API-calls up Google's reCAPTCHA service to make sure you're a human and not a filthy spambot.
   If our overlord Google is satisfied with your humanity, your message will be PHPMailer'd to me, and CC'd to the definitely-not-fake email address you provided.
 </p>

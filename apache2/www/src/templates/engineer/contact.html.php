@@ -8,8 +8,10 @@
       <div class="alert alert-success" role="alert">
         <h4 class="alert-heading">Message sent!</h4>
         <p>
-          Your message has been sent successfully.
-          As confirmation, a copy of your message has also been forwarded to your email address.
+          Whoosh!
+          Your message is now being hand-delivered by our nimble web gnomes, zip-lining straight into my inbox.
+          For an encore, they've backflipped a copy right to the email address you provided.
+          High-five!
         </p>
       </div>
     <?php } else { ?>
@@ -18,14 +20,43 @@
           <h4 class="alert-heading">Message send failure</h4>
             <?php if ($message['error-code'] === 'timeout-or-duplicate') { ?>
               <p>
-                It looks like this was a form resubmission which has failed the reCAPTCHA validation. Try manually resubmitting the form below. You can do this by checking the reCAPTCHA box and pressing the Submit button.
+                Uh-oh!
+                Our web gnomes our telling me this was a form resubmission which has failed the reCAPTCHA validation.
+                Naughty naughty!
+              </p>
+              <p>
+                If you're definitely not a robot, try submitting the form again.
+                But how can you really be sure you're not?
+              </p>
+            <?php } else if ($message['error-code'] === 'email') { ?>
+              <p>
+                Oh no! Our web gnomes are telling me the email address you entered is invalid. Whoops!
+              </p>
+            <?php } else if ($message['error-code'] === 'name') { ?>
+              <p>
+                Oh no!
+                Our web gnomes are telling me the name you entered is too long.
+                If you're name is really that long, I'm impressed!
+                But there's a 255 character limit on this form, so you'll have to shorten it.
+              </p>
+            <?php } else if ($message['error-code'] === 'message') { ?>
+              <p>
+                Oh no!
+                Our web gnomes are telling me the message you entered is too long.
+                I'm flattered you have so much to say, but there's a 65535 character limit on this form, so you'll have to just give me the highlights.
               </p>
             <?php } else { ?>
               <p>
-              It looks like there was some kind of internal error when trying to validate your message with reCAPTCHA or when trying to send your message as an email. This might just be a one-off problem, so try submitting your message again using the form below.
+                Yikes!
+                Looks like our web gnomes tripped on a digital banana peel while they were scurrying to deliver your message.
+                Fear not, for gnomes are resilient!
+                Try tapping that 'Submit' button one more time, you never know.
               </p>
               <p>
-                If you keep seeing this error message, it probably indicates that the contact form is no longer working. Sorry about this! The best thing to do is copy the message that you've written below so you don't lose it and then send it to me in an email instead.
+                If this keeps happening, it means the contact form may be on a coffee break.
+                My deepest apologies!
+                To safeguard your message from the perils of the Internet, copy-paste it somewhere safe and catapult it directly into my email inbox instead.
+                These gnomes, huh?
               </p>
             <?php } ?>
         </div>
@@ -96,16 +127,5 @@
         <?=includeIcon('box-arrow-up-right')?>
       </div>
     </div>
-    <!-- <div class="card mb-3">
-      <div class="card-header">
-        <h6 class="mb-0">Wellfound (formerly AngelList Talent)</h6>
-      </div>
-      <div class="card-body">
-        <?=includeIcon('wellfound')?>
-        &nbsp;
-        <a href="/wellfound" target="_blank">rmsy.me/wellfound</a>
-        <?=includeIcon('box-arrow-up-right')?>
-      </div>
-    </div> -->
   </div>
 </div>

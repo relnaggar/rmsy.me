@@ -88,37 +88,57 @@ class Engineer extends BaseController {
     }
   }
 
+  private function validatePostRequest(): bool {
+    if (isset($_POST['submit']) &&
+        isset($_POST['message']['name']) &&
+        isset($_POST['message']['email']) &&
+        isset($_POST['message']['message'])
+      ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public function contact(): array {
     $description = "I'm always game to talk tech, tutoring, or even dung beetles!";
     $message['sent'] = false;
-    if (isset($_POST['submit'])) {
-      $result_string = $this->validateRecaptcha();
-      if ($result_string) {
-        $result = json_decode($result_string, true);
-        // uncomment these lines to simulate a reCAPTCHA failure
-        // $result['success'] = false; 
-        // $result['error-codes'] = ['timeout-or-duplicate'];
-        if ($result['success']) {
-          $message['sent'] = $this->sendEmail(
-            'engineer@rmsy.me',
-            'Ramsey El-Naggar',
-            'engineer@rmsy.me',
-            'Ramsey El-Naggar',
-            $_POST['message']['email'],
-            $_POST['message']['name'],
-            'rmsy.me engineer contact form message',
-            nl2br($_POST['message']['message'], false)
-          );
-          if (!$message['sent']) {
-            $message['error-code'] = 'PHPMailer';
-          }
-        } else if (count($result['error-codes']) === 1 && $result['error-codes'][0] === 'timeout-or-duplicate') {
-          $message['error-code'] = 'timeout-or-duplicate';
-        } else {
-          $message['error-code'] = 'reCAPTCHA';
-        }
+    if ($this->validatePostRequest()) {
+      if (!filter_var($_POST['message']['email'], FILTER_VALIDATE_EMAIL)) {
+        $message['error-code'] = 'email';
+      } else if (strlen($_POST['message']['name']) > 255) {
+        $message['error-code'] = 'name';
+      } else if (strlen($_POST['message']['message']) > 65535) {
+        $message['error-code'] = 'message';
       } else {
-        $message['error-code'] = 'file_get_contents';
+        $result_string = $this->validateRecaptcha();
+        if ($result_string) {
+          $result = json_decode($result_string, true);
+          // uncomment these lines to simulate a reCAPTCHA failure
+          // $result['success'] = false; 
+          // $result['error-codes'] = ['timeout-or-duplicate'];
+          if ($result['success']) {
+            $message['sent'] = $this->sendEmail(
+              'engineer@rmsy.me',
+              'Ramsey El-Naggar',
+              'engineer@rmsy.me',
+              'Ramsey El-Naggar',
+              $_POST['message']['email'],
+              $_POST['message']['name'],
+              'rmsy.me engineer contact form message',
+              nl2br($_POST['message']['message'], false)
+            );
+            if (!$message['sent']) {
+              $message['error-code'] = 'PHPMailer';
+            }
+          } else if (count($result['error-codes']) === 1 && $result['error-codes'][0] === 'timeout-or-duplicate') {
+            $message['error-code'] = 'timeout-or-duplicate';
+          } else {
+            $message['error-code'] = 'reCAPTCHA';
+          }
+        } else {
+          $message['error-code'] = 'file_get_contents';
+        }
       }
     }
     if (!$message['sent']) {
