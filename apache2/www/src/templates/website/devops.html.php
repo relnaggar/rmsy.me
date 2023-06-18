@@ -4,7 +4,7 @@
   </div>
 </p>
 
-<h6>Achievements</h6>
+<h2>Boring Technical Summary</h2>
 <ul>
   <li>Set up and configured the AWS cloud server instance.</li>
   <li>Installed and securely configured the Apache HTTP Server software.</li>
