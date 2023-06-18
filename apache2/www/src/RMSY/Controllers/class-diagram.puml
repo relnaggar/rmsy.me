@@ -1,0 +1,25 @@
+@startuml Controller
+abstract class Controller {
+}
+
+abstract class Project {
+}
+
+class Engineer {
+}
+
+class Website {
+}
+
+class Beetle {
+}
+
+class SDP {
+}
+
+Controller <|-- Project
+Controller <|-- Engineer
+Project <|-- Website
+Project <|-- Beetle
+Project <|-- SDP
+@enduml

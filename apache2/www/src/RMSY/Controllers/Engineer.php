@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
-namespace Controllers;
+namespace RMSY\Controllers;
 
 use \PHPMailer\PHPMailer\PHPMailer;
 use \PHPMailer\PHPMailer\Exception;
 use \PHPMailer\PHPMailer\SMTP;
 
-class Engineer extends Segment {
+class Engineer extends BaseController {
   /* @var array */
   private $projects;
 
@@ -33,7 +33,7 @@ class Engineer extends Segment {
       'nonce' => base64_encode(random_bytes(18)), // number of bytes must be a multiple of 3 greater than 16
       'sitekey' => rtrim(file_get_contents('/run/secrets/RECAPTCHA_SITE_KEY'))
     ];
-    header("Content-Security-Policy: TO_BE_REPLACED; script-src 'self' https://platform.linkedin.com/badges/js/profile.js https://badges.linkedin.com/ 'nonce-" . $recaptcha['nonce'] . "'; frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/");
+    header("Content-Security-Policy: TO_BE_REPLACED; script-src 'self' 'nonce-" . $recaptcha['nonce'] . "'; frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/");
     return $recaptcha;
   }
 
@@ -64,8 +64,8 @@ class Engineer extends Segment {
       // Server settings
       $mail->SMTPDebug = SMTP::DEBUG_SERVER;
       $mail->isSMTP();
-      $mail->Host = rtrim(file_get_contents('/run/secrets/SMTP_HOST'));
       $mail->SMTPAuth = true;
+      $mail->Host = rtrim(file_get_contents('/run/secrets/SMTP_HOST'));      
       $mail->Username = rtrim(file_get_contents('/run/secrets/SMTP_USERNAME'));
       $mail->Password = rtrim(file_get_contents('/run/secrets/SMTP_PASSWORD'));
       $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
@@ -95,6 +95,9 @@ class Engineer extends Segment {
       $result_string = $this->validateRecaptcha();
       if ($result_string) {
         $result = json_decode($result_string, true);
+        // uncomment these lines to simulate a reCAPTCHA failure
+        // $result['success'] = false; 
+        // $result['error-codes'] = ['timeout-or-duplicate'];
         if ($result['success']) {
           $message['sent'] = $this->sendEmail(
             'engineer@rmsy.me',
@@ -104,7 +107,7 @@ class Engineer extends Segment {
             $_POST['message']['email'],
             $_POST['message']['name'],
             'rmsy.me engineer contact form message',
-            $_POST['message']['message']
+            nl2br($_POST['message']['message'], false)
           );
           if (!$message['sent']) {
             $message['error-code'] = 'PHPMailer';

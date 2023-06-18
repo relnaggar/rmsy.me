@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
-namespace Controllers;
+namespace RMSY\Controllers;
 
-abstract class Segment {
+use RMSY\Data\Sidebar;
+
+abstract class BaseController {
   /* @var string */
   protected $templateDir;
 
@@ -11,7 +13,7 @@ abstract class Segment {
   /* @var \Sidebar */
   protected $sidebar;
 
-  protected function __construct(string $templateDir, array $menu, \Sidebar $sidebar=NULL) {
+  protected function __construct(string $templateDir, array $menu, Sidebar $sidebar=NULL) {
     $this->templateDir = $templateDir;
     $this->menu = $menu;
     $this->sidebar = $sidebar;
@@ -24,19 +26,29 @@ abstract class Segment {
     return $title;
   }
 
-  protected function basic(string $function_name, array $meta=[], array $vars=[]): array {
+  private function addSectionTemplates(array $sections, string $function_name, array $vars): array {
+    foreach ($sections as &$section) {
+      $section['html'] = loadTemplate($this->templateDir . $function_name . '/' . $section['id'], $vars);
+    }
+    return $sections;
+  }
+
+  protected function basic(string $function_name, array $meta=[], array $vars=[], array $sections=NULL): array {
     if (!isset($meta['title'])) {
       $meta['title'] = $this->getTitle($function_name);
     }
     if (!isset($this->menu['activeItemText'])) {
       $this->menu['activeItemText'] = $meta['title'];
     }
-    
     $page = [
       'meta' => $meta,
-      'menu' => $this->menu,
-      'html' => loadTemplate($this->templateDir . $function_name, $vars)
+      'menu' => $this->menu
     ];
+    if (isset($sections)) {
+      $page['sections'] = $this->addSectionTemplates($sections, $function_name, $vars);
+    } else {
+      $page['html'] = loadTemplate($this->templateDir . $function_name, $vars);
+    }
     if (isset($this->sidebar)) {
       $this->sidebar->setActiveItemText($meta['title']);
       $page['sidebar'] = $this->sidebar;

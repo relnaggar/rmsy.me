@@ -1,4 +1,6 @@
 <?php declare(strict_types=1);
+namespace RMSY\Data;
+
 class Sidebar {
   /* @var string */
   private $title;

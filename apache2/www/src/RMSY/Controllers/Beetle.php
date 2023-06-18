@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
-namespace Controllers;
-class SDP extends Project {
+namespace RMSY\Controllers;
+class Beetle extends Project {
   public function __construct(array $menu, array $project) {
-    parent::__construct($templateDir='/sdp/', $menu=$menu, $project=$project);
+    parent::__construct($templateDir='/beetle/', $menu=$menu, $project=$project);
   }
 
   public function introduction(): array {

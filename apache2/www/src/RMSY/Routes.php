@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+namespace RMSY;
 class Routes implements \Framework\RoutesInterface {  
   /* @var \Controllers\Front */
   private $frontController;
@@ -13,11 +14,11 @@ class Routes implements \Framework\RoutesInterface {
   private $engineerMenu;
 
   public function __construct() {
-    $this->frontController = new \Controllers\Front();
+    $this->frontController = new \RMSY\Controllers\Front();
     $this->projects = $this->getProjects();
     $this->engineerMenu = $this->getEngineerMenu();
     $this->addProjectControllers();    
-    $this->engineerController= new \Controllers\Engineer($this->engineerMenu, $this->projects);
+    $this->engineerController= new \RMSY\Controllers\Engineer($this->engineerMenu, $this->projects);
   }
 
   private function getProjects(): array {
@@ -29,26 +30,14 @@ class Routes implements \Framework\RoutesInterface {
         'description' => "Find out how I gave birth to this technological tapestry of blood, tears and Dockerfiles: curiosity is better than regret!",
         'rootFunctionName' => 'introduction',
         'pages' => [
-          'aws' => [
-            'title' => 'AWS'
+          'devops' => [
+            'title' => 'DevOps'
           ],
-          'docker' => [
-            'title' => 'Docker'
+          'back' => [
+            'title' => 'Back-end'
           ],
-          'apache' => [
-            'title' => 'Apache'
-          ],
-          'bash' => [
-            'title' => 'Bash'
-          ],
-          'bootstrap' => [
-            'title' => 'Bootstrap'
-          ],
-          'php' => [
-            'title' => 'PHP'
-          ],
-          'contactForm' => [
-            'title' => 'Contact Form'
+          'front' => [
+            'title' => 'Front-end'
           ]
         ]
       ],
@@ -79,7 +68,7 @@ class Routes implements \Framework\RoutesInterface {
 
   private function addProjectControllers() {
     foreach ($this->projects as $projectId => &$project) {
-      $className = '\\Controllers\\' . $projectId;
+      $className = '\\RMSY\\Controllers\\' . $projectId;
       $controller = new $className($this->engineerMenu, $project);
       $project['controller'] = $controller;
     }

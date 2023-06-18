@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace Controllers;
+namespace RMSY\Controllers;
 class Front {
   public function home(): void {
     header('Location: /engineer/');

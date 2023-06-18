@@ -2,9 +2,10 @@
 
 function loadTemplate($filePath, $templateVars=[], $fileExtension='.html.php') {
   global $sourceDirectory;
+  $templateDirectory = $sourceDirectory . 'templates';
   extract($templateVars);
   ob_start();
-  require $sourceDirectory . 'templates' . $filePath . $fileExtension;
+  require $templateDirectory . $filePath . $fileExtension;
   $contents = ob_get_clean();
   return $contents;
 }
