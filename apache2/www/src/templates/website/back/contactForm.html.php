@@ -1,4 +1,4 @@
-<figure class="figure m-3 text-center col-lg-6 float-end">
+<figure class="figure m-3 text-center col-lg-6 float-end w-100-lg-down">
   <img src="/assets/img/contact-form-success.png" class="figure-img img-fluid" alt="Successful 'Message sent' message.">
   <img src="/assets/img/contact-form-cool.png" class="figure-img img-fluid" alt="A really cool person sending me a valuable and important message.">
   <figcaption class="figure-caption text-center">A really cool person sending me a valuable and important message.</figcaption>
@@ -19,7 +19,7 @@
   If our overlord Google is satisfied with your humanity, your message will be PHPMailer'd to me, and CC'd to the definitely-not-fake email address you provided.
 </p>
 
-<figure class="figure m-3 text-center col-lg-6 float-end">
+<figure class="figure m-3 text-center col-lg-6 float-end w-100-lg-down">
   <img src="/assets/img/smtp-secrets.png" class="figure-img img-fluid" alt="/run/secrets demonstration">
   <figcaption class="figure-caption text-center">The probably-50-hour detour to get <code>/run/secrets</code> working both in development and production is one of the many reasons <a href="/projects/website/devops#docker">Docker became my arch-nemesis</a>.</figcaption>
 </figure>
@@ -31,7 +31,7 @@
   But I'll never tell you what they are so don't even ask. 
 </p>
 
-<figure class="figure m-3 text-center col-lg-6 float-end">
+<figure class="figure m-3 text-center col-lg-6 float-end w-100-lg-down">
   <img src="/assets/img/contact-form-spam.png" class="figure-img img-fluid" alt="A nasty little spambot getting its just comeuppance.">
   <figcaption class="figure-caption text-center">A nasty little spambot getting its just comeuppance.</figcaption>
 </figure>

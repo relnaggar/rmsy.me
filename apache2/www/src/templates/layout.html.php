@@ -110,7 +110,7 @@
           <?php } ?>
           <?php if (isset($sections)) { ?>
             <div data-nosnippet>
-              <nav class="navbar flex-column justify-content-start navbar-light bg-light display-none-md-up border m-3 navbar-vertical">
+              <nav class="navbar flex-column justify-content-start navbar-light bg-light display-none-lg-up border m-3 navbar-vertical">
                 <span class="border-bottom text-muted p-3">On this page</span>
                 <ul class="navbar-nav">
                   <?php foreach ($sections as $section) { ?>
@@ -163,8 +163,8 @@
             </div>
           <?php } ?>
         </main>
-        <a href="#" class="btn btn-primary position-fixed bottom-0 end-0 display-none-md-up">^</a>
-        <div class="col-2 display-none-md-down" data-nosnippet>
+        <a href="#" class="btn btn-primary position-fixed bottom-0 end-0 display-none-lg-up">^</a>
+        <div class="col-2 display-none-lg-down" data-nosnippet>
           <?php if (isset($sections)) { ?>
             <nav id="sidebarMenu" class="navbar navbar-light flex-column justify-content-start bg-light navbar-vertical sidebar">
               <span class="border-bottom w-100 text-muted p-3">On this page</span>

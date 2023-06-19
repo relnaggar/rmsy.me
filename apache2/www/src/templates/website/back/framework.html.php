@@ -1,6 +1,6 @@
-<figure class="figure m-3 text-center col-lg-7 float-start">
+<figure class="figure m-3 text-center col-lg-7 float-start w-100-lg-down">
   <img src="/assets/img/routing-sequence.png" class="figure-img img-fluid" alt="Simplified UML Sequence Diagram for the routing and templating sequence.">
-  <figcaption class="figure-caption text-center">Simplified UML Sequence Diagram for the routing and templating sequence.</figcaption>
+  <figcaption class="figure-caption text-center">UML sequence diagram or modern art? You decide.</figcaption>
 </figure>
 
 <p>
@@ -14,9 +14,9 @@ No entry!
 You're quickly ushered to the <a href="/somenonsense">404 page</a>, where you can catch the next train back home.
 </p>
 
-<figure class="figure m-3 text-center col-lg-5 float-end">
+<figure class="figure m-3 text-center col-lg-5 float-end w-100-lg-down">
   <img src="/assets/img/packages-uml.png" class="figure-img img-fluid" alt="Simplified UML Class Diagram for the whole application.">
-  <figcaption class="figure-caption text-center">Simplified UML Class Diagram for the whole application.</figcaption>
+  <figcaption class="figure-caption text-center">Fear not, these complex diagrams are only here to bamboozle potential employers into believing I'm some kind of tech wizard.</figcaption>
 </figure>
 
 <p>

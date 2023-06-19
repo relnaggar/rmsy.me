@@ -52,6 +52,12 @@
   }
 }
 
+@include media-breakpoint-up(lg) {
+  .display-none-lg-up {
+    display: none !important;
+  }
+}
+
 .bg-contrast-primary {
   background-color: color-contrast($primary);
 }
