@@ -1,15 +1,16 @@
 <?php declare(strict_types=1);
 namespace RMSY\Controllers;
 
+use Framework\TemplateEngine;
 use RMSY\Data\Sidebar;
 
-abstract class Project extends BaseController {
+abstract class AbstractProject extends AbstractController {
 
   /* @var array */
   protected $project;
 
-  protected function __construct(string $templateDir, array $menu, array $project) {
-    parent::__construct($templateDir=$templateDir, $menu=$menu, $sidebar=$this->getSidebar($project));
+  protected function __construct(TemplateEngine $templateEngine, string $templateDir, array $menu, array $project) {
+    parent::__construct($templateEngine=$templateEngine, $templateDir=$templateDir, $menu=$menu, $sidebar=$this->getSidebar($project));
     $this->project = $project;
     $this->menu['activeItemText'] = 'Projects';
   }

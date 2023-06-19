@@ -1,11 +1,17 @@
 <?php declare(strict_types=1);
 namespace Framework;
+
 class EntryPoint {
-  /* @var \Framework\RoutesInterface */
+  /* @var TemplateEngine */
+  private $templateEngine;
+
+  /* @var RoutesInterface */
   private $routes;
 
-  public function __construct(\Framework\RoutesInterface $routes) {
-    $this->routes = $routes;
+  public function __construct(string $projectNamespace, TemplateEngine $templateEngine) {
+    $this->templateEngine = $templateEngine;
+    $routesClass = "\\" . $projectNamespace . "\\Routes";
+    $this->routes = new $routesClass($this->templateEngine);
   }
 
   public function run(): void {
@@ -20,7 +26,7 @@ class EntryPoint {
     $controller = $route['controller'];
     $functionName = $route['functionName'];
     $layoutVars = $controller->$functionName();
-    $output = loadTemplate('/layout', $layoutVars);
+    $output = $this->templateEngine->loadTemplate('/layout', $layoutVars);
     echo $output;
   }
 }

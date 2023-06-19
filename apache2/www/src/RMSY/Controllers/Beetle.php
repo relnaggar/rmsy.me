@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
 namespace RMSY\Controllers;
-class Beetle extends Project {
-  public function __construct(array $menu, array $project) {
-    parent::__construct($templateDir='/beetle/', $menu=$menu, $project=$project);
+
+use Framework\TemplateEngine;
+
+class Beetle extends AbstractProject {
+  public function __construct(TemplateEngine $templateEngine, array $menu, array $project) {
+    parent::__construct($templateEngine=$templateEngine, $templateDir='/beetle/', $menu=$menu, $project=$project);
   }
 
   public function introduction(): array {

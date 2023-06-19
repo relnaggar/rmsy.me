@@ -9,6 +9,11 @@ No entry!
 You're quickly ushered to the <a href="/somenonsense">404 page</a>, where you can catch the next train back home.
 </p>
 
+<figure class="figure m-3 text-center col-lg-4 float-end">
+  <img src="/assets/img/packages-uml.png" class="figure-img img-fluid" alt="UML Class Diagram for the whole application">
+  <figcaption class="figure-caption text-center">UML Class Diagram for the whole application (Controllers ommitted).</figcaption>
+</figure>
+
 <p>
   So, what did I do here that's actually useful to the world?
   Well, I put together a piece of web magic, a little wizardry, if you will, called a framework.

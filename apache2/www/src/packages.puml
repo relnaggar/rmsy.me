@@ -1,0 +1,30 @@
+@startuml Packages
+
+hide members
+set separator none
+
+package Framework {
+  class EntryPoint
+  class TemplateEngine
+  interface RoutesInterface
+}
+
+package RMSY {
+  class Routes
+  package Controllers {
+    class "..."
+    class Engineer
+    abstract class AbstractController
+  }
+}
+
+RoutesInterface <|.. Routes
+EntryPoint o-- RoutesInterface
+EntryPoint o-- TemplateEngine
+AbstractController o-- TemplateEngine
+AbstractController <|-- "..."
+Routes o-- "..."
+AbstractController <|-- Engineer
+Routes o-- Engineer
+
+@enduml

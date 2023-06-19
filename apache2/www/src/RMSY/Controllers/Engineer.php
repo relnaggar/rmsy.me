@@ -5,12 +5,14 @@ use \PHPMailer\PHPMailer\PHPMailer;
 use \PHPMailer\PHPMailer\Exception;
 use \PHPMailer\PHPMailer\SMTP;
 
-class Engineer extends BaseController {
+use Framework\TemplateEngine;
+
+class Engineer extends AbstractController {
   /* @var array */
   private $projects;
 
-  public function __construct(array $menu, array $projects) {
-    parent::__construct($templateDir='/engineer/', $menu=$menu);
+  public function __construct(TemplateEngine $templateEngine, array $menu, array $projects) {
+    parent::__construct($templateEngine=$templateEngine, $templateDir='/engineer/', $menu=$menu);
     $this->projects = $projects;
   }
 

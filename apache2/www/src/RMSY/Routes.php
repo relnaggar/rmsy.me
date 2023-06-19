@@ -1,6 +1,9 @@
 <?php declare(strict_types=1);
 namespace RMSY;
 class Routes implements \Framework\RoutesInterface {  
+  /* @var \Framework\TemplateEngine */
+  private $templateEngine;
+
   /* @var \Controllers\Front */
   private $frontController;
 
@@ -13,12 +16,13 @@ class Routes implements \Framework\RoutesInterface {
   /* @var array */
   private $engineerMenu;
 
-  public function __construct() {
+  public function __construct(\Framework\TemplateEngine $templateEngine) {
+    $this->templateEngine = $templateEngine;
     $this->frontController = new \RMSY\Controllers\Front();
     $this->projects = $this->getProjects();
     $this->engineerMenu = $this->getEngineerMenu();
     $this->addProjectControllers();    
-    $this->engineerController= new \RMSY\Controllers\Engineer($this->engineerMenu, $this->projects);
+    $this->engineerController= new \RMSY\Controllers\Engineer($templateEngine, $this->engineerMenu, $this->projects);
   }
 
   private function getProjects(): array {
@@ -72,7 +76,7 @@ class Routes implements \Framework\RoutesInterface {
   private function addProjectControllers() {
     foreach ($this->projects as $projectId => &$project) {
       $className = '\\RMSY\\Controllers\\' . $projectId;
-      $controller = new $className($this->engineerMenu, $project);
+      $controller = new $className($this->templateEngine, $this->engineerMenu, $project);
       $project['controller'] = $controller;
     }
   }

@@ -1,0 +1,20 @@
+@startuml Controllers
+
+hide members
+
+package Controllers {
+  abstract class AbstractController
+  abstract class AbstractProject
+  class Engineer
+  class Website
+  class Beetle
+  class SDP
+}
+
+AbstractController <|-- AbstractProject
+AbstractController <|-- Engineer
+AbstractProject <|-- Website
+AbstractProject <|-- Beetle
+AbstractProject <|-- SDP
+
+@enduml

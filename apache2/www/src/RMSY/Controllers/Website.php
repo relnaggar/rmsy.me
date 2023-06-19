@@ -1,14 +1,17 @@
 <?php declare(strict_types=1);
 namespace RMSY\Controllers;
-class Website extends Project {
+
+use Framework\TemplateEngine;
+
+class Website extends AbstractProject {
   /* @var string */
   private const REPOSITORY_URL = 'https://github.com/relnaggar/rmsy.me/blob/master/';
 
   /* @var string */
   private const PUBLIC_URL = 'apache2/www/public/';
 
-  public function __construct(array $menu, array $project) {
-    parent::__construct($templateDir='/website/', $menu=$menu, $project=$project);
+  public function __construct(TemplateEngine $templateEngine, array $menu, array $project) {
+    parent::__construct($templateEngine=$templateEngine, $templateDir='/website/', $menu=$menu, $project=$project);
   }
 
   public function introduction(): array {
