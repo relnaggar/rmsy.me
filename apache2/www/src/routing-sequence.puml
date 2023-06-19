@@ -1,0 +1,42 @@
+@startuml routing-sequence
+
+!pragma teoz true
+
+hide footbox
+
+box Framework
+  participant ":EntryPoint" as entry
+end box
+
+box RMSY #LightBlue
+  participant ":Routes" as routes <<RoutesInterface>>
+
+  box Controllers #LightGreen
+    participant ":Controller" as controller <<AbstractController>>
+  end box
+end box
+
+box Framework
+  participant ":TemplateEngine" as template
+end box
+
+[-> entry: run()
+activate entry
+  entry -> routes: getRoutes()
+  activate routes
+  return routes
+
+  entry -> controller: action()
+  activate controller
+    controller -> template: loadTemplate(template, data)
+    activate template
+    return partialPage
+  return pageData
+
+  entry -> template: loadTemplate(layout, pageData)
+  activate template
+  return page
+
+return page
+
+@enduml

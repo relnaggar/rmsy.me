@@ -1,3 +1,8 @@
+<figure class="figure m-3 text-center col-lg-7 float-start">
+  <img src="/assets/img/routing-sequence.png" class="figure-img img-fluid" alt="Simplified UML Sequence Diagram for the routing and templating sequence.">
+  <figcaption class="figure-caption text-center">Simplified UML Sequence Diagram for the routing and templating sequence.</figcaption>
+</figure>
+
 <p>
 Imagine you're a passenger in a bustling train station.
 This station is like the entry point of this application, the grand gateway to our website.
@@ -9,9 +14,9 @@ No entry!
 You're quickly ushered to the <a href="/somenonsense">404 page</a>, where you can catch the next train back home.
 </p>
 
-<figure class="figure m-3 text-center col-lg-4 float-end">
-  <img src="/assets/img/packages-uml.png" class="figure-img img-fluid" alt="UML Class Diagram for the whole application">
-  <figcaption class="figure-caption text-center">UML Class Diagram for the whole application (Controllers ommitted).</figcaption>
+<figure class="figure m-3 text-center col-lg-5 float-end">
+  <img src="/assets/img/packages-uml.png" class="figure-img img-fluid" alt="Simplified UML Class Diagram for the whole application.">
+  <figcaption class="figure-caption text-center">Simplified UML Class Diagram for the whole application.</figcaption>
 </figure>
 
 <p>

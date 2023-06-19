@@ -1,6 +1,6 @@
-<figure class="figure m-3 text-center col-lg-4 float-start">
-  <img src="/assets/img/controllers-uml.png" class="figure-img img-fluid" alt="UML Class Diagram for the Controllers namespace">
-  <figcaption class="figure-caption text-center">UML Class Diagram for the Controllers namespace (members hidden).</figcaption>
+<figure class="figure m-3 text-center col-lg-5 float-start">
+  <img src="/assets/img/controllers-uml.png" class="figure-img img-fluid" alt="Simplified UML Class Diagram for the Controllers namespace.">
+  <figcaption class="figure-caption text-center">Simplified UML Class Diagram for the Controllers namespace.</figcaption>
 </figure>
 
 <p>
