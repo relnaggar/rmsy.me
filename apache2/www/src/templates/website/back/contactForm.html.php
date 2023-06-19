@@ -19,19 +19,12 @@
   If our overlord Google is satisfied with your humanity, your message will be PHPMailer'd to me, and CC'd to the definitely-not-fake email address you provided.
 </p>
 
-<figure class="figure m-3 text-center col-lg-6 float-end w-100-lg-down">
-  <img src="/assets/img/smtp-secrets.png" class="figure-img img-fluid" alt="/run/secrets demonstration">
-  <figcaption class="figure-caption text-center">The probably-50-hour detour to get <code>/run/secrets</code> working both in development and production is one of the many reasons <a href="/projects/website/devops#docker">Docker became my arch-nemesis</a>.</figcaption>
-</figure>
-
 <p>    
   By the way, just in case you were trying to totally hack my email password, you should know that my <code>sendMail</code> function uses credentials secured away from the public source code repository.
   In other words, you can't see my email password even if you brought out your snazziest hacker shades and looked at the <a href="/projects/website/#source">source code</a> in green-on-black.
-  Check it out: <code>/run/secrets/</code> is where all my secrets are stored.
-  But I'll never tell you what they are so don't even ask. 
 </p>
 
-<figure class="figure m-3 text-center col-lg-6 float-end w-100-lg-down">
+<figure class="figure m-3 text-center col-lg-6 float-start w-100-lg-down">
   <img src="/assets/img/contact-form-spam.png" class="figure-img img-fluid" alt="A nasty little spambot getting its just comeuppance.">
   <figcaption class="figure-caption text-center">A nasty little spambot getting its just comeuppance.</figcaption>
 </figure>
