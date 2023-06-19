@@ -34,14 +34,14 @@ class Routes implements \Framework\RoutesInterface {
         'description' => "Find out how I gave birth to this technological tapestry of blood, tears and Dockerfiles: curiosity is better than regret!",
         'rootFunctionName' => 'introduction',
         'pages' => [
-          'devops' => [
-            'title' => 'DevOps'
-          ],
           'back' => [
             'title' => 'Back-end'
           ],
           'front' => [
             'title' => 'Front-end'
+          ],
+          'devops' => [
+            'title' => 'DevOps'
           ],
           'takeaways' => [
             'title' => 'Takeaways'

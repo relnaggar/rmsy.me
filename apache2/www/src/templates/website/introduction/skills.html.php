@@ -25,23 +25,23 @@
   I hear you ask, "Which skills does this coding cowboy particularly want to emphasise?"
   Well, partner, I'm glad you asked!
   My talents tend to sip from three main watering holes:
-  <dl>    
-    <dt><a href="/projects/website/devops">DevOps</a></dt>
-    <dd>
-    Taming Docker to containerise the application, building an automated DevOps pipeline using Bash scripts and Git hooks, and manually tuning the AWS EC2 instance and Apache HTTP Server like a trusty old guitar.
-    </dd>
-
+  <dl>
     <dt><a href="/projects/website/back">Back-end development</a></dt>
     <dd>
       Constructing a PHP back-end framework from scratch, complete with routing, templating, and a spam-free contact form so airtight that not even the Sam Fisher of stealthy spambots could sneak past.
     </dd>
     
-    <dt><a href="/projects/website/front">Front-end</a></dt>
+    <dt><a href="/projects/website/front">Front-end development</a></dt>
     <dd>
       Crafting an intricate front-end HTML/CSS template with Bootstrap.
       You see that fully responsive menu above, sidebar to the left and table of contents to the right?
       That's right, I built that.
       (If you're on a mobile or small screen, you'll see them compressed at the top instead).
+    </dd>
+
+    <dt><a href="/projects/website/devops">DevOps</a></dt>
+    <dd>
+    Taming Docker to containerise the application, building an automated DevOps pipeline using Bash scripts and Git hooks, and manually tuning the AWS EC2 instance and Apache HTTP Server like a trusty old guitar.
     </dd>
   </dl>
 </p>
