@@ -13,7 +13,6 @@ package RMSY {
   class Routes
   package Controllers {
     class "..."
-    class Engineer
     abstract class AbstractController
   }
 }
@@ -24,7 +23,5 @@ EntryPoint o-- TemplateEngine
 AbstractController o-- TemplateEngine
 AbstractController <|-- "..."
 Routes o-- "..."
-AbstractController <|-- Engineer
-Routes o-- Engineer
 
 @enduml
