@@ -10,4 +10,5 @@ if (!isset($GLOBALS['PRODUCTION'])) {
 
 $sourceDirectory = '../src/';
 $projectNamespace = "RMSY";
+require($sourceDirectory . $projectNamespace . '/includeIcon.php');
 require($sourceDirectory . 'Framework/framework.php');
