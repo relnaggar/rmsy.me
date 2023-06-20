@@ -30,7 +30,7 @@ class Routes implements \Framework\RoutesInterface {
       'Website' => [
         'title' => 'My Mona Lisa: A Personal Website',
         'path' => '/projects/website/',
-        'imagePath' => '/assets/img/website-project.png',
+        'imagePath' => '/assets/img/responsive.gif',
         'description' => "Find out how I gave birth to this technological tapestry of blood, tears and Dockerfiles: curiosity is better than regret!",
         'rootFunctionName' => 'introduction',
         'pages' => [
