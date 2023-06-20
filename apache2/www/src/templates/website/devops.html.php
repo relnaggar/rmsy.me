@@ -1,10 +1,4 @@
-<p>
-  <div class="alert alert-info" role="alert">
-    I'm still writing up this project: I've not yet uploaded the content for this page.
-  </div>
-</p>
-
-<h2>Boring Technical Summary</h2>
+<h2>Technical Highlights</h2>
 <ul>
   <li>Set up and configured the AWS cloud server instance.</li>
   <li>Installed and securely configured the Apache HTTP Server software.</li>
@@ -15,3 +9,9 @@
   <li>Added unit testing framework PHPUnit.</li>
   <li>Integrated end-to-end testing framework Cucumber including browser automation with Selenium.</li>
 </ul>
+
+<p>
+  <div class="alert alert-info" role="alert">
+    I'm still writing up this project: I've not yet uploaded the main content for this page.
+  </div>
+</p>

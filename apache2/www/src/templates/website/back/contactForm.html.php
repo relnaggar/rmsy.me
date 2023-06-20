@@ -1,7 +1,9 @@
 <figure class="figure m-3 text-center col-lg-6 float-end w-100-lg-down">
   <img src="/assets/img/contact-form-success.png" class="figure-img img-fluid" alt="Successful 'Message sent' message.">
   <img src="/assets/img/contact-form-cool.png" class="figure-img img-fluid" alt="A really cool person sending me a valuable and important message.">
-  <figcaption class="figure-caption text-center">A really cool person sending me a valuable and important message.</figcaption>
+  <figcaption class="figure-caption text-center">
+    A really cool person sending me a valuable and important message. 
+  </figcaption>
 </figure>
 
 <p>
@@ -26,7 +28,9 @@
 
 <figure class="figure m-3 text-center col-lg-6 float-start w-100-lg-down">
   <img src="/assets/img/contact-form-spam.png" class="figure-img img-fluid" alt="A nasty little spambot getting its just comeuppance.">
-  <figcaption class="figure-caption text-center">A nasty little spambot getting its just comeuppance.</figcaption>
+  <figcaption class="figure-caption text-center">
+    A nasty little spambot getting its just comeuppance.
+  </figcaption>
 </figure>
 
 <p>

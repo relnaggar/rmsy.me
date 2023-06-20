@@ -54,8 +54,8 @@ class Website extends AbstractProject {
       'controllersUrl' => $controllersUrl
     ], $sections=[
       [
-        'title' => 'Boring Technical Summary',
-        'id' => 'summary'
+        'title' => 'Technical Highlights',
+        'id' => 'highlights'
       ], [
         'title' => 'Boarding The Website Train: Laying the Framework',
         'id' => 'framework'
