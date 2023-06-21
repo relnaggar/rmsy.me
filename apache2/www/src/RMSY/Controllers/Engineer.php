@@ -21,12 +21,12 @@ class Engineer extends AbstractController {
   }
 
   public function home(): array {
-    $description = "I carved this space with my raw and bleeding fingers to serve as a testament to the proficiencies I've garnered throughout my professional odyssey.";
+    $description = "Hello there, I'm Ramsey -- not just your average software engineer, but a virtuoso conducting symphonies of syntax and semicolons.";
     return $this->basic(__FUNCTION__, $meta=['description' => $description], $vars=['projects' => $this->projects]);
   }
 
   public function about(): array {
-    $description = "Not just your average software engineer, but a virtuoso conducting symphonies of syntax and semicolons.";
+    $description = "My specialty? Well, I dive into the depths of full-stack web application development.";
     return $this->basic(__FUNCTION__, $meta=['description' => $description]);
   }
 
