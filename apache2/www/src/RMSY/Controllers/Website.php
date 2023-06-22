@@ -16,7 +16,7 @@ class Website extends AbstractProject {
 
   public function introduction(): array {
     return $this->basic(__FUNCTION__, $meta=[
-      'description' => 'Don\'t miss out on this coding rodeo! Ride into the sunset with this software engineer\'s personal website project, showcasing a wild west of DevOps, front-end, and back-end skills.'
+      'description' => 'Don\'t miss out on this coding rodeo! Ride into the sunset with this software engineer\'s personal website project, showcasing a wild west of back-end, front-end, and DevOps skills.'
     ], $vars=[], $sections=[
         [
           'title' => 'Executive Summary',
@@ -36,7 +36,30 @@ class Website extends AbstractProject {
   }
 
   public function devops(): array {
-    return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
+    return $this->basic(__FUNCTION__, $meta=[
+        'noindex' => true
+      ], $vars=[], $sections=[
+        [
+          'title' => 'Technical Highlights',
+          'id' => 'highlights'
+        ], [
+          'title' => 'Birth of a Cloud Whisperer',
+          'id' => 'cloud'
+        ], [
+          'title' => 'When Docker Met Swarm',
+          'id' => 'docker'
+        ], [
+          'title' => 'Acing Apache: My Security Report Card',
+          'id' => 'apache'
+        ], [
+          'title' => 'Bashing Out Some Scripts',
+          'id' => 'bash'
+        ], [
+          'title' => 'Testing: Is This Thing On?',
+          'id' => 'testing'
+        ]
+      ]
+    );
   }
 
   public function back(): array {
@@ -77,7 +100,7 @@ class Website extends AbstractProject {
   }
 
   public function front(): array {
-    return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
+    return $this->basic(__FUNCTION__, $meta=['description' => 'Roll into the digital dining room that is the front-end of this website. Savour the ambiance, admire the decor, peruse the menu, and hey, don\'t forget to wink at that charming server.']);
   }
 
   public function takeaways(): array {
