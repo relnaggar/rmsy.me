@@ -15,13 +15,22 @@
   <url>
     <loc>https://rmsy.me/projects/website/</loc>
   </url>
-  <!-- <url>
-    <loc>https://rmsy.me/projects/website/devops</loc>
-  </url> -->
   <url>
     <loc>https://rmsy.me/projects/website/back</loc>
   </url>
+  <!-- <url>
+    <loc>https://rmsy.me/projects/website/devops</loc>
+  </url>   -->
   <url>
     <loc>https://rmsy.me/projects/website/front</loc>
   </url>
+  <url>
+    <loc>https://rmsy.me/projects/website/takeaways</loc>
+  </url>
+  <!-- <url>
+    <loc>https://rmsy.me/projects/beetle/</loc>
+  </url> -->
+  <!-- <url>
+    <loc>https://rmsy.me/projects/sdp/</loc>
+  </url> -->
 </urlset>
