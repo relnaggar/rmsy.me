@@ -1,0 +1,54 @@
+@startuml production-deployment
+
+node "Client" as client
+interface "80/443" as p80
+client -up- p80: "<<protocol>>\nHTTP(S)"
+
+node "AWS EC2 Instance" as ec2 {
+  node "Docker (Swarm Mode)" <<executionEnvironment>> as docker {
+    interface "8080/8443" as p8080
+    p80 - p8080
+
+    node "rmsy-me" <<network>> as network
+    node "rmsy-me-apache2\nproduction build" <<container>> as apache2Container
+    node "rmsy-me-postgres\nproduction build" <<container>> as postgresContainer
+
+    apache2Container -up- network
+    postgresContainer -up- network
+  }
+  p8080 - apache2Container
+
+  artifact "apache2-logs" <<directory>> as apache2Logs
+  artifact "production secrets" <<secrets>> as secrets
+  artifact "database" <<directory>> as database
+  apache2Container -down- apache2Logs: <<volume>>
+  apache2Container -down- secrets: <<secrets>>
+  postgresContainer -down- secrets: <<secrets>>
+  postgresContainer -down- database: <<volume>>
+}
+
+node "Docker Hub" as dockerHub {
+  artifact "rmsy-me-apache2\nproduction build" <<image>> as apache2Image
+  artifact "rmsy-me-postgres\nproduction build" <<image>> as postgresImage
+}
+
+apache2Image .down.> apache2Container : <<deploy>>
+postgresImage .down.> postgresContainer : <<deploy>>
+
+node "Developer" as developer {
+  artifact "rmsy-me-apache2\nproduction build" <<Dockerfile.prod>> as apache2Dockerfile
+  artifact "rmsy-me-postgres\nproduction build" <<Dockerfile.prod>> as postgresDockerfile
+}
+apache2Image <.down. apache2Dockerfile: <<mainfest>>
+postgresImage <.down. postgresDockerfile: <<manifest>>
+dockerHub <.down. developer: "<<push>>\ndocker push"
+
+node "GitHub" as github {
+  artifact "source code repository" <<directory>> as sourceCode
+}
+
+developer .down.> github: "<<push>>\ngit push"
+
+ec2 .> github: "<<pull>\ngit pull" 
+
+@enduml

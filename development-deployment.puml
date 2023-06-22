@@ -1,0 +1,44 @@
+@startuml development-deployment
+
+node "Developer" as developer {
+  artifact "rmsy-me-apache2\ndevelopment build" <<Dockerfile>> as apache2Dockerfile
+
+  node "Docker" <<executionEnvironment>> as docker {
+    artifact "rmsy-me-apache2\ndevelopment build" <<image>> as apache2Image
+    node "rmsy-me" <<network>> as network
+    artifact "rmsy-me-postgres\ndevelopment build" <<image>> as postgresImage
+    node "rmsy-me-apache2\ndevelopment build" <<container>> as apache2Container
+    node "rmsy-me-postgres\ndevelopment build" <<container>> as postgresContainer
+
+    apache2Container -up- network
+    postgresContainer -up- network
+  }
+  apache2Image <.right. apache2Dockerfile: <<mainfest>>
+
+  artifact "apache2-logs" <<directory>> as apache2Logs
+  artifact "secrets" <<directory>> as secrets
+  artifact "db" <<database>> as database
+  apache2Container -down- apache2Logs: <<volume>>
+  apache2Container -down- secrets: <<volume>>
+  postgresContainer -down- secrets: <<volume>>
+  postgresContainer -down- database: <<volume>>
+
+  artifact "www" <<directory>> as www
+  artifact "apache2-conf" <<directory>> as apache2Conf
+  artifact "php-ini" <<directory>> as phpIni
+  apache2Container -down- www: <<volume>>
+  apache2Container -down- apache2Conf: <<volume>>
+  apache2Container -down- phpIni: <<volume>>
+
+  artifact "postgres-conf" <<directory>> as postgresConf
+  postgresContainer -down- postgresConf: <<volume>>
+
+  artifact "rmsy-me-postgres\ndevelopment build" <<Dockerfile>> as postgresDockerfile
+
+  apache2Image .down.> apache2Container : <<deploy>>
+  postgresImage .down.> postgresContainer : <<deploy>>
+
+  postgresImage <.. postgresDockerfile: <<manifest>>
+}
+
+@enduml
