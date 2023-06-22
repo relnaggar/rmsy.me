@@ -16,7 +16,7 @@
   Seriously though, there are a few things I'm particularly proud of here:
 
   <dl>
-    <dt>The responsive design</dt>
+    <dt>The responsive design.</dt>
     <dd>
       <p>
         Ever tried to fit a sumo wrestler into skinny jeans? No? Me neither.
@@ -41,7 +41,7 @@
       </figure>
     </dd>
 
-    <dt>Getting into Google's good books</dt>
+    <dt>Getting into Google's good books.</dt>
     <dd>
     I've taken steps to ensure that the people who want to find me can find me.
     By taking a deep dive into the world of SEO, I've made this website a veritable beacon in the night.
@@ -58,7 +58,7 @@
       </figcaption>
     </figure>
 
-    <dt>Meticulous attention to detail</dt>
+    <dt>Meticulous attention to detail.</dt>
     <dd>
       You know that satisfaction when every single pixel is exactly where it should be?
       That's my jam.
@@ -67,7 +67,7 @@
       My obsession with detail might verge on neurotic, but hey, when the result is a website this slick, I'm okay with that.
     </dd>
 
-    <dt>The fact that I did it all myself</dt>
+    <dt>The fact that I did it all myself.</dt>
     <dd>
       From scratch.
       Everything you see here?

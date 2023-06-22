@@ -18,15 +18,15 @@
 
     <li>
       <strong>A</strong>:
-      Another cog in the machine, my <strong>Apache</strong> 2 HTTP Server.
+      Another cog in the machine, my <a href="#apache">hand-configured</a> <strong>Apache</strong> 2 HTTP Server.
       Why Apache?
       Because Google said it was the most popular web server, and who was I to argue?
       Bayesian prior for the win!
     </li>
 
     <li>
-      <strong>M</strong>:
-      A living, breathing <strong>MySQL</strong> database service, cohabiting with Apache like they'd known each other for years.
+      <strong>P</strong>:
+      A living, breathing <strong>PostgreSQL</strong> database service.
     </li>
 
     <li>
@@ -37,7 +37,7 @@
 </p>
 
 <p>
-  In other words, my digital baby, the <strong>LAMP</strong> stack, was born, screaming its first words: "Hello, World!".
+  In other words, my digital baby, the <strong>LAPP</strong> stack, was born, screaming its first words: "Hello, World!".
   What could possibly go wrong?
 </p>
 
