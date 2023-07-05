@@ -70,7 +70,7 @@ class Website extends AbstractProject {
     $controllersUrl = $sourceUrl . __NAMESPACE__ . '/';
     
     return $this->basic(__FUNCTION__, $meta=[
-      'description' => 'Explore the backstage of a website\'s back-end! From PHP framework creation to template engine implementation, controller hierarchy setup, and contact form engineering. Join this thrilling dive into PHP single-page application development!'
+      'description' => 'From PHP framework creation to template engine implementation, controller hierarchy setup, and contact form engineering. Join this thrilling dive into PHP single-page application development!'
     ], $vars=[
       'publicUrl' => $publicUrl,
       'frameworkUrl' => $frameworkUrl,
