@@ -14,11 +14,11 @@
   Let's glance at the cast of controllers, as detailed in the diagram stage-left:
   <ul>
     <li>
-      We have the head honcho, the <code><a href="<?=$controllersUrl?>Controller.php" target="_blank">Controller</a></code> <?=includeIcon('box-arrow-up-right')?>, acting as the base for all other controllers.
+      We have the head honcho, the <code><a href="<?=$controllersUrl?>AbstractController.php" target="_blank">AbstractController</a></code> <?=includeIcon('box-arrow-up-right')?>, acting as the base for all other controllers.
       Picture it as the veteran stage director passing down wisdom to the newbies.
     </li>
     <li>
-      Next up, we have the <code><a href="<?=$controllersUrl?>Project.php" target="_blank">Project</a></code> <?=includeIcon('box-arrow-up-right')?>, a base project controller.
+      Next up, we have the <code><a href="<?=$controllersUrl?>AbstractProject.php" target="_blank">AbstractProject</a></code> <?=includeIcon('box-arrow-up-right')?>, a base project controller.
       This savvy maestro provides functionalities common to all project controllers.
     </li>
     <li>
