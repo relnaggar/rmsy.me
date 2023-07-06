@@ -73,6 +73,6 @@
 </p>
 
 <blockquote class="px-5 blockquote">
-  <?=includeIcon('quote')?> End? No, the journey doesn't end here.
+  End? No, the journey doesn't end here.
   <p class="mt-1 blockquote-footer">Gandalf, <cite title="Lord of the Rings: The Return of the King">Lord of the Rings: The Return of the King</cite></p>
 </blockquote>
