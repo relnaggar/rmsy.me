@@ -9,7 +9,7 @@
   Fast forward to that fateful night in Thailand.
   Exhausted yet exhilarated after a grueling day of Muay Thai training, a wild idea sparked in my mind -- why not "check out" AWS and "quickly" spin up my own server?
   Little did I know, I was plunging headfirst into a cocoon of frustration, confusion, and despair.
-  But from every chrysalis eventually emerges a victorious butterfly, and after my transformation I had wings to fly:
+  But from every chrysalis eventually emerges a victorious butterfly, and after my transformation I had four new wings:
   <ul>
     <li>
       <strong>L</strong>:
@@ -26,7 +26,7 @@
 
     <li>
       <strong>P</strong>:
-      A living, breathing <strong>PostgreSQL</strong> database service.
+      A living, breathing <strong>PostgreSQL</strong> database service -- I didn't have any data to store, but by golly I was going to store it well!
     </li>
 
     <li>
@@ -43,7 +43,7 @@
 
 <p>
   But then reality hit.
-  Every tweak made to the stack needed a similar but sometimes slightly different change on my local machine.
+  Every tweak made to this stack on the Cloud needed a similar but sometimes slightly different change on my local machine.
   The <a href="/projects/website/back#templating"><strong>laziness principle</strong></a> was being violated, and I was not happy.
   Sure, GitHub was my handy sidekick for the website content itself, but what if PHP rolled out a new version?
   What if my cool developer friends introduced me to an irresistible Apache module?

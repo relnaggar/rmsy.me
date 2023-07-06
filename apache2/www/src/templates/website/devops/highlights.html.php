@@ -1,6 +1,6 @@
 <ul>
   <li>
-    Effectively executed AWS <a href="#cloud">cloud</a> server instance setup and configuration for a fully functional LAMP stack.
+    Effectively executed AWS <a href="#cloud">cloud</a> server instance setup and configuration for a fully functional LAPP stack.
   <li>
     Leveraged <a href="#docker">Docker</a> to organise the application into neatly containerised microservices, precisely configured to work together in harmony across both development and production environments.
   </li>
