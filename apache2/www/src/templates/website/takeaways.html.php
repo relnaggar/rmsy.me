@@ -1,7 +1,5 @@
 <p>
-This epic saga of mine has been an unlimited treasure trove of enlightenment, bordering on intellectual nirvana.
-</p>
-<p>
+  This epic saga of mine has been an unlimited treasure trove of enlightenment, bordering on intellectual nirvana.
   Fortunately, I've managed to distill all this newfound wisdom into three golden nuggets. No more dilly-dallying, let's get to the good stuff:
   <dl>
     <dt>Don't be afraid to get your hands dirty.</dt>
