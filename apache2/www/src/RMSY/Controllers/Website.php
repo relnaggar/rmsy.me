@@ -47,7 +47,16 @@ class Website extends AbstractProject {
           'id' => 'cloud'
         ], [
           'title' => 'When Docker Met Swarm',
-          'id' => 'docker'
+          'id' => 'docker',
+          'subsections' => [
+            [
+              'title' => 'Development',
+              'id' => 'development'
+            ], [
+              'title' => 'Production',
+              'id' => 'production'
+            ]
+          ]          
         ], [
           'title' => 'Acing Apache: My Security Report Card',
           'id' => 'apache'
@@ -106,23 +115,4 @@ class Website extends AbstractProject {
   public function takeaways(): array {
     return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
   }
-
-  //$sections = [
-    //[
-      //'title' => 'Section 1',
-      //'id' => 'section-1',
-      //'html' => loadTemplate($this->templateDir . __FUNCTION__),
-      //'subsections' => [
-        //[
-          //'title' => 'A',
-          //'id' => 'a',
-          //'html' => loadTemplate($this->templateDir . __FUNCTION__ . '-a')
-        //], [
-          //'title' => 'B',
-          //'id' => 'b',
-          //'html' => loadTemplate($this->templateDir . __FUNCTION__ . '-b')
-        //]
-      //]
-    //]
-  //];
 }

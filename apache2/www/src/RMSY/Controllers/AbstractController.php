@@ -34,6 +34,11 @@ abstract class AbstractController {
   private function addSectionTemplates(array $sections, string $function_name, array $vars): array {
     foreach ($sections as &$section) {
       $section['html'] = $this->templateEngine->loadTemplate($this->templateDir . $function_name . '/' . $section['id'], $vars);
+      if (isset($section['subsections'])) {
+        foreach ($section['subsections'] as &$subsection) {
+          $subsection['html'] = $this->templateEngine->loadTemplate($this->templateDir . $function_name . '/' . $section['id'] . '/' . $subsection['id'], $vars);
+        }
+      }
     }
     return $sections;
   }
