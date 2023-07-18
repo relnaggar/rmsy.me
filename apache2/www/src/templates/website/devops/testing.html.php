@@ -24,16 +24,22 @@
 </p>
 
 Here's a basic test in Cucumber (yes, it looks just like English):
-<pre>
-  <code>
-  Feature: title
-  The homepage should have a title    
 
-  Scenario: The page title should work
-    Given I am on the homepage
-    Then the page title should be "Home | Ramsey El-Naggar"
+<p>
+  <code>
+    <br>
+    Feature: title
+    <br>
+    The homepage should have a title
+    <br>
+    <br>
+    Scenario: The page title should work
+    <br>
+    &nbsp;&nbsp;Given I am on the homepage
+    <br>
+    &nbsp;&nbsp;Then the page title should be "Home | Ramsey El&#8209;Naggar"
   </code>
-</pre>
+</p>
 
 And here's how it looks in action:
 <figure class="figure m-3 text-center w-100">
