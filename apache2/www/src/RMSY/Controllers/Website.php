@@ -37,7 +37,7 @@ class Website extends AbstractProject {
 
   public function devops(): array {
     return $this->basic(__FUNCTION__, $meta=[
-        'noindex' => true
+        'description' => 'Docker, Apache, Bash, and automated testing. From development to production, this project has it all. Join this DevOps adventure!'
       ], $vars=[], $sections=[
         [
           'title' => 'Technical Highlights',
