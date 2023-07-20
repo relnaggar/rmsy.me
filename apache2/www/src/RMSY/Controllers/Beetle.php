@@ -9,6 +9,27 @@ class Beetle extends AbstractProject {
   }
 
   public function introduction(): array {
-    return $this->basic(__FUNCTION__, $meta=['title' => $this->project['title'], 'noindex' => true]);
+    return $this->basic(__FUNCTION__, $meta=[
+      'title' => $this->project['title'],
+      'description' => 'TODO'
+    ], $vars=[], $sections=[
+        [
+          'title' => 'Executive Summary',
+          'id' => 'summary'
+        ], [
+          'title' => 'The Beetle Hunter Diaries',
+          'id' => '101'
+        ], [
+          'title' => 'Say Hello to My Little Friend',
+          'id' => 'robot'
+        ], [
+          'title' => 'Neural Model',
+          'id' => 'brain'
+        ], [
+          'title' => 'South Africa',
+          'id' => 'southAfrica'
+        ]
+      ]
+    );
   }
 }

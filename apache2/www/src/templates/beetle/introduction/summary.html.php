@@ -1,10 +1,3 @@
-<p>
-  <div class="alert alert-info" role="alert">
-    I'm still writing up this project: expect more content soon.
-  </div>
-</p>
-
-<h2>Executive Summary</h2>
 <ul>
   <li>
     Pioneered creation of dung beetle biorobot; adapted sophisticated neural model into the robot's programming.
@@ -17,10 +10,9 @@
   </li>
 </ul>
 
-<!-- <h2>Achievements</h2>
-<ul>
+<!-- <ul>
   <li>
-    Pioneered creation of dung beetle biorobot during 2-year Master's dissertation project, achieving average grade of 82% and acknowledged as one of the ~20 "outstanding" projects in the year.
+    Pioneered creation of dung beetle biorobot during 2-year Master's dissertation project for the School of Informatics at the University of Edinburgh.
   </li>
   <li>
     Designed and created the biorobot, including array of custom-built visual sensors to calculate the polarisation of light from the sky.
@@ -32,14 +24,11 @@
     Integrated this sophisticated neural model into the robot's programming.
   </li>
   <li>
-    Secured exclusive research grant to travel to South Africa to test the robot alongside real dung beetles.
-  </li>
-  <li>
     Demonstrated biorobot's ability to accurately mimic dung beetle behaviour, thus validating hypotheses concerning neural encoding and combination of visual cues.
   </li>
 </ul> -->
 
-<h6>More Details</h6>
+<!-- <h6>More Details</h6>
 <p>
   For my two-year Master's dissertation project for the School of Informatics at the University of Edinburgh, supervised by Professor Barbara Webb, I built a dung beetle biorobot, programmed the robot with a neural model of navigational behaviour, and received a grant to travel to South Africa to perform behavioural experiments on the robot alongside real dung beetles.
 </p>
@@ -50,5 +39,6 @@
 </p>
 
 <p>
-  Behavioural experiments were successful, demonstrating the ability of the model to encode, combine, and give preferential weighting to different visual cues from the sky, producing control signals that resulted in a straight-line path. The biorobot was shown to behave like a dung beetle under the same conditions that real dung beetles roll their dung balls, thus validating the plausibility of the model and the underlying assumptions made about the neural encoding and combination of visual cues.
-</p>
+  Behavioural experiments were successful, demonstrating the ability of the model to encode, combine, and give preferential weighting to different visual cues from the sky, producing control signals that resulted in a straight-line path.
+  The biorobot was shown to behave like a dung beetle under the same conditions that real dung beetles roll their dung balls, thus validating the plausibility of the model and the underlying assumptions made about the neural encoding and combination of visual cues.
+</p> -->
