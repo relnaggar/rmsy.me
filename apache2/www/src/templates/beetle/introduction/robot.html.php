@@ -4,8 +4,7 @@
   Young Pooptimus Prime isn't just any old robot, he's a <strong>biorobot</strong>, meaning he's a model of the real-deal biological system, and is used to test hypotheses about how dung beetles think and behave, all the way down to their neural circuitry!
   Sporting two independently controlled wheels and a ball-bearing for balance, Pooptimus is a lean, mean, dung-ball-rolling machine, and can go straight, turn on the spot, or make a forward curve -- all basic dung beetle moves.
   But if you're picturing some sophisticated, state-of-the-art equipment, think again.
-  Pooptimus is a simple creature, built robustly to withstand the harsh and accident-prone life of an experimental biorobot, but cheaply, from nothing but LEGO, some electronics, and the special ingredient that brought him to life... ❤️
-  That's right, programming!
+  Pooptimus is a simple creature, built robustly to withstand the harsh and accident-prone life of an experimental biorobot, but cheaply, from nothing but LEGO, some electronics, and the special ingredient that brought him to life... ❤️ ...that's right, programming!
 </p>
 <div class="container">
   <div class="row">
@@ -35,7 +34,7 @@
 <figure class="figure m-3 text-center col-lg-3 float-end w-100-lg-down">
   <img src="/assets/img/robot-polarisation.jpg" class="figure-img img-fluid" alt="Close-up of the custom-built polarisation sensor, consisting of four light sensors, each with a differently-angled polarisation filter.">
   <figcaption class="figure-caption text-center">
-    These sensors really 'light' things up!
+    These sensors really shed some 'light' on this whole polarisation situation!
   </figcaption>
 </figure>
 

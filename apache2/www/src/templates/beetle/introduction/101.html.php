@@ -19,7 +19,7 @@
   (This may be an easier leap for some of you than for others.)
   Now, dung-beetle-you is a simple creature, with simple needs.
   Cruising the rolling South African grasslands, hitching a ride on the summer breeze, you catch the wafting scent of a fresh juicy dung pile.
-  Mmmm, delicious!
+  Tasty stuff!
   Descending quickly, you follow your well-honed instincts and quickly get to work crafting the perfect dung ball.
   Fast forward to putting the finishing touches on your magnum opus, and with a final pat, you step back to bask in the glory of your creation.
   This is the Sistine Chapel of dung balls.
@@ -30,7 +30,7 @@
   You're not the only one who's noticed your fine craftsmanship.
   A nefarious rival has been lurking from the shadows, eyeing up your spherical masterpiece with envy.
   He's hungry, he's lazy, and he's clearly got no intention of making his own dinner.
-  If you want to save your baby, you've gotta act fast.
+  If you want to save your food baby, you've gotta act fast.
   Decision time!
   What do you do?
 </p>
@@ -52,10 +52,12 @@
   So how do dung beetles do it?
   Well, the secret is... they don't close their eyes!
   Don't tell me you didn't <u>see</u> that coming.
-  And some very clever scientists (whom I had the privilege of collaborating with in South Africa) have shown pretty conclusively that dung beetles use what they see in the sky to navigate and keep their dung babies rolling straight.
-  The visual cues used can include:
-  <ul>
-    <li>the polarisation pattern of the sky (explained more below);</li>
-    <li>the position of celestial objects such as the sun, moon, and even the stars!</li>
-  </ul>
+  And some very clever scientists (whom I had the privilege of learning from in South Africa) have shown pretty conclusively that dung beetles use what they see in the sky to keep their fabulous fecal formations rolling straight into the sunset.
+  The two most important visual cues are:
+  <dl>
+    <dt>The intensity-gradient cue.</dt>
+    <dd>This comes from the position of celestial objects such as the sun, moon, and even the stars!</dd>
+    <dt>The polarisation cue.</dt>
+    <dd>This comes from the polarisation pattern of the sky (explained more below).</dd>    
+  </dl>
 </p>
