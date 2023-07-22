@@ -10,7 +10,7 @@
   <dd>
     Collaborating within our small group was just like a real football team -- everyone with a distinct role and responsibility, yet all working harmoniously towards the same winning vision.
     I learned that patience and trust in others is required to avoid micromanaging, and communicating clearly is cruical so that everyone is on the same page.
-    I also learned that the reality of working in a group is that, talent and hard work aside, everyone has different priorities, and busy people don't always have the time to go the extra mile.
+    I also learned that the reality of working in a group is that even with the most talented and hardworking group members, busy people with 100 other deadlines that week don't always have the time to go the extra mile.
     Nevertheless, to borrow a phrase from Jocko Willink, leadership is taking extreme ownership, and in the end I happily took on additional responsibilities to ensure the success of the entire team.
   </dd>
   <dt>In the real world, no one tells you how to win.</dt>
