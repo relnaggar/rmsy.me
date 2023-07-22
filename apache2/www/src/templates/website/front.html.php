@@ -36,7 +36,7 @@
       </p>
 
       <figure class="figure m-3 text-center w-100">
-        <img src="/assets/img/responsive.gif" class="figure-img img-fluid" alt="Responsive design">
+        <img src="/assets/img/front/responsive.gif" class="figure-img img-fluid" alt="Responsive design">
         <figcaption class="figure-caption text-center">Definitive proof that (screen) size doesn't matter.</figcaption>
       </figure>
     </dd>
@@ -52,7 +52,7 @@
     </dd>
 
     <figure class="figure m-3 text-center w-100">
-      <img src="/assets/img/seo.png" class="figure-img img-fluid" alt="SEO demonstration">
+      <img src="/assets/img/front/seo.png" class="figure-img img-fluid" alt="SEO demonstration">
       <figcaption class="figure-caption text-center">
         I searched for "ramsey software engineer" in a new incognito window to avoid personalised results from the Google spymasters.
       </figcaption>

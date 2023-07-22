@@ -42,7 +42,7 @@
   <?php } ?>
   <div class="col-sm-6 mb-3">
     <div class="card">
-      <img class="card-img-top" src="/assets/img/coming-soon.jpeg" alt="Coming Soon">
+      <img class="card-img-top" src="/assets/img/coming-soon.jpg" alt="Coming Soon">
       <div class="card-body">
       <h5 class="card-title">Top Secret</h5>
         <p class="card-text">A project so secret, even my compiler doesn't know about it yet!</p>

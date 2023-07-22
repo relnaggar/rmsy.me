@@ -16,7 +16,7 @@
 </p>
 
 <figure class="figure m-3 text-center col-lg-5 float-end w-100-lg-down">
-  <img src="/assets/img/sa-setup.jpg" class="figure-img img-fluid" alt="TODO">
+  <img src="/assets/img/beetle/sa-raincoat.jpg" class="figure-img img-fluid" alt="TODO">
   <figcaption class="figure-caption text-center">Who said robots can't accessorise? Breaking stereotypes as South Africa's hottest new raincoat model.</figcaption>
 </figure>
 

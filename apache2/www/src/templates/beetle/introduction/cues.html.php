@@ -1,5 +1,5 @@
 <figure class="figure m-3 text-center w-100">
-  <img src="/assets/img/sa-sky.jpg" class="figure-img img-fluid" alt="Screenshots from the robot's camera looking up at the South African sky.">
+  <img src="/assets/img/beetle/sa-skies.jpg" class="figure-img img-fluid" alt="Screenshots from the robot's camera looking up at the South African sky.">
   <figcaption class="figure-caption text-center">Robot diary, day 6: Staring at the sky... again.</figcaption>
 </figure>
 
@@ -15,7 +15,7 @@
 </p>
 
 <figure class="figure m-3 text-center col-lg-5 float-end w-100-lg-down">
-  <img src="/assets/img/cx-path.jpg" class="figure-img img-fluid" alt="CX model extensions, including polarisation flip decision and weighted cue integration.">
+  <img src="/assets/img/beetle/cx-path.jpg" class="figure-img img-fluid" alt="CX model extensions, including polarisation flip decision and weighted cue integration.">
   <figcaption class="figure-caption text-center">Our newest CX model update: Now featuring Polarisation Flip Decision™ and CueCombination+!</figcaption>
 </figure>
 
@@ -54,7 +54,7 @@
 </ol>
 
 <figure class="figure m-3 text-center col-lg-5 float-start w-100-lg-down">
-  <img src="/assets/img/sa-posing.jpg" class="figure-img img-fluid" alt="The robot, outside in South Africa, posing for a camera.">
+  <img src="/assets/img/beetle/sa-posing.jpg" class="figure-img img-fluid" alt="The robot, outside in South Africa, posing for a camera.">
   <figcaption class="figure-caption text-center">
     Pooptimus posing for the camera. Oh yeah, work it!
   </figcaption>
@@ -64,7 +64,7 @@
   Finally we come to the most beautiful and satisfying part of the whole project.
   When I went to implement these two cue combination strategies, I found that <strong>they both fit perfectly into the CX model</strong>.
   Can you believe it?
-  I won't go into the math, but it was on par with solving one face of a Rubik's cube and finding the rest already solved for you.
+  I won't bore you with the math, but it was on par with solving one face of a Rubik's cube and finding the rest already solved for you.
   Isn't it just the best when a plan comes together?
   I was as happy as a dung beetle in a dung heap.
 </p>

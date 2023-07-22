@@ -1,5 +1,5 @@
 <figure class="figure m-3 text-center col-lg-5 float-start w-100-lg-down">
-  <img src="/assets/img/controllers-uml.png" class="figure-img img-fluid" alt="Simplified UML Class Diagram for the Controllers namespace.">
+  <img src="/assets/img/back/controllers-uml.png" class="figure-img img-fluid" alt="Simplified UML Class Diagram for the Controllers namespace.">
   <figcaption class="figure-caption text-center">The hierarchal family tree of controllers. It's like Game of Thrones, but with less dragons and more function overloading. Rawr!</figcaption>
 </figure>
 

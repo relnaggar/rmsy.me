@@ -9,13 +9,13 @@
 <div class="container">
   <div class="row">
     <figure class="figure m-3 text-center col-lg-5 float-start w-100-lg-down">
-      <img src="/assets/img/robot-wheelbase.jpg" class="figure-img img-fluid" alt="View of the robot from below, showing two wheels, gearchains, and a ball bearing.">
+      <img src="/assets/img/beetle/robot-below.jpg" class="figure-img img-fluid" alt="View of the robot from below, showing two wheels, gearchains, and a ball bearing.">
       <figcaption class="figure-caption text-center">
         Looks like someone skipped leg day.
       </figcaption>
     </figure>
     <figure class="figure m-3 text-center col-lg-5 w-100-lg-down">
-      <img src="/assets/img/robot-sensors.jpg" class="figure-img img-fluid" alt="View of the robot from above, showing a camera with a fish-eye lens and a custom-built array of four light sensors with polarisation filters.">
+      <img src="/assets/img/beetle/robot-above.jpg" class="figure-img img-fluid" alt="View of the robot from above, showing a camera with a fish-eye lens and a custom-built array of four light sensors with polarisation filters.">
       <figcaption class="figure-caption text-center">
         Smile! You're on dung beetle cam.
       </figcaption>
@@ -32,7 +32,7 @@
 </p>
 
 <figure class="figure m-3 text-center col-lg-3 float-end w-100-lg-down">
-  <img src="/assets/img/robot-polarisation.jpg" class="figure-img img-fluid" alt="Close-up of the custom-built polarisation sensor, consisting of four light sensors, each with a differently-angled polarisation filter.">
+  <img src="/assets/img/beetle/robot-polarisation.jpg" class="figure-img img-fluid" alt="Close-up of the custom-built polarisation sensor, consisting of four light sensors, each with a differently-angled polarisation filter.">
   <figcaption class="figure-caption text-center">
     These sensors really shed some 'light' on this whole polarisation situation!
   </figcaption>

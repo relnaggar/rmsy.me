@@ -43,6 +43,6 @@ Here's a basic test in Cucumber (yes, it looks just like English):
 
 And here's how it looks in action:
 <figure class="figure m-3 text-center w-100">
-  <img src="/assets/img/selenium.gif" class="figure-img img-fluid" alt="GIF of Selenium running an automated browser test.">
+  <img src="/assets/img/devops/selenium.gif" class="figure-img img-fluid" alt="GIF of Selenium running an automated browser test.">
   <figcaption class="figure-caption text-center">Selenium works so you don't have to.</figcaption>
 </figure>

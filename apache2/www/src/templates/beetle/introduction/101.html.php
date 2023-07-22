@@ -1,5 +1,5 @@
 <figure class="figure m-3 text-center col-lg-5 float-start w-100-lg-down">
-  <img src="/assets/img/dung-beetles-fighting.jpg" class="figure-img img-fluid" alt="Two dung beetles fighting over a dung ball.">
+  <img src="/assets/img/beetle/beetles-fighting.jpg" class="figure-img img-fluid" alt="Two dung beetles fighting over a dung ball.">
   <figcaption class="figure-caption text-center">
     This ball ain't big enough for the both of us.
     Credit: "Fighting Dung Beetles" by Jochen Smolka.
@@ -36,7 +36,7 @@
 </p>
 
 <figure class="figure m-3 text-center col-lg-5 float-end w-100-lg-down">
-  <img src="/assets/img/robot-architecture.png" class="figure-img img-fluid" alt="Informal system architecture diagram showing hardware and software components.">
+  <img src="/assets/img/beetle/architecture.png" class="figure-img img-fluid" alt="Informal system architecture diagram showing hardware and software components.">
   <figcaption class="figure-caption text-center">
     If only my life were as well organized as this system architecture diagram.
   </figcaption>

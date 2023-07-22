@@ -1,5 +1,5 @@
 <figure class="figure m-3 text-center w-100">
-  <img src="/assets/img/production-deployment.png" class="figure-img img-fluid" alt="UML Deployment Diagram for the production environment.">
+  <img src="/assets/img/devops/production-deployment.png" class="figure-img img-fluid" alt="UML Deployment Diagram for the production environment.">
   <figcaption class="figure-caption text-center">
     One does not simply 'deploy to production'.
   </figcaption>

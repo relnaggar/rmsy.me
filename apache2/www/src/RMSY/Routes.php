@@ -30,7 +30,7 @@ class Routes implements \Framework\RoutesInterface {
       'Website' => [
         'title' => 'My Mona Lisa: A Personal Website',
         'path' => '/projects/website/',
-        'imagePath' => '/assets/img/responsive.gif',
+        'imagePath' => '/assets/img/front/responsive.gif',
         'description' => "Find out how I gave birth to this technological tapestry of blood, tears and Dockerfiles: curiosity is better than regret!",
         'rootFunctionName' => 'introduction',
         'pages' => [
@@ -51,14 +51,14 @@ class Routes implements \Framework\RoutesInterface {
       'Beetle' => [
         'title' => 'Pooptimus Prime: The World\'s First Dung Beetle Biorobot',
         'path' => '/projects/beetle/',
-        'imagePath' => '/assets/img/robot-vs-beetle.jpg',
+        'imagePath' => '/assets/img/beetle/vs-robot.jpg',
         'description' => "Robot vs beetle: who will be the ultimate fighting champion?",
         'rootFunctionName' => 'introduction'
       ],
       'SDP' => [
         'title' => 'Robo-Messi: When Silicon Met Soccer',
         'path' => '/projects/sdp/',
-        'imagePath' => '/assets/img/robot-hug.jpg',
+        'imagePath' => '/assets/img/sdp/hug.jpg',
         'description' => "Robo-Messi wants a hug. Will you give him one?",
         'rootFunctionName' => 'introduction'
       ]      

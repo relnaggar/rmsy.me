@@ -1,5 +1,5 @@
 <figure class="figure m-3 text-center col-lg-7 float-start w-100-lg-down">
-  <img src="/assets/img/routing-sequence.png" class="figure-img img-fluid" alt="Simplified UML Sequence Diagram for the routing and templating sequence.">
+  <img src="/assets/img/back/routing-sequence.png" class="figure-img img-fluid" alt="Simplified UML Sequence Diagram for the routing and templating sequence.">
   <figcaption class="figure-caption text-center">UML sequence diagram or modern art? You decide.</figcaption>
 </figure>
 
@@ -15,7 +15,7 @@
 </p>
 
 <figure class="figure m-3 text-center col-lg-5 float-end w-100-lg-down">
-  <img src="/assets/img/packages-uml.png" class="figure-img img-fluid" alt="Simplified UML Class Diagram for the whole application.">
+  <img src="/assets/img/back/packages-uml.png" class="figure-img img-fluid" alt="Simplified UML Class Diagram for the whole application.">
   <figcaption class="figure-caption text-center">
     Fear not, these complex diagrams are only here to fool you into thinking I'm smart.
     Don't fall for it!

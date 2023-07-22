@@ -1,5 +1,5 @@
 <figure class="figure m-3 text-center w-100">
-  <img src="/assets/img/development-deployment.png" class="figure-img img-fluid" alt="UML Deployment Diagram for the development environment.">
+  <img src="/assets/img/devops/development-deployment.png" class="figure-img img-fluid" alt="UML Deployment Diagram for the development environment.">
   <figcaption class="figure-caption text-center">
     You've not even seen the diagram for production yet -- scroll down if you dare!
   </figcaption>
