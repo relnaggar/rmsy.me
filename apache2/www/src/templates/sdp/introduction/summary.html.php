@@ -1,10 +1,3 @@
-<p>
-  <div class="alert alert-info" role="alert">
-    I'm still writing up this project: expect more content soon.
-  </div>
-</p>
-
-<h2>Executive Summary</h2>
 <ul>
   <li>
     Led group of 4 to design and build a football-playing robot, winning 2nd place in annual competition.
