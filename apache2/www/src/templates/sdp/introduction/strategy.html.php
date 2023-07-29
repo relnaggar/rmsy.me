@@ -15,7 +15,7 @@
   Meanwhile, the planning subsystem, the sergeant-major of the operation, was left with the task of converting these Shakespearean dramas into a series of robot-friendly commands.
   My first attempt at this, the hare-like open-loop control mechanism, was like trying to get a drunk robot to walk in a straight line.
   Eventually, I switched to the tortoise-like visual servoing mechnasim.
-  Slow, steady, and winning the race, with this technique the robot methodically shuffles towards its target, pausing after every step like to make sure the vision system is keeping up with the race.
+  Slow, steady, and winning the race, with this technique the robot methodically shuffles towards its target, pausing after every step to make sure the vision system is keeping up with the race.
 <p>
 
 <p>
