@@ -11,7 +11,7 @@ Meanwhile, the web gnomes are furiously running around, pretending to fix this.
 </p>
 
 <p>
-While they're at it, why not teleport back to <a href="/engineer/">home</a>?
+While they're at it, why not teleport back to <a href="/">home</a>?
 </p>
 
 <p>
