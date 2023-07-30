@@ -18,7 +18,6 @@ class Routes implements \Framework\RoutesInterface {
 
   public function __construct(\Framework\TemplateEngine $templateEngine) {
     $this->templateEngine = $templateEngine;
-    $this->frontController = new \RMSY\Controllers\Front();
     $this->projects = $this->getProjects();
     $this->engineerMenu = $this->getEngineerMenu();
     $this->addProjectControllers();    
@@ -90,7 +89,7 @@ class Routes implements \Framework\RoutesInterface {
       ];
     }
 
-    $engineerHomePath = '/engineer/';
+    $engineerHomePath = '/';
     $engineerMenu = [
       'title' => 'software engineer',
       'homePath' => $engineerHomePath,
@@ -107,7 +106,7 @@ class Routes implements \Framework\RoutesInterface {
           'dropdown' => $projectsDropdown
         ], [
           'text' => 'Resume',
-          'path' => $engineerHomePath . 'resume',
+          'path' => '/engineer/resume',
           'target' => '_blank'
         ], [
           'text' => 'Linkedin',
@@ -127,23 +126,17 @@ class Routes implements \Framework\RoutesInterface {
     $routes = [
       '/' => [
         'GET' => [
-          'controller' => $this->frontController,
-          'functionName' => 'home'
-        ]
-      ],
-      '/engineer/' => [
-        'GET' => [
           'controller' => $this->engineerController,
           'functionName' => 'home'
         ]
-      ],
-      '/engineer/about' => [
+        ],
+      '/about' => [
         'GET' => [
           'controller' => $this->engineerController,
           'functionName' => 'about'
         ]
       ],
-      '/engineer/contact' => [
+      '/contact' => [
         'GET' => [
           'controller' => $this->engineerController,
           'functionName' => 'contact'

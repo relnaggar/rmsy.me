@@ -29,7 +29,7 @@
 </p>
 
 <p>
-  Our Engineer controller takes center stage, managing all the individual pages that branch off the main menu: currently <a href="/engineer/">Home</a>, <a href="/engineer/about">About</a>, <a href="/engineer/contact">Contact</a>.
+  Our Engineer controller takes center stage, managing all the individual pages that branch off the main menu: currently <a href="/">Home</a>, <a href="/about">About</a>, <a href="/contact">Contact</a>.
   This design was intentional, allowing for potential future expansion of the website.
   I imagined separate menus for my engineering projects, tutoring services, and even my musical exploits.
   Maybe I could add a menu for a travel blog, work 4 hours a week, and live off the passive income!

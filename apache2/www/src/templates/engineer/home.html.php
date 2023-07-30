@@ -24,7 +24,7 @@
 </p>
 
 <p>
-  Feel free to explore and discover more <a href="/engineer/about">about me</a>, my projects, and my passion for software engineering.
+  Feel free to explore and discover more <a href="/about">about me</a>, my projects, and my passion for software engineering.
 </p>
 
 <div class="row">

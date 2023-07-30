@@ -113,6 +113,6 @@ class Website extends AbstractProject {
   }
 
   public function takeaways(): array {
-    return $this->basic(__FUNCTION__, $meta=['noindex' => true]);
+    return $this->basic(__FUNCTION__, $meta=['description' => 'Discover how I tackled challenges head-on, embraced hands-on learning, and maintained my sense of humor throughout.']);
   }
 }

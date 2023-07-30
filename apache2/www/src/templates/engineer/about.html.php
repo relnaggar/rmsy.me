@@ -37,7 +37,7 @@
   Still curious?
   Check out <a href="/linkedin" target="_blank">my LinkedIn profile</a> <?=includeIcon('box-arrow-up-right')?>, which offers a treasure trove of highlights and achievements.
   It's the story of my professional life in all its glory.
-  Or better yet, feel free to <a href="/engineer/contact">reach out for a chat</a> -- I'm always game to talk tech, tutoring, or even dung beetles! 
+  Or better yet, feel free to <a href="/contact">reach out for a chat</a> -- I'm always game to talk tech, tutoring, or even dung beetles! 
 </p>
 
 <blockquote class="blockquote pt-3">

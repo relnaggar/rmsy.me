@@ -50,5 +50,5 @@
 </p>
 
 <p>
-  If you've read this far, you're probably pretty cool so why not <a href="/engineer/contact">give it a whirl</a> -- I'd love to hear from you!
+  If you've read this far, you're probably pretty cool so why not <a href="/contact">give it a whirl</a> -- I'd love to hear from you!
 </p>
