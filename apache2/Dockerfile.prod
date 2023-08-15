@@ -13,6 +13,10 @@ RUN apt-get update -y \
   openssl \
   # PHP Postgres
   php${PHPVERSION}-pgsql \
+  # Python 3.7 and WSGI
+  libapache2-mod-wsgi-py3 \
+  # flask
+  python3-flask \
   # cleanup
   && rm -rf /var/lib/apt/lists/*
 
@@ -22,6 +26,10 @@ COPY --chown=apache2:apache2 www /var/www
 COPY conf /etc/apache2
 COPY apache2-ini /etc/php/${PHPVERSION}/apache2
 
+# permissions for WSGISocketPrefix /var/run/apache2/wsgi
+RUN chown -R apache2:apache2 /var/run/apache2
+
+ENV WEBSITE_ENV=PRODUCTION
 COPY docker-entrypoint /
 VOLUME ["/var/log/apache2"]
 EXPOSE 8080

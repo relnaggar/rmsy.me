@@ -15,7 +15,7 @@ main() {
 
   local cmd=${1:-}
   if [[ "${cmd}" == "apache2" ]]; then
-    exec gosu apache2 /usr/sbin/apache2ctl -D FOREGROUND
+    exec gosu apache2 /usr/sbin/apache2ctl -D FOREGROUND -D "$WEBSITE_ENV"
   else
     exec gosu apache2 "$@"
   fi

@@ -15,6 +15,10 @@ RUN apt-get update -y \
   php${PHPVERSION}-pgsql \
   # Composer PHP dependencies
   php${PHPVERSION}-xml php${PHPVERSION}-mbstring zip unzip \
+  # Python 3.7 and WSGI
+  libapache2-mod-wsgi-py3 \
+  # flask
+  python3-flask \
   # cleanup
   && rm -rf /var/lib/apt/lists/*
 
@@ -23,7 +27,6 @@ COPY certs /usr/lib/ssl/certs
 
 # composer (for PHPUnit)
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-  && php -r "if (hash_file('sha384', 'composer-setup.php') === '55ce33d7678c5a611085589f1f3ddf8b3c52d662cd01d4ba75c0ee0459970c2200a51f492d557530c71c15d8dba01eae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
   && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
   && php -r "unlink('composer-setup.php');"
 ENV PATH $PATH:/home/apache2/.composer/vendor/bin/
@@ -33,6 +36,11 @@ USER apache2
 RUN composer global require phpunit/phpunit ^9.1
 
 USER root
+
+# permissions for WSGISocketPrefix /var/run/apache2/wsgi
+RUN chown -R apache2:apache2 /var/run/apache2
+
+ENV WEBSITE_ENV=DEVELOPMENT
 COPY docker-entrypoint /
 VOLUME ["/var/log/apache2", "/var/www", "/etc/apache2", "/etc/php/7.3/apache2"]
 EXPOSE 8080
