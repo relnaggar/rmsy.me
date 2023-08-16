@@ -16,7 +16,9 @@ RUN apt-get update -y \
   # Python 3.7 and WSGI
   libapache2-mod-wsgi-py3 \
   # Python packages
-  python3-pip \  
+  python3-pip \
+  build-essential \
+  python3-dev \
   # flask
   && python3 -m pip install setuptools \
   && python3 -m pip install wheel \
@@ -29,6 +31,8 @@ RUN apt-get update -y \
   # cleanup
   && python3 -m pip uninstall -y wheel \
   && python3 -m pip uninstall -y setuptools \
+  && apt purge -y python3-dev \
+  && apt purge -y build-essential \
   && apt purge -y python3-pip \
   && apt autoremove -y \  
   && rm -rf /var/lib/apt/lists/*
