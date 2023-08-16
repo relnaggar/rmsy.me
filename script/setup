@@ -48,7 +48,9 @@ setup_secrets() {
   set +e
     mkdir "$secrets_dir" 2>/dev/null
   set -e
+  # development secrets (not actually secret) 
   echo "password" > "$secrets_dir"/PGPASSWORD
+  echo "w%xlpgf2f)2p_j&mhdjvnzco@^s&o=x7d(0xy9pp8%#pt\$4nbg" > "$secrets_dir"/DJANGO_SECRET_KEY
 
   case "$OSTYPE" in
     darwin*) 

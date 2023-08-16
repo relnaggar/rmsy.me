@@ -20,13 +20,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '8*bm4%n2!6#tb^so=(jjjjy_&)m%23fr9-n6ifv*jg4^we4v@q'
+with open("/run/secrets/DJANGO_SECRET_KEY") as f:
+    SECRET_KEY = f.read().strip()
+
+WEBSITE_ENV = os.environ.get("WEBSITE_ENV", False)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
-
+if WEBSITE_ENV == "PRODUCTION":
+    DEBUG = False
+    ALLOWED_HOSTS = ["rmsy.me"]
+else:
+    DEBUG = True
+    ALLOWED_HOSTS = ["localhost"]
 
 # Application definition
 
@@ -118,3 +124,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
