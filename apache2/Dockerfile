@@ -17,9 +17,20 @@ RUN apt-get update -y \
   php${PHPVERSION}-xml php${PHPVERSION}-mbstring zip unzip \
   # Python 3.7 and WSGI
   libapache2-mod-wsgi-py3 \
+  # Python packages
+  python3-pip \  
   # flask
-  python3-flask \
+  && python3 -m pip install setuptools \
+  && python3 -m pip install wheel \
+  && python3 -m pip install markupsafe \
+  && python3 -m pip install flask \
+  # Django
+  && python3 -m pip install Django \
   # cleanup
+  && python3 -m pip uninstall -y wheel \
+  && python3 -m pip uninstall -y setuptools \
+  && apt purge -y python3-pip \
+  && apt autoremove -y \
   && rm -rf /var/lib/apt/lists/*
 
 COPY cli-ini /etc/php/${PHPVERSION}/cli
