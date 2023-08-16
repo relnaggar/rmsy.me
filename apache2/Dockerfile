@@ -26,6 +26,8 @@ RUN apt-get update -y \
   && python3 -m pip install flask \
   # Django
   && python3 -m pip install Django \
+  # openai
+  && python3 -m pip install openai \
   # cleanup
   && python3 -m pip uninstall -y wheel \
   && python3 -m pip uninstall -y setuptools \
