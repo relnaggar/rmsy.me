@@ -23,3 +23,7 @@ backup/
 
 ### Java ###
 *.class
+
+### Python ###
+__pycache__/
+*.py[cod]
