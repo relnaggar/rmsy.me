@@ -21,16 +21,15 @@ RUN apt-get update -y \
   python3-pip \
   build-essential \
   python3-dev \
-  # Django development with postgres
+  # Django with postgres
   libpq-dev \
   # flask
   && python3 -m pip install setuptools \
   && python3 -m pip install wheel \
   && python3 -m pip install markupsafe \
   && python3 -m pip install flask \
-  # Django development with postgres
+  # Django with postgres
   && python3 -m pip install psycopg2 \
-  # Django
   && python3 -m pip install Django \
   # openai
   && python3 -m pip install openai \

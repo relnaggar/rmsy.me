@@ -29,14 +29,15 @@ WEBSITE_ENV = os.environ.get("WEBSITE_ENV", False)
 
 if WEBSITE_ENV == "PRODUCTION":
     DEBUG = False
-    ALLOWED_HOSTS = ["rmsy.me"]
 else:
     DEBUG = True
-    ALLOWED_HOSTS = ["localhost"]
+
+ALLOWED_HOSTS = ["rmsy.me", "localhost"]
 
 # Application definition
 
 INSTALLED_APPS = [
+    'jobhunting.apps.JobhuntingConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
