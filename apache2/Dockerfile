@@ -31,6 +31,7 @@ RUN apt-get update -y \
   # Django with postgres
   && python3 -m pip install psycopg2 \
   && python3 -m pip install Django \
+  && python3 -m pip install djangorestframework \
   # openai
   && python3 -m pip install openai \
   # cleanup
