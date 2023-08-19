@@ -27,3 +27,8 @@ backup/
 ### Python ###
 __pycache__/
 *.py[cod]
+
+### React ###
+apache2/www/public/static/js/
+apache2/www/public/static/css/
+apache2/www/public/static/media/

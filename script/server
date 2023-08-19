@@ -31,8 +31,8 @@ build can be:
   prod  production, mandatory for staging/production environments
 
 ground can be:
-  -b  background, default, mandatory for stagin/production environments
-  -f  foreground
+  -b  background, mandatory for staging/production environments
+  -f  foreground, default for development environment
 END
   )"
 }
@@ -91,7 +91,10 @@ parse_args() {
     esac
   fi
   if [[ -z "${ground}" ]]; then
-    ground=-b
+    case "${environment}" in
+      -d) ground=-f ;;
+      -s|-p) ground=-b ;;
+    esac
   fi
 
   log "arguments (\
