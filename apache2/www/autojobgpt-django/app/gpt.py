@@ -1,3 +1,24 @@
+from string import Template
+
+prompts = {
+  "extract_job_details":
+"""
+Here's a job posting I found online:
+
+----
+
+${job_posting_text}
+
+----
+
+Please extract the following details from the job posting.
+Please give your response in JSON format with the following fields and data types:
+
+1. key: job_title, data_type: string, description: the job title
+2. key: company, data_type: string, description: the company name
+""",
+}
+
 class Chat:
   myopenai = None
 
@@ -15,8 +36,9 @@ class Chat:
       openai.api_key = f.read().strip()
     self.myopenai = openai
   
-  def ask(self, prompt):
-    self.messages.append({"role": "user", "content": prompt})
+  def ask(self, prompt_name, substitutions={}):
+    prompt_text = Template(prompts[prompt_name]).substitute(substitutions)
+    self.messages.append({"role": "user", "content": prompt_text})
     completion = self.myopenai.ChatCompletion.create(
       model = "gpt-3.5-turbo",
       messages = self.messages

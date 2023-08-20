@@ -1,19 +1,21 @@
 from django.db import models
-from django.db.utils import IntegrityError
 
-from string import Template 
 from json import loads
-from json.decoder import JSONDecodeError
 
+from .scraping import scrape_text
 from .gpt import Chat
 
 
+class ResumeTemplate(models.Model):
+    name = models.CharField(max_length=200, primary_key=True)
+    upload = models.FileField(upload_to='templates/')
+    description = models.TextField(blank=True)
+
 class JobPosting(models.Model):
   url = models.URLField(unique=True)
-  title = models.CharField(max_length=26, blank=True, null=True)
-  company = models.CharField(max_length=26, blank=True, null=True)
+  title = models.CharField(max_length=26, blank=True)
+  company = models.CharField(max_length=26, blank=True)
   text = models.TextField(blank=True)
-  error = models.TextField(blank=True)
   chat_messages = models.JSONField(blank=True, null=True)
 
   class Meta:
@@ -27,44 +29,15 @@ class JobPosting(models.Model):
     else:
       return f"{self.title}, {self.company}"
 
-  def scrape(self):
-    from .scraping import scrape_text
+  def scrape(self):    
     self.text = scrape_text(self.url)
-    self.save()
 
-  def resolve(self):
-    self.error = ""
-    self.save()
-
-  def extract(self):
+  def extract_job_details(self):
     chat = Chat()
-    response = chat.ask(Template(Prompt.objects.get(name="extract").text).substitute({
+    response = chat.ask("extract_job_details", {
       "job_posting_text": self.text
-    }))    
-    try:
-      answer = loads(response)
-      self.title = answer["job_title"]
-      self.company = answer["company"]
-      self.save()
-      # JobRequirement.objects.filter(job_posting=self).delete()
-      # for jobrequirement in answer["skills"]:
-      #   JobRequirement(job_posting=self, text=jobrequirement).save()   
-      self.chat_messages = chat.save_response()
-    except JSONDecodeError as e:
-      self.error = f"{type(e)}: {e}"
-    except (KeyError, IntegrityError) as e:
-      self.title = None
-      self.company = None
-      self.error = f"{type(e)}: {e}" 
-    self.save()
-
-class JobRequirement(models.Model):
-  job_posting = models.ForeignKey(JobPosting, on_delete=models.CASCADE)
-  text = models.TextField()
-
-class Prompt(models.Model):
-  name = models.CharField(max_length=200, primary_key=True)
-  text = models.TextField()
-
-  def __str__(self):
-    return self.name
+    })
+    answer = loads(response)
+    self.title = answer["job_title"]
+    self.company = answer["company"]
+    self.chat_messages = chat.save_response()
