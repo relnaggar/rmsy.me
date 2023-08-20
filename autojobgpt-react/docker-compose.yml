@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+  react:
+    container_name: react
+    init: true
+    image: node:14
+    networks:
+      - rmsy-me
+    ports:
+      - "3000:3000"
+    volumes:      
+      - .:/autojobgpt-react
+    working_dir: /autojobgpt-react
+    command: ./start start
+networks:
+  rmsy-me:
+    name: rmsy-me
