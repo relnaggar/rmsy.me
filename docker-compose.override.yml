@@ -11,7 +11,7 @@ services:
     image: rmsy-me-postgres
     build: "./postgres"
     volumes:
-      - "./postgres/conf:/etc/postgresql/11/main"
+      - "./postgres/conf:/etc/postgresql/15/main"
   watcher:
     container_name: watcher
     init: true

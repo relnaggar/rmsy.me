@@ -17,7 +17,7 @@ services:
     networks:
       - rmsy-me
     volumes:
-      - "db:/var/lib/postgresql/11/main"
+      - "db:/var/lib/postgresql/15/main"
 networks:
   rmsy-me:
     name: rmsy-me

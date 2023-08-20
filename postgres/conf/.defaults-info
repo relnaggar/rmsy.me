@@ -1,4 +1,4 @@
 #!/bin/bash
 
 SERVICE="postgres"
-SRC="/etc/postgresql/11/main"
+SRC="/etc/postgresql/15/main"
