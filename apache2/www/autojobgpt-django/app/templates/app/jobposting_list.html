@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Job Postings</h1>
+{% if object_list %}
+  <table>
+    <thead>
+      <tr>
+        <th>Error</th>
+        <th>URL</th>
+        <th>Scraping</th>
+        <th>Extraction</th>
+        <th>Title</th>
+        <th>Company</th>
+        <th>Requirements</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for job_posting in object_list %}
+        <tr>
+          <td>
+            {% if job_posting.error %}
+              <a href="{% url 'jobposting_error' job_posting.id %}">X</a>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{job_posting.url}}" target="_blank">{{job_posting.url|truncatechars:80}}</a>
+          </td>
+          <td>
+            {% if job_posting.text %}
+              <a href="{% url 'jobposting_text' job_posting.id %}">View</a>
+              <a href="{% url 'jobposting_scrape' job_posting.id %}">Rescrape</a>
+            {% else %}
+              <a href="{% url 'jobposting_scrape' job_posting.id %}">Scrape</a>
+            {% endif %}
+          </td>
+          <td>
+            {% if job_posting.text %}
+              {% if job_posting.title %}
+                <a href="{% url 'jobposting_extract' job_posting.id %}">Reextract</a>
+              {% else %}
+                <a href="{% url 'jobposting_extract' job_posting.id %}">Extract</a>
+              {% endif %}
+            {% else %}
+              Not yet scraped.
+            {% endif %}            
+          </td>
+          <td>{{job_posting.title}}</td>
+          <td>{{job_posting.company}}</td>
+          <td>
+            <ol>
+              {% for jobrequirement in job_posting.jobrequirement_set.all %}                
+                <li>{{jobrequirement.text}}</li>
+              {% endfor %}              
+            </ol>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No job postings yet.</p>
+{% endif %}
+
+{% endblock %}

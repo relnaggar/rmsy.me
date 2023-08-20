@@ -12,14 +12,14 @@ services:
     build: "./postgres"
     volumes:
       - "./postgres/conf:/etc/postgresql/15/main"
-  watcher:
-    container_name: watcher
-    init: true
-    image: node:14
-    networks:
-      - rmsy-me
-    volumes:
-      - ./autojobgpt-react:/autojobgpt-react
-      - ./apache2/www:/var/www
-    working_dir: /autojobgpt-react
-    command: ./start watch
+  # watcher:
+  #   container_name: watcher
+  #   init: true
+  #   image: node:14
+  #   networks:
+  #     - rmsy-me
+  #   volumes:
+  #     - ./autojobgpt-react:/autojobgpt-react
+  #     - ./apache2/www:/var/www
+  #   working_dir: /autojobgpt-react
+  #   command: ./start watch

@@ -47,6 +47,9 @@ RUN apt-get update -y \
   && pip3 install djangorestframework \
   # openai
   && pip3 install openai \
+  # BeautifulSoup
+  && pip3 install lxml \
+  && pip3 install beautifulsoup4 \
   # cleanup
   && apt autoremove -y \
   && rm -rf /var/lib/apt/lists/*

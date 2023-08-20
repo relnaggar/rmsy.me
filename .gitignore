@@ -32,4 +32,5 @@ __pycache__/
 apache2/www/public/static/js/
 apache2/www/public/static/css/
 apache2/www/public/static/media/
+apache2/www/public/static/app/
 apache2/www/public/autojobgpt/index.html

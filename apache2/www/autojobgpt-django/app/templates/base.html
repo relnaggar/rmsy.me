@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/static/app/base.css">
+    <title>AutoJobGPT</title>
+  </head>
+  <body>
+    <nav>
+      <a href="{% url 'admin:index' %}">Admin</a>
+      <a href="{% url 'index' %}">Job Postings</a>
+    </nav>
+    {% block content %}{% endblock %}
+  </body>
+</html>

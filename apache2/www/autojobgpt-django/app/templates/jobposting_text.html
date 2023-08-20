@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Job Posting Text</h1>
+{% if job_posting.text %}
+  <p>{{job_posting.text|linebreaks}}</p>
+{% else %}
+  <p>Not yet scraped.</p>
+  <a href="{% url 'jobposting_scrape' job_posting.id %}">Scrape</a>
+{% endif %}
+{% endblock %}
