@@ -19,7 +19,10 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
 
 usage() {
   die "$(cat <<END
-usage: ${SCRIPT_NAME} service [--root]
+usage: ${SCRIPT_NAME} service [--root] [command]
+  where service is a service name in the docker-compose.yml file
+  where --root is an optional flag to run as root
+  where command is an optional command to run in the service (default: bash)
 END
   )"
 }
@@ -30,19 +33,28 @@ parse_args() {
   if [[ -z "${service}" ]]; then
     usage
   fi
+  shift
+  log "${service}"
   
   # optional with validation
-  root="${2:-}"
-  if [[ -n "${root}" ]]; then
-    if [[ "${root}" != "--root" ]]; then
-      usage
-    else
-      root=("-u" "root")
-    fi
+  root="${1:-}"  
+  if [[ "${root}" == "--root" ]]; then
+    root=("-u" "root")
+    shift
+  else
+    root=()
   fi
+
+  # optional
+  command="${1:-}"
+  if [[ -n "${command}" ]]; then
+    command=("-c" "${command}")
+  fi 
 
   log "arguments (\
 service: ${service} \
+root: ${root:-} \
+command: ${command} \
 )"
 }
 
@@ -57,9 +69,9 @@ main() {
       | grep -o "${STACK_NAME}_${service}.*" \
       | head -1 \
     )"
-    logfun docker exec -it ${root[@]} "${container}" bash
+    logfun docker exec -it ${root[@]:-} "${container}" bash ${command[@]:-}
   elif is_compose_up; then
-    logfun docker-compose exec ${root[@]} "${service}" bash
+    logfun docker-compose exec ${root[@]:-} "${service}" bash ${command[@]:-}
   else
     die "the server is not running"
   fi

@@ -90,12 +90,13 @@ parse_args() {
       -s|-p) build=prod ;;
     esac
   fi
-  if [[ -z "${ground}" ]]; then
-    case "${environment}" in
-      -d) ground=-f ;;
-      -s|-p) ground=-b ;;
-    esac
-  fi
+  # if [[ -z "${ground}" ]]; then
+  #   case "${environment}" in
+  #     -d) ground=-f ;;
+  #     -s|-p) ground=-b ;;
+  #   esac
+  # fi
+  ground=-b
 
   log "arguments (\
 cmd: ${cmd}, \
