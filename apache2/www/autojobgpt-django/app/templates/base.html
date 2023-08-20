@@ -7,6 +7,7 @@
   <body>
     <nav>
       <a href="{% url 'admin:index' %}">Admin</a>
+      <a href="{% url 'api-root' %}">API</a>
       <a href="{% url 'index' %}">Job Postings</a>
     </nav>
     {% block content %}{% endblock %}
