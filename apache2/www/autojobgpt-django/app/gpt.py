@@ -1,5 +1,3 @@
-from string import Template
-
 class Chat:
   myopenai = None
 

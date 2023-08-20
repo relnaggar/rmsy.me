@@ -1,11 +1,10 @@
-import json
-from string import Template
-
 from django.db import models
 from django.db.utils import IntegrityError
-from django.shortcuts import get_object_or_404
 
-from .scraping import scrape_text
+from string import Template 
+from json import loads
+from json.decoder import JSONDecodeError
+
 from .gpt import Chat
 
 
@@ -29,6 +28,7 @@ class JobPosting(models.Model):
       return f"{self.title}, {self.company}"
 
   def scrape(self):
+    from .scraping import scrape_text
     self.text = scrape_text(self.url)
     self.save()
 
@@ -42,7 +42,7 @@ class JobPosting(models.Model):
       "job_posting_text": self.text
     }))    
     try:
-      answer = json.loads(response)
+      answer = loads(response)
       self.title = answer["job_title"]
       self.company = answer["company"]
       self.save()
@@ -50,7 +50,7 @@ class JobPosting(models.Model):
       # for jobrequirement in answer["skills"]:
       #   JobRequirement(job_posting=self, text=jobrequirement).save()   
       self.chat_messages = chat.save_response()
-    except json.decoder.JSONDecodeError as e:
+    except JSONDecodeError as e:
       self.error = f"{type(e)}: {e}"
     except (KeyError, IntegrityError) as e:
       self.title = None

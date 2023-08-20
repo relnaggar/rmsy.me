@@ -1,6 +1,7 @@
-from requests import get
 from bs4 import BeautifulSoup
-import re
+from re import sub
+from requests import get
+
 
 NON_BREAKING_ELEMENTS = ['a', 'abbr', 'acronym', 'audio', 'b', 'bdi', 'bdo', 'big', 'button', 
     'canvas', 'cite', 'code', 'data', 'datalist', 'del', 'dfn', 'em', 'embed', 'i', 'iframe', 
@@ -19,7 +20,7 @@ def html_to_text(markup, preserve_new_lines=True, strip_tags=['style', 'script',
       if element.name not in NON_BREAKING_ELEMENTS:
         element.append('\n')
   # remove extra newlines
-  return re.sub(r'[\n\s]*\n[\n\s]*', '\n', soup.get_text(" "))
+  return sub(r'[\n\s]*\n[\n\s]*', '\n', soup.get_text(" "))
 
 def scrape_text(url):
   response = get(url)
