@@ -1,0 +1,31 @@
+#!/bin/bash
+#
+# Displays apache2 error log
+#
+# inspired by github boilerplate:
+# https://github.com/github/scripts-to-rule-them-all
+#
+# using Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# using bash strict mode:
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+. "${SCRIPT_DIR}/lib/shared.sh"
+
+main() {
+  log start
+  cd "${SCRIPT_DIR}/.."
+
+  script/console apache2 "cat /var/log/apache2/error.log"
+
+  log "end"
+}
+
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  main "$@"
+fi
