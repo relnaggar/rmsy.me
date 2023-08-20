@@ -47,7 +47,7 @@ main() {
   log "start"
 
   while true; do
-    log "continue with removing backup of ${volume}? [y/n]"
+    log "continue with overwriting previous backup of ${volume}? [y/n]"
     local yn;
     read yn
     case "${yn}" in

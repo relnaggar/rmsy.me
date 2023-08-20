@@ -1,6 +1,24 @@
 FROM debian:10.3-slim
 RUN groupadd -r -g 999 apache2 && useradd -r -m -g apache2 -u 999 apache2
 
+ENV PYTHONVERSION 3.11.4
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends \
+  # Python dependencies
+  build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev ca-certificates \
+  # Python 3.11.4 from source
+  && wget https://www.python.org/ftp/python/${PYTHONVERSION}/Python-${PYTHONVERSION}.tgz \
+  && tar -xvf Python-${PYTHONVERSION}.tgz \
+  && cd Python-${PYTHONVERSION} \
+  && ./configure --enable-optimizations --enable-shared \
+  && make -j 2 \
+  && make install \
+  && cd .. \
+  && rm -rf Python-${PYTHONVERSION}* \
+  # cleanup
+  && apt autoremove -y \
+  && rm -rf /var/lib/apt/lists/*
+
 ENV PHPVERSION 7.3
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends gosu \
@@ -9,37 +27,27 @@ RUN apt-get update -y \
   # PHP                                                     
   libapache2-mod-php${PHPVERSION} \
   php${PHPVERSION}-common \
-  #OpenSSL
+  # OpenSSL
   openssl \
   # PHP Postgres
   php${PHPVERSION}-pgsql \
   # Composer PHP dependencies
   php${PHPVERSION}-xml php${PHPVERSION}-mbstring zip unzip \
-  # Python 3.7 and WSGI
-  libapache2-mod-wsgi-py3 \
-  # Python packages
-  python3-pip \
-  build-essential \
-  python3-dev \
-  # Django with postgres
+  # for mod-wsgi
+  apache2-dev \
+  # postgres for Django
   libpq-dev \
+  # Python backend
+  && pip3 install mod-wsgi \
   # flask
-  && python3 -m pip install setuptools \
-  && python3 -m pip install wheel \
-  && python3 -m pip install markupsafe \
-  && python3 -m pip install flask \
-  # Django with postgres
-  && python3 -m pip install psycopg2 \
-  && python3 -m pip install Django \
-  && python3 -m pip install djangorestframework \
+  && pip3 install flask \
+  # Django and DRF with postgres
+  && pip3 install psycopg2 \
+  && pip3 install Django \
+  && pip3 install djangorestframework \
   # openai
-  && python3 -m pip install openai \
+  && pip3 install openai \
   # cleanup
-  && python3 -m pip uninstall -y wheel \
-  && python3 -m pip uninstall -y setuptools \
-  && apt purge -y python3-dev \
-  && apt purge -y build-essential \
-  && apt purge -y python3-pip \
   && apt autoremove -y \
   && rm -rf /var/lib/apt/lists/*
 
