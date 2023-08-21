@@ -23,6 +23,7 @@ main() {
 
   script/server down
   logfun docker container prune -f
+  script/backupall
   set +e
     logfun docker volume rm db
     logfun docker volume rm django-media
