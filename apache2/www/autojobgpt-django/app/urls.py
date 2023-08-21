@@ -5,6 +5,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register("templates", views.ResumeTemplateViewSet)
 router.register("postings", views.JobPostingViewSet)
+router.register("resumes", views.ResumeViewSet)
 
 urlpatterns = [
   path("api/", include(router.urls)),

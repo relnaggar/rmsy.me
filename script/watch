@@ -21,6 +21,11 @@ main() {
   log start
   cd "${SCRIPT_DIR}/.."
   
+  if ! is_compose_up; then
+    script/server up
+  fi
+
+
   fswatch -o -r apache2/www/autojobgpt-django | (while read; do script/server up; done)
 
   log "end"

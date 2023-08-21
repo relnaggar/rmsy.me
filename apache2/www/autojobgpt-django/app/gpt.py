@@ -1,4 +1,5 @@
 from string import Template
+from json import loads
 
 prompts = {
   "extract_job_details":
@@ -48,7 +49,7 @@ class Chat:
       raise Exception(f"OpenAI API failed with status '{choice.finish_reason}'")
     else:
       self.response = choice.message
-      return self.response.content
+      return loads(self.response.content)
     
   def save_response(self):
     if self.response is not None:

@@ -50,6 +50,8 @@ RUN apt-get update -y \
   # BeautifulSoup
   && pip3 install lxml \
   && pip3 install beautifulsoup4 \
+  # docx
+  && pip3 install python-docx \
   # cleanup
   && apt autoremove -y \
   && rm -rf /var/lib/apt/lists/*
