@@ -18,7 +18,7 @@ class Beetle extends AbstractProject {
           'id' => 'summary'
         ], [
           'title' => 'The Beetle Hunter Diaries',
-          'id' => '101'
+          'id' => 'beetles101'
         ], [
           'title' => 'Say Hello to My Little Friend',
           'id' => 'robot'
