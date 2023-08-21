@@ -18,7 +18,7 @@ readonly SCRIPT_NAME="${BASH_SOURCE[1]##*/}"
 # stack constants
 readonly STACK_NAME="rmsy-me"
 declare -a STACK_SERVICES; readonly STACK_SERVICES=("apache2" "postgres")
-declare -a STACK_VOLUMES; readonly STACK_VOLUMES=("db" "apache2-logs")
+declare -a STACK_VOLUMES; readonly STACK_VOLUMES=("db" "apache2-logs", "django-media")
 declare -a STACK_DOMAINS; readonly STACK_DOMAINS=("rmsy.me" \
   "el-naggar.co.uk")
 

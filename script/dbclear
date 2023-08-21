@@ -25,8 +25,10 @@ main() {
   logfun docker container prune -f
   set +e
     logfun docker volume rm db
+    logfun docker volume rm django-media
   set -e
   logfun docker volume create db
+  logfun docker volume create django-media
   log "don't forget to run script/dbsetup the next time you start the server"
 
   log "end"

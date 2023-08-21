@@ -10,6 +10,7 @@ services:
       - rmsy-me
     volumes:
       - "apache2-logs:/var/log/apache2"
+      - "django-media:/var/www/public/media"
   postgres:
     container_name: postgres
     init: true
@@ -25,4 +26,6 @@ volumes:
   db:
     external: true
   apache2-logs:
+    external: true
+  django-media:
     external: true
