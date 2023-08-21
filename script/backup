@@ -31,10 +31,17 @@ parse_args() {
   fi
 
   # validation
-  case "${volume}" in
-    db | apache2-logs) ;;
-    *) die "invalid volume ${volume}" ;;
-  esac
+  local valid_volume=false
+  for existing_volume in "${STACK_VOLUMES[@]}"; do
+    if [[ "${volume}" == "${existing_volume}" ]]; then
+      valid_volume=true
+      break
+    fi
+  done
+
+  if ! "${valid_volume}"; then
+    die "invalid volume ${volume}"
+  fi
   
   log "arguments (\
 volume: ${volume} \
