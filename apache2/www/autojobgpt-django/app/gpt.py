@@ -1,11 +1,12 @@
 from string import Template
 
-prompts = {
-
+class Chat:
+  system_message_content = "You are an experienced hiring manager using your industry knowledge to help tailor a resume and cover letter to a job posting."
+  prompts = {
 "extract_job_details":
 
 """
-Extract the job_title and company_name from this job posting.
+Extract the job_title and company name from this job posting.
 
 <job_posting>
 ${job_posting_text}
@@ -13,7 +14,7 @@ ${job_posting_text}
 
 Provide your output in JSON format with the following keys:
 key: job_title, data_type: string
-key: company_name, data_type: string
+key: company, data_type: string
 """,
 
 
@@ -33,7 +34,7 @@ ${fillfields_text}
 Provide your output in JSON format, with a JSON key for each fillfield.
 """,
 
-"regenerate_fillfield":
+"regenerate_substitution":
 """
 I'm not happy with your output for ${key}.
 Please try again, adhering to the following feedback:
@@ -43,17 +44,28 @@ ${feedback}
 </feedback>
 
 Provide your output in JSON format, with one JSON key for this fillfield.
+""",
+
+"regenerate_resume":
 """
+I'm not happy with your output for all of the fillfields.
+Please try again, adhering to the following feedback:
+
+<feedback>
+${feedback}
+</feedback>
+
+Provide your output in JSON format, with a JSON key for each fillfield.
+""",
 }
 
-class Chat:
   myopenai = None
 
   def __init__(self, messages=None):
     if messages is None:
       self.original_messages = []
       self.additional_messages = [
-        {"role": "system", "content": "You are an experienced hiring manager using your industry to knowledge to help tailor a resume and cover letter to a job posting."}
+        {"role": "system", "content": self.system_message_content}
       ]
     else:
       self.original_messages = messages
@@ -65,7 +77,7 @@ class Chat:
     self.myopenai = openai
   
   def ask(self, prompt_name, substitutions={}):
-    prompt_text = Template(prompts[prompt_name]).substitute(substitutions)
+    prompt_text = Template(self.prompts[prompt_name]).substitute(substitutions)
     self.additional_messages.append({"role": "user", "content": prompt_text})
     completion = self.myopenai.ChatCompletion.create(
       model = "gpt-4",
