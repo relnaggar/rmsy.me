@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Recreate the database and run migrations
+# Clear the database and run the setup script for development
 #
 # inspired by github boilerplate:
 # https://github.com/github/scripts-to-rule-them-all
@@ -21,15 +21,9 @@ main() {
   log start
   cd "${SCRIPT_DIR}/.."
 
-  script/server down
-  logfun docker container prune -f
-  script/backupall
-  set +e
-    logfun docker volume rm db
-    logfun docker volume rm django-media
-  set -e
-  logfun docker volume create db
-  logfun docker volume create django-media
+  script/dbclear
+  script/server up
+  script/dbsetup -d
 
   log "end"
 }
