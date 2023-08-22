@@ -30,6 +30,7 @@ main() {
   set -e
   logfun docker volume create db
   logfun docker volume create django-media
+  script/server up
   log "don't forget to run script/dbsetup the next time you start the server"
 
   log "end"

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Watch Django source files for changes and restart server
+# Run Django manage.py
 #
 # inspired by github boilerplate:
 # https://github.com/github/scripts-to-rule-them-all
@@ -18,13 +18,11 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
 . "${SCRIPT_DIR}/lib/shared.sh"
 
 main() {
-  log "start"
+  log start
   cd "${SCRIPT_DIR}/.."
-  
-  script/server up
 
-  log "watching"
-  fswatch -o -r apache2/www/autojobgpt-django -e apache2/www/autojobgjpt-django/app/migrations | (while read; do script/server up; log "watching"; done)
+  IFS=' '
+  script/console apache2 "cd /var/www/autojobgpt-django/ && python3 manage.py $*"
 
   log "end"
 }
