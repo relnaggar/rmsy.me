@@ -150,6 +150,8 @@ class Resume(models.Model):
     fillfields_text = ""
     for key in fillfield_keys:
       fillfield = FillField.objects.get(key=key)
+      if fillfield is None:
+        raise Exception(f"fillfield {key} not found")
       fillfields_text +=\
 f"""<fillfield>
   <key>{key}</key>

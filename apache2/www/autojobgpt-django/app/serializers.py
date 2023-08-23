@@ -39,7 +39,7 @@ class FeedbackSerializer(serializers.Serializer):
   feedback = serializers.CharField()
 
 
-class ResumeSerializer(serializers.ModelSerializer):
+class ResumeSerializer(serializers.ModelSerializer):    
   substitutions = ResumeSubstitutionSerializer(many=True, read_only=True)
 
   class Meta:
