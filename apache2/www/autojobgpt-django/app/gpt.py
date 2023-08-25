@@ -31,7 +31,7 @@ ${resume_template_text}
 ${fillfields_text}
 </fillfields>
 
-Provide your output in JSON format, with a JSON key for each fillfield.
+Provide your output in JSON format, with JSON keys only for each of the fillfields listed above.
 """,
 
 "regenerate_substitution":
@@ -60,6 +60,7 @@ Provide your output in JSON format, with a JSON key for each fillfield.
 }
 
   myopenai = None
+  model = "gpt-4"
 
   def __init__(self, messages=None):
     if messages is None:
@@ -75,13 +76,24 @@ Provide your output in JSON format, with a JSON key for each fillfield.
     with open("/run/secrets/OPENAI_API_KEY") as f:
       openai.api_key = f.read().strip()
     self.myopenai = openai
+
+  def ask_with_messages(self, messages):
+    completion = self.myopenai.ChatCompletion.create(
+      model=self.model,
+      messages=messages,
+    )
+    choice = completion.choices[0]
+    if choice.finish_reason != "stop":
+      raise Exception(f"OpenAI API failed with status '{choice.finish_reason}'")
+    else:
+      return choice.message
   
   def ask(self, prompt_name, substitutions={}):
     prompt_text = Template(self.prompts[prompt_name]).substitute(substitutions)
     self.additional_messages.append({"role": "user", "content": prompt_text})
     completion = self.myopenai.ChatCompletion.create(
-      model = "gpt-4",
-      messages = self.original_messages + self.additional_messages,
+      model=self.model,
+      messages=self.original_messages + self.additional_messages,
     )
     choice = completion.choices[0]
     if choice.finish_reason != "stop":

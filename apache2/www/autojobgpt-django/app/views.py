@@ -40,13 +40,21 @@ class JobViewSet(viewsets.ModelViewSet):
 
 class RegeneratableViewSet(viewsets.ModelViewSet):
   def regenerate(self, request, pk=None):
-    if request.method == 'GET':
+    serializer = None
+    if request.method == 'GET' and 'feedback' in request.query_params:
       serializer = FeedbackSerializer(data=request.query_params)
-    elif request.method == 'POST':
+    elif request.method == 'POST' and 'feedback' in request.data:
       serializer = FeedbackSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    feedback = serializer.validated_data['feedback']
-    return Response(self.serializer_class(self.get_object().regenerate(feedback)).data)
+    if serializer is not None:
+      serializer.is_valid(raise_exception=True)
+      feedback = serializer.validated_data['feedback']
+      return Response(self.serializer_class(self.get_object().regenerate(feedback)).data)
+    else:
+      o = self.get_object()
+      r = o.regenerate()
+      s = self.serializer_class(r)
+      d = s.data
+      return Response(d)
 
 class ResumeViewSet(RegeneratableViewSet):
   queryset = Resume.objects.all()

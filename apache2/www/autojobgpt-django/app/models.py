@@ -114,7 +114,7 @@ class Resume(models.Model):
       "JOB_TITLE": self.job.title,
       "COMPANY": self.job.company,
     }
-  
+
   @property
   def is_filled(self):
     return self.substitutions.count() > 0
@@ -126,16 +126,44 @@ class Resume(models.Model):
   def get_next_version(self):
     return Resume.objects.filter(job=self.job).aggregate(models.Max('version'))["version__max"] + 1
 
+  def _remove_default_substitutions(self, fillfield_keys):
+    for default_key in self.default_substitutions.keys():
+      if default_key in fillfield_keys:
+        fillfield_keys.remove(default_key)
+
+  def _validate_response_and_get_substitutions(self, response, fillfield_keys):
+    # validate the response by checking that all the fillfields are present
+    substitutions = {}
+    for key in fillfield_keys:
+      substitutions[key] = response[key]
+    return substitutions
+  
+  def _create_resume_substitutions(resume, substitutions):
+    # create the resume substitutions
+    for key, value in substitutions.items():
+      ResumeSubstitution.objects.create(
+        resume=resume,
+        key=key,
+        value=value,
+      )
+
+  def _create_new_resume_and_substitutions(self, substitutions, chat_messages):
+    # create the new resume
+    new_resume = Resume.objects.create(
+      job=self.job,
+      version=self.get_next_version(),
+      chat_messages=chat_messages,
+    )
+    self._create_resume_substitutions(new_resume, substitutions)
+    return new_resume
+
   def fill(self):
     if self.is_filled:
       raise Exception("you can only fill a resume once")
     
     template_text = self.job.resume_template.extract_text()
     fillfield_keys = self.job.resume_template.extract_fillfields(text=template_text)
-
-    # exclude the default fillfields
-    for default_key in self.default_substitutions.keys():
-      fillfield_keys.remove(default_key)
+    self._remove_default_substitutions(fillfield_keys)
     
     # construct the fillfields_text part of the prompt    
     fillfields_text = ""
@@ -159,22 +187,13 @@ f"""<fillfield>
       "fillfields_text": fillfields_text,
     }))
 
-    # validate the response by checking that all the fillfields are present
-    substitutions = {}
-    for key in fillfield_keys:
-      substitutions[key] = response[key]
+    substitutions = self._validate_response_and_get_substitutions(response, fillfield_keys)
 
     # save the chat messages 
     self.chat_messages = chat.get_additional_messages()
     self.save()
 
-    # create the resume substitutions
-    for key, value in substitutions.items():
-      ResumeSubstitution.objects.create(
-        resume=self,
-        key=key,
-        value=value,
-      )
+    self._create_resume_substitutions(self, substitutions)
 
   def generate_docx(self):
     if not self.is_filled:
@@ -205,42 +224,52 @@ f"""<fillfield>
     file_name = f"{self.job}_{self.version}.docx"    
     self.upload.save(file_name, File(file_stream))   
 
-  def regenerate(self, feedback):
+  def regenerate(self, feedback=None):
     if not self.is_filled:
       raise Exception("you have to fill the resume with .fill() before you can regenerate the resume")
     
+    if feedback is None:
+      return self._regenerate_without_feedback()
+    else:
+      return self._regenerate_with_feedback(feedback)
+
+  def _regenerate_without_feedback(self):    
+    # the expected fillfields are the keys of the most recent response
+    fillfield_keys = list(loads(self.chat_messages[-1]['content']).keys())
+    self._remove_default_substitutions(fillfield_keys)    
+
+    # re-ask GPT the most recent question
+    chat_messages_rewinded_1 = self.chat_messages[:-1]
+    chat_message = Chat().ask_with_messages(self.job.chat_messages + chat_messages_rewinded_1)
+    response = loads(chat_message.content)
+
+    substitutions = self._validate_response_and_get_substitutions(response, fillfield_keys)
+    new_resume = self._create_new_resume_and_substitutions(substitutions, chat_messages_rewinded_1 + [chat_message])
+
+    # copy the resume substitutions from the previous resume
+    for key in self.job.resume_template.extract_fillfields():
+      if key not in fillfield_keys and key not in self.default_substitutions.keys():
+        # copy the resume substitution
+        old_resume_substitution = self.substitutions.get(key=key)
+        ResumeSubstitution.objects.create(
+          resume=new_resume,
+          key=old_resume_substitution.key,
+          value=old_resume_substitution.value,
+        )
+    
+    return new_resume
+
+  def _regenerate_with_feedback(self, feedback):
     chat = Chat(self.job.chat_messages + self.chat_messages)
     response = loads(chat.ask(prompt_name="regenerate_resume", substitutions={
       "feedback": feedback,
     }))
 
     fillfield_keys = self.job.resume_template.extract_fillfields()
+    self._remove_default_substitutions(fillfield_keys)
+    substitutions = self._validate_response_and_get_substitutions(response, fillfield_keys)
 
-    # exclude the default fillfields
-    for default_key in self.default_substitutions.keys():
-      fillfield_keys.remove(default_key)
-
-    # validate the response by checking that all the fillfields are present
-    substitutions = {}
-    for key in fillfield_keys:
-      substitutions[key] = response[key]
-
-    # copy the resume
-    new_resume = Resume.objects.create(
-      job=self.job,
-      version=self.get_next_version(),
-      chat_messages=self.chat_messages + chat.get_additional_messages(),
-    )
-
-    # create the resume substitutions
-    for key, value in substitutions.items():
-      ResumeSubstitution.objects.create(
-        resume=new_resume,
-        key=key,
-        value=value,
-      )
-    
-    return new_resume
+    return self._create_new_resume_and_substitutions(substitutions, self.chat_messages+chat.get_additional_messages())
 
   # def to_pdf(self):
   #   # old method from command-line application
@@ -275,6 +304,30 @@ class ResumeSubstitution(models.Model):
   def __str__(self):
     return f"{self.key}: {self.value} for {self.resume}"
   
+  def _regenerate_without_feedback(self):
+    # re-ask GPT the most recent question
+    chat_messages_rewinded_1 = self.chat_messages[:-1]
+    chat_message = Chat().ask_with_messages(self.resume.job.chat_messages + self.resume.chat_messages + chat_messages_rewinded_1)
+    response = loads(chat_message.content)
+    new_resume = Resume.objects.create(
+      job=self.resume.job,
+      version=self.resume.get_next_version(),
+      chat_messages=self.resume.chat_messages + chat_messages_rewinded_1 + [chat_message],
+    )
+    for resume_substitution in self.resume.substitutions.all():
+      if resume_substitution.key != self.key:
+        ResumeSubstitution.objects.create(
+          resume=new_resume,
+          key=resume_substitution.key,
+          value=resume_substitution.value,
+        )
+    return ResumeSubstitution.objects.create(
+      resume=new_resume,
+      key=self.key,
+      value=response[self.key],
+    )
+
+
   def regenerate(self, feedback):
     chat = Chat(self.resume.job.chat_messages + self.resume.chat_messages)
     response = loads(chat.ask(prompt_name="regenerate_substitution", substitutions={
