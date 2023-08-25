@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.files import File
+from django.utils import timezone
 
 from json import loads
 from docx import Document
@@ -93,6 +94,15 @@ class Job(models.Model):
     self.company = response["company"]
     self.chat_messages = chat.get_additional_messages()
 
+  def apply(self, chosen_resume):
+    self.date_applied = timezone.now()
+    self.chosen_resume = chosen_resume
+    self.status = "pending"
+    self.save()
+  
+  def set_status(self, status):
+    self.status = status
+    self.save()
 
 class Resume(models.Model):
   job = models.ForeignKey(to="Job", on_delete=models.CASCADE, related_name="resumes")  

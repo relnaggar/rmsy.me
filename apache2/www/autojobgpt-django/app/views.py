@@ -37,6 +37,24 @@ class JobViewSet(viewsets.ModelViewSet):
   queryset = Job.objects.all()
   serializer_class = JobSerializer
 
+  @action(detail=True, methods=['get', 'post'])
+  def apply(self, request, pk=None):
+    if request.method == 'GET':
+      chosen_resume_id = self.request.query_params.get('chosen_resume_id', None)
+    elif request.method == 'POST':
+      chosen_resume_id = self.request.data.get('chosen_resume_id', None)
+    chosen_resume = Resume.objects.get(pk=chosen_resume_id)  
+    self.get_object().apply(chosen_resume)
+    return Response(self.serializer_class(self.get_object()).data)
+
+  @action(detail=True, methods=['get', 'post'])
+  def set_status(self, request, pk=None):
+    if request.method == 'GET':
+      status = self.request.query_params.get('status', None)
+    elif request.method == 'POST':
+      status = self.request.data.get('status', None)
+    self.get_object().set_status(status)
+    return Response(self.serializer_class(self.get_object()).data)
 
 class RegeneratableViewSet(viewsets.ModelViewSet):
   def regenerate(self, request, pk=None):
@@ -50,11 +68,7 @@ class RegeneratableViewSet(viewsets.ModelViewSet):
       feedback = serializer.validated_data['feedback']
       return Response(self.serializer_class(self.get_object().regenerate(feedback)).data)
     else:
-      o = self.get_object()
-      r = o.regenerate()
-      s = self.serializer_class(r)
-      d = s.data
-      return Response(d)
+      return Response(self.serializer_class(self.get_object().regenerate()).data)
 
 class ResumeViewSet(RegeneratableViewSet):
   queryset = Resume.objects.all()
