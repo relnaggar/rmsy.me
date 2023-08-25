@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Job Postings</h1>
+<h1>Jobs</h1>
 {% if object_list %}
   <table>
     <thead>
@@ -13,24 +13,24 @@
       </tr>
     </thead>
     <tbody>
-      {% for job_posting in object_list %}
+      {% for job in object_list %}
         <tr>
           <td>
-            <a href="{{job_posting.url}}" target="_blank">{{job_posting.url|truncatechars:80}}</a>
+            <a href="{{job.url}}" target="_blank">{{job.url|truncatechars:80}}</a>
           </td>
           <td>
-            {% if job_posting.text %}
-              <a href="{% url 'jobposting_text' job_posting.id %}">View</a>
+            {% if job.text %}
+              <a href="{% url 'job_text' job.id %}">View</a>
             {% endif %}
           </td>
-          <td>{{job_posting.title}}</td>
-          <td>{{job_posting.company}}</td>
+          <td>{{job.title}}</td>
+          <td>{{job.company}}</td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
 {% else %}
-  <p>No job postings yet.</p>
+  <p>No jobs yet.</p>
 {% endif %}
 
 {% endblock %}

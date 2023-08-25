@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import ResumeTemplate, FillField, JobPosting, ResumeProject, Resume, ResumeSubstitution
+from .models import ResumeTemplate, FillField, Job, Resume, ResumeSubstitution
 
 
 class ResumeTemplateSerializer(serializers.ModelSerializer):
@@ -15,18 +15,12 @@ class FillFieldSerializer(serializers.ModelSerializer):
     fields = "__all__"
 
 
-class JobPostingSerializer(serializers.ModelSerializer):
+class JobSerializer(serializers.ModelSerializer):
   def create(self, validated_data):
     return self.Meta.model._default_manager.create(validated_data)
 
   class Meta:
-    model = JobPosting
-    fields = "__all__"
-
-
-class ResumeProjectSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = ResumeProject
+    model = Job
     fields = "__all__"
 
 

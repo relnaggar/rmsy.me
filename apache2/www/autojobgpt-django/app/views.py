@@ -5,19 +5,19 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from .models import ResumeTemplate, FillField, JobPosting, ResumeProject, Resume, ResumeSubstitution
-from .serializers import ResumeTemplateSerializer, FillFieldSerializer, JobPostingSerializer, ResumeProjectSerializer, ResumeSerializer, ResumeSubstitutionSerializer
+from .models import ResumeTemplate, FillField, Job, Resume, ResumeSubstitution
+from .serializers import ResumeTemplateSerializer, FillFieldSerializer, JobSerializer, ResumeSerializer, ResumeSubstitutionSerializer
 from .serializers import FeedbackSerializer
 
 ### VIEWS ###
 
 class IndexView(ListView):
-  model = JobPosting
+  model = Job
 
 
-def jobposting_text(request, job_posting_id):
-  return render(request, "jobposting_text.html", {
-    "job_posting": get_object_or_404(JobPosting, pk=job_posting_id)
+def job_text(request, job_id):
+  return render(request, "job_text.html", {
+    "job": get_object_or_404(Job, pk=job_id)
   })
 
 
@@ -33,14 +33,10 @@ class FillFieldViewSet(viewsets.ModelViewSet):
   serializer_class = FillFieldSerializer
 
 
-class JobPostingViewSet(viewsets.ModelViewSet):
-  queryset = JobPosting.objects.all()
-  serializer_class = JobPostingSerializer
+class JobViewSet(viewsets.ModelViewSet):
+  queryset = Job.objects.all()
+  serializer_class = JobSerializer
 
-
-class ResumeProjectViewSet(viewsets.ModelViewSet):
-  queryset = ResumeProject.objects.all()
-  serializer_class = ResumeProjectSerializer
 
 class RegeneratableViewSet(viewsets.ModelViewSet):
   def regenerate(self, request, pk=None):
@@ -69,7 +65,6 @@ class ResumeViewSet(RegeneratableViewSet):
   @action(detail=True, methods=['get', 'post'])
   def regenerate(self, request, pk=None):
     return super().regenerate(request, pk)
-
 
 class ResumeSubstitutionViewSet(RegeneratableViewSet):
   queryset = ResumeSubstitution.objects.all()

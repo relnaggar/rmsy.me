@@ -50,21 +50,25 @@ class FillField(models.Model):
     return f"{self.key}"
 
 
-class JobPostingManager(models.Manager):
+class JobManager(models.Manager):
   def create(self, validated_data):
-    job_posting = JobPosting(url=validated_data["url"])
-    job_posting.scrape()
-    job_posting.extract_job_details()
-    job_posting.save()
-    return job_posting
+    job = Job(url=validated_data["url"])
+    job.scrape()
+    job.extract_job_details()
+    job.save()
+    return job
 
-class JobPosting(models.Model):
-  objects = JobPostingManager()
+class Job(models.Model):
+  objects = JobManager()
   url = models.URLField(unique=True)
   title = models.CharField(max_length=26, blank=True)
   company = models.CharField(max_length=26, blank=True)
   text = models.TextField(blank=True)
   chat_messages = models.JSONField(blank=True, null=True)
+  resume_template = models.ForeignKey(to="ResumeTemplate", on_delete=models.SET_NULL, null=True, blank=True)
+  date_applied = models.DateTimeField(blank=True, null=True)
+  chosen_resume = models.ForeignKey(to="Resume", on_delete=models.SET_NULL, null=True, blank=True, related_name="chosen_jobs")
+  status = models.CharField(max_length=26, blank=True) # "backlog", "applying", "pending", "testing", "interviewing", "rejected", "accepted"
 
   class Meta:
     constraints = [
@@ -83,35 +87,22 @@ class JobPosting(models.Model):
   def extract_job_details(self):
     chat = Chat()
     response = loads(chat.ask(prompt_name="extract_job_details", substitutions={
-      "job_posting_text": self.text,
+      "job_text": self.text,
     }))
     self.title = response["job_title"]
     self.company = response["company"]
     self.chat_messages = chat.get_additional_messages()
 
 
-class ResumeProject(models.Model):
-  resume_template = models.ForeignKey(to=ResumeTemplate, on_delete=models.SET_NULL, null=True)
-  job_posting = models.ForeignKey(to=JobPosting, on_delete=models.SET_NULL, null=True)
-
-  class Meta:
-    constraints = [
-      models.UniqueConstraint(fields=['resume_template', 'job_posting'], name='unique_resume_template_job_posting'),
-    ]
-
-  def __str__(self):
-    return f"{self.resume_template}_{self.job_posting}"
-
-
 class Resume(models.Model):
-  project = models.ForeignKey(to=ResumeProject, on_delete=models.CASCADE, related_name="resumes")  
+  job = models.ForeignKey(to="Job", on_delete=models.CASCADE, related_name="resumes")  
   version = models.IntegerField(default=1)
   upload = models.FileField(upload_to='resumes/')
   chat_messages = models.JSONField(blank=True, null=True)
 
   class Meta:
     constraints = [
-      models.UniqueConstraint(fields=['project', 'version'], name='unique_project_version'),
+      models.UniqueConstraint(fields=['job', 'version'], name='unique_job_version'),
     ]
 
   def __str__(self):
@@ -120,8 +111,8 @@ class Resume(models.Model):
   @property
   def default_substitutions(self):
     return {
-      "JOB_TITLE": self.project.job_posting.title,
-      "COMPANY": self.project.job_posting.company,
+      "JOB_TITLE": self.job.title,
+      "COMPANY": self.job.company,
     }
   
   @property
@@ -133,14 +124,14 @@ class Resume(models.Model):
     return self.upload.name.endswith(".docx")
   
   def get_next_version(self):
-    return Resume.objects.filter(project=self.project).aggregate(models.Max('version'))["version__max"] + 1
+    return Resume.objects.filter(job=self.job).aggregate(models.Max('version'))["version__max"] + 1
 
   def fill(self):
     if self.is_filled:
       raise Exception("you can only fill a resume once")
     
-    template_text = self.project.resume_template.extract_text()
-    fillfield_keys = self.project.resume_template.extract_fillfields(text=template_text)
+    template_text = self.job.resume_template.extract_text()
+    fillfield_keys = self.job.resume_template.extract_fillfields(text=template_text)
 
     # exclude the default fillfields
     for default_key in self.default_substitutions.keys():
@@ -162,7 +153,7 @@ f"""<fillfield>
 </fillfield>\n"""
 
     # ask GPT to fill in the fillfields
-    chat = Chat(self.project.job_posting.chat_messages)
+    chat = Chat(self.job.chat_messages)
     response = loads(chat.ask(prompt_name="fill_resume_template", substitutions={
       "resume_template_text": template_text,
       "fillfields_text": fillfields_text,
@@ -192,7 +183,7 @@ f"""<fillfield>
       raise Exception("you can only generate the docx file once")
 
     # open the template with docx
-    template_document = self.project.resume_template.open_document()
+    template_document = self.job.resume_template.open_document()
 
     # get all the fillfields
     all_substitutions = self.default_substitutions
@@ -211,16 +202,19 @@ f"""<fillfield>
     template_document.save(file_stream)
     
     # save the file stream to the file field
-    file_name = f"{self.project}_{self.version}.docx"    
+    file_name = f"{self.job}_{self.version}.docx"    
     self.upload.save(file_name, File(file_stream))   
 
   def regenerate(self, feedback):
-    chat = Chat(self.project.job_posting.chat_messages + self.chat_messages)
+    if not self.is_filled:
+      raise Exception("you have to fill the resume with .fill() before you can regenerate the resume")
+    
+    chat = Chat(self.job.chat_messages + self.chat_messages)
     response = loads(chat.ask(prompt_name="regenerate_resume", substitutions={
       "feedback": feedback,
     }))
 
-    fillfield_keys = self.project.resume_template.extract_fillfields()
+    fillfield_keys = self.job.resume_template.extract_fillfields()
 
     # exclude the default fillfields
     for default_key in self.default_substitutions.keys():
@@ -233,7 +227,7 @@ f"""<fillfield>
 
     # copy the resume
     new_resume = Resume.objects.create(
-      project=self.project,
+      job=self.job,
       version=self.get_next_version(),
       chat_messages=self.chat_messages + chat.get_additional_messages(),
     )
@@ -269,7 +263,7 @@ f"""<fillfield>
 
 
 class ResumeSubstitution(models.Model):
-  resume = models.ForeignKey(to=Resume, on_delete=models.CASCADE, related_name="substitutions")
+  resume = models.ForeignKey(to="Resume", on_delete=models.CASCADE, related_name="substitutions")
   key = models.CharField(max_length=200)
   value = models.TextField()
 
@@ -282,7 +276,7 @@ class ResumeSubstitution(models.Model):
     return f"{self.key}: {self.value} for {self.resume}"
   
   def regenerate(self, feedback):
-    chat = Chat(self.resume.project.job_posting.chat_messages + self.resume.chat_messages)
+    chat = Chat(self.resume.job.chat_messages + self.resume.chat_messages)
     response = loads(chat.ask(prompt_name="regenerate_substitution", substitutions={
       "key": self.key,
       "feedback": feedback,
@@ -290,7 +284,7 @@ class ResumeSubstitution(models.Model):
 
     # copy the resume and its substitutions
     new_resume = Resume.objects.create(
-      project=self.resume.project,
+      job=self.resume.job,
       version=self.resume.get_next_version(),
       chat_messages=self.resume.chat_messages + chat.get_additional_messages(),
     )

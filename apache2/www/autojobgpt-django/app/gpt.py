@@ -9,7 +9,7 @@ class Chat:
 Extract the job_title and company name from this job posting.
 
 <job_posting>
-${job_posting_text}
+${job_text}
 </job_posting>
 
 Provide your output in JSON format with the following keys:

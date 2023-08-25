@@ -1,18 +1,17 @@
 from django.urls import include, path
 from rest_framework import routers
-from .views import ResumeTemplateViewSet, FillFieldViewSet, JobPostingViewSet, ResumeProjectViewSet, ResumeViewSet, ResumeSubstitutionViewSet
-from .views import IndexView, jobposting_text
+from .views import ResumeTemplateViewSet, FillFieldViewSet, JobViewSet, ResumeViewSet, ResumeSubstitutionViewSet
+from .views import IndexView, job_text
 
 router = routers.DefaultRouter()
 router.register("templates", ResumeTemplateViewSet)
 router.register("fillfields", FillFieldViewSet)
-router.register("jobpostings", JobPostingViewSet)
-router.register("resumeprojects", ResumeProjectViewSet)
+router.register("jobs", JobViewSet)
 router.register("resumes", ResumeViewSet)
 router.register("resumesubstitutions", ResumeSubstitutionViewSet)
 
 urlpatterns = [
   path("api/", include(router.urls)),
   path("", IndexView.as_view(), name="index"),
-  path("<int:job_posting_id>/text", jobposting_text, name="jobposting_text"),
+  path("<int:job_id>/text", job_text, name="job_text"),
 ] 
