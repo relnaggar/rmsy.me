@@ -148,7 +148,7 @@ class Resume(models.Model):
       substitutions[key] = response[key]
     return substitutions
   
-  def _create_resume_substitutions(resume, substitutions):
+  def _create_resume_substitutions(self, resume, substitutions):
     # create the resume substitutions
     for key, value in substitutions.items():
       ResumeSubstitution.objects.create(
