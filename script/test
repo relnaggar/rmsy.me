@@ -23,6 +23,7 @@ usage: ${SCRIPT_NAME} [tests] ...
 
 tests can be:
   unit  all PHPUnit tests (on the locally running application)
+  react all React tests (on the locally running application)
   e2e   all Cucumber tests (on the locally running application)
   live  all Cucumber tests (on the live application)
 the default is to run all available local tests
@@ -36,7 +37,7 @@ parse_args() {
   # defaults
   if [[ $# -eq 0 ]]; then
     if is_compose_up; then
-      tests=("unit" "e2e")
+      tests=("unit" "react" "e2e")
     else
       tests=("e2e")
     fi
@@ -70,6 +71,18 @@ main() {
         set -e
         if [[ "${result}" -eq 127 ]]; then
           log "unit tests not available (are you using the production build?)"
+        elif [[ "${result}" -ne 0 ]]; then
+          exit "${result}"
+        fi
+        ;;
+      react)
+        log "running React tests:"
+        set +e
+          logfun script/console watcher 'npm test -- --watchAll=false'
+          local result="$?"
+        set -e
+        if [[ "${result}" -eq 127 ]]; then
+          log "React tests not available (are you using the production build?)"
         elif [[ "${result}" -ne 0 ]]; then
           exit "${result}"
         fi

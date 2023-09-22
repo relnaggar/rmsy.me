@@ -1,9 +1,14 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import App from './App';
+import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import { routesConfig, routesBasename }  from './routesConfig';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
+test('renders title', () => {
+  const router = createMemoryRouter(routesConfig, {
+    initialEntries: [routesBasename],
+    basename: routesBasename,
+  });
+  render(<RouterProvider router={router} />);
+
+  const linkElement = screen.getByText(/autojobgpt/i);
   expect(linkElement).toBeInTheDocument();
 });
