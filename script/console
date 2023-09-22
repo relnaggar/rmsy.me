@@ -46,9 +46,13 @@ parse_args() {
   fi
 
   # optional
+  it="-it"
+  T=""
   command="${1:-}"
   if [[ -n "${command}" ]]; then
     command=("-c" "${command}")
+    it=""
+    T="-T"
   fi 
 
   log "arguments (\
@@ -69,9 +73,9 @@ main() {
       | grep -o "${STACK_NAME}_${service}.*" \
       | head -1 \
     )"
-    logfun docker exec -it ${root[@]:-} "${container}" bash ${command[@]:-}
+    logfun docker exec ${it} ${root[@]:-} "${container}" bash ${command[@]:-}
   elif is_compose_up; then
-    logfun docker-compose exec ${root[@]:-} "${service}" bash ${command[@]:-}
+    logfun docker-compose exec ${T} ${root[@]:-} "${service}" bash ${command[@]:-}
   else
     die "the server is not running"
   fi
