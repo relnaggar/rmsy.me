@@ -46,6 +46,7 @@
     ]
   },
   "devDependencies": {
-    "chokidar-cli": "^3.0.0"
+    "chokidar-cli": "^3.0.0",
+    "@babel/plugin-proposal-private-property-in-object": "*"
   }
 }
