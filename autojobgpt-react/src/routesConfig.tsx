@@ -1,7 +1,10 @@
+import { RouteObject } from 'react-router-dom';
+
 import Layout from './Layout';
+import Home from './Home';
 import Jobs from './Jobs';
 import Resumes from './Resumes';
-import { RouteObject } from 'react-router-dom';
+
 
 export const routesBasename = "/autojobgpt/app";
 
@@ -10,6 +13,9 @@ export const routesConfig: RouteObject[] = [{
   element: <Layout />,
   children: [{
     path: "/",
+    element: <Home />,
+  }, {
+    path: "/jobs",
     element: <Jobs />,
   }, {
     path: "/resumes",

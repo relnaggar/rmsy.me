@@ -1,4 +1,6 @@
-export default function JobsRoute(): JSX.Element {
+import { JOBS } from './api';
+
+export default function Jobs(): JSX.Element {
   return (
     <>
       <h1>Jobs</h1>
