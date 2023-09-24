@@ -31,6 +31,10 @@ $below-board-height: 15px;
       - $board-padding * 2
       - $below-board-height
     );
+    
+    .card:hover {
+      cursor: grab;
+    }
   }
 
   .card-footer {
