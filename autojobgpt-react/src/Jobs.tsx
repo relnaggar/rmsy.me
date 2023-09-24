@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import { Modal } from 'bootstrap';
 
 import { toPascalCase } from './utilities';
-import { JOBS } from './mockAPI';
 
 
 export type Job = {
@@ -16,7 +15,7 @@ export type Job = {
     "content": string;
   }[];
   "date_applied": string | null;
-  "status": string;  
+  "status": string;
   "resume_template": string | null;
   "chosen_resume": string | null;
 };
@@ -31,21 +30,22 @@ export const STATUSES: string[] = [
   "accepted",
 ]
 
+const LoadedContext: React.Context<boolean> = createContext<boolean>(false);
 
 export default function Jobs(): JSX.Element {
   const [jobs, setJobs]: [Job[], React.Dispatch<React.SetStateAction<Job[]>>] = useState<Job[]>([]);
+  const [loaded, setLoaded]: [boolean, React.Dispatch<React.SetStateAction<boolean>>] = useState<boolean>(false);
 
   useEffect(() => {
-    // fetch("/api/jobs")
-    //    .then((response) => response.json())
-    //    .then((data) => {
-    //       console.log(data);
-    //       setPosts(data);
-    //    })
-    //    .catch((err) => {
-    //       console.log(err.message);
-    //    });
-    setJobs(JOBS);
+    fetch("../api/jobs/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((response) => response.json())
+      .then((data) => setJobs(data))
+      .catch((error) => console.error("Error:", error))
+      .finally(() => setLoaded(true));
   }, []);
 
   function addJob(url: string): void {
@@ -66,7 +66,9 @@ export default function Jobs(): JSX.Element {
   return (
     <>
       <main>
-        <Board jobs={jobs} setJobs={setJobs} />
+        <LoadedContext.Provider value={loaded}>
+          <Board jobs={jobs} setJobs={setJobs} />
+        </LoadedContext.Provider>
       </main>
       <AddJobModal addJob={addJob} />
     </>
@@ -129,6 +131,7 @@ function Column({ title, jobs, onDragStart, onDragOver, onDrop }: {
   onDragOver: (e: React.DragEvent<HTMLDivElement>) => void,
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void,
 }): JSX.Element {
+  const loaded: boolean = useContext(LoadedContext);
 
   function handleAddJobClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
     const jobModal: HTMLElement | null = document.getElementById("addJobModal");
@@ -144,6 +147,16 @@ function Column({ title, jobs, onDragStart, onDragOver, onDrop }: {
           <h5 className="card-title">{title}</h5>
         </div>  
         <div className="card-body">
+          { !loaded && (
+            <div className="card mb-2 p-2" aria-hidden="true">
+              <h6 className="card-title placeholder-glow">
+                <span className="placeholder col-6"></span>
+              </h6>
+              <p className="card-subtitle placeholder-glow">
+                <span className="placeholder col-7"></span>
+              </p>
+            </div>
+          )}
           {jobs.map((job) => {
             return <JobCard
               key={job.id}
@@ -184,20 +197,30 @@ function AddJobModal({ addJob }: {
   addJob: (url: string) => void,
 }): JSX.Element {
   const [url, setUrl]: [string, React.Dispatch<React.SetStateAction<string>>] = useState<string>("");
+  const [isSubmitEnabled, setIsSubmitEnabled]: [boolean, React.Dispatch<React.SetStateAction<boolean>>] = useState<boolean>(false);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault();
     const modalElement: HTMLElement | null = document.getElementById("addJobModal");
     if (modalElement) {
       Modal.getInstance(modalElement)?.toggle();
+
+      // Bootstrap is supposed to remove the modal-backdrop but it's not working properly
       document.querySelector(".modal-backdrop")?.remove();
     }
     setUrl("");
+    setIsSubmitEnabled(false);
     addJob(url);
   }
 
   function handleUrlChange(e: React.ChangeEvent<HTMLInputElement>): void {
     setUrl(e.target.value);
+    // validate url using html input validation
+    if (e.target.checkValidity()) {
+      setIsSubmitEnabled(true);
+    } else {
+      setIsSubmitEnabled(false);
+    }
   }
 
   return (
@@ -209,15 +232,15 @@ function AddJobModal({ addJob }: {
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form onSubmit={handleSubmit}>
-              <div className="modal-body">              
+              <div className="modal-body">
                 <div className="mb-3">
                   <label htmlFor="url" className="form-label">URL</label>
-                  <input type="url" className="form-control" id="url" value={url} onChange={handleUrlChange} />
+                  <input type="url" className="form-control" id="url" value={url} onChange={handleUrlChange} required />
                 </div>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" className="btn btn-primary">Submit</button>
+                <button type="submit" className="btn btn-primary" disabled={isSubmitEnabled ? false : true} >Submit</button>
               </div>
             </form>
           </div>
