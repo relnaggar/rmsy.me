@@ -17,6 +17,14 @@ export default function Layout(): JSX.Element {
             </li>
           </ul>
         </div>
+        <ul className="navbar-nav">
+          <li className="nav-item">
+            <a href="/autojobgpt/api" className="nav-link">API</a>
+          </li>
+          <li className="nav-item">
+          <a href="/autojobgpt/admin" className="nav-link">Admin</a>
+          </li>
+        </ul>
       </nav>
 
       <Outlet />

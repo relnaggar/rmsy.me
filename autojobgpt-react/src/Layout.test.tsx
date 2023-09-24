@@ -4,7 +4,7 @@ import { routesConfig }  from './routesConfig';
 import { renderRoute, testRouteAndAllChildren } from './testUtilities';
 
 
-const MENU_LINKS: string[] = ['Jobs', 'Resumes'];
+const MENU_LINKS: string[] = ['Jobs', 'Resumes', 'API', 'Admin'];
 
 describe('every route displays the menu', () => {
   const theTest: (routePath: string) => void = function(routePath: string): void {
