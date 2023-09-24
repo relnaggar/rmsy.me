@@ -1,5 +1,4 @@
-from django.views.generic.list import ListView
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect
 
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -9,17 +8,8 @@ from .models import ResumeTemplate, FillField, Job, Resume, ResumeSubstitution
 from .serializers import ResumeTemplateSerializer, FillFieldSerializer, JobSerializer, ResumeSerializer, ResumeSubstitutionSerializer
 from .serializers import FeedbackSerializer
 
-### VIEWS ###
-
-class IndexView(ListView):
-  model = Job
-
-
-def job_text(request, job_id):
-  return render(request, "job_text.html", {
-    "job": get_object_or_404(Job, pk=job_id)
-  })
-
+def app(request):
+  return redirect(request.get_full_path() + 'app')
 
 ### API ###
 
