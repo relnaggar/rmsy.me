@@ -16,7 +16,7 @@ export const routesConfig: RouteObject[] = [{
     element: <Home />,
   }, {
     path: "/jobs",
-    element: <Jobs />,
+    element: <Jobs fetchData={fetch} />,
   }, {
     path: "/resumes",
     element: <Resumes />,

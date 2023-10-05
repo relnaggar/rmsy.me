@@ -32,35 +32,69 @@ export const STATUSES: string[] = [
 
 const LoadedContext: React.Context<boolean> = createContext<boolean>(false);
 
-export default function Jobs(): JSX.Element {
+export default function Jobs({ fetchData }:
+  { fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response> }
+): JSX.Element {
   const [jobs, setJobs]: [Job[], React.Dispatch<React.SetStateAction<Job[]>>] = useState<Job[]>([]);
   const [loaded, setLoaded]: [boolean, React.Dispatch<React.SetStateAction<boolean>>] = useState<boolean>(false);
+  const [addedJob, setAddedJob]: [Job | null, React.Dispatch<React.SetStateAction<Job | null>>] = useState<Job | null>(null);
 
   useEffect(() => {
-    fetch("../api/jobs/", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).then((response) => response.json())
-      .then((data) => setJobs(data))
-      .catch((error) => console.error("Error:", error))
-      .finally(() => setLoaded(true));
+    async function getJobs(): Promise<void> {
+      await fetchData("../api/jobs/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((response) => response.json())
+        .then((data) => setJobs(data))
+        .catch((error) => console.error("Error:", error))
+        .finally(() => setLoaded(true));
+    }
+    getJobs();
   }, []);
 
+  useEffect(() => {
+    async function postJob(): Promise<void> {
+      return await fetchData('../api/jobs/', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          "url": addedJob?.url,
+        }),
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        // remove the placeholder job and add the new job
+        setJobs([
+          ...jobs.filter((job) => job.id !== 0),
+          data
+        ]);
+        setAddedJob(null);
+      })
+      .catch((error) => console.error("Error:", error));
+    }
+    if (addedJob) {
+      postJob();
+    }
+  }, [addedJob]);
+
   function addJob(url: string): void {
-    setJobs([...jobs, {
-      "id": jobs.length + 1,
+    const placeholderJob: Job = {
+      "id": 0,
       "url": url,
-      "title": "???",
-      "company": "???",
+      "title": "",
+      "company": "",
       "text": "",
       "chat_messages": [],
       "date_applied": null,
-      "status": "backlog",
+      "status": "",
       "resume_template": null,
       "chosen_resume": null,
-    }]);
+    }
+    setJobs([...jobs, placeholderJob]);
+    setAddedJob(placeholderJob);
   };
 
   return (
@@ -101,6 +135,7 @@ function Board({ jobs, setJobs }: {
         }
         return job;
       }));
+      setDraggingJobId(-1);
     }
   }
 
@@ -186,9 +221,21 @@ function JobCard({ job, onDragStart }: {
   onDragStart: (e: React.DragEvent<HTMLDivElement>) => void,
 }): JSX.Element {
   return (
-    <div className="card mb-2 p-2 text-bg-primary" onDragStart={onDragStart} draggable="true">
-      <h6 className="card-title">{job.title}</h6>
-      <p className="card-subtitle">{job.company}</p>
+    <div className="card mb-2 p-2 text-bg-primary" onDragStart={onDragStart} draggable="true" role="listitem">
+      <h6 className="card-title">{
+        job.title ? job.title : (
+          <span className="placeholder-glow">
+            <span className="placeholder col-6"></span>
+          </span>
+        )
+      }</h6>
+      <p className="card-subtitle">{
+        job.company ? job.company : (
+          <span className="placeholder-glow">
+            <span className="placeholder col-7"></span>
+          </span>
+        )
+      }</p>
     </div>
   );
 }
