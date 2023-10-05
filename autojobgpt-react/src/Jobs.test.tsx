@@ -162,13 +162,52 @@ test('adding a job adds the same job to the backlog column', async () => {
   const backlogColumn: HTMLElement | null = getBacklogColumn();
   let backlogJobs: HTMLElement[] = [];
   if (backlogColumn) {
-    backlogJobs = queryAllByRole(backlogColumn, "listitem");
+    backlogJobs = getAllByRole(backlogColumn, "listitem");
   }
 
   // expect the number of jobs in the backlog column to be 1
   expect(backlogJobs.length).toBe(1);
 
   // expect the job in the backlog column to be the same as the job added
+  expect(backlogJobs[0]).toHaveTextContent(validJob1.title);
+  expect(backlogJobs[0]).toHaveTextContent(validJob1.company);
+});
+
+test('deleting a job removes the job from the backlog column', async () => {
+  mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
+  await renderRoute('/jobs');
+
+  // remove job 2
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse([], 204));
+  let backlogColumn: HTMLElement | null = getBacklogColumn();
+  let backlogJobs: HTMLElement[] = [];
+  if (backlogColumn) {
+    backlogJobs = getAllByRole(backlogColumn, "listitem");
+  }
+  for (const job of backlogJobs) {
+    if (job.textContent?.includes(validJob2.title)) {
+      const deleteButton: HTMLElement = getByRole(job, "button", {name: new RegExp("remove", "i")});
+      await act(async () => {
+        userEvent.click(deleteButton);
+      });
+      break;
+    }
+  }
+
+  // check that the API was called again to delete the job
+  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
+
+  // count the number of jobs in the backlog column
+  backlogColumn = getBacklogColumn();
+  backlogJobs = [];
+  if (backlogColumn) {
+    backlogJobs = getAllByRole(backlogColumn, "listitem");
+  }
+
+  // expect the number of jobs in the backlog column to be 1
+  expect(backlogJobs.length).toBe(1);
+
+  // expect the job in the backlog column to be the job that wasn't deleted
   expect(backlogJobs[0]).toHaveTextContent(validJob1.title);
   expect(backlogJobs[0]).toHaveTextContent(validJob1.company);
 });

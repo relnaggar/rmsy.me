@@ -31,6 +31,7 @@ export const STATUSES: string[] = [
 ]
 
 const LoadedContext: React.Context<boolean> = createContext<boolean>(false);
+const RemoveJobContext: React.Context<(jobId: number) => void> = createContext<(jobId: number) => void>(() => {});
 
 export default function Jobs({ fetchData }:
   { fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response> }
@@ -38,6 +39,7 @@ export default function Jobs({ fetchData }:
   const [jobs, setJobs]: [Job[], React.Dispatch<React.SetStateAction<Job[]>>] = useState<Job[]>([]);
   const [loaded, setLoaded]: [boolean, React.Dispatch<React.SetStateAction<boolean>>] = useState<boolean>(false);
   const [addedJob, setAddedJob]: [Job | null, React.Dispatch<React.SetStateAction<Job | null>>] = useState<Job | null>(null);
+  const [removedJobId, setRemovedJobId]: [number, React.Dispatch<React.SetStateAction<number>>] = useState<number>(-1);
 
   useEffect(() => {
     async function getJobs(): Promise<void> {
@@ -68,7 +70,7 @@ export default function Jobs({ fetchData }:
       .then((data) => {
         // remove the placeholder job and add the new job
         setJobs([
-          ...jobs.filter((job) => job.id !== 0),
+          ...jobs.filter((job) => job.id !== -1),
           data
         ]);
         setAddedJob(null);
@@ -80,9 +82,26 @@ export default function Jobs({ fetchData }:
     }
   }, [addedJob]);
 
+  useEffect(() => {
+    async function deleteJob(): Promise<void> {
+      return await fetchData(`../api/jobs/${removedJobId}/`, { 
+        method: 'DELETE', 
+        headers: { 'Content-Type': 'application/json' },
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        setRemovedJobId(-1);
+      })
+      .catch((error) => console.error("Error:", error));
+    }
+    if (removedJobId >= 0) {
+      deleteJob();
+    }
+  }, [removedJobId]);
+
   function addJob(url: string): void {
     const placeholderJob: Job = {
-      "id": 0,
+      "id": -1,
       "url": url,
       "title": "",
       "company": "",
@@ -97,12 +116,19 @@ export default function Jobs({ fetchData }:
     setAddedJob(placeholderJob);
   };
 
+  function removeJob(jobId: number): void {
+    setJobs(jobs.filter((job) => job.id !== jobId));
+    setRemovedJobId(jobId);
+  }
+
   return (
     <>
       <main>
-        <LoadedContext.Provider value={loaded}>
-          <Board jobs={jobs} setJobs={setJobs} />
-        </LoadedContext.Provider>
+        <RemoveJobContext.Provider value={removeJob}>
+          <LoadedContext.Provider value={loaded}>
+            <Board jobs={jobs} setJobs={setJobs} />
+          </LoadedContext.Provider>
+        </RemoveJobContext.Provider>
       </main>
       <AddJobModal addJob={addJob} />
     </>
@@ -218,24 +244,39 @@ function Column({ title, jobs, onDragStart, onDragOver, onDrop }: {
 
 function JobCard({ job, onDragStart }: {
   job: Job,
-  onDragStart: (e: React.DragEvent<HTMLDivElement>) => void,
+  onDragStart: (e: React.DragEvent<HTMLDivElement>) => void
 }): JSX.Element {
+  const removeJob: (jobId: number) => void = useContext(RemoveJobContext);
+
+  function handleRemove(jobId: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
+    return (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      removeJob(jobId);
+    }
+  }
+
   return (
-    <div className="card mb-2 p-2 text-bg-primary" onDragStart={onDragStart} draggable="true" role="listitem">
-      <h6 className="card-title">{
-        job.title ? job.title : (
-          <span className="placeholder-glow">
-            <span className="placeholder col-6"></span>
-          </span>
-        )
-      }</h6>
-      <p className="card-subtitle">{
-        job.company ? job.company : (
-          <span className="placeholder-glow">
-            <span className="placeholder col-7"></span>
-          </span>
-        )
-      }</p>
+    <div className="card mb-2 p-2 text-bg-primary" role="listitem"
+      onDragStart={job.title ? onDragStart : ()=>{}}
+      draggable={job.title ? true : false}  
+      aria-busy={job.title ? false : true}
+    >
+      {job.title ?
+        <span className="d-flex justify-content-between">
+          <h6 className="card-title">{job.title}</h6>
+          <button type="button" className="btn-close" aria-label="Remove" onClick={handleRemove(job.id)}></button>
+        </span>
+      :
+        <span className="placeholder-glow">
+          <span className="placeholder col-6"></span>
+        </span>
+      }
+      {job.company ?
+        <p className="card-subtitle">{job.company}</p>
+      :
+        <span className="placeholder-glow">
+          <span className="placeholder col-7"></span>
+        </span>
+      }
     </div>
   );
 }
@@ -244,7 +285,6 @@ function AddJobModal({ addJob }: {
   addJob: (url: string) => void,
 }): JSX.Element {
   const [url, setUrl]: [string, React.Dispatch<React.SetStateAction<string>>] = useState<string>("");
-  const [isSubmitEnabled, setIsSubmitEnabled]: [boolean, React.Dispatch<React.SetStateAction<boolean>>] = useState<boolean>(false);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault();
@@ -256,18 +296,11 @@ function AddJobModal({ addJob }: {
       document.querySelector(".modal-backdrop")?.remove();
     }
     setUrl("");
-    setIsSubmitEnabled(false);
     addJob(url);
   }
 
   function handleUrlChange(e: React.ChangeEvent<HTMLInputElement>): void {
     setUrl(e.target.value);
-    // validate url using html input validation
-    if (e.target.checkValidity()) {
-      setIsSubmitEnabled(true);
-    } else {
-      setIsSubmitEnabled(false);
-    }
   }
 
   return (
@@ -287,7 +320,7 @@ function AddJobModal({ addJob }: {
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" className="btn btn-primary" disabled={isSubmitEnabled ? false : true} >Submit</button>
+                <button type="submit" className="btn btn-primary">Submit</button>
               </div>
             </form>
           </div>
