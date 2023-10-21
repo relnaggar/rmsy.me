@@ -6,24 +6,33 @@ from json import loads
 from docx import Document
 from io import BytesIO
 from re import findall
-import requests
+from os import system
 
 from .scraping import scrape_text
 from .gpt import Chat
 
 
+class ResumeTemplateManager(models.Manager):
+  def create(self, validated_data):
+    resume_template = ResumeTemplate(name=validated_data["name"], upload=validated_data["upload"], description=validated_data["description"])
+    resume_template.save()
+    resume_template.generate_png()
+    resume_template.save()
+    return resume_template
+
 class ResumeTemplate(models.Model):
+  objects = ResumeTemplateManager()
   name = models.CharField(max_length=200, primary_key=True)
   upload = models.FileField(upload_to='templates/')
-  pdf = models.FileField(upload_to='templates/', blank=True)
+  png = models.FileField(upload_to='templates/')
   description = models.TextField(blank=True)
 
   def __str__(self):
     return self.name
   
   @property
-  def has_pdf(self):
-    return self.pdf.name.endswith(".pdf")
+  def has_png(self):
+    return self.png.name != ""
 
   def open_document(self):
     # open the template with docx
@@ -47,20 +56,34 @@ class ResumeTemplate(models.Model):
     # fillfields must be in the format {{key}}
     return findall(r"{{(.*?)}}", text)
   
-  def generate_pdf(self):
-    if self.has_pdf:
-      raise Exception("the template already has a pdf file")    
-    url = "http://gotenberg:3000/forms/libreoffice/convert"
-    files = {
-      'files': (self.upload.name, open(self.upload.path, 'rb')),
-    }
-    response = requests.post(url, files=files)
-    if response.status_code == 200:
-      file_stream = BytesIO(response.content)
-      file_name = self.upload.name.replace(".docx", ".pdf")
-      self.pdf.save(file_name, File(file_stream))
-    else:
-      raise Exception("could not generate pdf")
+  def generate_png(self):
+    if self.has_png:
+      raise Exception("the template already has a png file")
+    
+    # generate the pdf using libreoffice
+    print(f"upload.path: {self.upload.path}")
+    outdir = "/".join(self.upload.path.split("/")[:-1])
+    print(f"outdir: {outdir}")
+    system(f"libreoffice --headless --convert-to pdf {self.upload.path} --outdir {outdir}")
+    pdf_path = self.upload.path.replace(".docx", ".pdf")
+
+    # convert the pdf to png using pdftoppm
+    system(f"pdftoppm -f 1 -l 1 -png {pdf_path} {self.upload.path.replace('.docx', '')}")
+    png_path = self.upload.path.replace(".docx", "-1.png")
+
+    # remove the pdf file
+    system(f"rm {pdf_path}")
+
+    # read in the png as a file stream
+    png_file_stream = BytesIO()
+    with open(png_path, "rb") as f:
+      png_file_stream.write(f.read())
+    
+    # remove the extra png file
+    system(f"rm {png_path}")
+
+    # save the png file stream to the model with the same name as the docx file
+    self.png.save(png_path.split("/")[-1].replace("-1.png", ".png"), File(png_file_stream))
 
 
 class FillField(models.Model):
@@ -152,7 +175,7 @@ class Resume(models.Model):
   
   @property
   def has_docx(self):
-    return self.docx.name.endswith(".docx")
+    return self.docx.name != ""
   
   def get_next_version(self):
     return Resume.objects.filter(job=self.job).aggregate(models.Max('version'))["version__max"] + 1

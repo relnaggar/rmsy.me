@@ -52,7 +52,9 @@ RUN apt-get update -y \
   && pip3 install beautifulsoup4 \
   # docx
   && pip3 install python-docx \
-  # cleanup
+  # libreoffice-writer and poppler-utils for docx to png conversion
+  && apt-get install -y --no-install-recommends libreoffice-writer poppler-utils \
+  # cleanup  
   && apt autoremove -y \
   && rm -rf /var/lib/apt/lists/*
 

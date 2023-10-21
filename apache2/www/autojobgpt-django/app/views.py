@@ -17,11 +17,6 @@ class ResumeTemplateViewSet(viewsets.ModelViewSet):
   queryset = ResumeTemplate.objects.all()
   serializer_class = ResumeTemplateSerializer
 
-  @action(detail=True, methods=['get', 'post'])
-  def generate_pdf(self, request, pk=None):
-    ResumeTemplate.objects.get(pk=pk).generate_pdf()
-    return Response(self.serializer_class(self.get_object()).data)
-
 
 class FillFieldViewSet(viewsets.ModelViewSet):
   queryset = FillField.objects.all()
