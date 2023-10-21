@@ -6,6 +6,7 @@ from json import loads
 from docx import Document
 from io import BytesIO
 from re import findall
+import requests
 
 from .scraping import scrape_text
 from .gpt import Chat
@@ -14,11 +15,16 @@ from .gpt import Chat
 class ResumeTemplate(models.Model):
   name = models.CharField(max_length=200, primary_key=True)
   upload = models.FileField(upload_to='templates/')
+  pdf = models.FileField(upload_to='templates/', blank=True)
   description = models.TextField(blank=True)
 
   def __str__(self):
     return self.name
   
+  @property
+  def has_pdf(self):
+    return self.pdf.name.endswith(".pdf")
+
   def open_document(self):
     # open the template with docx
     return Document(self.upload.path)
@@ -40,6 +46,21 @@ class ResumeTemplate(models.Model):
     # extract all the fillfields from the template text
     # fillfields must be in the format {{key}}
     return findall(r"{{(.*?)}}", text)
+  
+  def generate_pdf(self):
+    if self.has_pdf:
+      raise Exception("the template already has a pdf file")    
+    url = "http://gotenberg:3000/forms/libreoffice/convert"
+    files = {
+      'files': (self.upload.name, open(self.upload.path, 'rb')),
+    }
+    response = requests.post(url, files=files)
+    if response.status_code == 200:
+      file_stream = BytesIO(response.content)
+      file_name = self.upload.name.replace(".docx", ".pdf")
+      self.pdf.save(file_name, File(file_stream))
+    else:
+      raise Exception("could not generate pdf")
 
 
 class FillField(models.Model):
@@ -107,7 +128,7 @@ class Job(models.Model):
 class Resume(models.Model):
   job = models.ForeignKey(to="Job", on_delete=models.CASCADE, related_name="resumes")  
   version = models.IntegerField(default=1)
-  upload = models.FileField(upload_to='resumes/')
+  docx = models.FileField(upload_to='resumes/')
   chat_messages = models.JSONField(blank=True, null=True)
 
   class Meta:
@@ -116,7 +137,7 @@ class Resume(models.Model):
     ]
 
   def __str__(self):
-    return self.upload.name.split("/")[-1].replace(".docx", "")
+    return self.docx.name.split("/")[-1].replace(".docx", "")
   
   @property
   def default_substitutions(self):
@@ -131,7 +152,7 @@ class Resume(models.Model):
   
   @property
   def has_docx(self):
-    return self.upload.name.endswith(".docx")
+    return self.docx.name.endswith(".docx")
   
   def get_next_version(self):
     return Resume.objects.filter(job=self.job).aggregate(models.Max('version'))["version__max"] + 1
@@ -208,8 +229,6 @@ f"""<fillfield>
   def generate_docx(self):
     if not self.is_filled:
       raise Exception("you have to fill the resume with .fill() before you can generate the docx file")
-    if self.has_docx:
-      raise Exception("you can only generate the docx file once")
 
     # open the template with docx
     template_document = self.job.resume_template.open_document()
@@ -232,7 +251,7 @@ f"""<fillfield>
     
     # save the file stream to the file field
     file_name = f"{self.job}_{self.version}.docx"    
-    self.upload.save(file_name, File(file_stream))   
+    self.docx.save(file_name, File(file_stream))    
 
   def regenerate(self, feedback=None):
     if not self.is_filled:
