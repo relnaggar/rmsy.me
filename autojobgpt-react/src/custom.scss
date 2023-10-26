@@ -41,3 +41,41 @@ $below-board-height: 15px;
     height: $card-footer-height;
   }
 }
+
+$document-scale: 0.25;
+$document-width: 1241px * $document-scale;
+$document-height: 1754px * $document-scale;
+
+.document {
+  width: fit-content;
+  position: relative;
+  flex: 0 0 auto;
+
+  .document-image {
+    width: $document-width;
+    height: $document-height;
+  }
+
+  img {
+    filter: blur(1px);
+  }  
+
+  .document-header, .document-footer, .document-body {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0%);
+  }
+
+  .document-header {
+    top: 0%;
+  }
+
+  .document-body {
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .document-footer {
+    bottom: 0%;
+  }
+}
