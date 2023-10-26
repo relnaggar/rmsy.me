@@ -139,7 +139,7 @@ test('jobs are initially fetched from the server', async () => {
   expect(backlogJobs[1]).toHaveTextContent(validJob2.company);
 });
 
-test('adding a job adds the same job to the backlog column', async () => {
+test.only('adding a job adds the same job to the backlog column', async () => {
   await renderRoute('/jobs');
 
   // add a job

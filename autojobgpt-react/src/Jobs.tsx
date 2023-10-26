@@ -23,7 +23,7 @@ export type Job = {
 export const STATUSES: string[] = [
   "backlog",
   "applying",
-  "pending",
+  "applied",
   "testing",
   "interviewing",
   "rejected",
@@ -35,7 +35,7 @@ const RemoveJobContext: React.Context<(jobId: number) => void> = createContext<(
 
 export default function Jobs({ fetchData }:
   { fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response> }
-): JSX.Element {
+): React.JSX.Element {
   const [jobs, setJobs]: [Job[], React.Dispatch<React.SetStateAction<Job[]>>] = useState<Job[]>([]);
   const [loaded, setLoaded]: [boolean, React.Dispatch<React.SetStateAction<boolean>>] = useState<boolean>(false);
   const [addedJob, setAddedJob]: [Job | null, React.Dispatch<React.SetStateAction<Job | null>>] = useState<Job | null>(null);
@@ -55,7 +55,7 @@ export default function Jobs({ fetchData }:
         .finally(() => setLoaded(true));
     }
     getJobs();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     async function postJob(): Promise<void> {
@@ -80,7 +80,7 @@ export default function Jobs({ fetchData }:
     if (addedJob) {
       postJob();
     }
-  }, [addedJob]);
+  }, [addedJob]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     async function deleteJob(): Promise<void> {
@@ -97,7 +97,7 @@ export default function Jobs({ fetchData }:
     if (removedJobId >= 0) {
       deleteJob();
     }
-  }, [removedJobId]);
+  }, [removedJobId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function addJob(url: string): void {
     const placeholderJob: Job = {
@@ -138,7 +138,7 @@ export default function Jobs({ fetchData }:
 function Board({ jobs, setJobs }: {
   jobs: Job[],
   setJobs: React.Dispatch<React.SetStateAction<Job[]>>,
-}): JSX.Element {
+}): React.JSX.Element {
   const [draggingJobId, setDraggingJobId]: [number, React.Dispatch<React.SetStateAction<number>>] = useState<number>(-1);
 
   function handleDragStart(jobId: number): (e: React.DragEvent<HTMLDivElement>) => void {
@@ -191,7 +191,7 @@ function Column({ title, jobs, onDragStart, onDragOver, onDrop }: {
   onDragStart: (jobId: number) => (e: React.DragEvent<HTMLDivElement>) => void,
   onDragOver: (e: React.DragEvent<HTMLDivElement>) => void,
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void,
-}): JSX.Element {
+}): React.JSX.Element {
   const loaded: boolean = useContext(LoadedContext);
 
   function handleAddJobClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
@@ -234,7 +234,7 @@ function Column({ title, jobs, onDragStart, onDragOver, onDrop }: {
               data-bs-toggle="modal"
               data-bs-target="#addJobModal"
               onClick={handleAddJobClick}
-            >+ Add a job</button>
+            >+ Add job</button>
           : "" }
         </div>
       </div>
@@ -245,7 +245,7 @@ function Column({ title, jobs, onDragStart, onDragOver, onDrop }: {
 function JobCard({ job, onDragStart }: {
   job: Job,
   onDragStart: (e: React.DragEvent<HTMLDivElement>) => void
-}): JSX.Element {
+}): React.JSX.Element {
   const removeJob: (jobId: number) => void = useContext(RemoveJobContext);
 
   function handleRemove(jobId: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
@@ -283,9 +283,7 @@ function JobCard({ job, onDragStart }: {
 
 function AddJobModal({ addJob }: {
   addJob: (url: string) => void,
-}): JSX.Element {
-  const [url, setUrl]: [string, React.Dispatch<React.SetStateAction<string>>] = useState<string>("");
-
+}): React.JSX.Element {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault();
     const modalElement: HTMLElement | null = document.getElementById("addJobModal");
@@ -295,36 +293,33 @@ function AddJobModal({ addJob }: {
       // Bootstrap is supposed to remove the modal-backdrop but it's not working properly
       document.querySelector(".modal-backdrop")?.remove();
     }
-    setUrl("");
+    const url: string = (document.getElementById("url") as HTMLInputElement).value;
     addJob(url);
-  }
-
-  function handleUrlChange(e: React.ChangeEvent<HTMLInputElement>): void {
-    setUrl(e.target.value);
+    e.currentTarget.reset();   
   }
 
   return (
     <div className="modal fade" id="addJobModal" tabIndex={-1} aria-labelledby="addJobModalLabel" aria-hidden="true">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h1 className="modal-title fs-5" id="addJobModalLabel">Add Job</h1>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form onSubmit={handleSubmit}>
-              <div className="modal-body">
-                <div className="mb-3">
-                  <label htmlFor="url" className="form-label">URL</label>
-                  <input type="url" className="form-control" id="url" value={url} onChange={handleUrlChange} required />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" className="btn btn-primary">Submit</button>
-              </div>
-            </form>
+      <div className="modal-dialog">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h1 className="modal-title fs-5" id="addJobModalLabel">Add Job</h1>
+            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
+          <form onSubmit={handleSubmit}>
+            <div className="modal-body">
+              <div className="mb-3">
+                <label htmlFor="url" className="form-label">URL</label>
+                <input type="url" className="form-control" id="url" name="url" required />
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" className="btn btn-primary">Submit</button>
+            </div>
+          </form>
         </div>
       </div>
+    </div>
   );
 }
