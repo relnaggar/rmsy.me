@@ -1,7 +1,7 @@
 import { Outlet, Link } from "react-router-dom";
 
 
-export default function Layout(): JSX.Element {
+export default function Layout(): React.JSX.Element {
   return (
     <div className="container">
 

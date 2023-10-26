@@ -9,6 +9,6 @@ const router = createBrowserRouter(routesConfig, {
   basename: routesBasename,
 });
 
-export default function App(): JSX.Element {
+export default function App(): React.JSX.Element {
   return <RouterProvider router={router} />
 }
