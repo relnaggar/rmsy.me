@@ -1,7 +1,7 @@
-import { useState, useEffect, createContext, useContext } from 'react';
-import { Modal } from 'bootstrap';
+import React, { useState, useEffect, createContext, useContext } from "react";
+import { Modal } from "bootstrap";
 
-import { toPascalCase } from './utilities';
+import { toPascalCase } from "./utilities";
 
 
 export type Job = {
@@ -30,16 +30,16 @@ export const STATUSES: string[] = [
   "accepted",
 ]
 
-const LoadedContext: React.Context<boolean> = createContext<boolean>(false);
-const RemoveJobContext: React.Context<(jobId: number) => void> = createContext<(jobId: number) => void>(() => {});
+const LoadedContext = createContext<boolean>(false);
+const RemoveJobContext = createContext<(jobId: number) => void>(() => {});
 
 export default function Jobs({ fetchData }:
   { fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response> }
 ): React.JSX.Element {
-  const [jobs, setJobs]: [Job[], React.Dispatch<React.SetStateAction<Job[]>>] = useState<Job[]>([]);
-  const [loaded, setLoaded]: [boolean, React.Dispatch<React.SetStateAction<boolean>>] = useState<boolean>(false);
-  const [addedJob, setAddedJob]: [Job | null, React.Dispatch<React.SetStateAction<Job | null>>] = useState<Job | null>(null);
-  const [removedJobId, setRemovedJobId]: [number, React.Dispatch<React.SetStateAction<number>>] = useState<number>(-1);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loaded, setLoaded] = useState<boolean>(false);
+  const [addedJob, setAddedJob] = useState<Job | null>(null);
+  const [removedJobId, setRemovedJobId] = useState<number>(-1);
 
   useEffect(() => {
     async function getJobs(): Promise<void> {
@@ -59,16 +59,15 @@ export default function Jobs({ fetchData }:
 
   useEffect(() => {
     async function postJob(): Promise<void> {
-      return await fetchData('../api/jobs/', { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' },
+      return await fetchData("../api/jobs/", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           "url": addedJob?.url,
         }),
       })
       .then((response) => response.json())
       .then((data) => {
-        // remove the placeholder job and add the new job
         setJobs([
           ...jobs.filter((job) => job.id !== -1),
           data
@@ -85,12 +84,13 @@ export default function Jobs({ fetchData }:
   useEffect(() => {
     async function deleteJob(): Promise<void> {
       return await fetchData(`../api/jobs/${removedJobId}/`, { 
-        method: 'DELETE', 
-        headers: { 'Content-Type': 'application/json' },
+        method: "DELETE", 
+        headers: { "Content-Type": "application/json" },
       })
-      .then((response) => response.json())
-      .then((data) => {
-        setRemovedJobId(-1);
+      .then((response) => {
+        if (response.status === 204) {
+          setRemovedJobId(-1);
+        }
       })
       .catch((error) => console.error("Error:", error));
     }
@@ -139,7 +139,7 @@ function Board({ jobs, setJobs }: {
   jobs: Job[],
   setJobs: React.Dispatch<React.SetStateAction<Job[]>>,
 }): React.JSX.Element {
-  const [draggingJobId, setDraggingJobId]: [number, React.Dispatch<React.SetStateAction<number>>] = useState<number>(-1);
+  const [draggingJobId, setDraggingJobId] = useState<number>(-1);
 
   function handleDragStart(jobId: number): (e: React.DragEvent<HTMLDivElement>) => void {
     return (e: React.DragEvent<HTMLDivElement>): void => {
@@ -196,7 +196,7 @@ function Column({ title, jobs, onDragStart, onDragOver, onDrop }: {
 
   function handleAddJobClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
     const jobModal: HTMLElement | null = document.getElementById("addJobModal");
-    jobModal?.addEventListener('shown.bs.modal', () => {
+    jobModal?.addEventListener("shown.bs.modal", () => {
       document.getElementById("url")?.focus();
     });
   }

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Modal } from 'bootstrap';
+import React, { useState, useEffect, createContext } from "react";
+import { Modal } from "bootstrap";
 
 type ResumeTemplateUpload = {
   name: string,
@@ -7,36 +7,26 @@ type ResumeTemplateUpload = {
   description?: string
 }
 
-type ResumeTemplateDownload = {
+export type ResumeTemplateDownload = {
   name: string
   upload: string,
   png: string,
   description?: string
 }
 
+const RemoveTemplateContext = createContext<((templateName: string) => void)>(() => {});
+
 export default function Resumes({ fetchData }: {
   fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>
 }): React.JSX.Element {
-  const [templates, setTemplates]: [
-    ResumeTemplateDownload[], React.Dispatch<React.SetStateAction<ResumeTemplateDownload[]>>
-  ] = useState<ResumeTemplateDownload[]>([]);
-  const [addedTemplate, setAddedTemplate]: [
-    ResumeTemplateUpload | null, React.Dispatch<React.SetStateAction<ResumeTemplateUpload | null>>
-  ] = useState<ResumeTemplateUpload | null>(null);
-  const [loaded, setLoaded]: [
-    boolean, React.Dispatch<React.SetStateAction<boolean>>
-  ] = useState<boolean>(false);
-
-  function handleAddTemplateClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    const jobModal: HTMLElement | null = document.getElementById("addTemplateModal");
-    jobModal?.addEventListener('shown.bs.modal', () => {
-      document.getElementById("name")?.focus();
-    });
-  }
+  const [templates, setTemplates] = useState<ResumeTemplateDownload[]>([]);
+  const [addedTemplate, setAddedTemplate] = useState<ResumeTemplateUpload | null>(null);
+  const [loaded, setLoaded] = useState<boolean>(false);
+  const [removedTemplateName, setRemovedTemplateName] = useState<string>("");
 
   useEffect(() => {
     async function getTemplates(): Promise<void> {
-      return await fetchData('../api/templates/')
+      return await fetchData("../api/templates/")
       .then((response) => response.json())
       .then((data) => {
         setTemplates(data);
@@ -49,15 +39,14 @@ export default function Resumes({ fetchData }: {
 
   useEffect(() => {
     async function postTemplate(formData: FormData): Promise<void> {
-      return await fetchData('../api/templates/', { 
-        method: 'POST', 
+      return await fetchData("../api/templates/", { 
+        method: "POST", 
         body: formData
       })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setTemplates([
-          ...templates.filter((template) => template.upload !== ''),
+          ...templates.filter((template) => template.upload !== ""),
           data
         ]);
         setAddedTemplate(null);
@@ -73,21 +62,53 @@ export default function Resumes({ fetchData }: {
     }
   }, [addedTemplate]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    async function deleteTemplate(): Promise<void> {
+      return await fetchData(`../api/templates/${removedTemplateName}/`, { 
+        method: "DELETE", 
+        headers: { "Content-Type": "application/json" },
+      })
+      .then((response) => {
+        if (response.status === 204) {
+          setRemovedTemplateName("");
+        }
+      })
+      .catch((error) => console.error("Error:", error));
+    }
+    if (removedTemplateName !== "") {
+      deleteTemplate();
+    }
+  }, [removedTemplateName]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleAddTemplateClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    const jobModal: HTMLElement | null = document.getElementById("addTemplateModal");
+    jobModal?.addEventListener("shown.bs.modal", () => {
+      document.getElementById("name")?.focus();
+    });
+  }
+
   function addTemplate(template: ResumeTemplateUpload): void {
     const placeholderTemplate: ResumeTemplateDownload = {
       name: template.name,
-      upload: '',
-      png: '',
+      upload: "",
+      png: "",
       description: template.description
     }
     setTemplates([...templates, placeholderTemplate]);
     setAddedTemplate(template);
+  }  
+
+  function removeTemplate(templateName: string): void {
+    setTemplates(templates.filter((template) => template.name !== templateName));
+    setRemovedTemplateName(templateName);
   }
 
   return (
     <>
       <main>
-        <ResumeTemplates templates={templates} onAddTemplateClick={handleAddTemplateClick} loaded={loaded} />
+        <RemoveTemplateContext.Provider value={removeTemplate}>
+          <ResumeTemplates templates={templates} onAddTemplateClick={handleAddTemplateClick} loaded={loaded} />
+        </RemoveTemplateContext.Provider>
       </main>
       <AddTemplateModal addTemplate={addTemplate} />
     </>
@@ -120,26 +141,28 @@ function ResumeTemplates({ templates, onAddTemplateClick, loaded }: {
 function ResumeTemplate({ template }: {
   template: ResumeTemplateDownload
 }): React.JSX.Element {
+  const removeTemplate: (templateName: string) => void = React.useContext(RemoveTemplateContext);
+
   return (
     <div className="document text-center me-3">
-      {template.png === '' ?
+      {template.png === "" ?
         <div className="document-image img-thumbnail text-start">
           <p className="placeholder-glow pt-5">
             {generatePlaceholderWidths(15).map((width, index) => {
               return (
                 width === 0 ?
-                  <br />
+                  <br key={index} />
                 :
-                  <span className={"placeholder me-1 col-"+width} key={index}></span>
+                  <span className={`placeholder me-1 col-${width}`} key={index}></span>
               );                  
             })}
           </p>
         </div>
       :
-        <img src={template.png} className="document-image img-thumbnail" alt={template.name} />
+        <img src={template.png} className="document-image img-thumbnail" alt={`resume template '${template.name}'`} />
       }
       <div className="document-header d-flex justify-content-between w-100 p-2 border-bottom border-3 border-dark bg-dark bg-opacity-50 rounded-top">
-        {template.name === '' ?
+        {template.name === "" ?
           <h6 className="p-1 m-0 bg-body border rounded w-50">
             <div className="placeholder-glow text-start">
               <span className="placeholder w-100"></span>
@@ -148,20 +171,20 @@ function ResumeTemplate({ template }: {
         :
           <h6 className="p-1 m-0 bg-body border rounded">{template.name}</h6>
         }
-        {template.name !== '' &&
-          <button type="button" className="btn-close" aria-label="Remove" onClick={() => {}}></button>
+        {template.name !== "" &&
+          <button type="button" className="btn-close" aria-label="Remove" onClick={(e) => removeTemplate(template.name)}></button>
         }
       </div>
-      {template.png === '' &&
+      {template.png === "" &&
         <div className="document-body">
           <div className="spinner-border" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
         </div>
       }
-      {template.upload !== '' && 
+      {template.upload !== "" && 
         <div className="document-footer pb-4">
-          <a href={template.upload} className="btn btn-primary">Download</a>       
+          <a href={template.upload} className="btn btn-primary" role="button">Download</a>       
         </div>
       }
     </div>
@@ -189,9 +212,9 @@ function AddResumeButton({ onAddTemplateClick }: {
 
 function ResumeTemplatePlaceholder(): React.JSX.Element {
   return <ResumeTemplate template={{
-    name: '',
-    upload: '',
-    png: ''
+    name: "",
+    upload: "",
+    png: ""
   }} />;
 }
 
@@ -274,5 +297,4 @@ function AddTemplateModal({ addTemplate }: {
       </div>
     </div>
   )
-
 }

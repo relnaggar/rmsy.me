@@ -1,11 +1,12 @@
 import { Job } from "./Jobs";
+import { ResumeTemplateDownload } from "./Resumes";
 
 export function generateResponse(data: any, status: number = 200): () => Promise<Response> {
   return async () => new Response(
     JSON.stringify(data), {
       status: status,
       headers: {
-        'Content-type': 'application/json',
+        "Content-type": "application/json",
       },
     }
   );
@@ -35,4 +36,18 @@ export const validJob2: Job = {
   status: "",
   resume_template: null,
   chosen_resume: null,
+}
+
+export const validResumeTemplate1: ResumeTemplateDownload = {
+  name: "Test Resume Template",
+  description: "Test Description",
+  upload: "https://www.example.com/test.docx",
+  png: "https://www.example.com/test.png",
+}
+
+export const validResumeTemplate2: ResumeTemplateDownload = {
+  name: "Test Resume Template 2",
+  description: "Test Description 2",
+  upload: "https://www.example.com/test2.docx",
+  png: "https://www.example.com/test2.png",
 }

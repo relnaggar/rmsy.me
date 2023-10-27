@@ -1,5 +1,5 @@
-import { injectMocks, mockFunctions, renderRoute, testRouteAndAllChildren } from './testUtilities';
-import { routesConfig }  from './routesConfig';
+import { injectMocks, renderRoute, testRouteAndAllChildren } from "./testUtilities";
+import { routesConfig }  from "./routesConfig";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -7,7 +7,7 @@ beforeEach(() => {
 });
 
 
-describe('every route renders without errors', () => {
+describe("every route renders without errors", () => {
   const theTest: (routePath: string) => void = function(routePath: string): void {
     test(`route ${routePath} renders without errors`, async () => {
       await renderRoute(routePath);

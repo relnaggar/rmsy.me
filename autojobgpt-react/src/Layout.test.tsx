@@ -1,7 +1,7 @@
-import { screen } from '@testing-library/react';
+import { screen } from "@testing-library/react";
 
-import { routesConfig }  from './routesConfig';
-import { injectMocks, mockFunctions, renderRoute, testRouteAndAllChildren } from './testUtilities';
+import { routesConfig }  from "./routesConfig";
+import { injectMocks, renderRoute, testRouteAndAllChildren } from "./testUtilities";
 
 
 beforeEach(() => {
@@ -9,9 +9,9 @@ beforeEach(() => {
   injectMocks();
 });
 
-const MENU_LINKS: string[] = ['Jobs', 'Resumes', 'API', 'Admin'];
+const MENU_LINKS: string[] = ["Jobs", "Resumes", "API", "Admin"];
 
-describe('every route displays the menu', () => {
+describe("every route displays the menu", () => {
   const theTest: (routePath: string) => void = function(routePath: string): void {
     for (const menuLink of MENU_LINKS) {
       test(`route ${routePath} displays the menu link ${menuLink}`, async () => {

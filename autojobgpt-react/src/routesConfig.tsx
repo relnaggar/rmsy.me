@@ -1,9 +1,9 @@
-import { RouteObject } from 'react-router-dom';
+import { RouteObject } from "react-router-dom";
 
-import Layout from './Layout';
-import Home from './Home';
-import Jobs from './Jobs';
-import Resumes from './Resumes';
+import Layout from "./Layout";
+import Home from "./Home";
+import Jobs from "./Jobs";
+import Resumes from "./Resumes";
 
 
 export const routesBasename = "/autojobgpt/app";
