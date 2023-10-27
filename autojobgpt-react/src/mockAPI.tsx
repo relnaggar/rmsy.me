@@ -14,10 +14,10 @@ export function generateResponse(data: any, status: number = 200): () => Promise
 
 export const validJob1: Job = {
   id: 1,
-  url: "https://www.example.com",
-  title: "Test Job",
-  company: "Test Company",
-  text: "Test Text",    
+  url: "https://www.example1.com",
+  title: "Test Job 1",
+  company: "Test Company 1",
+  text: "Test Text 1",    
   chat_messages: [],
   date_applied: null,
   status: "",
@@ -39,10 +39,10 @@ export const validJob2: Job = {
 }
 
 export const validResumeTemplate1: ResumeTemplateDownload = {
-  name: "Test Resume Template",
-  description: "Test Description",
-  upload: "https://www.example.com/test.docx",
-  png: "https://www.example.com/test.png",
+  name: "Test Resume Template 1",
+  description: "Test Description 1",
+  upload: "https://www.example.com/test1.docx",
+  png: "https://www.example.com/test1.png",
 }
 
 export const validResumeTemplate2: ResumeTemplateDownload = {

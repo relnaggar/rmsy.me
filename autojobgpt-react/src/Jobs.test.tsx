@@ -101,46 +101,46 @@ test("add job modal has a url input", async () => {
   expect(urlInput).toBeInTheDocument();
 });
 
-function queryJobs(): HTMLElement[] {
+function queryBacklogJobs(): HTMLElement[] {
   const backlogColumn: HTMLElement = getBacklogColumn();
   const jobs = queryAllByRole(backlogColumn, "listitem");
   return jobs;
 }
 
-test("jobs are initially fetched from the server if there are any", async () => {
+test("backlog jobs are initially fetched from the server if there are any", async () => {
   mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
   await renderThisRoute();
   expect(mockFunctions.fetchData).toHaveBeenCalledTimes(1);
   expect(mockFunctions.fetchData).toHaveBeenCalledWith("../api/jobs/", expect.objectContaining({
     method: "GET"
   }));
-  const jobs: HTMLElement[] = queryJobs();
+  const jobs: HTMLElement[] = queryBacklogJobs();
   expect(jobs.length).toBe(2);
 });
 
-test("if there are no jobs fetched then none are displayed", async () => {
+test("if there are no backlog jobs fetched then none are displayed", async () => {
   mockFunctions.fetchData.mockImplementation(generateResponse([]));
   await renderThisRoute();
   expect(mockFunctions.fetchData).toHaveBeenCalledTimes(1);
   expect(mockFunctions.fetchData).toHaveBeenCalledWith("../api/jobs/", expect.objectContaining({
     method: "GET"
   }));
-  const jobs: HTMLElement[] = queryJobs();
+  const jobs: HTMLElement[] = queryBacklogJobs();
   expect(jobs.length).toBe(0);
 });
 
-test("jobs are displayed with their titles", async () => {
+test("backlog jobs are displayed with their titles", async () => {
   mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
   await renderThisRoute();
-  const jobs: HTMLElement[] = queryJobs();
+  const jobs: HTMLElement[] = queryBacklogJobs();
   expect(jobs[0]).toHaveTextContent(validJob1.title);
   expect(jobs[1]).toHaveTextContent(validJob2.title);
 });
 
-test("jobs are displayed with their companies", async () => {
+test("backlog jobs are displayed with their companies", async () => {
   mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
   await renderThisRoute();
-  const jobs: HTMLElement[] = queryJobs();
+  const jobs: HTMLElement[] = queryBacklogJobs();
   expect(jobs[0]).toHaveTextContent(validJob1.company);
   expect(jobs[1]).toHaveTextContent(validJob2.company);
 });
@@ -178,33 +178,36 @@ test("adding a job adds the same job to the backlog column", async () => {
   expect(addedJob).toHaveTextContent(validJob1.company);
 });
 
-test("deleting a job removes the job from the backlog column", async () => {
+function getBacklogJobByTitle(title: string): HTMLElement {
+  const backlogJobs: HTMLElement[] = queryBacklogJobs();
+  const matchingJob: HTMLElement = backlogJobs.find((job: HTMLElement) => {
+    const jobHeading: HTMLElement | null = queryByRole(job, "heading", {name: title});
+    return jobHeading && jobHeading.textContent === title;
+  })!;
+  return matchingJob;
+}
+
+test("deleting a job removes it from the backlog column", async () => {
   mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
   await renderThisRoute();
 
-  // remove job 2
+  // delete validJob2
   mockFunctions.fetchData.mockImplementationOnce(generateResponse([], 204));
-  let backlogJobs: HTMLElement[] = getAllByRole(getBacklogColumn(), "listitem");
-  for (const job of backlogJobs) {
-    if (job.textContent?.includes(validJob2.title)) {
-      const deleteButton: HTMLElement = getByRole(job, "button", {name: new RegExp("remove", "i")});
-      await act(async () => {
-        userEvent.click(deleteButton);
-      });
-      break;
-    }
-  }
+  const matchingJob: HTMLElement = getBacklogJobByTitle(validJob2.title);
+  const deleteButton: HTMLElement = getByRole(matchingJob, "button", {name: new RegExp("delete", "i")});
+  await act(async () => {
+    userEvent.click(deleteButton);
+  });
 
   // check that the API was called again to delete the job
   expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
+  expect(mockFunctions.fetchData).toHaveBeenCalledWith(`../api/jobs/${validJob2.id}/`, expect.objectContaining({
+    method: "DELETE"
+  }));
 
-  // count the number of jobs in the backlog column
-  backlogJobs = getAllByRole(getBacklogColumn(), "listitem");
-
-  // expect the number of jobs in the backlog column to be 1
+  // check that the only job left in the backlog column is the job that wasn't deleted
+  const backlogJobs: HTMLElement[] = queryBacklogJobs();
   expect(backlogJobs.length).toBe(1);
-
-  // expect the job in the backlog column to be the job that wasn't deleted
   expect(backlogJobs[0]).toHaveTextContent(validJob1.title);
   expect(backlogJobs[0]).toHaveTextContent(validJob1.company);
 });

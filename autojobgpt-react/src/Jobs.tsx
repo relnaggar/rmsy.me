@@ -263,7 +263,7 @@ function JobCard({ job, onDragStart }: {
       {job.title ?
         <span className="d-flex justify-content-between">
           <h6 className="card-title">{job.title}</h6>
-          <button type="button" className="btn-close" aria-label="Remove" onClick={handleRemove(job.id)}></button>
+          <button type="button" className="btn-close" aria-label="Delete" onClick={handleRemove(job.id)}></button>
         </span>
       :
         <span className="placeholder-glow">

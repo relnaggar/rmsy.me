@@ -1,4 +1,4 @@
-import { screen, getAllByRole, getByRole, getByLabelText, queryAllByRole, act } from "@testing-library/react";
+import { screen, getAllByRole, getByRole, getByLabelText, queryByRole, queryAllByRole, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { injectMocks, renderRoute, openAndGetModal, getSubmitButton, mockFunctions, closeModal } from "./testUtilities";
@@ -126,12 +126,12 @@ test("resume templates are displayed with their images", async () => {
   expect(resumeTemplates[1].querySelector("img")?.src).toBe(validResumeTemplate2.png);
 });
 
-test("resume templates are displayed with a remove button", async () => {
+test("resume templates are displayed with a delete button", async () => {
   mockFunctions.fetchData.mockImplementation(generateResponse([validResumeTemplate1,validResumeTemplate2]));
   await renderThisRoute();
   const resumeTemplates: HTMLElement[] = queryResumeTemplates();
   for (const resumeTemplate of resumeTemplates) {
-    const deleteButton: HTMLElement = getByRole(resumeTemplate, "button", {name: new RegExp("remove", "i")});
+    const deleteButton: HTMLElement = getByRole(resumeTemplate, "button", {name: new RegExp("delete", "i")});
     expect(deleteButton).toBeInTheDocument();
   }
 });
@@ -181,4 +181,39 @@ test("adding a job adds the same job to the backlog column", async () => {
   expect(resumeTemplates.length).toBe(1);
   const addedResumeTemplate: HTMLElement = resumeTemplates[0];
   expect(addedResumeTemplate).toHaveTextContent(validResumeTemplate1.name);
+});
+
+function getResumeTemplateByName(name: string): HTMLElement {
+  const resumeTemplates: HTMLElement[] = queryResumeTemplates();
+  const matchingResumeTemplate: HTMLElement = resumeTemplates.find((resumeTemplate: HTMLElement) => {
+    const resumeHeading: HTMLElement | null = queryByRole(resumeTemplate, "heading", {name: name});
+    return resumeHeading && resumeHeading.textContent === name;
+  }
+  )!;
+  return matchingResumeTemplate;
+}
+
+test("deleting a resume template removes it from the backlog column", async () => {
+  mockFunctions.fetchData.mockImplementation(generateResponse([validResumeTemplate1,validResumeTemplate2]));
+  await renderThisRoute();
+
+  // delete validResumeTemplate2
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse([], 204));
+  const matchingResumeTemplate: HTMLElement = getResumeTemplateByName(validResumeTemplate2.name);
+  const deleteButton: HTMLElement = getByRole(matchingResumeTemplate, "button", {name: new RegExp("delete", "i")});
+  await act(async () => {
+    userEvent.click(deleteButton);
+  });
+
+  // check that the API was called again to delete the resume template
+  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
+  expect(mockFunctions.fetchData).toHaveBeenCalledWith(
+    `../api/templates/${validResumeTemplate2.name}/`,
+    expect.objectContaining({method: "DELETE"}
+  ));
+
+  // check that the only resume left is the one that wasn't deleted
+  const resumeTemplates: HTMLElement[] = queryResumeTemplates();
+  expect(resumeTemplates.length).toBe(1);
+  expect(resumeTemplates[0]).toHaveTextContent(validResumeTemplate1.name);
 });

@@ -69,7 +69,7 @@ export default function Resumes({ fetchData }: {
     }
   }, [addedTemplate]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // remove template from server if removedTemplateName is changed to a non-empty string
+  // delete template from server if removedTemplateName is changed to a non-empty string
   useEffect(() => {
     async function deleteTemplate(): Promise<void> {
       await fetchData(`../api/templates/${removedTemplateName}/`, { 
@@ -98,7 +98,7 @@ export default function Resumes({ fetchData }: {
     setAddedTemplate(templateUpload);
   }  
 
-  // remove template from templates state and queue template to be removed from server
+  // remove template from templates state and queue template to be deleted from server
   function removeTemplate(templateName: string): void {
     setTemplates(templates.filter((template) => template.name !== templateName));
     setRemovedTemplateName(templateName);
@@ -179,7 +179,7 @@ function ResumeTemplate({ template }: {
           <h6 className="p-1 m-0 bg-body border rounded">{template.name}</h6>
         }
         {template.name !== "" &&
-          <button type="button" className="btn-close" aria-label="Remove" onClick={(e) => removeTemplate(template.name)}></button>
+          <button type="button" className="btn-close" aria-label="Delete" onClick={(e) => removeTemplate(template.name)}></button>
         }
       </div>
 
@@ -205,7 +205,7 @@ function ResumeTemplate({ template }: {
 function AddResumeButton(): React.JSX.Element {
   // focus on name input when add template modal is shown
   function handleAddTemplateClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    const jobModal: HTMLElement = document.getElementById("addTemplateModal") as HTMLInputElement;
+    const jobModal: HTMLElement = document.getElementById("addTemplateModal")!;
     jobModal.addEventListener("shown.bs.modal", () => {
       document.getElementById("name")?.focus();
     });
@@ -269,7 +269,7 @@ function AddTemplateModal({ addTemplate }: {
     e.preventDefault();
 
     // close modal
-    const modalElement: HTMLElement = document.getElementById("addTemplateModal") as HTMLInputElement;
+    const modalElement: HTMLElement = document.getElementById("addTemplateModal")!;
     if (modalElement) {
       Modal.getInstance(modalElement)?.toggle();
       // Bootstrap is supposed to remove the modal-backdrop but it's not working properly
@@ -278,7 +278,7 @@ function AddTemplateModal({ addTemplate }: {
     
     // add template
     const name: string = (document.getElementById("name") as HTMLInputElement).value;
-    const upload: File = ((document.getElementById("upload") as HTMLInputElement).files as FileList)[0];
+    const upload: File = (document.getElementById("upload") as HTMLInputElement).files![0];
     const description: string = (document.getElementById("description") as HTMLInputElement).value;
     const templateUpload: ResumeTemplateUpload = { name, upload, description };
     addTemplate(templateUpload);
