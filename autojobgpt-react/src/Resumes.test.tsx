@@ -1,6 +1,7 @@
-import { screen, getAllByRole, getByRole, getByLabelText } from "@testing-library/react";
+import { screen, getAllByRole, getByRole, getByLabelText, queryAllByRole, act } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
-import { injectMocks, renderRoute, openAndGetModal, getSubmitButton, mockFunctions } from "./testUtilities";
+import { injectMocks, renderRoute, openAndGetModal, getSubmitButton, mockFunctions, closeModal } from "./testUtilities";
 import { generateResponse, validResumeTemplate1, validResumeTemplate2 } from "./mockAPI";
 import { ResumeTemplateDownload } from "./Resumes";
 
@@ -13,8 +14,15 @@ async function renderThisRoute(): Promise<void> {
   await renderRoute("/resumes");
 }
 
+function getResumeTemplateSection(): HTMLElement {
+  const resumeTemplateHeading: HTMLElement = screen.getByRole("heading", {name: new RegExp("templates", "i"), level: 2});
+  const resumeTemplateSection: HTMLElement = resumeTemplateHeading.parentElement as HTMLElement;
+  return resumeTemplateSection;
+}
+
 function getAddResumeTemplateButton(): HTMLElement {
-  return screen.getByRole("button", {name: new RegExp("add resume template", "i")});
+  const resumeTemplateSection: HTMLElement = getResumeTemplateSection();
+  return getByRole(resumeTemplateSection, "button", {name: new RegExp("add resume template", "i")});
 }
 
 test("add resume template button appears", async () => {
@@ -75,10 +83,13 @@ test("resume templates are initially fetched from the server", async () => {
 });
 
 function queryResumeTemplates(): HTMLElement[] {
-  // resume templates are elements with a child img with alt text containing "resume template"
-  return screen.queryAllByRole("img", {name: new RegExp("resume template", "i")}).map(
-    (img: HTMLElement) => img.parentElement as HTMLElement
+  // resume templates are listitems in the resume template section that don't have the aria-busy attribute set to true
+  const resumeTemplatesSection: HTMLElement = getResumeTemplateSection();  
+  const listItems: HTMLElement[] = queryAllByRole(resumeTemplatesSection, "listitem");
+  const resumeTemplates: HTMLElement[] = listItems.filter((listItem: HTMLElement) => 
+    !listItem.hasAttribute("aria-busy") || listItem.getAttribute("aria-busy") === "false"
   );
+  return resumeTemplates;
 }
 
 test("resume templates are initially fetched from the server", async () => {
@@ -88,6 +99,15 @@ test("resume templates are initially fetched from the server", async () => {
   expect(mockFunctions.fetchData).toHaveBeenCalledWith("../api/templates/");
   const resumeTemplates: HTMLElement[] = queryResumeTemplates();
   expect(resumeTemplates.length).toBe(2);
+});
+
+test("if there are no resume templates fetched then none are displayed", async () => {
+  mockFunctions.fetchData.mockImplementation(generateResponse([]));
+  await renderThisRoute();
+  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(1);
+  expect(mockFunctions.fetchData).toHaveBeenCalledWith("../api/templates/");
+  const resumeTemplates: HTMLElement[] = queryResumeTemplates();
+  expect(resumeTemplates.length).toBe(0);
 });
 
 test("resume templates are displayed with their names", async () => {
@@ -127,4 +147,38 @@ test("resume templates are displayed with a download button", async () => {
     expect(downloadButton).toBeInTheDocument();
     expect(downloadButton).toHaveAttribute("href", validResumeTemplates[i].upload);
   }
+});
+
+function closeResumeTemplateModal(): void {
+  closeModal("add resume template");
+}
+
+test("adding a job adds the same job to the backlog column", async () => {
+  await renderThisRoute();
+
+  // add a resume template
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse(validResumeTemplate1));
+  const addResumeTemplateModal: HTMLElement = await openAndGetAddResumeTemplateModal();
+  const nameInput: HTMLElement = getByRole(addResumeTemplateModal, "textbox", {name: new RegExp("name", "i")});
+  userEvent.type(nameInput, validResumeTemplate1.name);
+  const fileInput: HTMLElement = getByLabelText(addResumeTemplateModal, new RegExp("upload", "i"));
+  userEvent.upload(fileInput, new File([""], "test.docx", {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}));
+  const submitButton: HTMLElement = getSubmitButton(addResumeTemplateModal);
+  await act(async () => {
+    userEvent.click(submitButton);
+  });
+  closeResumeTemplateModal();
+
+  // check that the API was called again to add the resume template
+  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
+  expect(mockFunctions.fetchData).toHaveBeenCalledWith("../api/templates/", expect.objectContaining({
+    method: "POST",
+    body: expect.any(FormData)
+  }));
+
+  // check that the resume template was added
+  const resumeTemplates: HTMLElement[] = queryResumeTemplates();
+  expect(resumeTemplates.length).toBe(1);
+  const addedResumeTemplate: HTMLElement = resumeTemplates[0];
+  expect(addedResumeTemplate).toHaveTextContent(validResumeTemplate1.name);
 });

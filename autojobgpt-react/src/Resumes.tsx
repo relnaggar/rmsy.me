@@ -14,29 +14,29 @@ export type ResumeTemplateDownload = {
   description?: string
 }
 
-const RemoveTemplateContext = createContext<((templateName: string) => void)>(() => {});
+const RemoveTemplateContext = createContext<((name: string) => void)>(() => {});
 
 export default function Resumes({ fetchData }: {
   fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>
 }): React.JSX.Element {
   const [templates, setTemplates] = useState<ResumeTemplateDownload[]>([]);
-  const [addedTemplate, setAddedTemplate] = useState<ResumeTemplateUpload | null>(null);
-  const [loaded, setLoaded] = useState<boolean>(false);
+  const [templatesLoaded, setTemplatesLoaded] = useState<boolean>(false);
+  const [addedTemplate, setAddedTemplate] = useState<ResumeTemplateUpload | null>(null);  
   const [removedTemplateName, setRemovedTemplateName] = useState<string>("");
 
+  // fetch templates from server on page load
   useEffect(() => {
     async function getTemplates(): Promise<void> {
       return await fetchData("../api/templates/")
       .then((response) => response.json())
-      .then((data) => {
-        setTemplates(data);
-      })
+      .then((data) => setTemplates(data))
       .catch((error) => console.error("Error:", error))
-      .finally(() => setLoaded(true));
+      .finally(() => setTemplatesLoaded(true));
     }
     getTemplates();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // add template to server if addedTemplate is changed to a non-null value
   useEffect(() => {
     async function postTemplate(formData: FormData): Promise<void> {
       return await fetchData("../api/templates/", { 
@@ -45,59 +45,60 @@ export default function Resumes({ fetchData }: {
       })
       .then((response) => response.json())
       .then((data) => {
+        // replace placeholder template with template from server
         setTemplates([
           ...templates.filter((template) => template.upload !== ""),
           data
         ]);
+        // template has been added so set addedTemplate to null
         setAddedTemplate(null);
       })
       .catch((error) => console.error("Error:", error));
     }
-    if (addedTemplate) {
+
+    function toFormData(object: {[index: string]: string | File}): FormData {
       const formData: FormData = new FormData();
-      for (const [key, value] of Object.entries(addedTemplate)) {
+      for (const [key, value] of Object.entries(object)) {
         formData.append(key, value);
       }
-      postTemplate(formData);
+      return formData;
+    }
+
+    if (addedTemplate) {
+      postTemplate(toFormData(addedTemplate));
     }
   }, [addedTemplate]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // remove template from server if removedTemplateName is changed to a non-empty string
   useEffect(() => {
     async function deleteTemplate(): Promise<void> {
-      return await fetchData(`../api/templates/${removedTemplateName}/`, { 
+      await fetchData(`../api/templates/${removedTemplateName}/`, { 
         method: "DELETE", 
         headers: { "Content-Type": "application/json" },
       })
-      .then((response) => {
-        if (response.status === 204) {
-          setRemovedTemplateName("");
-        }
-      })
+      .then((response) => response.status === 204 && setRemovedTemplateName(""))
       .catch((error) => console.error("Error:", error));
     }
-    if (removedTemplateName !== "") {
+    if (removedTemplateName) {
       deleteTemplate();
     }
   }, [removedTemplateName]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  function handleAddTemplateClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    const jobModal: HTMLElement | null = document.getElementById("addTemplateModal");
-    jobModal?.addEventListener("shown.bs.modal", () => {
-      document.getElementById("name")?.focus();
-    });
-  }
-
-  function addTemplate(template: ResumeTemplateUpload): void {
+  function addTemplate(templateUpload: ResumeTemplateUpload): void {
+    // add placeholder template to templates state
     const placeholderTemplate: ResumeTemplateDownload = {
-      name: template.name,
+      name: templateUpload.name,
       upload: "",
       png: "",
-      description: template.description
+      description: templateUpload.description
     }
     setTemplates([...templates, placeholderTemplate]);
-    setAddedTemplate(template);
+
+    // queue template to be added to server
+    setAddedTemplate(templateUpload);
   }  
 
+  // remove template from templates state and queue template to be removed from server
   function removeTemplate(templateName: string): void {
     setTemplates(templates.filter((template) => template.name !== templateName));
     setRemovedTemplateName(templateName);
@@ -106,30 +107,33 @@ export default function Resumes({ fetchData }: {
   return (
     <>
       <main>
-        <RemoveTemplateContext.Provider value={removeTemplate}>
-          <ResumeTemplates templates={templates} onAddTemplateClick={handleAddTemplateClick} loaded={loaded} />
-        </RemoveTemplateContext.Provider>
+        <section>
+          <h2>Templates</h2>
+          <RemoveTemplateContext.Provider value={removeTemplate}>
+            <ResumeTemplates templates={templates} templatesLoaded={templatesLoaded} />
+          </RemoveTemplateContext.Provider>
+        </section>
       </main>
       <AddTemplateModal addTemplate={addTemplate} />
     </>
   );
 }
 
-function ResumeTemplates({ templates, onAddTemplateClick, loaded }: {
-  templates: ResumeTemplateDownload[],
-  onAddTemplateClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
-  loaded: boolean
+function ResumeTemplates({ templates, templatesLoaded }: {
+  templates: ResumeTemplateDownload[]
+  templatesLoaded: boolean
 }): React.JSX.Element {
   return (
-    <div className="d-flex overflow-x-auto border border-5 p-2">
-      {loaded ?
+    <div className="d-flex overflow-x-auto border border-5 p-2" role="list">
+      {templatesLoaded ?
         <>
           {templates.map((template, _) => 
             <ResumeTemplate template={template} key={template.name} />
           )}
-          <AddResumeButton onAddTemplateClick={onAddTemplateClick} />
+          <AddResumeButton />
         </>
       :
+        // display 3 placeholders while templates are being fetched
         [...Array(3)].map((_, index) => 
           <ResumeTemplatePlaceholder key={index} />
         )
@@ -141,13 +145,14 @@ function ResumeTemplates({ templates, onAddTemplateClick, loaded }: {
 function ResumeTemplate({ template }: {
   template: ResumeTemplateDownload
 }): React.JSX.Element {
-  const removeTemplate: (templateName: string) => void = React.useContext(RemoveTemplateContext);
+  const removeTemplate: (name: string) => void = React.useContext(RemoveTemplateContext);
 
   return (
-    <div className="document text-center me-3">
+    <div className="document text-center me-3" role="listitem" aria-label={template.name} aria-busy={template.png === ""}>
+      {/* document image */}
       {template.png === "" ?
-        <div className="document-image img-thumbnail text-start">
-          <p className="placeholder-glow pt-5">
+        <div className="document-image img-thumbnail">
+          <p className="placeholder-glow pt-5 text-start">
             {generatePlaceholderWidths(15).map((width, index) => {
               return (
                 width === 0 ?
@@ -159,8 +164,10 @@ function ResumeTemplate({ template }: {
           </p>
         </div>
       :
-        <img src={template.png} className="document-image img-thumbnail" alt={`resume template '${template.name}'`} />
+        <img src={template.png} className="document-image img-thumbnail" alt={template.name} />
       }
+
+      {/* document header */}
       <div className="document-header d-flex justify-content-between w-100 p-2 border-bottom border-3 border-dark bg-dark bg-opacity-50 rounded-top">
         {template.name === "" ?
           <h6 className="p-1 m-0 bg-body border rounded w-50">
@@ -175,6 +182,8 @@ function ResumeTemplate({ template }: {
           <button type="button" className="btn-close" aria-label="Remove" onClick={(e) => removeTemplate(template.name)}></button>
         }
       </div>
+
+      {/* document body */}
       {template.png === "" &&
         <div className="document-body">
           <div className="spinner-border" role="status">
@@ -182,6 +191,8 @@ function ResumeTemplate({ template }: {
           </div>
         </div>
       }
+
+      {/* document footer */}
       {template.upload !== "" && 
         <div className="document-footer pb-4">
           <a href={template.upload} className="btn btn-primary" role="button">Download</a>       
@@ -191,9 +202,15 @@ function ResumeTemplate({ template }: {
   );
 }
 
-function AddResumeButton({ onAddTemplateClick }: {
-  onAddTemplateClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
-}): React.JSX.Element {
+function AddResumeButton(): React.JSX.Element {
+  // focus on name input when add template modal is shown
+  function handleAddTemplateClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    const jobModal: HTMLElement = document.getElementById("addTemplateModal") as HTMLInputElement;
+    jobModal.addEventListener("shown.bs.modal", () => {
+      document.getElementById("name")?.focus();
+    });
+  }
+
   return (
     <div className="document">
       <div className="document-image img-thumbnail"></div>
@@ -203,7 +220,7 @@ function AddResumeButton({ onAddTemplateClick }: {
           className="btn btn-primary"
           data-bs-toggle="modal"
           data-bs-target="#addTemplateModal"
-          onClick={onAddTemplateClick}
+          onClick={handleAddTemplateClick}
         >+ Add resume template</button>
       </div>
     </div>
@@ -221,9 +238,9 @@ function ResumeTemplatePlaceholder(): React.JSX.Element {
 function generatePlaceholderWidths(numberOfRows: number): number[] {
   // generate a random list of numbers
   // the numbers represent the width of each placeholder span
-  // there should be 15 groups of numbers
+  // there should be (numberOfRows) groups of numbers
   // each group represents a row of placeholders
-  // each group of numbers should add up to 10 or less
+  // each group of numbers should add up to (maxWidth) or less
 
   const maxWidth: number = 10;
   const placeHolderWidths: number[] = [];
@@ -248,20 +265,25 @@ function AddTemplateModal({ addTemplate }: {
   addTemplate: (template: ResumeTemplateUpload) => void
 }): React.JSX.Element {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+    // prevent page from reloading
     e.preventDefault();
-    const modalElement: HTMLElement | null = document.getElementById("addTemplateModal");
+
+    // close modal
+    const modalElement: HTMLElement = document.getElementById("addTemplateModal") as HTMLInputElement;
     if (modalElement) {
       Modal.getInstance(modalElement)?.toggle();
-
       // Bootstrap is supposed to remove the modal-backdrop but it's not working properly
       document.querySelector(".modal-backdrop")?.remove();
     }
     
-    const name: string = (document.getElementById("templateName") as HTMLInputElement).value;
+    // add template
+    const name: string = (document.getElementById("name") as HTMLInputElement).value;
     const upload: File = ((document.getElementById("upload") as HTMLInputElement).files as FileList)[0];
     const description: string = (document.getElementById("description") as HTMLInputElement).value;
+    const templateUpload: ResumeTemplateUpload = { name, upload, description };
+    addTemplate(templateUpload);
 
-    addTemplate({ name, upload, description });
+    // reset form
     e.currentTarget.reset();
   }
 
@@ -276,8 +298,8 @@ function AddTemplateModal({ addTemplate }: {
           <form onSubmit={handleSubmit}>
             <div className="modal-body">
               <div className="mb-3">
-                <label htmlFor="templateName" className="form-label">Template Name</label>
-                <input type="text" className="form-control" id="templateName" name="templateName" required />
+                <label htmlFor="name" className="form-label">Template Name</label>
+                <input type="text" className="form-control" id="name" name="name" required />
               </div>
               <div className="mb-3">
                 <label htmlFor="upload" className="form-label">Upload</label>
