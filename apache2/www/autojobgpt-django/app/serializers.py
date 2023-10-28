@@ -37,10 +37,15 @@ class FeedbackSerializer(serializers.Serializer):
   feedback = serializers.CharField()
 
 
-class ResumeSerializer(serializers.ModelSerializer):    
+class ResumeSerializer(serializers.ModelSerializer):   
+  def create(self, validated_data):
+    return self.Meta.model._default_manager.create(validated_data)
+   
   substitutions = ResumeSubstitutionSerializer(many=True, read_only=True)
 
   class Meta:
     model = Resume
     fields = "__all__"
-    extra_kwargs = {'upload': {'required': False}}
+    extra_kwargs = {
+      'docx': {'required': False},    
+    }

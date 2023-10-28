@@ -64,15 +64,15 @@ class ResumeViewSet(RegeneratableViewSet):
   queryset = Resume.objects.all()
   serializer_class = ResumeSerializer
 
-  @action(detail=True, methods=['get', 'post'])
-  def fill(self, request, pk=None):
-    Resume.objects.get(pk=pk).fill()
-    return Response(self.serializer_class(self.get_object()).data)
+  # @action(detail=True, methods=['get', 'post'])
+  # def fill(self, request, pk=None):
+  #   Resume.objects.get(pk=pk).fill()
+  #   return Response(self.serializer_class(self.get_object()).data)
   
-  @action(detail=True, methods=['get', 'post'])
-  def generate_docx(self, request, pk=None):
-    Resume.objects.get(pk=pk).generate_docx()
-    return Response(self.serializer_class(self.get_object()).data)
+  # @action(detail=True, methods=['get', 'post'])
+  # def generate_docx(self, request, pk=None):
+  #   Resume.objects.get(pk=pk).generate_docx()
+  #   return Response(self.serializer_class(self.get_object()).data)
   
   @action(detail=True, methods=['get', 'post'])
   def regenerate(self, request, pk=None):

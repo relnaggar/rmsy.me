@@ -110,7 +110,6 @@ class Job(models.Model):
   company = models.CharField(max_length=26, blank=True)
   text = models.TextField(blank=True)
   chat_messages = models.JSONField(blank=True, null=True)
-  resume_template = models.ForeignKey(to="ResumeTemplate", on_delete=models.SET_NULL, null=True, blank=True)
   date_applied = models.DateTimeField(blank=True, null=True)
   chosen_resume = models.ForeignKey(to="Resume", on_delete=models.SET_NULL, null=True, blank=True, related_name="chosen_jobs")
   status = models.CharField(max_length=26, blank=True) # "backlog", "applying", "pending", "testing", "interviewing", "rejected", "accepted"
@@ -148,8 +147,19 @@ class Job(models.Model):
     self.status = status
     self.save()
 
+
+class ResumeManager(models.Manager):
+  def create(self, validated_data):
+    resume = Resume(**validated_data)
+    resume.save()
+    resume.fill()
+    resume.generate_docx()
+    return resume
+
 class Resume(models.Model):
+  objects = ResumeManager()
   job = models.ForeignKey(to="Job", on_delete=models.CASCADE, related_name="resumes")  
+  template = models.ForeignKey(to="ResumeTemplate", on_delete=models.SET_NULL, null=True)
   version = models.IntegerField(default=1)
   docx = models.FileField(upload_to='resumes/')
   chat_messages = models.JSONField(blank=True, null=True)
@@ -215,8 +225,8 @@ class Resume(models.Model):
     if self.is_filled:
       raise Exception("you can only fill a resume once")
     
-    template_text = self.job.resume_template.extract_text()
-    fillfield_keys = self.job.resume_template.extract_fillfields(text=template_text)
+    template_text = self.template.extract_text()
+    fillfield_keys = self.template.extract_fillfields(text=template_text)
     self._remove_default_substitutions(fillfield_keys)
     
     # construct the fillfields_text part of the prompt    
@@ -254,7 +264,7 @@ f"""<fillfield>
       raise Exception("you have to fill the resume with .fill() before you can generate the docx file")
 
     # open the template with docx
-    template_document = self.job.resume_template.open_document()
+    template_document = self.template.open_document()
 
     # get all the fillfields
     all_substitutions = self.default_substitutions
@@ -299,7 +309,7 @@ f"""<fillfield>
     new_resume = self._create_new_resume_and_substitutions(substitutions, chat_messages_rewinded_1 + [chat_message])
 
     # copy the resume substitutions from the previous resume
-    for key in self.job.resume_template.extract_fillfields():
+    for key in self.template.extract_fillfields():
       if key not in fillfield_keys and key not in self.default_substitutions.keys():
         # copy the resume substitution
         old_resume_substitution = self.substitutions.get(key=key)
@@ -317,7 +327,7 @@ f"""<fillfield>
       "feedback": feedback,
     }))
 
-    fillfield_keys = self.job.resume_template.extract_fillfields()
+    fillfield_keys = self.template.extract_fillfields()
     self._remove_default_substitutions(fillfield_keys)
     substitutions = self._validate_response_and_get_substitutions(response, fillfield_keys)
 
