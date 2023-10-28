@@ -23,12 +23,29 @@ export type Job = {
 export const STATUSES: string[] = [
   "backlog",
   "applying",
-  "applied",
+  "pending",
   "testing",
   "interviewing",
   "rejected",
   "accepted",
 ]
+
+export const ALLOWED_TRANSITIONS: string[][] = [
+  ["backlog", "applying"],
+  ["applying", "backlog"],
+  ["applying", "pending"],
+  ["pending", "testing"],
+  ["pending", "interviewing"],
+  ["pending", "rejected"],
+  ["pending", "accepted"],
+  ["testing", "pending"],
+  ["testing", "interviewing"],
+  ["testing", "rejected"],
+  ["testing", "accepted"],
+  ["interviewing", "pending"],
+  ["interviewing", "rejected"],
+  ["interviewing", "accepted"],
+];
 
 const LoadedContext = createContext<boolean>(false);
 const RemoveJobContext = createContext<(jobId: number) => void>(() => {});
@@ -144,7 +161,9 @@ function Board({ jobs, setJobs }: {
   function handleDragStart(jobId: number): (e: React.DragEvent<HTMLDivElement>) => void {
     return (e: React.DragEvent<HTMLDivElement>): void => {
       setDraggingJobId(jobId);
-      e.currentTarget.scrollIntoView({behavior: "smooth", block: "center"});
+      try { // e.currentTarget not supported in jsdom
+        e.currentTarget.scrollIntoView({behavior: "smooth", block: "center"});
+      } catch (error) {}
     };
   }
 
@@ -152,15 +171,30 @@ function Board({ jobs, setJobs }: {
     e.preventDefault();
   }
 
-  function handleDrop(status: string): (e: React.DragEvent<HTMLDivElement>) => void {
+  function handleDrop(endStatus: string): (e: React.DragEvent<HTMLDivElement>) => void {
     return (e: React.DragEvent<HTMLDivElement>): void => {
       e.preventDefault();
-      setJobs(jobs.map((job) => {
-        if (job.id === draggingJobId) {
-          job.status = status;
-        }
-        return job;
-      }));
+
+      // get the job that is being dragged
+      const currentJob: Job = jobs.find((job) => job.id === draggingJobId)!;
+      const startStatus: string = currentJob.status || "backlog";
+      
+      // check if the transition is allowed
+      const allowedTransitions: string[] = ALLOWED_TRANSITIONS.filter((transition) => {
+        return transition[0] === startStatus;
+      }).map((transition) => transition[1]);
+
+      // if the transition is allowed, move the job by updating its status
+      if (allowedTransitions.includes(endStatus)) {
+        setJobs(jobs.map((job) => {
+          if (job.id === draggingJobId) {
+            job.status = endStatus;
+          }
+          return job;
+        }));
+      }
+
+      // stop dragging
       setDraggingJobId(-1);
     }
   }

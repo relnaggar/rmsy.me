@@ -1,4 +1,4 @@
-import { screen, getByRole, getAllByRole, queryByRole, queryAllByRole, act } from "@testing-library/react";
+import { screen, getByRole, getAllByRole, queryByRole, queryAllByRole, act, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { injectMocks, mockFunctions, renderRoute, openAndGetModal, getSubmitButton, closeModal } from "./testUtilities";
@@ -149,7 +149,7 @@ function closeAddJobModal(): void {
   closeModal("add job");
 }
 
-test("adding a job adds the same job to the backlog column", async () => {
+test("adding a job adds the same job to the backlog column and calls the API", async () => {
   await renderThisRoute();
 
   // add a job
@@ -187,7 +187,7 @@ function getBacklogJobByTitle(title: string): HTMLElement {
   return matchingJob;
 }
 
-test("deleting a job removes it from the backlog column", async () => {
+test("deleting a job removes it from the backlog column and calls the API", async () => {
   mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
   await renderThisRoute();
 
@@ -210,4 +210,85 @@ test("deleting a job removes it from the backlog column", async () => {
   expect(backlogJobs.length).toBe(1);
   expect(backlogJobs[0]).toHaveTextContent(validJob1.title);
   expect(backlogJobs[0]).toHaveTextContent(validJob1.company);
+});
+
+async function dragJob(job: HTMLElement, targetStatus: string): Promise<void> {
+  await act(async () => {
+    fireEvent.dragStart(job);
+  });
+  await act(async () => {
+    fireEvent.dragOver(getKanbanColumn(targetStatus));
+  });
+  await act(async () => {
+    fireEvent.drop(getKanbanColumn(targetStatus));
+  });
+}
+
+describe("dragging a job according to allowed transitions results in the job being moved", () => {
+  test("dragging a job from the backlog column to the applying column results in the job being moved", async () => {
+    mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
+    await renderThisRoute();
+
+    // drag validJob2 from backlog to applying
+    mockFunctions.fetchData.mockImplementationOnce(generateResponse({...validJob2, status: "applying"}));
+    const matchingJob: HTMLElement = getBacklogJobByTitle(validJob2.title);
+    await dragJob(matchingJob, "applying");
+
+    // check that the job was moved to the applying column
+    const applyingJobs: HTMLElement[] = queryAllByRole(getKanbanColumn("applying"), "listitem");
+    expect(applyingJobs.length).toBe(1);
+    const movedJob: HTMLElement = applyingJobs[0];
+    expect(movedJob).toHaveTextContent(validJob2.title);
+    expect(movedJob).toHaveTextContent(validJob2.company);
+
+    // check that the job was removed from the backlog column
+    const backlogJobs: HTMLElement[] = queryBacklogJobs();
+    expect(backlogJobs.length).toBe(1);
+    const remainingJob: HTMLElement = backlogJobs[0];
+    expect(remainingJob).toHaveTextContent(validJob1.title);
+    expect(remainingJob).toHaveTextContent(validJob1.company);
+  });
+});
+
+describe("dragging a job when its new status is not allowed results in the job not being moved", () => {
+  test("dragging a job from the backlog column to the pending column results in the job not being moved", async () => {
+    mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
+    await renderThisRoute();
+
+    // drag validJob2 from backlog to pending
+    mockFunctions.fetchData.mockImplementationOnce(generateResponse({...validJob2, status: "pending"}));
+    const matchingJob: HTMLElement = getBacklogJobByTitle(validJob2.title);    
+    await dragJob(matchingJob, "pending");
+
+    // check that the job was not moved to the pending column
+    const pendingJobs: HTMLElement[] = queryAllByRole(getKanbanColumn("pending"), "listitem");
+    expect(pendingJobs.length).toBe(0);
+
+    // check that both jobs are still in the backlog column
+    const backlogJobs: HTMLElement[] = queryBacklogJobs();
+    expect(backlogJobs.length).toBe(2);
+    expect(backlogJobs[0]).toHaveTextContent(validJob1.title);
+    expect(backlogJobs[0]).toHaveTextContent(validJob1.company);
+    expect(backlogJobs[1]).toHaveTextContent(validJob2.title);
+    expect(backlogJobs[1]).toHaveTextContent(validJob2.company);
+    
+  });
+});
+
+describe("dragging a job according to allowed transitions calls the API to update the job", () => {
+  test.todo("dragging a job from the backlog column to the applying column calls the API to update the job");/*, async () => {  
+    mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
+    await renderThisRoute();
+
+    // drag validJob2 from backlog to applying
+    mockFunctions.fetchData.mockImplementationOnce(generateResponse({...validJob2, status: "applying"}));
+    const matchingJob: HTMLElement = getBacklogJobByTitle(validJob2.title);    
+    await dragJob(matchingJob, "applying");
+
+    // check that the API was called again to update the job
+    expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
+    expect(mockFunctions.fetchData).toHaveBeenCalledWith(`../api/jobs/${validJob2.id}/`, expect.objectContaining({
+      body: expect.stringContaining("applying")
+    }));
+  });*/
 });
