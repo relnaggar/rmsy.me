@@ -57,6 +57,8 @@ export default function Jobs({ fetchData }:
   const [loaded, setLoaded] = useState<boolean>(false);
   const [addedJob, setAddedJob] = useState<Job | null>(null);
   const [removedJobId, setRemovedJobId] = useState<number>(-1);
+  const [updatedJobId, setUpdatedJobId] = useState<number>(-1);
+  const [updatedJobStatus, setUpdatedJobStatus] = useState<string>("");
 
   useEffect(() => {
     async function getJobs(): Promise<void> {
@@ -116,6 +118,27 @@ export default function Jobs({ fetchData }:
     }
   }, [removedJobId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    async function updateJob(updatedJobId: number, updatedJobStatus: string): Promise<void> {
+      await fetchData(`../api/jobs/${updatedJobId}/`, { 
+        method: "PATCH", 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          "status": updatedJobStatus,
+        }),
+      })
+      .catch((error) => console.error("Error:", error))
+      .finally(() => {
+        setUpdatedJobId(-1);
+        setUpdatedJobStatus("");
+      });
+    }
+    if (updatedJobId >= 0) {
+      updateJob(updatedJobId, updatedJobStatus);
+    }
+  }, [updatedJobId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+
   function addJob(url: string): void {
     const placeholderJob: Job = {
       "id": -1,
@@ -138,12 +161,23 @@ export default function Jobs({ fetchData }:
     setRemovedJobId(jobId);
   }
 
+  function updateJobStatus(jobId: number, status: string): void {
+    setJobs(jobs.map((job) => {
+      if (job.id === jobId) {
+        job.status = status;
+      }
+      return job;
+    }));    
+    setUpdatedJobStatus(status);
+    setUpdatedJobId(jobId);
+  }
+
   return (
     <>
       <main>
         <RemoveJobContext.Provider value={removeJob}>
           <LoadedContext.Provider value={loaded}>
-            <Board jobs={jobs} setJobs={setJobs} />
+            <Board jobs={jobs} updateJobStatus={updateJobStatus} />
           </LoadedContext.Provider>
         </RemoveJobContext.Provider>
       </main>
@@ -152,9 +186,9 @@ export default function Jobs({ fetchData }:
   );
 }
 
-function Board({ jobs, setJobs }: {
+function Board({ jobs, updateJobStatus }: {
   jobs: Job[],
-  setJobs: React.Dispatch<React.SetStateAction<Job[]>>,
+  updateJobStatus: (jobId: number, status: string) => void,
 }): React.JSX.Element {
   const [draggingJobId, setDraggingJobId] = useState<number>(-1);
 
@@ -186,12 +220,7 @@ function Board({ jobs, setJobs }: {
 
       // if the transition is allowed, move the job by updating its status
       if (allowedTransitions.includes(endStatus)) {
-        setJobs(jobs.map((job) => {
-          if (job.id === draggingJobId) {
-            job.status = endStatus;
-          }
-          return job;
-        }));
+        updateJobStatus(draggingJobId, endStatus);
       }
 
       // stop dragging

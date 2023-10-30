@@ -276,7 +276,7 @@ describe("dragging a job when its new status is not allowed results in the job n
 });
 
 describe("dragging a job according to allowed transitions calls the API to update the job", () => {
-  test.todo("dragging a job from the backlog column to the applying column calls the API to update the job");/*, async () => {  
+  test("dragging a job from the backlog column to the applying column calls the API to update the job", async () => {  
     mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
     await renderThisRoute();
 
@@ -288,7 +288,8 @@ describe("dragging a job according to allowed transitions calls the API to updat
     // check that the API was called again to update the job
     expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
     expect(mockFunctions.fetchData).toHaveBeenCalledWith(`../api/jobs/${validJob2.id}/`, expect.objectContaining({
+      method: "PATCH",
       body: expect.stringContaining("applying")
     }));
-  });*/
+  });
 });
