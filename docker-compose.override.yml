@@ -12,8 +12,8 @@ services:
     build: "./postgres"
     volumes:
       - "./postgres/conf:/etc/postgresql/15/main"
-  watcher:
-    container_name: watcher
+  autojobgpt-react:
+    container_name: autojobgpt-react
     init: true
     image: node:14
     networks:
