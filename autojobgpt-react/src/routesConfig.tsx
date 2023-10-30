@@ -2,8 +2,8 @@ import { RouteObject } from "react-router-dom";
 
 import Layout from "./Layout";
 import Home from "./Home";
-import Jobs from "./Jobs";
-import Resumes from "./Resumes";
+import JobsPage from "./JobsPage";
+import ResumesPage from "./ResumesPage";
 
 
 export const routesBasename = "/autojobgpt/app";
@@ -16,9 +16,9 @@ export const routesConfig: RouteObject[] = [{
     element: <Home />,
   }, {
     path: "/jobs",
-    element: <Jobs fetchData={fetch} />,
+    element: <JobsPage fetchData={fetch} />,
   }, {
     path: "/resumes",
-    element: <Resumes fetchData={fetch} />,
+    element: <ResumesPage fetchData={fetch} />,
   }],
 }];

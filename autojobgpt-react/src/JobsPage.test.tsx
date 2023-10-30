@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 
 import { injectMocks, mockFunctions, renderRoute, openAndGetModal, getSubmitButton, closeModal } from "./testUtilities";
 import { generateResponse, validJob1, validJob2 } from "./mockAPI";
-import { STATUSES } from "./Jobs";
+import { STATUSES } from "./JobsPage";
 
 beforeEach(() => {
   jest.clearAllMocks();

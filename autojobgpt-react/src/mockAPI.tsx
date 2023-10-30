@@ -1,5 +1,5 @@
-import { Job } from "./Jobs";
-import { ResumeTemplateDownload } from "./Resumes";
+import { Job } from "./JobsPage";
+import { ResumeTemplateDownload } from "./ResumeTemplates";
 
 export function generateResponse(data: any, status: number = 200): () => Promise<Response> {
   return async () => new Response(
@@ -38,16 +38,16 @@ export const validJob2: Job = {
   chosen_resume: null,
 }
 
-export const validResumeTemplate1: ResumeTemplateDownload = {
+export const validResumeTemplate1: ResumeTemplateDownload = new ResumeTemplateDownload({
   name: "Test Resume Template 1",
   description: "Test Description 1",
   upload: "https://www.example.com/test1.docx",
   png: "https://www.example.com/test1.png",
-}
+});
 
-export const validResumeTemplate2: ResumeTemplateDownload = {
+export const validResumeTemplate2: ResumeTemplateDownload = new ResumeTemplateDownload({
   name: "Test Resume Template 2",
   description: "Test Description 2",
   upload: "https://www.example.com/test2.docx",
   png: "https://www.example.com/test2.png",
-}
+});

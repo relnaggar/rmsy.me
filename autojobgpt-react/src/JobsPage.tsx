@@ -50,7 +50,7 @@ export const ALLOWED_TRANSITIONS: string[][] = [
 const LoadedContext = createContext<boolean>(false);
 const RemoveJobContext = createContext<(jobId: number) => void>(() => {});
 
-export default function Jobs({ fetchData }:
+export default function JobsPage({ fetchData }:
   { fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response> }
 ): React.JSX.Element {
   const [jobs, setJobs] = useState<Job[]>([]);

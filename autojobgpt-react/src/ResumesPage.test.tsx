@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 
 import { injectMocks, renderRoute, openAndGetModal, getSubmitButton, mockFunctions, closeModal } from "./testUtilities";
 import { generateResponse, validResumeTemplate1, validResumeTemplate2 } from "./mockAPI";
-import { ResumeTemplateDownload } from "./Resumes";
+import { ResumeTemplateDownload } from "./ResumeTemplates";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -20,14 +20,14 @@ function getResumeTemplateSection(): HTMLElement {
   return resumeTemplateSection;
 }
 
-function getAddResumeTemplateButton(): HTMLElement {
+function getUploadResumeTemplateButton(): HTMLElement {
   const resumeTemplateSection: HTMLElement = getResumeTemplateSection();
-  return getByRole(resumeTemplateSection, "button", {name: new RegExp("add resume template", "i")});
+  return getByRole(resumeTemplateSection, "button", {name: new RegExp("upload resume template", "i")});
 }
 
 test("add resume template button appears", async () => {
   await renderThisRoute();
-  const addResumeTemplateButton: HTMLElement = getAddResumeTemplateButton();
+  const addResumeTemplateButton: HTMLElement = getUploadResumeTemplateButton();
   expect(addResumeTemplateButton).toBeInTheDocument();
 });
 
@@ -37,7 +37,7 @@ test("add resume template modal isn't visible before clicking add resume templat
 });
 
 async function openAndGetAddResumeTemplateModal(timeout: number = 1000): Promise<HTMLElement> {
-  return openAndGetModal(getAddResumeTemplateButton(), "add resume template", timeout);
+  return openAndGetModal(getUploadResumeTemplateButton(), "add resume template", timeout);
 }
 
 test("clicking add resume template button shows add resume template modal within 1 second", async () => {
