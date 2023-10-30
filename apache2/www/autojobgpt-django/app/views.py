@@ -37,15 +37,6 @@ class JobViewSet(viewsets.ModelViewSet):
     self.get_object().apply(chosen_resume)
     return Response(self.serializer_class(self.get_object()).data)
 
-  @action(detail=True, methods=['get', 'post'])
-  def set_status(self, request, pk=None):
-    if request.method == 'GET':
-      status = self.request.query_params.get('status', None)
-    elif request.method == 'POST':
-      status = self.request.data.get('status', None)
-    self.get_object().set_status(status)
-    return Response(self.serializer_class(self.get_object()).data)
-
 class RegeneratableViewSet(viewsets.ModelViewSet):
   def regenerate(self, request, pk=None):
     serializer = None

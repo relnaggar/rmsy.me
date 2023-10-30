@@ -142,10 +142,6 @@ class Job(models.Model):
     self.chosen_resume = chosen_resume
     self.status = "pending"
     self.save()
-  
-  def set_status(self, status):
-    self.status = status
-    self.save()
 
 
 class ResumeManager(models.Manager):
