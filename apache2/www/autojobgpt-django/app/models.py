@@ -198,7 +198,7 @@ class Resume(models.Model, IDocumentModel):
     ]
 
   def __str__(self):
-    return self.docx.name.split("/")[-1].replace(".docx", "")
+    return f"{self.job.title}, {self.job.company}, v{self.version}"
   
   @property
   def default_substitutions(self):
@@ -316,7 +316,7 @@ f"""<fillfield>
     template_document.save(file_stream)
     
     # save the file stream to the file field
-    file_name = f"{self.job}_{self.version}.docx"    
+    file_name = f"{self.job.title}_{self.job.company}_v{self.version}.docx"    
     self.docx.save(file_name, files.File(file_stream))    
 
   def regenerate(self, feedback=None):

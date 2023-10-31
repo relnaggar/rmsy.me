@@ -27,7 +27,7 @@ export function ResumesSection({ fetchData, resumes, setResumes, addedResume, se
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    async function deleteTemplate(): Promise<void> {
+    async function deleteResume(): Promise<void> {
       await fetchData(`../api/resumes/${removedResumeId}/`, { 
         method: "DELETE", 
         headers: { "Content-Type": "application/json" },
@@ -36,7 +36,7 @@ export function ResumesSection({ fetchData, resumes, setResumes, addedResume, se
       .catch((error) => console.error("Error:", error));
     }
     if (removedResumeId !== -1) {
-      deleteTemplate();
+      deleteResume();
     }
   }, [removedResumeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
