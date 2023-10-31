@@ -1,9 +1,9 @@
 import { screen, getByRole, getAllByRole, queryByRole, queryAllByRole, act, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { injectMocks, mockFunctions, renderRoute, openAndGetModal, getSubmitButton, closeModal } from "./testUtilities";
-import { generateResponse, validJob1, validJob2 } from "./mockAPI";
-import { STATUSES } from "./JobsPage";
+import { injectMocks, mockFunctions, renderRoute, openAndGetModal, getSubmitButton } from "../common/testUtilities";
+import { generateResponse, validJob1, validJob2 } from "../common/mockAPI";
+import { STATUSES } from "./JobBoard";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -145,10 +145,6 @@ test("backlog jobs are displayed with their companies", async () => {
   expect(jobs[1]).toHaveTextContent(validJob2.company);
 });
 
-function closeAddJobModal(): void {
-  closeModal("add job");
-}
-
 test("adding a job adds the same job to the backlog column and calls the API", async () => {
   await renderThisRoute();
 
@@ -161,7 +157,6 @@ test("adding a job adds the same job to the backlog column and calls the API", a
   await act(async () => {
     userEvent.click(submitButton);
   });
-  closeAddJobModal();
 
   // check that the API was called again to add the job
   expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);

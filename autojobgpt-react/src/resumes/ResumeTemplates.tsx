@@ -1,60 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { Modal } from "bootstrap";
 
-import { RemoveDocumentContext, DocumentData, DocumentList } from "./Documents";
-import { toFormData } from "./utilities";
+import DocumentList from "../common/DocumentList";
+import { RemoveDocumentContext } from "../common/DocumentThumbnail";
+import { ModalContext } from "../common/AddDocument";
+import { toFormData, closeModal } from "../common/utilities";
+import { ResumeTemplate, ResumeTemplateUpload } from "./types";
 
-
-export class ResumeTemplateDownload {
-  name: string;
-  upload: string;
-  png: string;
-  description?: string;
-
-  constructor({name, upload, png, description}: {
-    name: string,
-    upload: string,
-    png: string,
-    description?: string
-  }) {
-    this.name = name;
-    this.upload = upload;
-    this.png = png;
-    this.description = description;
-  }
-
-  toDocumentData(): DocumentData {
-    return new DocumentData(
-      this.name,
-      this.png,
-      this.upload,
-      this.description
-    );
-  }
-}
-
-export type ResumeTemplateUpload = {
-  name: string,
-  upload: File,
-  description?: string
-}
 
 export function ResumeTemplatesSection({ fetchData, templates, setTemplates, addedTemplate, setAddedTemplate  }: {
   fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>,
-  templates: ResumeTemplateDownload[],
-  setTemplates: React.Dispatch<React.SetStateAction<ResumeTemplateDownload[]>>,
+  templates: ResumeTemplate[],
+  setTemplates: React.Dispatch<React.SetStateAction<ResumeTemplate[]>>,
   addedTemplate: ResumeTemplateUpload | null,
   setAddedTemplate: React.Dispatch<React.SetStateAction<ResumeTemplateUpload | null>>
 }): React.JSX.Element {  
   const [templatesLoaded, setTemplatesLoaded] = useState<boolean>(false);
-  const [removedTemplateName, setRemovedTemplateName] = useState<string>("");
+  const [removedTemplateId, setRemovedTemplateId] = useState<number>(-1);
 
   // fetch templates from server on page load
   useEffect(() => {
     async function getTemplates(): Promise<void> {
       return await fetchData("../api/templates/")
       .then((response) => response.json())
-      .then((data) => setTemplates(data.map((d: ResumeTemplateDownload) => new ResumeTemplateDownload(d))))
+      .then((data) => setTemplates(data))
       .catch((error) => console.error("Error:", error))
       .finally(() => setTemplatesLoaded(true));
     }
@@ -72,15 +40,15 @@ export function ResumeTemplatesSection({ fetchData, templates, setTemplates, add
       .then((data) => {
         // replace placeholder template with template from server
         setTemplates([
-          ...templates.filter((template) => template.upload !== ""),
-          new ResumeTemplateDownload(data)
+          ...templates.filter((template) => template.docx !== ""),
+          data
         ]);
         // template has been added so set addedTemplate to null
         setAddedTemplate(null);
       })
       .catch((error) => console.error("Error:", error));
     }
-    if (addedTemplate) {
+    if (addedTemplate !== null) {
       postTemplate(toFormData(addedTemplate));
     }
   }, [addedTemplate]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -88,33 +56,35 @@ export function ResumeTemplatesSection({ fetchData, templates, setTemplates, add
   // delete template from server if removedTemplateName is changed to a non-empty string
   useEffect(() => {
     async function deleteTemplate(): Promise<void> {
-      await fetchData(`../api/templates/${removedTemplateName}/`, { 
+      await fetchData(`../api/templates/${removedTemplateId}/`, { 
         method: "DELETE", 
         headers: { "Content-Type": "application/json" },
       })
-      .then((response) => response.status === 204 && setRemovedTemplateName(""))
+      .then((response) => response.status === 204 && setRemovedTemplateId(-1))
       .catch((error) => console.error("Error:", error));
     }
-    if (removedTemplateName) {
+    if (removedTemplateId !== -1) {
       deleteTemplate();
     }
-  }, [removedTemplateName]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [removedTemplateId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // remove template from templates state and queue template to be deleted from server
-  function removeTemplate(templateName: string): void {
-    setTemplates(templates.filter((template) => template.name !== templateName));
-    setRemovedTemplateName(templateName);
+  function removeTemplate(id: number): void {
+    setTemplates(templates.filter((template) => template.id !== id));
+    setRemovedTemplateId(id);
   }
 
   return(
     <section>
       <h2>Templates</h2>
       <RemoveDocumentContext.Provider value={removeTemplate}>
-        <DocumentList
-          documents={templates.map((template) => template.toDocumentData())}
-          areDocumentsLoaded={templatesLoaded}
-          addButtonText="Upload resume template"
-        />
+        <ModalContext.Provider value={{modalId: "addTemplateModal", modalFocusId: "name"}}>
+          <DocumentList
+            documents={templates}
+            areDocumentsLoaded={templatesLoaded}
+            addButtonText="Upload resume template"
+          />
+        </ModalContext.Provider>
       </RemoveDocumentContext.Provider>
     </section>
   )
@@ -128,18 +98,14 @@ export function AddTemplateModal({ addTemplate }: {
     e.preventDefault();
 
     // close modal
-    const modalElement: HTMLElement = document.getElementById("addTemplateModal")!;
-    if (modalElement) {
-      Modal.getInstance(modalElement)?.toggle();
-      // Bootstrap is supposed to remove the modal-backdrop but it's not working properly
-      document.querySelector(".modal-backdrop")?.remove();
-    }
+    const modal: HTMLElement = document.getElementById("addTemplateModal")!;
+    closeModal(modal);
     
     // add template
     const name: string = (document.getElementById("name") as HTMLInputElement).value;
-    const upload: File = (document.getElementById("upload") as HTMLInputElement).files![0];
+    const docx: File = (document.getElementById("upload") as HTMLInputElement).files![0];
     const description: string = (document.getElementById("description") as HTMLInputElement).value;
-    const templateUpload: ResumeTemplateUpload = { name, upload, description };
+    const templateUpload: ResumeTemplateUpload = { name, docx, description };
     addTemplate(templateUpload);
 
     // reset form
@@ -147,7 +113,13 @@ export function AddTemplateModal({ addTemplate }: {
   }
 
   return (
-    <div className="modal fade" id="addTemplateModal" tabIndex={-1} aria-labelledby="addTemplateModalLabel" aria-hidden="true">
+    <div
+      className="modal fade"
+      id="addTemplateModal"
+      tabIndex={-1}
+      aria-labelledby="addTemplateModalLabel"
+      aria-hidden="true"
+    >
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
@@ -162,7 +134,9 @@ export function AddTemplateModal({ addTemplate }: {
               </div>
               <div className="mb-3">
                 <label htmlFor="upload" className="form-label">Upload</label>
-                <input type="file" className="form-control" id="upload" name="upload" accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required />
+                <input type="file" className="form-control" id="upload" name="upload" required
+                  accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                />
               </div>
               <div className="mb-3">
                 <label htmlFor="description" className="form-label">Description (optional)</label>

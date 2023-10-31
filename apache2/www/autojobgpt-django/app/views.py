@@ -17,11 +17,9 @@ class ResumeTemplateViewSet(viewsets.ModelViewSet):
   queryset = ResumeTemplate.objects.all()
   serializer_class = ResumeTemplateSerializer
 
-
 class FillFieldViewSet(viewsets.ModelViewSet):
   queryset = FillField.objects.all()
   serializer_class = FillFieldSerializer
-
 
 class JobViewSet(viewsets.ModelViewSet):
   queryset = Job.objects.all()
@@ -36,6 +34,7 @@ class JobViewSet(viewsets.ModelViewSet):
     chosen_resume = Resume.objects.get(pk=chosen_resume_id)  
     self.get_object().apply(chosen_resume)
     return Response(self.serializer_class(self.get_object()).data)
+
 
 class RegeneratableViewSet(viewsets.ModelViewSet):
   def regenerate(self, request, pk=None):
@@ -54,16 +53,6 @@ class RegeneratableViewSet(viewsets.ModelViewSet):
 class ResumeViewSet(RegeneratableViewSet):
   queryset = Resume.objects.all()
   serializer_class = ResumeSerializer
-
-  # @action(detail=True, methods=['get', 'post'])
-  # def fill(self, request, pk=None):
-  #   Resume.objects.get(pk=pk).fill()
-  #   return Response(self.serializer_class(self.get_object()).data)
-  
-  # @action(detail=True, methods=['get', 'post'])
-  # def generate_docx(self, request, pk=None):
-  #   Resume.objects.get(pk=pk).generate_docx()
-  #   return Response(self.serializer_class(self.get_object()).data)
   
   @action(detail=True, methods=['get', 'post'])
   def regenerate(self, request, pk=None):

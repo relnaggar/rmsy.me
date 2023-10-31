@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 
 import { routesConfig }  from "./routesConfig";
-import { injectMocks, renderRoute, testRouteAndAllChildren } from "./testUtilities";
+import { injectMocks, renderRoute, testRouteAndAllChildren } from "../common/testUtilities";
 
 
 beforeEach(() => {

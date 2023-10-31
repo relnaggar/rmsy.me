@@ -1,42 +1,61 @@
 from django.db import models
-from django.core.files import File
+from django.core import files
 from django.utils import timezone
 
-from json import loads
-from docx import Document
-from io import BytesIO
-from re import findall
-from os import system
+import docx
+import json
+import io
+import re
+import os
 
 from .scraping import scrape_text
 from .gpt import Chat
 
 
-class ResumeTemplateManager(models.Manager):
-  def create(self, validated_data):
-    resume_template = ResumeTemplate(name=validated_data["name"], upload=validated_data["upload"], description=validated_data["description"])
-    resume_template.save()
-    resume_template.generate_png()
-    resume_template.save()
-    return resume_template
+class IDocumentModel:
+  @property
+  def has_docx(self):
+    return self.docx.name != ""
 
-class ResumeTemplate(models.Model):
-  objects = ResumeTemplateManager()
-  name = models.CharField(max_length=200, primary_key=True)
-  upload = models.FileField(upload_to='templates/')
-  png = models.FileField(upload_to='templates/')
-  description = models.TextField(blank=True)
-
-  def __str__(self):
-    return self.name
-  
   @property
   def has_png(self):
     return self.png.name != ""
+  
+  def generate_png(self):
+    if self.has_png:
+      raise Exception("the template already has a png file")
+    
+    # generate the pdf using libreoffice
+    outdir = "/".join(self.docx.path.split("/")[:-1])
+    os.system(f"libreoffice --headless --convert-to pdf {self.docx.path} " +
+      f"--outdir {outdir}")
+    pdf_path = self.docx.path.replace(".docx", ".pdf")
 
+    # convert the pdf to png using pdftoppm
+    os.system(f"pdftoppm -f 1 -l 1 -png {pdf_path} " + 
+      f"{self.docx.path.replace('.docx', '')}")
+    png_path = self.docx.path.replace(".docx", "-1.png")
+
+    # remove the pdf file
+    os.system(f"rm {pdf_path}")
+
+    # read in the png as a file stream
+    png_file_stream = io.BytesIO()
+    with open(png_path, "rb") as f:
+      png_file_stream.write(f.read())
+    
+    # remove the extra png file
+    os.system(f"rm {png_path}")
+
+    # save the png file stream to the model with the same name as the docx file
+    self.png.save(
+      png_path.split("/")[-1].replace("-1.png", ".png"),
+      files.File(png_file_stream)
+    )
+  
   def open_document(self):
     # open the template with docx
-    return Document(self.upload.path)
+    return docx.Document(self.docx.path)
   
   def extract_text(self):
     # open the template with docx
@@ -47,6 +66,34 @@ class ResumeTemplate(models.Model):
     for paragraph in document.paragraphs:
       paragraphs.append(paragraph.text)
     return "\n".join(paragraphs)
+
+
+class ResumeTemplateManager(models.Manager):
+  def create(self, validated_data):
+    resume_template = ResumeTemplate(
+      name=validated_data["name"],
+      docx=validated_data["docx"],
+      description=validated_data["description"]
+    )
+    resume_template.save()
+    resume_template.generate_png()
+    resume_template.save()
+    return resume_template
+
+class ResumeTemplate(models.Model, IDocumentModel):
+  objects = ResumeTemplateManager()
+  docx = models.FileField(upload_to='templates/')
+  png = models.FileField(upload_to='templates/')
+  name = models.CharField(max_length=200)
+  description = models.TextField(blank=True)
+
+  class Meta:
+    constraints = [
+      models.UniqueConstraint(fields=['name'], name='unique_name'),
+    ]
+
+  def __str__(self):
+    return self.name
   
   def extract_fillfields(self, text=None):
     if text is None:
@@ -54,36 +101,7 @@ class ResumeTemplate(models.Model):
 
     # extract all the fillfields from the template text
     # fillfields must be in the format {{key}}
-    return findall(r"{{(.*?)}}", text)
-  
-  def generate_png(self):
-    if self.has_png:
-      raise Exception("the template already has a png file")
-    
-    # generate the pdf using libreoffice
-    print(f"upload.path: {self.upload.path}")
-    outdir = "/".join(self.upload.path.split("/")[:-1])
-    print(f"outdir: {outdir}")
-    system(f"libreoffice --headless --convert-to pdf {self.upload.path} --outdir {outdir}")
-    pdf_path = self.upload.path.replace(".docx", ".pdf")
-
-    # convert the pdf to png using pdftoppm
-    system(f"pdftoppm -f 1 -l 1 -png {pdf_path} {self.upload.path.replace('.docx', '')}")
-    png_path = self.upload.path.replace(".docx", "-1.png")
-
-    # remove the pdf file
-    system(f"rm {pdf_path}")
-
-    # read in the png as a file stream
-    png_file_stream = BytesIO()
-    with open(png_path, "rb") as f:
-      png_file_stream.write(f.read())
-    
-    # remove the extra png file
-    system(f"rm {png_path}")
-
-    # save the png file stream to the model with the same name as the docx file
-    self.png.save(png_path.split("/")[-1].replace("-1.png", ".png"), File(png_file_stream))
+    return re.findall(r"{{(.*?)}}", text)
 
 
 class FillField(models.Model):
@@ -111,12 +129,19 @@ class Job(models.Model):
   text = models.TextField(blank=True)
   chat_messages = models.JSONField(blank=True, null=True)
   date_applied = models.DateTimeField(blank=True, null=True)
-  chosen_resume = models.ForeignKey(to="Resume", on_delete=models.SET_NULL, null=True, blank=True, related_name="chosen_jobs")
-  status = models.CharField(max_length=26, blank=True) # "backlog", "applying", "pending", "testing", "interviewing", "rejected", "accepted"
+  chosen_resume = models.ForeignKey(
+    to="Resume", on_delete=models.SET_NULL, null=True, blank=True,
+    related_name="chosen_jobs"
+  )
+  # "backlog", "applying", "pending", "testing"
+  # "interviewing", "rejected", "accepted"
+  status = models.CharField(max_length=26, blank=True) 
 
   class Meta:
     constraints = [
-      models.UniqueConstraint(fields=['title', 'company'], name='unique_title_company'),
+      models.UniqueConstraint(
+        fields=['title', 'company'],
+        name='unique_title_company'),
     ]
 
   def __str__(self):
@@ -130,9 +155,9 @@ class Job(models.Model):
 
   def extract_job_details(self):
     chat = Chat()
-    response = loads(chat.ask(prompt_name="extract_job_details", substitutions={
-      "job_text": self.text,
-    }))
+    response = json.loads(chat.ask(prompt_name="extract_job_details",
+      substitutions={"job_text": self.text})
+    )
     self.title = response["job_title"]
     self.company = response["company"]
     self.chat_messages = chat.get_additional_messages()
@@ -150,19 +175,26 @@ class ResumeManager(models.Manager):
     resume.save()
     resume.fill()
     resume.generate_docx()
+    resume.generate_png()
+    resume.save()
     return resume
 
-class Resume(models.Model):
+class Resume(models.Model, IDocumentModel):
   objects = ResumeManager()
   job = models.ForeignKey(to="Job", on_delete=models.CASCADE, related_name="resumes")  
-  template = models.ForeignKey(to="ResumeTemplate", on_delete=models.SET_NULL, null=True)
+  template = models.ForeignKey(
+    to="ResumeTemplate", on_delete=models.SET_NULL, null=True
+  )
   version = models.IntegerField(default=1)
   docx = models.FileField(upload_to='resumes/')
+  png = models.FileField(upload_to='resumes/')
   chat_messages = models.JSONField(blank=True, null=True)
 
   class Meta:
     constraints = [
-      models.UniqueConstraint(fields=['job', 'version'], name='unique_job_version'),
+      models.UniqueConstraint(
+        fields=['job', 'version'], name='unique_job_version'
+      )
     ]
 
   def __str__(self):
@@ -179,12 +211,10 @@ class Resume(models.Model):
   def is_filled(self):
     return self.substitutions.count() > 0
   
-  @property
-  def has_docx(self):
-    return self.docx.name != ""
-  
   def get_next_version(self):
-    return Resume.objects.filter(job=self.job).aggregate(models.Max('version'))["version__max"] + 1
+    return Resume.objects.filter(job=self.job).aggregate(
+      models.Max('version')
+    )["version__max"] + 1
 
   def _remove_default_substitutions(self, fillfield_keys):
     for default_key in self.default_substitutions.keys():
@@ -242,12 +272,16 @@ f"""<fillfield>
 
     # ask GPT to fill in the fillfields
     chat = Chat(self.job.chat_messages)
-    response = loads(chat.ask(prompt_name="fill_resume_template", substitutions={
-      "resume_template_text": template_text,
-      "fillfields_text": fillfields_text,
-    }))
+    response = json.loads(
+      chat.ask(prompt_name="fill_resume_template", substitutions={
+        "resume_template_text": template_text,
+        "fillfields_text": fillfields_text,
+      })
+    )
 
-    substitutions = self._validate_response_and_get_substitutions(response, fillfield_keys)
+    substitutions = self._validate_response_and_get_substitutions(
+      response, fillfield_keys
+    )
 
     # save the chat messages 
     self.chat_messages = chat.get_additional_messages()
@@ -257,7 +291,10 @@ f"""<fillfield>
 
   def generate_docx(self):
     if not self.is_filled:
-      raise Exception("you have to fill the resume with .fill() before you can generate the docx file")
+      raise Exception(
+        "you have to fill the resume with .fill() before you can generate " +
+        "the docx file"
+      )
 
     # open the template with docx
     template_document = self.template.open_document()
@@ -275,16 +312,19 @@ f"""<fillfield>
             run.text = run.text.replace("{{" + key + "}}", value)
 
     # save the document to file stream
-    file_stream = BytesIO()
+    file_stream = io.BytesIO()
     template_document.save(file_stream)
     
     # save the file stream to the file field
     file_name = f"{self.job}_{self.version}.docx"    
-    self.docx.save(file_name, File(file_stream))    
+    self.docx.save(file_name, files.File(file_stream))    
 
   def regenerate(self, feedback=None):
     if not self.is_filled:
-      raise Exception("you have to fill the resume with .fill() before you can regenerate the resume")
+      raise Exception(
+        "you have to fill the resume with .fill() before you can regenerate " +
+        "the resume"
+      )
     
     if feedback is None:
       return self._regenerate_without_feedback()
@@ -293,20 +333,27 @@ f"""<fillfield>
 
   def _regenerate_without_feedback(self):    
     # the expected fillfields are the keys of the most recent response
-    fillfield_keys = list(loads(self.chat_messages[-1]['content']).keys())
+    fillfield_keys = list(json.loads(self.chat_messages[-1]['content']).keys())
     self._remove_default_substitutions(fillfield_keys)    
 
     # re-ask GPT the most recent question
     chat_messages_rewinded_1 = self.chat_messages[:-1]
-    chat_message = Chat().ask_with_messages(self.job.chat_messages + chat_messages_rewinded_1)
-    response = loads(chat_message.content)
+    chat_message = Chat().ask_with_messages(
+      self.job.chat_messages + chat_messages_rewinded_1
+    )
+    response = json.loads(chat_message.content)
 
-    substitutions = self._validate_response_and_get_substitutions(response, fillfield_keys)
-    new_resume = self._create_new_resume_and_substitutions(substitutions, chat_messages_rewinded_1 + [chat_message])
+    substitutions = self._validate_response_and_get_substitutions(
+      response, fillfield_keys
+    )
+    new_resume = self._create_new_resume_and_substitutions(
+      substitutions, chat_messages_rewinded_1 + [chat_message]
+    )
 
     # copy the resume substitutions from the previous resume
     for key in self.template.extract_fillfields():
-      if key not in fillfield_keys and key not in self.default_substitutions.keys():
+      if key not in fillfield_keys and \
+          key not in self.default_substitutions.keys():
         # copy the resume substitution
         old_resume_substitution = self.substitutions.get(key=key)
         ResumeSubstitution.objects.create(
@@ -319,34 +366,21 @@ f"""<fillfield>
 
   def _regenerate_with_feedback(self, feedback):
     chat = Chat(self.job.chat_messages + self.chat_messages)
-    response = loads(chat.ask(prompt_name="regenerate_resume", substitutions={
-      "feedback": feedback,
-    }))
+    response = json.loads(
+      chat.ask(prompt_name="regenerate_resume", substitutions={
+        "feedback": feedback,
+      })
+    )
 
     fillfield_keys = self.template.extract_fillfields()
     self._remove_default_substitutions(fillfield_keys)
-    substitutions = self._validate_response_and_get_substitutions(response, fillfield_keys)
+    substitutions = self._validate_response_and_get_substitutions(
+      response, fillfield_keys
+    )
 
-    return self._create_new_resume_and_substitutions(substitutions, self.chat_messages+chat.get_additional_messages())
-
-  # def to_pdf(self):
-  #   # old method from command-line application
-  #   from docx2pdf import convert
-  #   import os
-  #   from pypdf import PdfReader
-
-  #   # save the resume as a .pdf file
-  #   filepath_pdf = self.filepath.replace(".docx", ".pdf")    
-  #   tmp_filepath = "tmp.docx"
-  #   os.system(f"cp {self.filepath} {tmp_filepath}")
-  #   convert(tmp_filepath, filepath_pdf)
-  #   os.remove(tmp_filepath)
-
-  #   # check that the .pdf resume has only 1 page
-  #   reader = PdfReader(filepath_pdf)
-  #   number_of_pages = len(reader.pages)
-  #   if number_of_pages > 1:
-  #     raise Exception(f"tailored resume has {number_of_pages} pages, but should have only 1 page")
+    return self._create_new_resume_and_substitutions(
+      substitutions, self.chat_messages+chat.get_additional_messages()
+    )
 
 
 class ResumeSubstitution(models.Model):
@@ -365,8 +399,10 @@ class ResumeSubstitution(models.Model):
   def _regenerate_without_feedback(self):
     # re-ask GPT the most recent question
     chat_messages_rewinded_1 = self.chat_messages[:-1]
-    chat_message = Chat().ask_with_messages(self.resume.job.chat_messages + self.resume.chat_messages + chat_messages_rewinded_1)
-    response = loads(chat_message.content)
+    chat_message = Chat().ask_with_messages(
+      self.resume.job.chat_messages + self.resume.chat_messages + chat_messages_rewinded_1
+    )
+    response = json.loads(chat_message.content)
     new_resume = Resume.objects.create(
       job=self.resume.job,
       version=self.resume.get_next_version(),
@@ -388,7 +424,7 @@ class ResumeSubstitution(models.Model):
 
   def regenerate(self, feedback):
     chat = Chat(self.resume.job.chat_messages + self.resume.chat_messages)
-    response = loads(chat.ask(prompt_name="regenerate_substitution", substitutions={
+    response = json.loads(chat.ask(prompt_name="regenerate_substitution", substitutions={
       "key": self.key,
       "feedback": feedback,
     }))

@@ -1,9 +1,14 @@
 import { screen, getAllByRole, getByRole, getByLabelText, queryByRole, queryAllByRole, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { injectMocks, renderRoute, openAndGetModal, getSubmitButton, mockFunctions, closeModal } from "./testUtilities";
-import { generateResponse, validResumeTemplate1, validResumeTemplate2 } from "./mockAPI";
-import { ResumeTemplateDownload } from "./ResumeTemplates";
+import { injectMocks, renderRoute, openAndGetModal, getSubmitButton, mockFunctions } from "../common/testUtilities";
+import {
+  generateResponse,
+  generateConditionalResponseByRoute,
+  validResumeTemplate1,
+  validResumeTemplate2
+} from "../common/mockAPI";
+import { ResumeTemplate } from "./types";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -76,12 +81,6 @@ test("add resume template modal has a description input", async () => {
   expect(descriptionInput).toBeInTheDocument();
 });
 
-test("resume templates are initially fetched from the server", async () => {
-  mockFunctions.fetchData.mockImplementation(generateResponse([validResumeTemplate1,validResumeTemplate2]));
-  await renderThisRoute();
-  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(1);
-});
-
 function queryResumeTemplates(): HTMLElement[] {
   // resume templates are listitems in the resume template section that don't have the aria-busy attribute set to true
   const resumeTemplatesSection: HTMLElement = getResumeTemplateSection();  
@@ -93,9 +92,17 @@ function queryResumeTemplates(): HTMLElement[] {
 }
 
 test("resume templates are initially fetched from the server", async () => {
-  mockFunctions.fetchData.mockImplementation(generateResponse([validResumeTemplate1,validResumeTemplate2]));
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([
+    {
+      url: "../api/templates/",
+      data: [validResumeTemplate1,validResumeTemplate2],
+    }, {
+      url: "../api/resumes/",
+      data: [],
+    }
+  ]));
   await renderThisRoute();
-  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(1);
+  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
   expect(mockFunctions.fetchData).toHaveBeenCalledWith("../api/templates/");
   const resumeTemplates: HTMLElement[] = queryResumeTemplates();
   expect(resumeTemplates.length).toBe(2);
@@ -104,14 +111,22 @@ test("resume templates are initially fetched from the server", async () => {
 test("if there are no resume templates fetched then none are displayed", async () => {
   mockFunctions.fetchData.mockImplementation(generateResponse([]));
   await renderThisRoute();
-  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(1);
+  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
   expect(mockFunctions.fetchData).toHaveBeenCalledWith("../api/templates/");
   const resumeTemplates: HTMLElement[] = queryResumeTemplates();
   expect(resumeTemplates.length).toBe(0);
 });
 
 test("resume templates are displayed with their names", async () => {
-  mockFunctions.fetchData.mockImplementation(generateResponse([validResumeTemplate1,validResumeTemplate2]));
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([
+    {
+      url: "../api/templates/",
+      data: [validResumeTemplate1,validResumeTemplate2],
+    }, {
+      url: "../api/resumes/",
+      data: [],
+    }
+  ]));
   await renderThisRoute();
   const resumeTemplates: HTMLElement[] = queryResumeTemplates();
   expect(resumeTemplates[0]).toHaveTextContent(validResumeTemplate1.name);
@@ -119,7 +134,15 @@ test("resume templates are displayed with their names", async () => {
 });
 
 test("resume templates are displayed with their images", async () => {
-  mockFunctions.fetchData.mockImplementation(generateResponse([validResumeTemplate1,validResumeTemplate2]));
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([
+    {
+      url: "../api/templates/",
+      data: [validResumeTemplate1,validResumeTemplate2],
+    }, {
+      url: "../api/resumes/",
+      data: [],
+    }
+  ]));
   await renderThisRoute();
   const resumeTemplates: HTMLElement[] = queryResumeTemplates();
   expect(resumeTemplates[0].querySelector("img")?.src).toBe(validResumeTemplate1.png);
@@ -127,7 +150,15 @@ test("resume templates are displayed with their images", async () => {
 });
 
 test("resume templates are displayed with a delete button", async () => {
-  mockFunctions.fetchData.mockImplementation(generateResponse([validResumeTemplate1,validResumeTemplate2]));
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([
+    {
+      url: "../api/templates/",
+      data: [validResumeTemplate1,validResumeTemplate2],
+    }, {
+      url: "../api/resumes/",
+      data: [],
+    }
+  ]));
   await renderThisRoute();
   const resumeTemplates: HTMLElement[] = queryResumeTemplates();
   for (const resumeTemplate of resumeTemplates) {
@@ -137,21 +168,25 @@ test("resume templates are displayed with a delete button", async () => {
 });
 
 test("resume templates are displayed with a download button", async () => {
-  const validResumeTemplates: ResumeTemplateDownload[] = [validResumeTemplate1,validResumeTemplate2];
-  mockFunctions.fetchData.mockImplementation(generateResponse(validResumeTemplates));
+  const validResumeTemplates: ResumeTemplate[] = [validResumeTemplate1,validResumeTemplate2];
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([
+    {
+      url: "../api/templates/",
+      data: validResumeTemplates,
+    }, {
+      url: "../api/resumes/",
+      data: [],
+    }
+  ]));
   await renderThisRoute();
   const resumeTemplates: HTMLElement[] = queryResumeTemplates();
   for (let i = 0; i < resumeTemplates.length; i++) {
     const resumeTemplate: HTMLElement = resumeTemplates[i];
     const downloadButton: HTMLElement = getByRole(resumeTemplate, "button", {name: new RegExp("download", "i")});
     expect(downloadButton).toBeInTheDocument();
-    expect(downloadButton).toHaveAttribute("href", validResumeTemplates[i].upload);
+    expect(downloadButton).toHaveAttribute("href", validResumeTemplates[i].docx);
   }
 });
-
-function closeResumeTemplateModal(): void {
-  closeModal("add resume template");
-}
 
 test("adding a job adds the same job to the backlog column", async () => {
   await renderThisRoute();
@@ -167,10 +202,9 @@ test("adding a job adds the same job to the backlog column", async () => {
   await act(async () => {
     userEvent.click(submitButton);
   });
-  closeResumeTemplateModal();
 
   // check that the API was called again to add the resume template
-  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
+  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(3);
   expect(mockFunctions.fetchData).toHaveBeenCalledWith("../api/templates/", expect.objectContaining({
     method: "POST",
     body: expect.any(FormData)
@@ -194,7 +228,15 @@ function getResumeTemplateByName(name: string): HTMLElement {
 }
 
 test("deleting a resume template removes it from the backlog column", async () => {
-  mockFunctions.fetchData.mockImplementation(generateResponse([validResumeTemplate1,validResumeTemplate2]));
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([
+    {
+      url: "../api/templates/",
+      data: [validResumeTemplate1,validResumeTemplate2],
+    }, {
+      url: "../api/resumes/",
+      data: [],
+    }
+  ]));
   await renderThisRoute();
 
   // delete validResumeTemplate2
@@ -206,9 +248,9 @@ test("deleting a resume template removes it from the backlog column", async () =
   });
 
   // check that the API was called again to delete the resume template
-  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
+  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(3);
   expect(mockFunctions.fetchData).toHaveBeenCalledWith(
-    `../api/templates/${validResumeTemplate2.name}/`,
+    `../api/templates/${validResumeTemplate2.id}/`,
     expect.objectContaining({method: "DELETE"}
   ));
 

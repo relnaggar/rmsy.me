@@ -1,5 +1,5 @@
-import { Job } from "./JobsPage";
-import { ResumeTemplateDownload } from "./ResumeTemplates";
+import { Job } from "../jobs/types";
+import { ResumeTemplate } from "../resumes/types";
 
 export function generateResponse(data: any, status: number = 200): () => Promise<Response> {
   return async () => new Response(
@@ -10,6 +10,28 @@ export function generateResponse(data: any, status: number = 200): () => Promise
       },
     }
   );
+}
+
+type MockAPIRoute = {
+  url: string,
+  data: any,
+  status?: number,
+}
+
+export function generateConditionalResponseByRoute(mockAPIRoutes: MockAPIRoute[], status: number = 200): (
+  input: RequestInfo | URL, init?: RequestInit | undefined
+) => Promise<Response> {
+  return async (input: RequestInfo | URL, init?: RequestInit | undefined) => {
+    const mockAPIRoute: MockAPIRoute = mockAPIRoutes.find((mockAPIRoute) => mockAPIRoute.url === input.toString())!;
+    return new Response(      
+      JSON.stringify(mockAPIRoute.data), {
+        status: mockAPIRoute.status || status,
+        headers: {
+          "Content-type": "application/json",
+        },
+      }
+    );
+  }
 }
 
 export const validJob1: Job = {
@@ -38,16 +60,18 @@ export const validJob2: Job = {
   chosen_resume: null,
 }
 
-export const validResumeTemplate1: ResumeTemplateDownload = new ResumeTemplateDownload({
+export const validResumeTemplate1: ResumeTemplate = {
+  id: 1,
   name: "Test Resume Template 1",
   description: "Test Description 1",
-  upload: "https://www.example.com/test1.docx",
+  docx: "https://www.example.com/test1.docx",
   png: "https://www.example.com/test1.png",
-});
+};
 
-export const validResumeTemplate2: ResumeTemplateDownload = new ResumeTemplateDownload({
+export const validResumeTemplate2: ResumeTemplate = {
+  id: 2,
   name: "Test Resume Template 2",
   description: "Test Description 2",
-  upload: "https://www.example.com/test2.docx",
+  docx: "https://www.example.com/test2.docx",
   png: "https://www.example.com/test2.png",
-});
+};

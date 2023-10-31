@@ -85,7 +85,7 @@ volumes:
   ${volume}:
     external: true
 END
-  logfun docker-compose -f - run --rm backup cp -r "${volume}" backup/
+  logfun docker-compose -f - run -T --rm backup cp -r "${volume}" backup/
   logfun sudo chmod -R +r "backup/${volume}"
 
   log "end"

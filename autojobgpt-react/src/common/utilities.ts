@@ -35,3 +35,21 @@ export function generatePlaceholderWidths(numberOfRows: number): number[] {
   }
   return placeHolderWidths;
 }
+
+export function closeModal(modal: HTMLElement): void {
+  modal.removeAttribute("aria-modal")
+  modal.removeAttribute("role")
+  modal.classList.remove("show");
+  modal.setAttribute("style", "display: none;");
+  modal.setAttribute("aria-hidden", "true");
+
+  document.body.classList.remove("modal-open");
+  document.body.removeAttribute("style");
+  document.body.removeAttribute("data-bs-overflow");
+  document.body.removeAttribute("data-bs-padding-right");
+
+  const modalBackdrops = document.getElementsByClassName("modal-backdrop");
+  for (let i = 0; i < modalBackdrops.length; i++) {
+    modalBackdrops[i].remove();
+  }
+}

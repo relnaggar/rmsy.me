@@ -1,0 +1,35 @@
+import { Job } from "../jobs/types";
+import { ChatMessage } from "../common/types";
+
+type Substition = {
+  id: number,
+  key: string,
+  value: string,
+  resume: number,
+}
+
+export type Resume = {
+  id: number,
+  substitutions: Substition[],
+  version: number,
+  docx: string,
+  png: string,
+  chat_messages: ChatMessage[],
+  job: Job,
+  template: string,
+  name: string,
+}
+
+export type ResumeTemplate = {
+  id: number,
+  name: string,
+  docx: string,
+  png: string,
+  description?: string
+}
+
+export type ResumeTemplateUpload = {
+  name: string,
+  docx: File,
+  description?: string
+}

@@ -1,5 +1,5 @@
-import { injectMocks, renderRoute, testRouteAndAllChildren } from "./testUtilities";
-import { routesConfig }  from "./routesConfig";
+import { injectMocks, renderRoute, testRouteAndAllChildren } from "./common/testUtilities";
+import { routesConfig }  from "./routes/routesConfig";
 
 beforeEach(() => {
   jest.clearAllMocks();
