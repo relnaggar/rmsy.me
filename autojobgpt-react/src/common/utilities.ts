@@ -48,8 +48,8 @@ export function closeModal(modal: HTMLElement): void {
   document.body.removeAttribute("data-bs-overflow");
   document.body.removeAttribute("data-bs-padding-right");
 
-  const modalBackdrops = document.getElementsByClassName("modal-backdrop");
-  for (let i = 0; i < modalBackdrops.length; i++) {
-    modalBackdrops[i].remove();
-  }
+  const backdrops: NodeListOf<HTMLElement> = document.querySelectorAll(".modal-backdrop");
+  backdrops.forEach(function(backdrop) {
+    backdrop.parentElement!.removeChild(backdrop);
+  });
 }

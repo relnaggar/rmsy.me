@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 
-import { ResumeTemplatesSection, AddTemplateModal } from "./ResumeTemplates";
-import { ResumesSection, AddResumeModal } from "./ResumeList";
-import { Resume, ResumeTemplate, ResumeTemplateUpload } from "./types";
+import ResumeTemplateList from "./ResumeTemplateList";
+import ResumeList from "./ResumeList";
+import AddTemplateModal from "./AddTemplateModal";
+import GenerateResumeModal from './GenerateResumeModal';
+import { ResumeTemplate, ResumeTemplateUpload, Resume, ResumeUpload } from "./types";
 
 
 export default function ResumesPage({ fetchData }: {
@@ -11,7 +13,7 @@ export default function ResumesPage({ fetchData }: {
   const [templates, setTemplates] = useState<ResumeTemplate[]>([]);
   const [addedTemplate, setAddedTemplate] = useState<ResumeTemplateUpload | null>(null);
   const [resumes, setResumes] = useState<Resume[]>([]);
-  const [addedResume, setAddedResume] = useState<Resume | null>(null);
+  const [addedResume, setAddedResume] = useState<ResumeUpload | null>(null);
 
   function addTemplate(templateUpload: ResumeTemplateUpload): void {
     // add placeholder template to templates state
@@ -28,7 +30,7 @@ export default function ResumesPage({ fetchData }: {
     setAddedTemplate(templateUpload);
   }
 
-  function addResume(resume: Resume): void {
+  function addResume(resume: ResumeUpload): void {
     // add placeholder resume to resumes state
     const placeholderResume: Resume = {
       id: -1,
@@ -50,14 +52,14 @@ export default function ResumesPage({ fetchData }: {
   return (
     <>
       <main>
-        <ResumeTemplatesSection
+        <ResumeTemplateList
           fetchData={fetchData}
           templates={templates}
           setTemplates={setTemplates}
           addedTemplate={addedTemplate}
           setAddedTemplate={setAddedTemplate}
         />
-        <ResumesSection
+        <ResumeList
           fetchData={fetchData}
           resumes={resumes}
           setResumes={setResumes}
@@ -66,7 +68,7 @@ export default function ResumesPage({ fetchData }: {
          />
       </main>
       <AddTemplateModal addTemplate={addTemplate} />
-      <AddResumeModal addResume={addResume} />
+      <GenerateResumeModal addResume={addResume} />
     </>
   );
 }

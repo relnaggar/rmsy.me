@@ -15,9 +15,14 @@ export type Resume = {
   docx: string,
   png: string,
   chat_messages: ChatMessage[],
-  job: Job,
-  template: string,
+  job: Job | number,
+  template: number,
   name: string,
+}
+
+export type ResumeUpload = {
+  job: number,
+  template: number,
 }
 
 export type ResumeTemplate = {

@@ -3,28 +3,34 @@ import React, { useState, useEffect } from 'react';
 import DocumentList from '../common/DocumentList';
 import { RemoveDocumentContext } from '../common/DocumentThumbnail';
 import { ModalContext } from '../common/AddDocument';
-import { Resume } from './types';
+import { Resume, ResumeUpload } from './types';
 
 
-export function ResumesSection({ fetchData, resumes, setResumes, addedResume, setAddedResume }: {
+export default function ResumeList({ fetchData, resumes, setResumes, addedResume, setAddedResume }: {
   fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>,
   resumes: Resume[],
   setResumes: React.Dispatch<React.SetStateAction<Resume[]>>,
-  addedResume: Resume | null,
-  setAddedResume: React.Dispatch<React.SetStateAction<Resume | null>>
+  addedResume: ResumeUpload | null,
+  setAddedResume: React.Dispatch<React.SetStateAction<ResumeUpload | null>>
 }): React.JSX.Element { 
+  const [resumesLoaded, setResumesLoaded] = useState<boolean>(false);
   const [removedResumeId, setRemovedResumeId] = useState<number>(-1);
 
   useEffect(() => {
     async function getResumes(): Promise<void> {
-      fetchData('../api/resumes/')
+      await fetchData('../api/resumes/')
       .then(response => response.json())
-      .then(data => 
-        setResumes(data)
-      )
+      .then(data => setResumes(data))
+      .catch(error => console.error('Error:', error))
+      .finally(() => setResumesLoaded(true));
     }
     getResumes()    
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function removeResume(id: number): void {
+    setResumes(resumes.filter((resume) => resume.id !== id));
+    setRemovedResumeId(id);
+  }
 
   useEffect(() => {
     async function deleteResume(): Promise<void> {
@@ -40,72 +46,18 @@ export function ResumesSection({ fetchData, resumes, setResumes, addedResume, se
     }
   }, [removedResumeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  function removeResume(pk: string | number): void {
-    setResumes(resumes.filter((resume) => resume.id !== pk));
-    setRemovedResumeId(pk as number);
-  }
-
   return(
     <section>
       <h2>Resumes</h2>
       <RemoveDocumentContext.Provider value={removeResume}>
-        <ModalContext.Provider value={{modalId: "addResumeModal", modalFocusId: "TODO"}}>
+        <ModalContext.Provider value={{modalId: "generateResumeModal", modalFocusId: "job"}}>
           <DocumentList
             documents={resumes}
-            areDocumentsLoaded={true}
+            areDocumentsLoaded={resumesLoaded}
             addButtonText="Generate new resume"
           />
         </ModalContext.Provider>
       </RemoveDocumentContext.Provider>
     </section>
   )
-}
-
-export function AddResumeModal({ addResume }: {
-  addResume: (resume: Resume) => void
-}): React.JSX.Element {
-  // TODO
-  // const [job, setJob] = useState<Job | null>(null);
-  // const [template, setTemplate] = useState<string>("");
-
-  // function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
-  //   event.preventDefault();
-  //   if (job && template) {
-  //     addResume(new Resume({
-  //       id: -1,
-  //       substitutions: [],
-  //       version: -1,
-  //       docx: "",
-  //       png: "",
-  //       chat_messages: [],
-  //       job: job,
-  //       template: template
-  //     }));
-  //   }
-  // }
-
-  return (
-    <></>
-    // TODO
-    // <form onSubmit={handleSubmit}>
-    //   <h3>Generate new resume</h3>
-    //   <label htmlFor="job">Job</label>
-    //   <input
-    //     id="job"
-    //     type="text"
-    //     value={job ? job.title + ", " + job.company : ""}
-    //     onChange={(event) => setJob(JSON.parse(event.target.value))}
-    //     required
-    //   />
-    //   <label htmlFor="template">Template</label>
-    //   <input
-    //     id="template"
-    //     type="text"
-    //     value={template}
-    //     onChange={(event) => setTemplate(event.target.value)}
-    //     required
-    //   />
-    //   <button type="submit">Generate</button>
-    // </form>
-  );
 }
