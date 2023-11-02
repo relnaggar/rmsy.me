@@ -4,6 +4,7 @@ import ResumeTemplateList from "./ResumeTemplateList";
 import ResumeList from "./ResumeList";
 import AddTemplateModal from "./AddTemplateModal";
 import GenerateResumeModal from './GenerateResumeModal';
+import { ShowModalButtonContext } from "../common/AddDocument";
 import { ResumeTemplate, ResumeTemplateUpload, Resume, ResumeUpload } from "./types";
 
 
@@ -14,6 +15,8 @@ export default function ResumesPage({ fetchData }: {
   const [addedTemplate, setAddedTemplate] = useState<ResumeTemplateUpload | null>(null);
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [addedResume, setAddedResume] = useState<ResumeUpload | null>(null);
+  const [showAddTemplate, setShowAddTemplate] = useState<boolean>(false);
+  const [showGenerateResume, setShowGenerateResume] = useState<boolean>(false);
 
   function addTemplate(templateUpload: ResumeTemplateUpload): void {
     // add placeholder template to templates state
@@ -52,23 +55,28 @@ export default function ResumesPage({ fetchData }: {
   return (
     <>
       <main>
-        <ResumeTemplateList
-          fetchData={fetchData}
-          templates={templates}
-          setTemplates={setTemplates}
-          addedTemplate={addedTemplate}
-          setAddedTemplate={setAddedTemplate}
-        />
-        <ResumeList
-          fetchData={fetchData}
-          resumes={resumes}
-          setResumes={setResumes}
-          addedResume={addedResume}
-          setAddedResume={setAddedResume}
-         />
+        <ShowModalButtonContext.Provider value={{setShow: setShowAddTemplate, buttonText: "Upload resume template"}}>
+          <ResumeTemplateList
+            fetchData={fetchData}
+            templates={templates}
+            setTemplates={setTemplates}
+            addedTemplate={addedTemplate}
+            setAddedTemplate={setAddedTemplate}
+          />
+        </ShowModalButtonContext.Provider>
+        <ShowModalButtonContext.Provider value={{setShow: setShowGenerateResume, buttonText: "Generate new resume"}}>
+          <ResumeList
+            fetchData={fetchData}
+            resumes={resumes}
+            setResumes={setResumes}
+            addedResume={addedResume}
+            setAddedResume={setAddedResume}
+          />
+         </ShowModalButtonContext.Provider>
       </main>
-      <AddTemplateModal addTemplate={addTemplate} />
-      <GenerateResumeModal addResume={addResume} />
+      <AddTemplateModal show={showAddTemplate} setShow={setShowAddTemplate} addTemplate={addTemplate} />
+      <GenerateResumeModal show={showGenerateResume} setShow={setShowGenerateResume} addResume={addResume}
+      />
     </>
   );
 }

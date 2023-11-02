@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 
 import DocumentList from '../common/DocumentList';
 import { RemoveDocumentContext } from '../common/DocumentThumbnail';
-import { ModalContext } from '../common/AddDocument';
 import { Resume, ResumeUpload } from './types';
 
 
@@ -50,13 +49,7 @@ export default function ResumeList({ fetchData, resumes, setResumes, addedResume
     <section>
       <h2>Resumes</h2>
       <RemoveDocumentContext.Provider value={removeResume}>
-        <ModalContext.Provider value={{modalId: "generateResumeModal", modalFocusId: "job"}}>
-          <DocumentList
-            documents={resumes}
-            areDocumentsLoaded={resumesLoaded}
-            addButtonText="Generate new resume"
-          />
-        </ModalContext.Provider>
+        <DocumentList documents={resumes} areDocumentsLoaded={resumesLoaded} />
       </RemoveDocumentContext.Provider>
     </section>
   )

@@ -1,39 +1,51 @@
-import { closeModal } from "../common/utilities";
+import React from "react";
+import Modal from 'react-bootstrap/Modal';
 
-export default function AddJobModal({ addJob }: {
+export default function AddJobModal({ show, setShow, addJob }: {
+  show: boolean,
+  setShow: (show: boolean) => void,
   addJob: (url: string) => void,
 }): React.JSX.Element {
+  function handleClose() {
+    setShow(false);
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+    // prevent page from reloading
     e.preventDefault();
-    const modal: HTMLElement = document.getElementById("addJobModal")!;
-    closeModal(modal);
+
+    // close modal
+    handleClose();
+
+    // add job    
     const url: string = (document.getElementById("url") as HTMLInputElement).value;
     addJob(url);
+
+    // reset form
     e.currentTarget.reset();   
   }
 
+  function onEntered(): void {
+    document.getElementById("url")?.focus();
+  }
+
   return (
-    <div className="modal fade" id="addJobModal" tabIndex={-1} aria-labelledby="addJobModalLabel" aria-hidden="true">
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h1 className="modal-title fs-5" id="addJobModalLabel">Add Job</h1>
-            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <Modal show={show} onHide={handleClose} onEntered={onEntered} aria-labelledby="addJobModalLabel">
+      <Modal.Header closeButton>
+        <Modal.Title id="addJobModalLabel">Add Job</Modal.Title>
+      </Modal.Header>
+      <form onSubmit={handleSubmit}>
+        <Modal.Body>
+          <div className="mb-3">
+            <label htmlFor="url" className="form-label">URL</label>
+            <input type="url" className="form-control" id="url" name="url" required />
           </div>
-          <form onSubmit={handleSubmit}>
-            <div className="modal-body">
-              <div className="mb-3">
-                <label htmlFor="url" className="form-label">URL</label>
-                <input type="url" className="form-control" id="url" name="url" required />
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" className="btn btn-primary">Submit</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
+          <button type="submit" className="btn btn-primary">Submit</button>
+        </Modal.Footer>        
+      </form>
+    </Modal>
   );
 }

@@ -7,6 +7,7 @@ import { Job } from "./types";
 
 export const LoadedContext = createContext<boolean>(false);
 export const RemoveJobContext = createContext<(jobId: number) => void>(() => {});
+export const SetShowContext = createContext<(show: boolean) => void>(() => {});
 
 export default function Jobs({ fetchData }: {
   fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>
@@ -17,6 +18,7 @@ export default function Jobs({ fetchData }: {
   const [removedJobId, setRemovedJobId] = useState<number>(-1);
   const [updatedJobId, setUpdatedJobId] = useState<number>(-1);
   const [updatedJobStatus, setUpdatedJobStatus] = useState<string>("");
+  const [showAddJob, setShowAddJob] = useState<boolean>(false);
 
   useEffect(() => {
     async function getJobs(): Promise<void> {
@@ -134,11 +136,13 @@ export default function Jobs({ fetchData }: {
       <main>
         <RemoveJobContext.Provider value={removeJob}>
           <LoadedContext.Provider value={loaded}>
-            <JobBoard jobs={jobs} updateJobStatus={updateJobStatus} />
+            <SetShowContext.Provider value={setShowAddJob}>
+              <JobBoard jobs={jobs} updateJobStatus={updateJobStatus} />
+            </SetShowContext.Provider>
           </LoadedContext.Provider>
         </RemoveJobContext.Provider>
       </main>
-      <AddJobModal addJob={addJob} />
+      <AddJobModal show={showAddJob} setShow={setShowAddJob} addJob={addJob} />
     </>
   );
 }

@@ -1,19 +1,17 @@
 import React, { createContext, useContext } from "react";
 
 
-export const ModalContext = createContext<{modalId: string, modalFocusId: string}>({modalId: "", modalFocusId: ""});
-
-export default function AddDocument({ buttonText }: {
+export const ShowModalButtonContext = createContext<{
+  setShow: (show: boolean) => void,
   buttonText: string
-}): React.JSX.Element {
-  const {modalId, modalFocusId}: {modalId: string, modalFocusId: string} = useContext(ModalContext);
+}>({setShow: (_: boolean) => {}, buttonText: ""});
+
+export default function AddDocument(): React.JSX.Element {
+  const {setShow, buttonText} = useContext(ShowModalButtonContext);
 
   // focus on name input when modal is shown
-  function handleAddDocumentClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    const modal: HTMLElement = document.getElementById(modalId)!;
-    modal.addEventListener("shown.bs.modal", () => {
-      document.getElementById(modalFocusId)?.focus();
-    });
+  function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    setShow(true);
   }
 
   return (
@@ -23,9 +21,7 @@ export default function AddDocument({ buttonText }: {
         <button
           type="button"
           className="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target={`#${modalId}`}
-          onClick={handleAddDocumentClick}
+          onClick={handleClick}
         >{`+ ${buttonText}`}</button>
       </div>
     </div>

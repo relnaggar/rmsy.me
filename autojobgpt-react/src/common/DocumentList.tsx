@@ -5,10 +5,9 @@ import AddDocument from './AddDocument';
 import { Document } from './types';
 
 
-export default function DocumentList({ documents, areDocumentsLoaded, addButtonText }: {
+export default function DocumentList({ documents, areDocumentsLoaded }: {
   documents: Document[],
   areDocumentsLoaded: boolean,
-  addButtonText: string
 }): React.JSX.Element {
   return (
     <div className="d-flex overflow-x-auto border border-5 p-2" role="list">
@@ -17,7 +16,7 @@ export default function DocumentList({ documents, areDocumentsLoaded, addButtonT
           {documents.map((document, _) => 
             <DocumentThumbnail document={document} key={document.id} />
           )}
-          <AddDocument buttonText={addButtonText} />
+          <AddDocument />
         </>
       :
         // display 3 placeholders while templates are being fetched

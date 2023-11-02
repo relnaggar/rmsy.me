@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 
 import { LoadedContext } from "./Jobs";
 import JobCard from "./JobCard";
+import { SetShowContext } from "./Jobs";
 import { Job } from "./types";
 
 
@@ -13,12 +14,10 @@ export default function Column({ title, jobs, onDragStart, onDragOver, onDrop }:
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void,
 }): React.JSX.Element {
   const loaded: boolean = useContext(LoadedContext);
+  const setShowAddJob: (show: boolean) => void = useContext(SetShowContext);
 
   function handleAddJobClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    const jobModal: HTMLElement | null = document.getElementById("addJobModal");
-    jobModal?.addEventListener("shown.bs.modal", () => {
-      document.getElementById("url")?.focus();
-    });
+    setShowAddJob(true);
   }
 
   return (
@@ -45,8 +44,6 @@ export default function Column({ title, jobs, onDragStart, onDragOver, onDrop }:
             <button
               type="button"
               className="btn btn-primary"
-              data-bs-toggle="modal"
-              data-bs-target="#addJobModal"
               onClick={handleAddJobClick}
             >+ Add job</button>
           : "" }

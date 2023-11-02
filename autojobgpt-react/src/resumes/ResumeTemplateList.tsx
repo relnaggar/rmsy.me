@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 
 import DocumentList from "../common/DocumentList";
 import { RemoveDocumentContext } from "../common/DocumentThumbnail";
-import { ModalContext } from "../common/AddDocument";
 import { toFormData } from "../common/utilities";
 import { ResumeTemplate, ResumeTemplateUpload } from "./types";
 
@@ -78,13 +77,7 @@ export default function ResumeTemplateList({ fetchData, templates, setTemplates,
     <section>
       <h2>Templates</h2>
       <RemoveDocumentContext.Provider value={removeTemplate}>
-        <ModalContext.Provider value={{modalId: "addTemplateModal", modalFocusId: "name"}}>
-          <DocumentList
-            documents={templates}
-            areDocumentsLoaded={templatesLoaded}
-            addButtonText="Upload resume template"
-          />
-        </ModalContext.Provider>
+        <DocumentList documents={templates} areDocumentsLoaded={templatesLoaded} />
       </RemoveDocumentContext.Provider>
     </section>
   )

@@ -1,19 +1,24 @@
 import React from "react";
+import Modal from 'react-bootstrap/Modal';
 
-import { closeModal } from "../common/utilities";
 import { ResumeUpload } from "./types";
 
-export default function GenerateResumeModal({ addResume }: {
+
+export default function GenerateResumeModal({ show, setShow, addResume }: {
+  show: boolean,
+  setShow: (show: boolean) => void,
   addResume: (resume: ResumeUpload) => void
 }): React.JSX.Element {
+  function handleClose() {
+    setShow(false);
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     // prevent page from reloading
     e.preventDefault();
 
     // close modal
-    const modal: HTMLElement = document.getElementById("generateResumeModal")!;
-    closeModal(modal);
+    handleClose();
 
     // add resume
     const job: number = (document.getElementById("job") as HTMLInputElement).valueAsNumber;
@@ -27,48 +32,41 @@ export default function GenerateResumeModal({ addResume }: {
     e.currentTarget.reset();
   }
 
+  function onEntered(): void {
+    document.getElementById("job")?.focus();
+  }
+
   return (
-    <div
-      className="modal fade"
-      id="generateResumeModal"
-      tabIndex={-1}
-      aria-labelledby="generateResumeModalLabel"
-      aria-hidden="true"
-    >
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h1 className="modal-title fs-5" id="generateResumeModalLabel">Generate Resume</h1>
-            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <Modal show={show} onHide={handleClose} onEntered={onEntered} aria-labelledby="generateResumeModalLabel">
+      <Modal.Header closeButton>
+        <Modal.Title id="generateResumeModalLabel">Generate Resume</Modal.Title>
+      </Modal.Header>        
+      <form onSubmit={handleSubmit}>
+        <Modal.Body>
+          <div className="mb-3">
+            <label htmlFor="job" className="form-label">Job</label>
+            <select className="form-select" id="job" name="job" defaultValue="0" required>
+              <option value="0">Open this select menu</option>
+              <option value="1">One</option>
+              <option value="2">Two</option>
+              <option value="3">Three</option>
+            </select>
           </div>
-          <form onSubmit={handleSubmit}>
-            <div className="modal-body">
-              <div className="mb-3">
-                <label htmlFor="job" className="form-label">Job</label>
-                <select className="form-select" id="job" name="job" defaultValue="0" required>
-                  <option value="0">Open this select menu</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
-                </select>
-              </div>
-              <div className="mb-3">
-                <label htmlFor="template" className="form-label">Template</label>
-                <select className="form-select" id="template" name="template" defaultValue="0" required>
-                  <option value="0">Open this select menu</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
-                </select>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" className="btn btn-primary">Submit</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+          <div className="mb-3">
+            <label htmlFor="template" className="form-label">Template</label>
+            <select className="form-select" id="template" name="template" defaultValue="0" required>
+              <option value="0">Open this select menu</option>
+              <option value="1">One</option>
+              <option value="2">Two</option>
+              <option value="3">Three</option>
+            </select>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
+          <button type="submit" className="btn btn-primary">Submit</button>
+        </Modal.Footer>
+      </form>
+    </Modal>
   );
 }
