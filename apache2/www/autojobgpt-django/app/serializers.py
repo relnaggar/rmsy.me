@@ -40,19 +40,18 @@ class FeedbackSerializer(serializers.Serializer):
 class ResumeSerializer(serializers.ModelSerializer):   
   def create(self, validated_data):
     return self.Meta.model._default_manager.create(validated_data)
-
+  
+  substitutions = ResumeSubstitutionSerializer(many=True, read_only=True)
+  job_details = JobSerializer(source='job', read_only=True)
+  name = serializers.SerializerMethodField(required=False)
+  
   class Meta:
     model = Resume
     fields = "__all__"
     extra_kwargs = {
-      'docx': {'required': False},    
-      'png': {'required': False},
+      'docx': {'required': False},
+      'png': {'required': False},      
     }
-
-  substitutions = ResumeSubstitutionSerializer(many=True, read_only=True)
-  job = serializers.PrimaryKeyRelatedField(queryset=Job.objects.all(), write_only=True)
-  job_details = JobSerializer(source='job', read_only=True)
-  name = serializers.SerializerMethodField()
 
   def get_name(self, obj):
     return str(obj)

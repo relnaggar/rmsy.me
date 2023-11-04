@@ -171,6 +171,10 @@ class Job(models.Model):
 
 class ResumeManager(models.Manager):
   def create(self, validated_data):
+    # if the job already has a resume, then we need to increment the version
+    if Resume.objects.filter(job=validated_data["job"]).exists():
+      validated_data["version"] = Resume.get_next_version(validated_data["job"])
+
     resume = Resume(**validated_data)
     resume.save()
     resume.fill()
@@ -181,10 +185,8 @@ class ResumeManager(models.Manager):
 
 class Resume(models.Model, IDocumentModel):
   objects = ResumeManager()
-  job = models.ForeignKey(to="Job", on_delete=models.CASCADE, related_name="resumes")  
-  template = models.ForeignKey(
-    to="ResumeTemplate", on_delete=models.SET_NULL, null=True
-  )
+  job = models.ForeignKey(to="Job", on_delete=models.SET_NULL, related_name="resumes", null=True)  
+  template = models.ForeignKey(to="ResumeTemplate", on_delete=models.SET_NULL, null=True)
   version = models.IntegerField(default=1)
   docx = models.FileField(upload_to='resumes/')
   png = models.FileField(upload_to='resumes/')
@@ -211,8 +213,9 @@ class Resume(models.Model, IDocumentModel):
   def is_filled(self):
     return self.substitutions.count() > 0
   
-  def get_next_version(self):
-    return Resume.objects.filter(job=self.job).aggregate(
+  @staticmethod
+  def get_next_version(job):
+    return Resume.objects.filter(job=job).aggregate(
       models.Max('version')
     )["version__max"] + 1
 
@@ -241,7 +244,7 @@ class Resume(models.Model, IDocumentModel):
     # create the new resume
     new_resume = Resume.objects.create(
       job=self.job,
-      version=self.get_next_version(),
+      version=Resume.get_next_version(self.job),
       chat_messages=chat_messages,
     )
     self._create_resume_substitutions(new_resume, substitutions)
@@ -405,7 +408,7 @@ class ResumeSubstitution(models.Model):
     response = json.loads(chat_message.content)
     new_resume = Resume.objects.create(
       job=self.resume.job,
-      version=self.resume.get_next_version(),
+      version=Resume.get_next_version(self.resume.job),
       chat_messages=self.resume.chat_messages + chat_messages_rewinded_1 + [chat_message],
     )
     for resume_substitution in self.resume.substitutions.all():
@@ -432,7 +435,7 @@ class ResumeSubstitution(models.Model):
     # copy the resume and its substitutions
     new_resume = Resume.objects.create(
       job=self.resume.job,
-      version=self.resume.get_next_version(),
+      version=Resume.get_next_version(self.resume.job),
       chat_messages=self.resume.chat_messages + chat.get_additional_messages(),
     )
     for resume_substitution in self.resume.substitutions.all():
