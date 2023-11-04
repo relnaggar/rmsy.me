@@ -1,26 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 
 import DocumentList from '../common/DocumentList';
 import { RemoveDocumentContext } from '../common/DocumentThumbnail';
+import { FetchDataContext } from "../routes/routesConfig";
 import { Resume, ResumeUpload } from './types';
 
 
-export default function ResumeList({ fetchData, resumes, setResumes, addedResume, setAddedResume }: {
-  fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>,
+export default function ResumeList({ resumes, setResumes, addedResume, setAddedResume }: {
   resumes: Resume[],
   setResumes: React.Dispatch<React.SetStateAction<Resume[]>>,
   addedResume: ResumeUpload | null,
   setAddedResume: React.Dispatch<React.SetStateAction<ResumeUpload | null>>
 }): React.JSX.Element { 
+  const fetchData = useContext(FetchDataContext);
+
   const [resumesLoaded, setResumesLoaded] = useState<boolean>(false);
   const [removedResumeId, setRemovedResumeId] = useState<number>(-1);
 
   useEffect(() => {
     async function getResumes(): Promise<void> {
-      await fetchData('../api/resumes/')
+      await fetchData("../api/resumes/")
       .then(response => response.json())
       .then(data => setResumes(data))
-      .catch(error => console.error('Error:', error))
+      .catch(error => console.error("Error:", error))
       .finally(() => setResumesLoaded(true));
     }
     getResumes()    
@@ -44,6 +46,34 @@ export default function ResumeList({ fetchData, resumes, setResumes, addedResume
       deleteResume();
     }
   }, [removedResumeId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // add template to server if addedTemplate is changed to a non-null value
+  useEffect(() => {
+    async function postResume(): Promise<void> {
+      await fetchData("../api/resumes/", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          "job": addedResume?.job,
+          "template": addedResume?.template,
+        }),        
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        // replace placeholder resume with resume from server
+        setResumes([
+          ...resumes.filter((resume) => resume.id !== -1),
+          data
+        ]);
+        // resume has been added so set addedResume to null
+        setAddedResume(null);
+      })
+      .catch((error) => console.error("Error:", error));
+    }
+    if (addedResume !== null) {
+      postResume();
+    }
+  }, [addedResume]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return(
     <section>

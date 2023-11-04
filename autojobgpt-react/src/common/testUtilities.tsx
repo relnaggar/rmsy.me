@@ -20,10 +20,10 @@ export function injectMocks() {
     for (const route of routes) {
       if (route.element) {
         route.element = route.element as React.ReactElement;
-        if (route.element.props && route.element.props.fetchData) {
+        if (route.element.props && route.element.props.value) {
           route.element = React.cloneElement(route.element, {
             ...route.element.props,
-            fetchData: mockFunctions.fetchData,
+            value: mockFunctions.fetchData,
           });
         }
       }

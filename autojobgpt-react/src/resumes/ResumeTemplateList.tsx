@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import DocumentList from "../common/DocumentList";
 import { RemoveDocumentContext } from "../common/DocumentThumbnail";
 import { toFormData } from "../common/utilities";
+import { FetchDataContext } from "../routes/routesConfig";
 import { ResumeTemplate, ResumeTemplateUpload } from "./types";
 
 
-export default function ResumeTemplateList({ fetchData, templates, setTemplates, addedTemplate, setAddedTemplate  }: {
-  fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>,
+export default function ResumeTemplateList({ templates, setTemplates, addedTemplate, setAddedTemplate  }: {
   templates: ResumeTemplate[],
   setTemplates: React.Dispatch<React.SetStateAction<ResumeTemplate[]>>,
   addedTemplate: ResumeTemplateUpload | null,
   setAddedTemplate: React.Dispatch<React.SetStateAction<ResumeTemplateUpload | null>>
 }): React.JSX.Element {  
+  const fetchData = useContext(FetchDataContext);
+
   const [templatesLoaded, setTemplatesLoaded] = useState<boolean>(false);
   const [removedTemplateId, setRemovedTemplateId] = useState<number>(-1);
 
@@ -39,7 +41,7 @@ export default function ResumeTemplateList({ fetchData, templates, setTemplates,
       .then((data) => {
         // replace placeholder template with template from server
         setTemplates([
-          ...templates.filter((template) => template.docx !== ""),
+          ...templates.filter((template) => template.id !== -1),
           data
         ]);
         // template has been added so set addedTemplate to null
@@ -51,6 +53,12 @@ export default function ResumeTemplateList({ fetchData, templates, setTemplates,
       postTemplate(toFormData(addedTemplate));
     }
   }, [addedTemplate]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // remove template from templates state and queue template to be deleted from server
+  function removeTemplate(id: number): void {
+    setTemplates(templates.filter((template) => template.id !== id));
+    setRemovedTemplateId(id);
+  }
 
   // delete template from server if removedTemplateName is changed to a non-empty string
   useEffect(() => {
@@ -66,12 +74,6 @@ export default function ResumeTemplateList({ fetchData, templates, setTemplates,
       deleteTemplate();
     }
   }, [removedTemplateId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // remove template from templates state and queue template to be deleted from server
-  function removeTemplate(id: number): void {
-    setTemplates(templates.filter((template) => template.id !== id));
-    setRemovedTemplateId(id);
-  }
 
   return(
     <section>

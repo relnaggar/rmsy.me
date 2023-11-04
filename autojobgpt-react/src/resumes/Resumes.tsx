@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 
 import ResumeTemplateList from "./ResumeTemplateList";
 import ResumeList from "./ResumeList";
 import AddTemplateModal from "./AddTemplateModal";
 import GenerateResumeModal from './GenerateResumeModal';
+import { FetchDataContext } from "../routes/routesConfig";
 import { ShowModalButtonContext } from "../common/AddDocument";
 import { ResumeTemplate, ResumeTemplateUpload, Resume, ResumeUpload } from "./types";
 
 
-export default function ResumesPage({ fetchData }: {
-  fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>
-}): React.JSX.Element {
+export default function ResumesPage(): React.JSX.Element {
+  const fetchData = useContext(FetchDataContext);
+  
   const [templates, setTemplates] = useState<ResumeTemplate[]>([]);
   const [addedTemplate, setAddedTemplate] = useState<ResumeTemplateUpload | null>(null);
   const [resumes, setResumes] = useState<Resume[]>([]);
@@ -57,26 +58,25 @@ export default function ResumesPage({ fetchData }: {
       <main>
         <ShowModalButtonContext.Provider value={{setShow: setShowAddTemplate, buttonText: "Upload resume template"}}>
           <ResumeTemplateList
-            fetchData={fetchData}
             templates={templates}
             setTemplates={setTemplates}
             addedTemplate={addedTemplate}
             setAddedTemplate={setAddedTemplate}
           />
-        </ShowModalButtonContext.Provider>
+        </ShowModalButtonContext.Provider>        
         <ShowModalButtonContext.Provider value={{setShow: setShowGenerateResume, buttonText: "Generate new resume"}}>
           <ResumeList
-            fetchData={fetchData}
             resumes={resumes}
             setResumes={setResumes}
             addedResume={addedResume}
             setAddedResume={setAddedResume}
           />
-         </ShowModalButtonContext.Provider>
+        </ShowModalButtonContext.Provider>
       </main>
       <AddTemplateModal show={showAddTemplate} setShow={setShowAddTemplate} addTemplate={addTemplate} />
-      <GenerateResumeModal show={showGenerateResume} setShow={setShowGenerateResume} addResume={addResume}
-      />
+      <FetchDataContext.Provider value={fetchData}>
+        <GenerateResumeModal show={showGenerateResume} setShow={setShowGenerateResume} addResume={addResume} />
+      </FetchDataContext.Provider>
     </>
   );
 }

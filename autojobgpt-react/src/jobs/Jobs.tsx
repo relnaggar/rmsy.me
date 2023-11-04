@@ -1,5 +1,6 @@
-import React, { useState, useEffect, createContext } from "react";
+import React, { useState, useEffect, createContext, useContext } from "react";
 
+import { FetchDataContext } from "../routes/routesConfig";
 import JobBoard from "./JobBoard";
 import AddJobModal from "./AddJobModal";
 import { Job } from "./types";
@@ -9,9 +10,9 @@ export const LoadedContext = createContext<boolean>(false);
 export const RemoveJobContext = createContext<(jobId: number) => void>(() => {});
 export const SetShowContext = createContext<(show: boolean) => void>(() => {});
 
-export default function Jobs({ fetchData }: {
-  fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>
-}): React.JSX.Element {
+export default function Jobs(): React.JSX.Element {
+  const fetchData = useContext(FetchDataContext);
+
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [addedJob, setAddedJob] = useState<Job | null>(null);
@@ -55,7 +56,7 @@ export default function Jobs({ fetchData }: {
 
   useEffect(() => {
     async function postJob(): Promise<void> {
-      return await fetchData("../api/jobs/", { 
+      await fetchData("../api/jobs/", { 
         method: "POST", 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

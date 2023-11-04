@@ -1,7 +1,10 @@
 import React from "react";
 import Modal from 'react-bootstrap/Modal';
 
+import SelectWithRefresh from "../common/SelectWithRefresh";
 import { ResumeUpload } from "./types";
+import { Job } from "../jobs/types";
+import { ResumeTemplate } from "../resumes/types";
 
 
 export default function GenerateResumeModal({ show, setShow, addResume }: {
@@ -21,11 +24,11 @@ export default function GenerateResumeModal({ show, setShow, addResume }: {
     handleClose();
 
     // add resume
-    const job: number = (document.getElementById("job") as HTMLInputElement).valueAsNumber;
-    const template: number = (document.getElementById("template") as HTMLInputElement).valueAsNumber;
+    const job: number = parseInt((document.getElementById("job") as HTMLSelectElement).value);
+    const template: number = parseInt((document.getElementById("template") as HTMLSelectElement).value);
     addResume({
       job: job,
-      template: template
+      template: template,
     });
 
     // reset form
@@ -45,21 +48,19 @@ export default function GenerateResumeModal({ show, setShow, addResume }: {
         <Modal.Body>
           <div className="mb-3">
             <label htmlFor="job" className="form-label">Job</label>
-            <select className="form-select" id="job" name="job" defaultValue="0" required>
-              <option value="0">Open this select menu</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
-            </select>
+            <SelectWithRefresh<Job>
+              apiPath="../api/jobs/"
+              id="job"
+              optionToString={(job) => `${job.title}, ${job.company}`}
+            />
           </div>
           <div className="mb-3">
             <label htmlFor="template" className="form-label">Template</label>
-            <select className="form-select" id="template" name="template" defaultValue="0" required>
-              <option value="0">Open this select menu</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
-            </select>
+            <SelectWithRefresh<ResumeTemplate>
+              apiPath="../api/templates/"
+              id="template"
+              optionToString={(template) => template.name}
+            />
           </div>
         </Modal.Body>
         <Modal.Footer>
