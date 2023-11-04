@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { ReactComponent as BoxArrowUpRight } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
 
 import { RemoveJobContext } from './Jobs';
 import { Job } from './types';
@@ -34,7 +35,12 @@ export default function JobCard({ job, onDragStart }: {
         </span>
       }
       {job.company ?
-        <p className="card-subtitle">{job.company}</p>
+        <p className="card-subtitle">
+          <a href={job.url} target="_blank" rel="noreferrer" className="link-light">
+            {job.company}
+            <BoxArrowUpRight className="ms-1" />
+          </a>
+        </p>
       :
         <span className="placeholder-glow">
           <span className="placeholder col-7"></span>
