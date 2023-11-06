@@ -5,13 +5,13 @@ import AddDocument from './AddDocument';
 import { Document } from './types';
 
 
-export default function DocumentList({ documents, areDocumentsLoaded }: {
+export default function DocumentList({ documents, documentsLoaded }: {
   documents: Document[],
-  areDocumentsLoaded: boolean,
+  documentsLoaded: boolean,
 }): React.JSX.Element {
   return (
     <div className="d-flex overflow-x-auto border border-5 p-2" role="list">
-      {areDocumentsLoaded ?
+      {documentsLoaded ?
         <>
           {documents.map((document, _) => 
             <DocumentThumbnail document={document} key={document.id} />

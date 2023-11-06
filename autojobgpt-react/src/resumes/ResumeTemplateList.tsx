@@ -82,7 +82,7 @@ export default function ResumeTemplateList({ templates, setTemplates, addedTempl
     <section>
       <h2>Templates</h2>
       <RemoveDocumentContext.Provider value={removeTemplate}>
-        <DocumentList documents={templates} areDocumentsLoaded={templatesLoaded} />
+        <DocumentList documents={templates} documentsLoaded={templatesLoaded} />
       </RemoveDocumentContext.Provider>
     </section>
   )

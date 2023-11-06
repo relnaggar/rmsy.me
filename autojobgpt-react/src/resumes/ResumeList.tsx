@@ -82,7 +82,7 @@ export default function ResumeList({ resumes, setResumes, addedResume, setAddedR
     <section>
       <h2>Resumes</h2>
       <RemoveDocumentContext.Provider value={removeResume}>
-        <DocumentList documents={resumes} areDocumentsLoaded={resumesLoaded} />
+        <DocumentList documents={resumes} documentsLoaded={resumesLoaded} />
       </RemoveDocumentContext.Provider>
     </section>
   )
