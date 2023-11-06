@@ -21,7 +21,10 @@ export default function ResumeTemplateList({ templates, setTemplates, addedTempl
   // fetch templates from server on page load
   useEffect(() => {
     async function getTemplates(): Promise<void> {
-      await fetchData("../api/templates/")
+      await fetchData("../api/templates/", { 
+        method: "GET", 
+        headers: { "Content-Type": "application/json" },
+      })
       .then(response => response.json())
       .then(data => setTemplates(data))
       .catch(error => console.error("Error:", error))

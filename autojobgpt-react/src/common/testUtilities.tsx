@@ -64,7 +64,7 @@ export function testRouteAndAllChildren(
 export async function openAndGetModal(openModalButton: HTMLElement, modalName: string, timeout: number = 1000): Promise<HTMLElement> {
   // click the add resume template button
   await act(async () => {
-    await userEvent.click(openModalButton);
+    userEvent.click(openModalButton);
   });
   
   // wait for the modal to appear

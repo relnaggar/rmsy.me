@@ -19,7 +19,10 @@ export default function ResumeList({ resumes, setResumes, addedResume, setAddedR
 
   useEffect(() => {
     async function getResumes(): Promise<void> {
-      await fetchData("../api/resumes/")
+      await fetchData("../api/resumes/", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
       .then(response => response.json())
       .then(data => setResumes(data))
       .catch(error => console.error("Error:", error))

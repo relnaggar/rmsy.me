@@ -1,5 +1,5 @@
 import { Job } from "../jobs/types";
-import { ResumeTemplate } from "../resumes/types";
+import { ResumeTemplate, Resume } from "../resumes/types";
 
 export function generateResponse(data: any, status: number = 200): () => Promise<Response> {
   return async () => new Response(
@@ -22,10 +22,10 @@ export function generateConditionalResponseByRoute(mockAPIRoutes: MockAPIRoute[]
   input: RequestInfo | URL, init?: RequestInit | undefined
 ) => Promise<Response> {
   return async (input: RequestInfo | URL, init?: RequestInit | undefined) => {
-    const mockAPIRoute: MockAPIRoute = mockAPIRoutes.find((mockAPIRoute) => mockAPIRoute.url === input.toString())!;
+    const mockAPIRoute: MockAPIRoute | undefined = mockAPIRoutes.find((mockAPIRoute) => mockAPIRoute.url === input.toString());
     return new Response(      
-      JSON.stringify(mockAPIRoute.data), {
-        status: mockAPIRoute.status || status,
+      JSON.stringify(mockAPIRoute ? mockAPIRoute.data : []), {
+        status: mockAPIRoute && mockAPIRoute.status ? mockAPIRoute.status : status,
         headers: {
           "Content-type": "application/json",
         },
@@ -74,4 +74,28 @@ export const validResumeTemplate2: ResumeTemplate = {
   description: "Test Description 2",
   docx: "https://www.example.com/test2.docx",
   png: "https://www.example.com/test2.png",
+};
+
+export const validResume1: Resume = {
+  id: 1,
+  substitutions: [],
+  version: 1,
+  docx: "https://www.example.com/test1.docx",
+  png: "https://www.example.com/test1.png",
+  chat_messages: [],
+  job: validJob1.id,
+  template: validResumeTemplate1.id,
+  name: validJob1.title + ", " + validJob1.company + ", " + 1
+};
+
+export const validResume2: Resume = {
+  id: 2,
+  substitutions: [],
+  version: 1,
+  docx: "https://www.example.com/test2.docx",
+  png: "https://www.example.com/test2.png",
+  chat_messages: [],
+  job: validJob2.id,
+  template: validResumeTemplate2.id,
+  name: validJob2.title + ", " + validJob2.company + ", " + 1
 };

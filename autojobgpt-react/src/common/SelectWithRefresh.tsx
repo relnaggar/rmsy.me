@@ -3,7 +3,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { FetchDataContext } from "../routes/routesConfig";
 
 
-interface WithID {
+export interface WithID {
   id: number,
 }
 
@@ -41,13 +41,18 @@ export default function SelectWithRefresh<Option extends WithID>({apiPath, id, o
 
   return (
     <div className="input-group">
-      <select className="form-select" id={id} name={id} defaultValue="0" required disabled={!loaded} >
+      <select className="form-select" id={id} name={id} defaultValue="0" required disabled={!loaded} aria-busy={loaded} >
         <option value="0">{ loaded ? "Open this select menu" : "Loading..."}</option>
         {options.map((option) => (
           <option key={option.id} value={option.id}>{optionToString(option)}</option>
         ))}
       </select>
-      <button className="btn btn-outline-primary" type="button" onClick={handleRefresh}>Refresh</button>
+      <button
+        className="btn btn-outline-primary"
+        type="button"
+        onClick={handleRefresh}
+        aria-controls={id}
+      >Refresh</button>
     </div>
   );
 }
