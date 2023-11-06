@@ -3,7 +3,7 @@
   I've been a naughty little developer for this project and haven't penned a single proper test.
   Horrified gasp, right?
   Absolutely shocking behaviour.
-  But before you spank my ass and banish me from the coding kingdom, give me a chance to redeem myself, at least from the DevOps perspective.
+  But before you banish me from the coding kingdom, give me a chance to redeem myself, at least from the DevOps perspective.
   Despite the numerous test-shaped holes, what is not lacking is the effort I excerted to painstakingly configure <strong>automated testing</strong> and set up <strong>testing frameworks</strong>.
 </p>
 
