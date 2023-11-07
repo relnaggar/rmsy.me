@@ -1,16 +1,15 @@
-import React, { createContext } from "react";
+import React from "react";
+import { ReactComponent as PencilSquare } from "bootstrap-icons/icons/pencil-square.svg";
+import { ReactComponent as Trash3 } from "bootstrap-icons/icons/trash3.svg";
 
 import { generatePlaceholderWidths } from "./utilities";
 import { Document } from "./types";
 
-
-export const RemoveDocumentContext = createContext<((id: number) => void)>(() => {});
-
-export default function DocumentThumbnail({ document }: {
-  document: Document
+export default function DocumentThumbnail({ document, onClickEditDocument, onClickRemoveDocument }: {
+  document: Document,
+  onClickEditDocument?: (id: number) => void,
+  onClickRemoveDocument?: (id: number) => void,
 }): React.JSX.Element {
-  const removeDocument: (id: number) => void = React.useContext(RemoveDocumentContext);
-
   return (
     <div
       className="document text-center me-3"
@@ -46,15 +45,27 @@ export default function DocumentThumbnail({ document }: {
             </div>
           </h6>
         :
-          <h6 className="p-1 m-0 bg-body border rounded">{document.name}</h6>
-        }
-        {document.name !== "" &&
-          <button
-            type="button"
-            className="btn-close"
-            aria-label="Delete"
-            onClick={(e) => removeDocument(document.id)}
-          ></button>
+          <>
+            <h6 className="p-2 m-0 bg-body border rounded">{document.name}</h6>
+            <div className="btn-group ms-1" role="group">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                aria-label="Edit"
+                onClick={(e) => {onClickEditDocument!(document.id)}}
+              >
+                <PencilSquare />
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                aria-label="Delete"
+                onClick={(e) => onClickRemoveDocument!(document.id)}
+              >
+                <Trash3 />
+              </button>
+            </div>
+          </>
         }
       </div>
 

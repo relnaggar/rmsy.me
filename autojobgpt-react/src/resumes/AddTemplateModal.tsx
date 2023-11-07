@@ -4,10 +4,10 @@ import Modal from 'react-bootstrap/Modal';
 import { ResumeTemplateUpload } from "./types";
 
 
-export default function AddTemplateModal({ show, setShow, addTemplate }: {
+export default function AddTemplateModal({ show, setShow, onSubmitAddTemplate }: {
   show: boolean,
   setShow: (show: boolean) => void,
-  addTemplate: (template: ResumeTemplateUpload) => void
+  onSubmitAddTemplate: (template: ResumeTemplateUpload) => void
 }): React.JSX.Element {
   function handleClose() {
     setShow(false);
@@ -25,7 +25,7 @@ export default function AddTemplateModal({ show, setShow, addTemplate }: {
     const docx: File = (document.getElementById("upload") as HTMLInputElement).files![0];
     const description: string = (document.getElementById("description") as HTMLInputElement).value;
     const templateUpload: ResumeTemplateUpload = { name, docx, description };
-    addTemplate(templateUpload);
+    onSubmitAddTemplate(templateUpload);
 
     // reset form
     e.currentTarget.reset();

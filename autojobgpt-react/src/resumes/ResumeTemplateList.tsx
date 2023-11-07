@@ -1,24 +1,22 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
+
+import { FetchDataContext } from "../routes/routesConfig";
 
 import DocumentList from "../common/DocumentList";
-import { RemoveDocumentContext } from "../common/DocumentThumbnail";
 import { toFormData } from "../common/utilities";
-import { FetchDataContext } from "../routes/routesConfig";
+
+import EditTemplateModal from "./EditTemplateModal";
+import AddTemplateModal from "./AddTemplateModal";
+
 import { ResumeTemplate, ResumeTemplateUpload } from "./types";
 
 
-export default function ResumeTemplateList({ templates, setTemplates, addedTemplate, setAddedTemplate  }: {
-  templates: ResumeTemplate[],
-  setTemplates: React.Dispatch<React.SetStateAction<ResumeTemplate[]>>,
-  addedTemplate: ResumeTemplateUpload | null,
-  setAddedTemplate: React.Dispatch<React.SetStateAction<ResumeTemplateUpload | null>>
-}): React.JSX.Element {  
+export default function ResumeTemplateList(): React.JSX.Element {  
   const fetchData = useContext(FetchDataContext);
 
-  const [templatesLoaded, setTemplatesLoaded] = useState<boolean>(false);
-  const [removedTemplateId, setRemovedTemplateId] = useState<number>(-1);
-
-  // fetch templates from server on page load
+  // get templates from server
+  const [templates, setTemplates] = useState<ResumeTemplate[]>([]);
+  const [templatesLoaded, setTemplatesLoaded] = useState<boolean>(false);  
   useEffect(() => {
     async function getTemplates(): Promise<void> {
       await fetchData("../api/templates/", { 
@@ -33,7 +31,54 @@ export default function ResumeTemplateList({ templates, setTemplates, addedTempl
     getTemplates();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // add template to server if addedTemplate is changed to a non-null value
+  // edit template
+  const [showEditTemplateModal, setShowEditTemplateModal] = useState<boolean>(false);
+  const [editTemplateID, setEditTemplateID] = useState<number>(-1);
+  function handleClickEditTemplate(id: number): void {
+    setEditTemplateID(id);
+    setShowEditTemplateModal(true);    
+  }
+
+  // remove template
+  const [removedTemplateId, setRemovedTemplateId] = useState<number>(-1);
+  function removeTemplate(id: number): void {
+    setTemplates(templates.filter((template) => template.id !== id));
+    setRemovedTemplateId(id);
+  }  
+  useEffect(() => {
+    async function deleteTemplate(): Promise<void> {
+      await fetchData(`../api/templates/${removedTemplateId}/`, { 
+        method: "DELETE", 
+        headers: { "Content-Type": "application/json" },
+      })
+      .then((response) => response.status === 204 && setRemovedTemplateId(-1))
+      .catch((error) => console.error("Error:", error));
+    }
+    if (removedTemplateId !== -1) {
+      deleteTemplate();
+    }
+  }, [removedTemplateId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // add template
+  const [showAddTemplateModal, setShowAddTemplateModal] = useState<boolean>(false);
+  const [addedTemplate, setAddedTemplate] = useState<ResumeTemplateUpload | null>(null);
+  function handleClickAddTemplate(): void {
+    setShowAddTemplateModal(true);
+  }
+  function addTemplate(templateUpload: ResumeTemplateUpload): void {
+    // add placeholder template to templates state
+    const placeholderTemplate: ResumeTemplate = {
+      id: -1,
+      name: templateUpload.name,
+      docx: "",
+      png: "",
+      description: templateUpload.description
+    };
+    setTemplates([...templates, placeholderTemplate]);
+
+    // queue template to be added to server
+    setAddedTemplate(templateUpload);
+  }
   useEffect(() => {
     async function postTemplate(formData: FormData): Promise<void> {
       await fetchData("../api/templates/", { 
@@ -57,33 +102,19 @@ export default function ResumeTemplateList({ templates, setTemplates, addedTempl
     }
   }, [addedTemplate]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // remove template from templates state and queue template to be deleted from server
-  function removeTemplate(id: number): void {
-    setTemplates(templates.filter((template) => template.id !== id));
-    setRemovedTemplateId(id);
-  }
-
-  // delete template from server if removedTemplateName is changed to a non-empty string
-  useEffect(() => {
-    async function deleteTemplate(): Promise<void> {
-      await fetchData(`../api/templates/${removedTemplateId}/`, { 
-        method: "DELETE", 
-        headers: { "Content-Type": "application/json" },
-      })
-      .then((response) => response.status === 204 && setRemovedTemplateId(-1))
-      .catch((error) => console.error("Error:", error));
-    }
-    if (removedTemplateId !== -1) {
-      deleteTemplate();
-    }
-  }, [removedTemplateId]); // eslint-disable-line react-hooks/exhaustive-deps
-
   return(
     <section>
       <h2>Templates</h2>
-      <RemoveDocumentContext.Provider value={removeTemplate}>
-        <DocumentList documents={templates} documentsLoaded={templatesLoaded} />
-      </RemoveDocumentContext.Provider>
+      <DocumentList
+        documents={templates}
+        documentsLoaded={templatesLoaded}
+        onClickEditDocument={handleClickEditTemplate}
+        onClickRemoveDocument={removeTemplate}
+        onClickAddDocument={handleClickAddTemplate}
+        addButtonText="Upload resume template"
+      />
+      <EditTemplateModal show={showEditTemplateModal} setShow={setShowEditTemplateModal} id={editTemplateID} />
+      <AddTemplateModal show={showAddTemplateModal} setShow={setShowAddTemplateModal} onSubmitAddTemplate={addTemplate} />
     </section>
   )
 }

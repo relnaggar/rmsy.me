@@ -1,19 +1,9 @@
-import React, { createContext, useContext } from "react";
+import React from "react";
 
-
-export const ShowModalButtonContext = createContext<{
-  setShow: (show: boolean) => void,
-  buttonText: string
-}>({setShow: (_: boolean) => {}, buttonText: ""});
-
-export default function AddDocument(): React.JSX.Element {
-  const {setShow, buttonText} = useContext(ShowModalButtonContext);
-
-  // focus on name input when modal is shown
-  function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    setShow(true);
-  }
-
+export default function AddDocument({ onClickAddDocument, buttonText }: {
+  onClickAddDocument: () => void,
+  buttonText: string,
+}): React.JSX.Element {
   return (
     <div className="document">
       <div className="document-image img-thumbnail"></div>
@@ -21,7 +11,7 @@ export default function AddDocument(): React.JSX.Element {
         <button
           type="button"
           className="btn btn-primary"
-          onClick={handleClick}
+          onClick={(e) => onClickAddDocument()}
         >{`+ ${buttonText}`}</button>
       </div>
     </div>

@@ -5,18 +5,34 @@ import AddDocument from './AddDocument';
 import { Document } from './types';
 
 
-export default function DocumentList({ documents, documentsLoaded }: {
+export default function DocumentList({
+  documents,
+  documentsLoaded,
+  onClickEditDocument,
+  onClickRemoveDocument,
+  onClickAddDocument,
+  addButtonText
+}: {
   documents: Document[],
   documentsLoaded: boolean,
+  onClickEditDocument: (id: number) => void,
+  onClickRemoveDocument: (id: number) => void,
+  onClickAddDocument: () => void,
+  addButtonText: string,
 }): React.JSX.Element {
   return (
     <div className="d-flex overflow-x-auto border border-5 p-2" role="list">
       {documentsLoaded ?
         <>
           {documents.map((document, _) => 
-            <DocumentThumbnail document={document} key={document.id} />
+            <DocumentThumbnail
+              document={document}
+              key={document.id}
+              onClickEditDocument={onClickEditDocument}
+              onClickRemoveDocument={onClickRemoveDocument}
+            />
           )}
-          <AddDocument />
+          <AddDocument onClickAddDocument={onClickAddDocument} buttonText={addButtonText} />
         </>
       :
         // display 3 placeholders while templates are being fetched
