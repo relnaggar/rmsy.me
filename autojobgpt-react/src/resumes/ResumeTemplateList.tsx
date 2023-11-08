@@ -33,6 +33,7 @@ export default function ResumeTemplateList(): React.JSX.Element {
     setEditTemplateID(id);
     setShowEditTemplateModal(true);    
   }  
+  
   function handleClickAddTemplate(): void {
     setShowAddTemplateModal(true);
   }

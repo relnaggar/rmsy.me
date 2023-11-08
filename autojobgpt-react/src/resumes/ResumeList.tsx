@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import useResource from '../hooks/useResource';
 import DocumentList from '../common/DocumentList';
+import EditResumeModal from './EditResumeModal';
 import GenerateResumeModal from './GenerateResumeModal';
 import { Resume, ResumeUpload } from './types';
 
@@ -28,11 +29,15 @@ export default function ResumeList(): React.JSX.Element {
     errors
   } = useResource<Resume,ResumeUpload>("../api/resumes/", getPlaceholderResume);
 
-  const [showGenerateResume, setShowGenerateResume] = useState<boolean>(false);  
+  const [showEditResumeModal, setShowEditResumeModal] = useState<boolean>(false);
+  const [editResumeID, setEditResumeID] = useState<number>(-1);
+  const [showGenerateResume, setShowGenerateResume] = useState<boolean>(false);
 
   function handleClickEditResume(id: number): void {
-    console.log(`edit resume ${id}`);
+    setEditResumeID(id);
+    setShowEditResumeModal(true); 
   }
+  
   function handleClickAddResume(): void {
     setShowGenerateResume(true);
   }  
@@ -48,6 +53,7 @@ export default function ResumeList(): React.JSX.Element {
         onClickAddDocument={handleClickAddResume}
         addButtonText="Generate new resume"
       />
+      <EditResumeModal show={showEditResumeModal} setShow={setShowEditResumeModal} id={editResumeID} />
       <GenerateResumeModal show={showGenerateResume} setShow={setShowGenerateResume} addResume={addResume} />
     </section>
   )
