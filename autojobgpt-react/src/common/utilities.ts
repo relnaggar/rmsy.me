@@ -2,14 +2,6 @@ export function toPascalCase(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-export function toFormData(object: {[index: string]: string | File}): FormData {
-  const formData: FormData = new FormData();
-  for (const [key, value] of Object.entries(object)) {
-    formData.append(key, value);
-  }
-  return formData;
-}
-
 export function generatePlaceholderWidths(numberOfRows: number): number[] {
   // generate a random list of numbers
   // the numbers represent the width of each placeholder span

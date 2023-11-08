@@ -18,11 +18,12 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    async function postResource(): Promise<void> {
+    async function postResource(body: FormData | string): Promise<void> {
       await fetchData(apiPath, { 
         method: "POST", 
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(addedResourceUpload),   
+        // if the body is a FormData, then we don't need to set the Content-Type header
+        headers: body instanceof FormData ? {} : { "Content-Type": "application/json" },
+        body: body
       })
       .then((response) => response.json())
       .then((data) => {
@@ -36,7 +37,21 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
       .catch((error) => setError(error.message));
     }
     if (addedResourceUpload !== null) {
-      postResource();
+      const formData = new FormData();
+      let containsFile = false;
+      for (const [key, value] of Object.entries(addedResourceUpload!)) {
+        if (value instanceof File) {
+          containsFile = true;
+          formData.append(key, value);
+        }
+      }
+      if (containsFile) {
+        // if the addedResource contains a file, then we need to use FormData
+        postResource(formData);
+      } else {
+        // otherwise we should use JSON
+        postResource(JSON.stringify(addedResourceUpload));
+      }
     }
   }, [fetchData, apiPath, addedResourceUpload, resources, setResources]);
 

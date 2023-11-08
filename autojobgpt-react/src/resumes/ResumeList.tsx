@@ -23,20 +23,19 @@ export default function ResumeList(): React.JSX.Element {
       name: "",
     }
   };
-
   const {
     resources: resumes,
     loaded: resumesLoaded,
     removeResource: removeResume,
     addResource: addResume,
     errors
-  } = useResource(fetchData, "../api/resumes/", getPlaceholderResume);
-  const [showGenerateResume, setShowGenerateResume] = useState<boolean>(false);
+  } = useResource<Resume,ResumeUpload>(fetchData, "../api/resumes/", getPlaceholderResume);
+
+  const [showGenerateResume, setShowGenerateResume] = useState<boolean>(false);  
 
   function handleClickEditResume(id: number): void {
     console.log(`edit resume ${id}`);
-  }  
-  
+  }
   function handleClickAddResume(): void {
     setShowGenerateResume(true);
   }  
