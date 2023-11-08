@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 
+import { FetchData } from '../../routes/types';
 import { Resume } from '../types';
 
 
-export default function useFetchResumes(
-  fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>
-): {
+export default function useFetchResumes(fetchData: FetchData): {
   resumes: Resume[],
-  setResumes: (resumes: Resume[]) => void,
+  setResumes: React.Dispatch<React.SetStateAction<Resume[]>>,
   resumesLoaded: boolean,
   error: string
 } {

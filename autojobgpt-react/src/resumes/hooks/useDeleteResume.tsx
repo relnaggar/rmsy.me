@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 
+import { Resume } from "../types";
+
+
 export default function useDeleteResume(
-  fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>
+  fetchData: (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>,
+  resumes: Resume[],
+  setResumes: React.Dispatch<React.SetStateAction<Resume[]>>,
 ): {
-  setRemovedResumeId: (id: number) => void,
+  removeResume: (id: number) => void,
   error: string
 } {
   const [removedResumeId, setRemovedResumeId] = useState<number>(-1);
@@ -22,6 +27,11 @@ export default function useDeleteResume(
       deleteResume();
     }
   }, [fetchData, removedResumeId]);
+
+  function removeResume(id: number): void {
+    setResumes(resumes.filter((resume) => resume.id !== id));
+    setRemovedResumeId(id);
+  }
   
-  return { setRemovedResumeId, error };
+  return { removeResume, error };
 }

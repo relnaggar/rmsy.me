@@ -5,9 +5,10 @@ import Layout from "./Layout";
 import Home from "../home/Home";
 import Jobs from "../jobs/Jobs";
 import Resumes from "../resumes/Resumes";
+import { FetchData } from "./types";
 
 
-export const FetchDataContext = createContext(
+export const FetchDataContext = createContext<FetchData>(
   (input: RequestInfo, init?: RequestInit | undefined) => Promise.resolve(new Response())
 );
 
