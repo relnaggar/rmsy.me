@@ -1,12 +1,14 @@
 import { render, screen } from "@testing-library/react";
+import { act } from "react-dom/test-utils";
 import userEvent from "@testing-library/user-event";
 
-import SelectWithRefresh, { WithID } from "./SelectWithRefresh";
+import SelectWithRefresh from "./SelectWithRefresh";
 import { FetchDataContext } from "../routes/routesConfig";
+import { generateResponse, validJob1, validJob2 } from "./mockAPI";
 import { mockFunctions } from "./testUtilities";
 import { Job } from "../jobs/types";
-import { generateResponse, validJob1, validJob2 } from "./mockAPI";
-import { act } from "react-dom/test-utils";
+import { WithID } from "./types";
+
 
 beforeEach(() => {
   jest.clearAllMocks();

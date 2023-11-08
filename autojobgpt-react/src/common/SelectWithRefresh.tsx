@@ -1,11 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
 
 import { FetchDataContext } from "../routes/routesConfig";
+import { WithID } from "./types";
 
-
-export interface WithID {
-  id: number,
-}
 
 export default function SelectWithRefresh<Option extends WithID>({apiPath, id, optionToString}: {
   apiPath: string,

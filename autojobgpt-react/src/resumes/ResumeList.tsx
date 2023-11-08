@@ -1,15 +1,36 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 
-import useResumes from './hooks/useResumes';
 import { FetchDataContext } from "../routes/routesConfig";
+import useResource from '../hooks/useResource';
 import DocumentList from '../common/DocumentList';
 import GenerateResumeModal from './GenerateResumeModal';
+import { Resume, ResumeUpload } from './types';
 
 
 export default function ResumeList(): React.JSX.Element { 
   const fetchData = useContext(FetchDataContext);
 
-  const { resumes, resumesLoaded, removeResume, addResume, errors } = useResumes(fetchData);
+  function getPlaceholderResume(resumeUpload: ResumeUpload): Resume {
+    return {
+      id: -1,
+      substitutions: [],
+      version: -1,
+      docx: "",
+      png: "",
+      chat_messages: [],
+      job: resumeUpload.job,
+      template: resumeUpload.template,
+      name: "",
+    }
+  };
+
+  const {
+    resources: resumes,
+    loaded: resumesLoaded,
+    removeResource: removeResume,
+    addResource: addResume,
+    errors
+  } = useResource(fetchData, "../api/resumes/", getPlaceholderResume);
   const [showGenerateResume, setShowGenerateResume] = useState<boolean>(false);
 
   function handleClickEditResume(id: number): void {

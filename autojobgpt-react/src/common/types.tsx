@@ -1,3 +1,7 @@
+export type WithID = {
+  id: number
+}
+
 export type ChatMessage = {
   role: string,
   content: string,
