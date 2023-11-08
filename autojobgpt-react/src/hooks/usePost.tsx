@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 
+import { FetchDataContext } from "../routes/routesConfig";
 import { WithID } from "../common/types";
-import { FetchData } from "../routes/types";
 
 
 export default function usePost<Resource extends WithID, ResourceUpload>(
-  fetchData: FetchData,
   apiPath: string,
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
@@ -14,6 +13,8 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
   addResource: (resource: ResourceUpload) => void,
   error: string,
 } {
+  const fetchData = useContext(FetchDataContext);
+  
   const [addedResourceUpload, setAddedResourceUpload] = useState<ResourceUpload | null>(null);
   const [error, setError] = useState<string>("");
 

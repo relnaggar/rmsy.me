@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
-import { FetchData } from "../routes/types";
+import { FetchDataContext } from "../routes/routesConfig";
 import { WithID } from "../common/types";
 
 
 export default function usePatch<Resource extends WithID>(
-  fetchData: FetchData,
   apiPath: string,
   resources: Resource[],
   setJobs: React.Dispatch<React.SetStateAction<Resource[]>>
@@ -13,6 +12,8 @@ export default function usePatch<Resource extends WithID>(
   updateResource: (id: number, patch: Partial<Resource>) => void,
   error: string
 } {
+  const fetchData = useContext(FetchDataContext);
+
   const [updatedId, setUpdatedId] = useState<number>(-1);
   const [patch, setPatch] = useState<Partial<Resource>>({});
   const [error, setError] = useState<string>("");

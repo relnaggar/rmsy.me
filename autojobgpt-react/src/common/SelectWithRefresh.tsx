@@ -1,6 +1,6 @@
-import React, { useContext, useState, useEffect } from "react";
+import React from "react";
 
-import { FetchDataContext } from "../routes/routesConfig";
+import useFetch from "../hooks/useFetch";
 import { WithID } from "./types";
 
 
@@ -9,28 +9,7 @@ export default function SelectWithRefresh<Option extends WithID>({apiPath, id, o
   id: string,
   optionToString: (option: Option) => string,
 }): React.JSX.Element {
-  const fetchData = useContext(FetchDataContext);
-
-  const [options, setOptions] = useState<Option[]>([]);
-  const [loaded, setLoaded] = useState<boolean>(false);
-
-  useEffect(() => {
-    async function getOptions(): Promise<void> {
-      await fetchData(apiPath, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then(response => response.json())
-      .then(data => setOptions(data))
-      .catch(error => console.error("Error:", error))
-      .finally(() => setLoaded(true));
-    }
-    if (!loaded) {
-      getOptions();
-    }
-  }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
+  const { resources: options, loaded, setLoaded, error } = useFetch<Option>(apiPath);
 
   function handleRefresh(): void {
     setLoaded(false);
@@ -38,7 +17,7 @@ export default function SelectWithRefresh<Option extends WithID>({apiPath, id, o
 
   return (
     <div className="input-group">
-      <select className="form-select" id={id} name={id} defaultValue="0" required disabled={!loaded} aria-busy={loaded} >
+      <select className="form-select" id={id} name={id} defaultValue="0" required disabled={!loaded} aria-busy={loaded}>
         <option value="0">{ loaded ? "Open this select menu" : "Loading..."}</option>
         {options.map((option) => (
           <option key={option.id} value={option.id}>{optionToString(option)}</option>

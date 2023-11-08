@@ -1,25 +1,28 @@
-import React, { useContext } from "react";
+import React from "react";
 
-import { LoadedContext } from "./Jobs";
 import JobCard from "./JobCard";
-import { SetShowContext } from "./Jobs";
 import { Job } from "./types";
 
 
-export default function Column({ title, jobs, onDragStart, onDragOver, onDrop }: {
+export default function Column({
+  title,
+  jobs,
+  loaded,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onClickAddJob,
+  onClickRemoveJob
+}: {
   title: string,
   jobs: Job[],
+  loaded: boolean,
   onDragStart: (jobId: number) => (e: React.DragEvent<HTMLDivElement>) => void,
   onDragOver: (e: React.DragEvent<HTMLDivElement>) => void,
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void,
+  onClickAddJob?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  onClickRemoveJob: (jobId: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
 }): React.JSX.Element {
-  const loaded: boolean = useContext(LoadedContext);
-  const setShowAddJob: (show: boolean) => void = useContext(SetShowContext);
-
-  function handleAddJobClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    setShowAddJob(true);
-  }
-
   return (
     <div className="kanban-column me-2" onDragOver={onDragOver} onDrop={onDrop}>
       <div className="card">
@@ -37,14 +40,21 @@ export default function Column({ title, jobs, onDragStart, onDragOver, onDrop }:
               </p>
             </div>
           )}
-          {jobs.map((job) => <JobCard key={job.id} job={job} onDragStart={onDragStart(job.id)} />)}
+          {jobs.map((job) =>
+            <JobCard
+              key={job.id}
+              job={job}
+              onDragStart={onDragStart(job.id)}
+              onClickRemoveJob={onClickRemoveJob(job.id)}
+            />
+          )}
         </div>
         <div className="card-footer">
-          { title.toLowerCase() === "backlog" ?
+          { onClickAddJob ?
             <button
               type="button"
               className="btn btn-primary"
-              onClick={handleAddJobClick}
+              onClick={onClickAddJob}
             >+ Add job</button>
           : "" }
         </div>

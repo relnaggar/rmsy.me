@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
+import { FetchDataContext } from "../routes/routesConfig";
 import { WithID } from "../common/types";
-import { FetchData } from "../routes/types";
 
 
 export default function useDelete<Resource extends WithID>(
-  fetchData: FetchData,
   apiPath: string,
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
@@ -13,6 +12,8 @@ export default function useDelete<Resource extends WithID>(
   removeResource: (id: number) => void,
   error: string
 } {
+  const fetchData = useContext(FetchDataContext);
+
   const [removedId, setRemovedId] = useState<number>(-1);
   const [error, setError] = useState<string>("");
 

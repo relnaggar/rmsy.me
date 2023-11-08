@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 
+import useResource from "../hooks/useResource";
 import JobColumn from "./JobColumn";
+import AddJobModal from "./AddJobModal";
 import { toPascalCase } from "../common/utilities";
-import { Job } from "./types";
+import { Job, JobUpload } from "./types";
 
 
 export const STATUSES: string[] = [
@@ -32,10 +34,31 @@ export const ALLOWED_TRANSITIONS: string[][] = [
   ["interviewing", "accepted"],
 ];
 
-export default function JobBoard({ jobs, updateJob }: {
-  jobs: Job[],
-  updateJob: (id: number, patch: Partial<Job>) => void,
-}): React.JSX.Element {
+export default function JobBoard(): React.JSX.Element {
+  function generatePlaceholderJob(jobUpload: JobUpload): Job {
+    return {
+      "id": -1,
+      "url": jobUpload.url,
+      "title": "",
+      "company": "",
+      "text": "",
+      "chat_messages": [],
+      "date_applied": null,
+      "status": "",
+      "resume_template": null,
+      "chosen_resume": null,
+    }
+  }
+  const {
+    resources: jobs,
+    loaded,
+    removeResource: removeJob,
+    addResource: addJob,
+    updateResource: updateJob,
+    errors
+  } = useResource<Job,JobUpload>("../api/jobs/", generatePlaceholderJob);
+
+  const [showAddJob, setShowAddJob] = useState<boolean>(false);
   const [draggingJobId, setDraggingJobId] = useState<number>(-1);
 
   function handleDragStart(jobId: number): (e: React.DragEvent<HTMLDivElement>) => void {
@@ -76,20 +99,36 @@ export default function JobBoard({ jobs, updateJob }: {
     }
   }
 
+  function handleClickAddJob(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    setShowAddJob(true);
+  }
+
+  function handleClickRemoveJob(jobId: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
+    return (e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+      removeJob(jobId);
+    };
+  }
+
   return (
-    <div className="kanban-board border">
-      {STATUSES.map((status) => {
-        return (
-          <JobColumn
-            key={status}
-            title={toPascalCase(status)}
-            jobs={jobs.filter((job) => (job.status === "" && status === "backlog") || (job.status === status))}
-            onDrop={handleDrop(status)}
-            onDragOver={handleDragOver}
-            onDragStart={handleDragStart}
-          />
-        );
-      })}
-    </div>
+    <>
+      <div className="kanban-board border">
+        {STATUSES.map((status) => {
+          return (
+            <JobColumn
+              key={status}
+              title={toPascalCase(status)}
+              jobs={jobs.filter((job) => (job.status === "" && status === "backlog") || (job.status === status))}
+              loaded={loaded}
+              onDrop={handleDrop(status)}
+              onDragOver={handleDragOver}
+              onDragStart={handleDragStart}
+              onClickAddJob={status === "backlog" ? handleClickAddJob : undefined}
+              onClickRemoveJob={handleClickRemoveJob}
+            />
+          );
+        })}
+      </div>
+      <AddJobModal show={showAddJob} setShow={setShowAddJob} addJob={addJob} />
+    </>
   );
 }

@@ -1,14 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 
-import { FetchData } from '../routes/types';
+import { FetchDataContext } from "../routes/routesConfig";
 
 
-export default function useFetch<Resource>(fetchData: FetchData, apiPath: string): {
+export default function useFetch<Resource>(apiPath: string): {
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
   loaded: boolean,
+  setLoaded: React.Dispatch<React.SetStateAction<boolean>>,
   error: string
 } {
+  const fetchData = useContext(FetchDataContext);
+
   const [resources, setResources] = useState<Resource[]>([]);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -24,8 +27,10 @@ export default function useFetch<Resource>(fetchData: FetchData, apiPath: string
       .catch(error => setError(error.message))
       .finally(() => setLoaded(true));
     }
-    getResources();
-  }, [fetchData, apiPath, setResources, setError, setLoaded]);
+    if (!loaded) {
+      getResources();
+    }
+  }, [fetchData, apiPath, loaded, setResources, setError, setLoaded]);
 
-  return { resources, setResources, loaded, error };
+  return { resources, setResources, loaded, setLoaded, error };
 }

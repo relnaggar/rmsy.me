@@ -1,1 +1,0 @@
-export type FetchData = (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>;

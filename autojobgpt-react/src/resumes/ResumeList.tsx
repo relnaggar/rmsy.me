@@ -1,6 +1,5 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 
-import { FetchDataContext } from "../routes/routesConfig";
 import useResource from '../hooks/useResource';
 import DocumentList from '../common/DocumentList';
 import GenerateResumeModal from './GenerateResumeModal';
@@ -8,8 +7,6 @@ import { Resume, ResumeUpload } from './types';
 
 
 export default function ResumeList(): React.JSX.Element { 
-  const fetchData = useContext(FetchDataContext);
-
   function getPlaceholderResume(resumeUpload: ResumeUpload): Resume {
     return {
       id: -1,
@@ -29,7 +26,7 @@ export default function ResumeList(): React.JSX.Element {
     removeResource: removeResume,
     addResource: addResume,
     errors
-  } = useResource<Resume,ResumeUpload>(fetchData, "../api/resumes/", getPlaceholderResume);
+  } = useResource<Resume,ResumeUpload>("../api/resumes/", getPlaceholderResume);
 
   const [showGenerateResume, setShowGenerateResume] = useState<boolean>(false);  
 

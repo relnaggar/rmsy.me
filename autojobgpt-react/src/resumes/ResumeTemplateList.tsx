@@ -1,6 +1,5 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 
-import { FetchDataContext } from "../routes/routesConfig";
 import useResource from "../hooks/useResource";
 import EditTemplateModal from "./EditTemplateModal";
 import AddTemplateModal from "./AddTemplateModal";
@@ -8,9 +7,7 @@ import DocumentList from "../common/DocumentList";
 import { ResumeTemplate, ResumeTemplateUpload } from "./types";
 
 
-export default function ResumeTemplateList(): React.JSX.Element {  
-  const fetchData = useContext(FetchDataContext);
-
+export default function ResumeTemplateList(): React.JSX.Element {
   function getPlaceholderTemplate(templateUpload: ResumeTemplateUpload): ResumeTemplate {
     return {
       id: -1,
@@ -26,7 +23,7 @@ export default function ResumeTemplateList(): React.JSX.Element {
     removeResource: removeTemplate,
     addResource: addTemplate,
     errors
-  } = useResource<ResumeTemplate,ResumeTemplateUpload>(fetchData, "../api/templates/", getPlaceholderTemplate);
+  } = useResource<ResumeTemplate,ResumeTemplateUpload>("../api/templates/", getPlaceholderTemplate);
 
   const [showEditTemplateModal, setShowEditTemplateModal] = useState<boolean>(false);
   const [editTemplateID, setEditTemplateID] = useState<number>(-1);
