@@ -28,7 +28,7 @@ export default function useDelete<Resource extends WithID>(
     if (removedId !== -1) {
       deleteResource();
     }
-  }, [fetchData, apiPath, removedId]);
+  }, [fetchData, apiPath, removedId, setRemovedId, setError]);
 
   function removeResource(id: number): void {
     setResources(resources.filter((resource) => resource.id !== id));

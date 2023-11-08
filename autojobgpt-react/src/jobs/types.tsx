@@ -12,3 +12,7 @@ export type Job = {
   resume_template: string | null,
   chosen_resume: string | null,
 }
+
+export type JobUpload = {
+  url: string,
+}

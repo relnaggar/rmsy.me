@@ -1,10 +1,13 @@
 import React from "react";
 import Modal from 'react-bootstrap/Modal';
 
+import { JobUpload } from "./types";
+
+
 export default function AddJobModal({ show, setShow, addJob }: {
   show: boolean,
   setShow: (show: boolean) => void,
-  addJob: (url: string) => void,
+  addJob: (jobUpload: JobUpload) => void,
 }): React.JSX.Element {
   function handleClose() {
     setShow(false);
@@ -19,7 +22,7 @@ export default function AddJobModal({ show, setShow, addJob }: {
 
     // add job    
     const url: string = (document.getElementById("url") as HTMLInputElement).value;
-    addJob(url);
+    addJob({url});
 
     // reset form
     e.currentTarget.reset();   

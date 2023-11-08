@@ -1,9 +1,10 @@
-import React, { useState, useEffect, createContext, useContext } from "react";
+import React, { useState, createContext, useContext } from "react";
 
 import { FetchDataContext } from "../routes/routesConfig";
+import useResource from "../hooks/useResource";
 import JobBoard from "./JobBoard";
 import AddJobModal from "./AddJobModal";
-import { Job } from "./types";
+import { Job, JobUpload } from "./types";
 
 
 export const LoadedContext = createContext<boolean>(false);
@@ -13,34 +14,10 @@ export const SetShowContext = createContext<(show: boolean) => void>(() => {});
 export default function Jobs(): React.JSX.Element {
   const fetchData = useContext(FetchDataContext);
 
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loaded, setLoaded] = useState<boolean>(false);
-  const [addedJob, setAddedJob] = useState<Job | null>(null);
-  const [removedJobId, setRemovedJobId] = useState<number>(-1);
-  const [updatedJobId, setUpdatedJobId] = useState<number>(-1);
-  const [updatedJobStatus, setUpdatedJobStatus] = useState<string>("");
-  const [showAddJob, setShowAddJob] = useState<boolean>(false);
-
-  useEffect(() => {
-    async function getJobs(): Promise<void> {
-      await fetchData("../api/jobs/", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-        .then((response) => response.json())
-        .then((data) => setJobs(data))
-        .catch((error) => console.error("Error:", error))
-        .finally(() => setLoaded(true));
-    }
-    getJobs();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  function addJob(url: string): void {
-    const placeholderJob: Job = {
+  function generatePlaceholderJob(jobUpload: JobUpload): Job {
+    return {
       "id": -1,
-      "url": url,
+      "url": jobUpload.url,
       "title": "",
       "company": "",
       "text": "",
@@ -50,87 +27,17 @@ export default function Jobs(): React.JSX.Element {
       "resume_template": null,
       "chosen_resume": null,
     }
-    setJobs([...jobs, placeholderJob]);
-    setAddedJob(placeholderJob);
-  };
-
-  useEffect(() => {
-    async function postJob(): Promise<void> {
-      await fetchData("../api/jobs/", { 
-        method: "POST", 
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          "url": addedJob?.url,
-        }),
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        setJobs([
-          ...jobs.filter((job) => job.id !== -1),
-          data
-        ]);
-        setAddedJob(null);
-      })
-      .catch((error) => console.error("Error:", error));
-    }
-    if (addedJob) {
-      postJob();
-    }
-  }, [addedJob]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  function removeJob(jobId: number): void {
-    setJobs(jobs.filter((job) => job.id !== jobId));
-    setRemovedJobId(jobId);
   }
+  const {
+    resources: jobs,
+    loaded,
+    removeResource: removeJob,
+    addResource: addJob,
+    updateResource: updateJob,
+    errors
+  } = useResource<Job,JobUpload>(fetchData, "../api/jobs/", generatePlaceholderJob);
 
-  useEffect(() => {
-    async function deleteJob(): Promise<void> {
-      return await fetchData(`../api/jobs/${removedJobId}/`, { 
-        method: "DELETE", 
-        headers: { "Content-Type": "application/json" },
-      })
-      .then((response) => {
-        if (response.status === 204) {
-          setRemovedJobId(-1);
-        }
-      })
-      .catch((error) => console.error("Error:", error));
-    }
-    if (removedJobId >= 0) {
-      deleteJob();
-    }
-  }, [removedJobId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  function updateJobStatus(jobId: number, status: string): void {
-    setJobs(jobs.map((job) => {
-      if (job.id === jobId) {
-        job.status = status;
-      }
-      return job;
-    }));    
-    setUpdatedJobStatus(status);
-    setUpdatedJobId(jobId);
-  }
-
-  useEffect(() => {
-    async function updateJob(updatedJobId: number, updatedJobStatus: string): Promise<void> {
-      await fetchData(`../api/jobs/${updatedJobId}/`, { 
-        method: "PATCH", 
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          "status": updatedJobStatus,
-        }),
-      })
-      .catch((error) => console.error("Error:", error))
-      .finally(() => {
-        setUpdatedJobId(-1);
-        setUpdatedJobStatus("");
-      });
-    }
-    if (updatedJobId >= 0) {
-      updateJob(updatedJobId, updatedJobStatus);
-    }
-  }, [updatedJobId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [showAddJob, setShowAddJob] = useState<boolean>(false);
 
   return (
     <>
@@ -138,7 +45,7 @@ export default function Jobs(): React.JSX.Element {
         <RemoveJobContext.Provider value={removeJob}>
           <LoadedContext.Provider value={loaded}>
             <SetShowContext.Provider value={setShowAddJob}>
-              <JobBoard jobs={jobs} updateJobStatus={updateJobStatus} />
+              <JobBoard jobs={jobs} updateJob={updateJob} />
             </SetShowContext.Provider>
           </LoadedContext.Provider>
         </RemoveJobContext.Provider>

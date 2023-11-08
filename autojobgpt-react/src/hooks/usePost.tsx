@@ -53,7 +53,7 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
         postResource(JSON.stringify(addedResourceUpload));
       }
     }
-  }, [fetchData, apiPath, addedResourceUpload, resources, setResources]);
+  }, [fetchData, apiPath, addedResourceUpload, resources, setResources, setError]);
 
   function addResource(resourceUpload: ResourceUpload): void {
     const placeHolderResource: Resource = getPlaceholderResource(resourceUpload);

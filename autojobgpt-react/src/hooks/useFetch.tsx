@@ -25,7 +25,7 @@ export default function useFetch<Resource>(fetchData: FetchData, apiPath: string
       .finally(() => setLoaded(true));
     }
     getResources();
-  }, [fetchData, apiPath]);
+  }, [fetchData, apiPath, setResources, setError, setLoaded]);
 
   return { resources, setResources, loaded, error };
 }

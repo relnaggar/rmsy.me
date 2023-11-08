@@ -32,9 +32,9 @@ export const ALLOWED_TRANSITIONS: string[][] = [
   ["interviewing", "accepted"],
 ];
 
-export default function JobBoard({ jobs, updateJobStatus }: {
+export default function JobBoard({ jobs, updateJob }: {
   jobs: Job[],
-  updateJobStatus: (jobId: number, status: string) => void,
+  updateJob: (id: number, patch: Partial<Job>) => void,
 }): React.JSX.Element {
   const [draggingJobId, setDraggingJobId] = useState<number>(-1);
 
@@ -68,7 +68,7 @@ export default function JobBoard({ jobs, updateJobStatus }: {
 
       // if the transition is allowed, move the job by updating its status
       if (allowedTransitions.includes(endStatus)) {
-        updateJobStatus(draggingJobId, endStatus);
+        updateJob(draggingJobId, {status: endStatus});
       }
 
       // stop dragging
