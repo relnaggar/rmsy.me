@@ -15,23 +15,23 @@ export const routesBasename = "/autojobgpt/app";
 
 export const routesConfig: RouteObject[] = [{
   path: "/",
-  element: <Layout />,
+  element: (
+    <FetchDataContext.Provider value={fetch}>
+      <Layout />
+    </FetchDataContext.Provider>
+  ),
   children: [{
     path: "/",
     element: <Home />,
   }, {
     path: "/jobs",
-    element: (
-      <FetchDataContext.Provider value={fetch}>
-        <Jobs />
-      </FetchDataContext.Provider>
+    element: (      
+      <Jobs />      
     )
   }, {
     path: "/resumes",
     element: (
-      <FetchDataContext.Provider value={fetch}>
-        <Resumes />
-      </FetchDataContext.Provider>
+      <Resumes />
     )
   }],
 }];
