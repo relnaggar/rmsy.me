@@ -7,8 +7,8 @@ import { Document } from "./types";
 
 export default function DocumentThumbnail({ document, onClickEditDocument, onClickRemoveDocument }: {
   document: Document,
-  onClickEditDocument?: (id: number) => void,
-  onClickRemoveDocument?: (id: number) => void,
+  onClickEditDocument?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  onClickRemoveDocument?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }): React.JSX.Element {
   return (
     <div
@@ -52,7 +52,7 @@ export default function DocumentThumbnail({ document, onClickEditDocument, onCli
                 type="button"
                 className="btn btn-secondary"
                 aria-label="Edit"
-                onClick={(e) => {onClickEditDocument!(document.id)}}
+                onClick={onClickEditDocument!}
               >
                 <PencilSquare />
               </button>
@@ -60,7 +60,7 @@ export default function DocumentThumbnail({ document, onClickEditDocument, onCli
                 type="button"
                 className="btn btn-secondary"
                 aria-label="Delete"
-                onClick={(e) => onClickRemoveDocument!(document.id)}
+                onClick={onClickRemoveDocument!}
               >
                 <Trash3 />
               </button>

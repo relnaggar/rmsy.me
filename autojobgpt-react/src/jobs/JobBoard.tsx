@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
+import { ConfirmationModalContext } from "../routes/Layout";
 import useResource from "../hooks/useResource";
 import JobColumn from "./JobColumn";
+import EditJobModal from "./EditJobModal";
 import AddJobModal from "./AddJobModal";
 import { toPascalCase } from "../common/utilities";
 import { Job, JobUpload } from "./types";
@@ -35,6 +37,13 @@ export const ALLOWED_TRANSITIONS: string[][] = [
 ];
 
 export default function JobBoard(): React.JSX.Element {
+  const {
+    setShow: setShowConfirmationModal,
+    setAction: setConfirmationAction,
+    setActionDescription: setConfirmationActionDescription,
+    setActionVerb: setConfirmationActionVerb,
+  } = useContext(ConfirmationModalContext);
+
   function generatePlaceholderJob(jobUpload: JobUpload): Job {
     return {
       "id": -1,
@@ -58,12 +67,14 @@ export default function JobBoard(): React.JSX.Element {
     errors
   } = useResource<Job,JobUpload>("../api/jobs/", generatePlaceholderJob);
 
-  const [showAddJob, setShowAddJob] = useState<boolean>(false);
   const [draggingJobId, setDraggingJobId] = useState<number>(-1);
+  const [editJobID, setEditJobID] = useState<number>(-1);
+  const [showEditJob, setShowEditJob] = useState<boolean>(false);
+  const [showAddJob, setShowAddJob] = useState<boolean>(false);  
 
-  function handleDragStart(jobId: number): (e: React.DragEvent<HTMLDivElement>) => void {
+  function handleDragStart(id: number): (e: React.DragEvent<HTMLDivElement>) => void {
     return (e: React.DragEvent<HTMLDivElement>): void => {
-      setDraggingJobId(jobId);
+      setDraggingJobId(id);
       try { // e.currentTarget not supported in jsdom
         e.currentTarget.scrollIntoView({behavior: "smooth", block: "center"});
       } catch (error) {}
@@ -99,14 +110,25 @@ export default function JobBoard(): React.JSX.Element {
     }
   }
 
-  function handleClickAddJob(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    setShowAddJob(true);
+  function handleClickEditJob(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
+    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+      setEditJobID(id);
+      setShowEditJob(true);
+    };
   }
 
-  function handleClickRemoveJob(jobId: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
-    return (e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-      removeJob(jobId);
+  function handleClickRemoveJob(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
+    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+      setConfirmationAction(() => () => removeJob(id));
+      const job: Job = jobs.find((job) => job.id === id)!;
+      setConfirmationActionDescription(`delete job "${job.title}, ${job.company}"`);
+      setConfirmationActionVerb("Delete");
+      setShowConfirmationModal(true);
     };
+  }
+
+  function handleClickAddJob(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    setShowAddJob(true);
   }
 
   return (
@@ -122,12 +144,14 @@ export default function JobBoard(): React.JSX.Element {
               onDrop={handleDrop(status)}
               onDragOver={handleDragOver}
               onDragStart={handleDragStart}
-              onClickAddJob={status === "backlog" ? handleClickAddJob : undefined}
+              onClickEditJob={handleClickEditJob}
               onClickRemoveJob={handleClickRemoveJob}
+              onClickAddJob={status === "backlog" ? handleClickAddJob : undefined}
             />
           );
         })}
       </div>
+      <EditJobModal show={showEditJob} setShow={setShowEditJob} id={editJobID} />
       <AddJobModal show={showAddJob} setShow={setShowAddJob} addJob={addJob} />
     </>
   );

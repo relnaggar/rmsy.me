@@ -15,9 +15,9 @@ export default function DocumentList({
 }: {
   documents: Document[],
   documentsLoaded: boolean,
-  onClickEditDocument: (id: number) => void,
-  onClickRemoveDocument: (id: number) => void,
-  onClickAddDocument: () => void,
+  onClickEditDocument: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  onClickRemoveDocument: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  onClickAddDocument: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   addButtonText: string,
 }): React.JSX.Element {
   return (
@@ -28,8 +28,8 @@ export default function DocumentList({
             <DocumentThumbnail
               document={document}
               key={document.id}
-              onClickEditDocument={onClickEditDocument}
-              onClickRemoveDocument={onClickRemoveDocument}
+              onClickEditDocument={onClickEditDocument(document.id)}
+              onClickRemoveDocument={onClickRemoveDocument(document.id)}
             />
           )}
           <AddDocument onClickAddDocument={onClickAddDocument} buttonText={addButtonText} />

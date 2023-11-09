@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function AddDocument({ onClickAddDocument, buttonText }: {
-  onClickAddDocument: () => void,
+  onClickAddDocument: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   buttonText: string,
 }): React.JSX.Element {
   return (
@@ -11,7 +11,7 @@ export default function AddDocument({ onClickAddDocument, buttonText }: {
         <button
           type="button"
           className="btn btn-primary"
-          onClick={(e) => onClickAddDocument()}
+          onClick={onClickAddDocument}
         >{`+ ${buttonText}`}</button>
       </div>
     </div>

@@ -1,12 +1,15 @@
 import React from 'react';
 import { ReactComponent as BoxArrowUpRight } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
+import { ReactComponent as PencilSquare } from 'bootstrap-icons/icons/pencil-square.svg';
+import { ReactComponent as Trash3 } from 'bootstrap-icons/icons/trash3.svg';
 
 import { Job } from './types';
 
 
-export default function JobCard({ job, onDragStart, onClickRemoveJob }: {
+export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemoveJob }: {
   job: Job,
   onDragStart: (e: React.DragEvent<HTMLDivElement>) => void
+  onClickEditJob: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   onClickRemoveJob: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }): React.JSX.Element {
 
@@ -20,8 +23,25 @@ export default function JobCard({ job, onDragStart, onClickRemoveJob }: {
     >
       {job.title ?
         <span className="d-flex justify-content-between">
-          <h6 className="card-title">{job.title}</h6>
-          <button type="button" className="btn-close" aria-label="Delete" onClick={onClickRemoveJob}></button>
+          <h6 className="pt-2 card-title">{job.title}</h6>
+          <div className="btn-group ms-1" role="group">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                aria-label="Edit"
+                onClick={onClickEditJob}
+              >
+                <PencilSquare />
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                aria-label="Delete"
+                onClick={onClickRemoveJob}
+              >
+                <Trash3 />
+              </button>
+            </div>
         </span>
       :
         <span className="placeholder-glow">

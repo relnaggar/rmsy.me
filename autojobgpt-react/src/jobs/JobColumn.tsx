@@ -11,8 +11,9 @@ export default function Column({
   onDragStart,
   onDragOver,
   onDrop,
+  onClickEditJob,
+  onClickRemoveJob,
   onClickAddJob,
-  onClickRemoveJob
 }: {
   title: string,
   jobs: Job[],
@@ -20,8 +21,9 @@ export default function Column({
   onDragStart: (jobId: number) => (e: React.DragEvent<HTMLDivElement>) => void,
   onDragOver: (e: React.DragEvent<HTMLDivElement>) => void,
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void,
+  onClickEditJob: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  onClickRemoveJob: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   onClickAddJob?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  onClickRemoveJob: (jobId: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
 }): React.JSX.Element {
   return (
     <div className="kanban-column me-2" onDragOver={onDragOver} onDrop={onDrop}>
@@ -45,6 +47,7 @@ export default function Column({
               key={job.id}
               job={job}
               onDragStart={onDragStart(job.id)}
+              onClickEditJob={onClickEditJob(job.id)}
               onClickRemoveJob={onClickRemoveJob(job.id)}
             />
           )}

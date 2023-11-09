@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
+import { ConfirmationModalContext } from "../routes/Layout";
 import useResource from '../hooks/useResource';
 import DocumentList from '../common/DocumentList';
 import EditResumeModal from './EditResumeModal';
@@ -7,7 +8,14 @@ import GenerateResumeModal from './GenerateResumeModal';
 import { Resume, ResumeUpload } from './types';
 
 
-export default function ResumeList(): React.JSX.Element { 
+export default function ResumeList(): React.JSX.Element {
+  const {
+    setShow: setShowConfirmationModal,
+    setAction: setConfirmationAction,
+    setActionDescription: setConfirmationActionDescription,
+    setActionVerb: setConfirmationActionVerb,
+  } = useContext(ConfirmationModalContext);
+
   function getPlaceholderResume(resumeUpload: ResumeUpload): Resume {
     return {
       id: -1,
@@ -33,12 +41,24 @@ export default function ResumeList(): React.JSX.Element {
   const [editResumeID, setEditResumeID] = useState<number>(-1);
   const [showGenerateResume, setShowGenerateResume] = useState<boolean>(false);
 
-  function handleClickEditResume(id: number): void {
-    setEditResumeID(id);
-    setShowEditResumeModal(true); 
+  function handleClickEditResume(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
+    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      setEditResumeID(id);
+      setShowEditResumeModal(true);
+    }
+  }
+
+  function handleClickRemoveResume(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
+    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      setConfirmationAction(() => () => removeResume(id));
+      const resume: Resume = resumes.find((resume) => resume.id === id)!;
+      setConfirmationActionDescription(`delete resume "${resume.name}"`);
+      setConfirmationActionVerb("Delete");
+      setShowConfirmationModal(true);      
+    }
   }
   
-  function handleClickAddResume(): void {
+  function handleClickAddResume(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
     setShowGenerateResume(true);
   }  
 
@@ -49,7 +69,7 @@ export default function ResumeList(): React.JSX.Element {
         documents={resumes}
         documentsLoaded={resumesLoaded}
         onClickEditDocument={handleClickEditResume}
-        onClickRemoveDocument={removeResume}
+        onClickRemoveDocument={handleClickRemoveResume}
         onClickAddDocument={handleClickAddResume}
         addButtonText="Generate new resume"
       />

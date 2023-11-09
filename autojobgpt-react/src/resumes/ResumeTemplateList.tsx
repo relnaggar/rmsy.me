@@ -1,13 +1,21 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
+import { ConfirmationModalContext } from "../routes/Layout";
 import useResource from "../hooks/useResource";
+import DocumentList from "../common/DocumentList";
 import EditTemplateModal from "./EditTemplateModal";
 import AddTemplateModal from "./AddTemplateModal";
-import DocumentList from "../common/DocumentList";
 import { ResumeTemplate, ResumeTemplateUpload } from "./types";
 
 
 export default function ResumeTemplateList(): React.JSX.Element {
+  const {
+    setShow: setShowConfirmationModal,
+    setAction: setConfirmationAction,
+    setActionDescription: setConfirmationActionDescription,
+    setActionVerb: setConfirmationActionVerb,
+  } = useContext(ConfirmationModalContext);
+
   function getPlaceholderTemplate(templateUpload: ResumeTemplateUpload): ResumeTemplate {
     return {
       id: -1,
@@ -29,12 +37,24 @@ export default function ResumeTemplateList(): React.JSX.Element {
   const [editTemplateID, setEditTemplateID] = useState<number>(-1);
   const [showAddTemplateModal, setShowAddTemplateModal] = useState<boolean>(false);
 
-  function handleClickEditTemplate(id: number): void {
-    setEditTemplateID(id);
-    setShowEditTemplateModal(true);    
+  function handleClickEditTemplate(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
+    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      setEditTemplateID(id);
+      setShowEditTemplateModal(true);
+    };
   }  
+
+  function handleClickRemoveResume(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {    
+    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      setConfirmationAction(() => () => removeTemplate(id));
+      const template: ResumeTemplate = templates.find((template) => template.id === id)!;
+      setConfirmationActionDescription(`delete resume template "${template.name}"`);
+      setConfirmationActionVerb("Delete");
+      setShowConfirmationModal(true);      
+    };
+  }
   
-  function handleClickAddTemplate(): void {
+  function handleClickAddTemplate(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
     setShowAddTemplateModal(true);
   }
 
@@ -45,7 +65,7 @@ export default function ResumeTemplateList(): React.JSX.Element {
         documents={templates}
         documentsLoaded={templatesLoaded}
         onClickEditDocument={handleClickEditTemplate}
-        onClickRemoveDocument={removeTemplate}
+        onClickRemoveDocument={handleClickRemoveResume}
         onClickAddDocument={handleClickAddTemplate}
         addButtonText="Upload resume template"
       />

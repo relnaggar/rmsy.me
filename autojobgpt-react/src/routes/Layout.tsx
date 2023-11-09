@@ -1,8 +1,27 @@
-import React from "react";
+import React, { createContext, useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 
+import ConfirmationModal from "../common/ConfirmationModal";
+
+
+export const ConfirmationModalContext = createContext<{
+  setShow: (show: boolean) => void,
+  setAction: (action: () => void) => void,
+  setActionDescription: (description: string) => void,
+  setActionVerb: (verb: string) => void,
+}>({
+  setShow: () => {},
+  setAction: () => {},
+  setActionDescription: () => {},
+  setActionVerb: () => {},
+});
 
 export default function Layout(): React.JSX.Element {
+  const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+  const [confirmationAction, setConfirmationAction] = useState<() => void>(() => () => {});
+  const [confirmationActionDescription, setConfirmationActionDescription] = useState<string>("");
+  const [confirmationActionVerb, setConfirmationActionVerb] = useState<string>("");
+
   return (
     <div className="container">
 
@@ -28,8 +47,22 @@ export default function Layout(): React.JSX.Element {
         </ul>
       </nav>
 
-      <Outlet />
+      <ConfirmationModalContext.Provider value={{
+        setShow: setShowConfirmationModal,
+        setAction: setConfirmationAction,
+        setActionDescription: setConfirmationActionDescription,
+        setActionVerb: setConfirmationActionVerb,
+      }}>
+        <Outlet />
+      </ConfirmationModalContext.Provider>
 
+      <ConfirmationModal
+        show={showConfirmationModal}
+        setShow={setShowConfirmationModal}
+        action={confirmationAction}
+        actionDescription={confirmationActionDescription}
+        actionVerb={confirmationActionVerb}
+      />
     </div>
   )
 }
