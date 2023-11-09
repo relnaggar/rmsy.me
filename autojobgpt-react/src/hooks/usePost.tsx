@@ -42,9 +42,9 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
       let containsFile = false;
       for (const [key, value] of Object.entries(addedResourceUpload!)) {
         if (value instanceof File) {
-          containsFile = true;
-          formData.append(key, value);
+          containsFile = true;          
         }
+        formData.append(key, value);
       }
       if (containsFile) {
         // if the addedResource contains a file, then we need to use FormData
