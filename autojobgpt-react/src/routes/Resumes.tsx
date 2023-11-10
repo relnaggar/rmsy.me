@@ -1,7 +1,7 @@
 import React from "react";
 
-import ResumeTemplateList from "./ResumeTemplateList";
-import ResumeList from "./ResumeList";
+import ResumeTemplateList from "../resumes/ResumeTemplateList";
+import ResumeList from "../resumes/ResumeList";
 
 
 export default function ResumesPage(): React.JSX.Element {

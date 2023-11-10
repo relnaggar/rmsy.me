@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import SelectWithRefresh from "./SelectWithRefresh";
 import { FetchDataContext } from "../routes/routesConfig";
 import { generateResponse, validJob1, validJob2 } from "./mockAPI";
-import { mockFunctions } from "./testUtilities";
+import { mockFunctions } from "./testUtils";
 import { Job } from "../jobs/types";
 import { WithID } from "./types";
 

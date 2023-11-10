@@ -2,7 +2,7 @@ import React from "react";
 import { ReactComponent as PencilSquare } from "bootstrap-icons/icons/pencil-square.svg";
 import { ReactComponent as Trash3 } from "bootstrap-icons/icons/trash3.svg";
 
-import { generatePlaceholderWidths } from "./utilities";
+import { generatePlaceholderWidths } from "./utils";
 import { Document } from "./types";
 
 export default function DocumentThumbnail({ document, onClickEditDocument, onClickRemoveDocument }: {

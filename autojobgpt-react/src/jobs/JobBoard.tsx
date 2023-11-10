@@ -5,7 +5,7 @@ import useResource from "../hooks/useResource";
 import JobColumn from "./JobColumn";
 import EditJobModal from "./EditJobModal";
 import AddJobModal from "./AddJobModal";
-import { toPascalCase } from "../common/utilities";
+import { toPascalCase } from "../common/utils";
 import { Job, JobUpload } from "./types";
 
 

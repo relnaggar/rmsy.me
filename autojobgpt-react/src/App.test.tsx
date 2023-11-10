@@ -1,4 +1,4 @@
-import { injectMocks, renderRoute, testRouteAndAllChildren } from "./common/testUtilities";
+import { injectMocks, renderRoute, testRouteAndAllChildren } from "./common/testUtils";
 import { routesConfig }  from "./routes/routesConfig";
 
 beforeEach(() => {

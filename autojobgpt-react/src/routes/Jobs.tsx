@@ -1,6 +1,6 @@
 import React from "react";
 
-import JobBoard from "./JobBoard";
+import JobBoard from "../jobs/JobBoard";
 
 
 export default function Jobs(): React.JSX.Element {

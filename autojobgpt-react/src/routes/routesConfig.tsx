@@ -3,8 +3,8 @@ import { RouteObject } from "react-router-dom";
 
 import Layout from "./Layout";
 import Home from "../home/Home";
-import Jobs from "../jobs/Jobs";
-import Resumes from "../resumes/Resumes";
+import Jobs from "./Jobs";
+import Resumes from "./Resumes";
 
 
 export const FetchDataContext = createContext(

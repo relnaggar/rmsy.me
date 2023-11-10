@@ -1,7 +1,13 @@
-import { screen, getAllByRole, getByRole, getByLabelText, queryByRole, queryAllByRole, act } from "@testing-library/react";
+import { screen, getByRole, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { injectMocks, renderRoute, openAndGetModal, getSubmitButton, mockFunctions } from "../common/testUtilities";
+import {
+  renderThisRoute,
+  getUploadResumeTemplateButton,
+  queryResumeTemplates,
+  getResumeTemplateByName
+} from "./resumeTemplateTestUtils";
+import { injectMocks, mockFunctions, openAndGetModal } from "../common/testUtils";
 import {
   generateResponse,
   generateConditionalResponseByRoute,
@@ -10,25 +16,11 @@ import {
 } from "../common/mockAPI";
 import { ResumeTemplate } from "./types";
 
+
 beforeEach(() => {
   jest.clearAllMocks();
   injectMocks();
 });
-
-async function renderThisRoute(): Promise<void> {
-  await renderRoute("/resumes");
-}
-
-function getResumeTemplateSection(): HTMLElement {
-  const resumeTemplateHeading: HTMLElement = screen.getByRole("heading", {name: new RegExp("templates", "i"), level: 2});
-  const resumeTemplateSection: HTMLElement = resumeTemplateHeading.parentElement as HTMLElement;
-  return resumeTemplateSection;
-}
-
-function getUploadResumeTemplateButton(): HTMLElement {
-  const resumeTemplateSection: HTMLElement = getResumeTemplateSection();
-  return getByRole(resumeTemplateSection, "button", {name: new RegExp("upload resume template", "i")});
-}
 
 test("add resume template button appears", async () => {
   await renderThisRoute();
@@ -41,55 +33,10 @@ test("add resume template modal isn't visible before clicking add resume templat
   expect(screen.queryByRole("dialog", {name: new RegExp("add resume template", "i")})).not.toBeInTheDocument();
 });
 
-async function openAndGetAddResumeTemplateModal(timeout: number = 1000): Promise<HTMLElement> {
-  return openAndGetModal(getUploadResumeTemplateButton(), "add resume template", timeout);
-}
-
-test("clicking add resume template button shows add resume template modal within 1 second", async () => {
+test("confirm delete modal isn't visible before clicking delete button", async () => {
   await renderThisRoute();
-  const addResumeTemplateModal: HTMLElement = await openAndGetAddResumeTemplateModal(1000);
-  expect(addResumeTemplateModal).toBeInTheDocument();
+  expect(screen.queryByRole("dialog", {name: new RegExp("confirm delete", "i")})).not.toBeInTheDocument();
 });
-
-test("add resume template modal has a submit button", async () => {
-  await renderThisRoute();
-  const submitButton: HTMLElement = getSubmitButton(await openAndGetAddResumeTemplateModal());  
-  expect(submitButton).toBeInTheDocument();
-});
-
-test("add resume template modal has a close button", async () => {
-  await renderThisRoute();
-  const closeButtons: HTMLElement[] = getAllByRole(await openAndGetAddResumeTemplateModal(), "button", {name: new RegExp("close", "i")});
-  expect(closeButtons.length).toBeGreaterThan(0);
-});
-
-test("add resume template modal has a name input", async () => {
-  await renderThisRoute();
-  const nameInput: HTMLElement = getByRole(await openAndGetAddResumeTemplateModal(), "textbox", {name: new RegExp("name", "i")});
-  expect(nameInput).toBeInTheDocument();
-});
-
-test("add resume template modal has a file input", async () => {
-  await renderThisRoute();
-  const fileInput: HTMLElement = getByLabelText(await openAndGetAddResumeTemplateModal(), new RegExp("upload", "i"));
-  expect(fileInput).toBeInTheDocument();
-});
-
-test("add resume template modal has a description input", async () => {
-  await renderThisRoute();
-  const descriptionInput: HTMLElement = getByRole(await openAndGetAddResumeTemplateModal(), "textbox", {name: new RegExp("description", "i")});
-  expect(descriptionInput).toBeInTheDocument();
-});
-
-function queryResumeTemplates(): HTMLElement[] {
-  // resume templates are listitems in the resume template section that don't have the aria-busy attribute set to true
-  const resumeTemplatesSection: HTMLElement = getResumeTemplateSection();  
-  const listItems: HTMLElement[] = queryAllByRole(resumeTemplatesSection, "listitem");
-  const resumeTemplates: HTMLElement[] = listItems.filter((listItem: HTMLElement) => 
-    !listItem.hasAttribute("aria-busy") || listItem.getAttribute("aria-busy") === "false"
-  );
-  return resumeTemplates;
-}
 
 test("resume templates are initially fetched from the server", async () => {
   mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
@@ -140,6 +87,19 @@ test("resume templates are displayed with their images", async () => {
   expect(resumeTemplates[1].querySelector("img")?.src).toBe(validResumeTemplate2.png);
 });
 
+test("resume templates are displayed with an edit button", async () => {
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
+    url: "../api/templates/",
+    data: [validResumeTemplate1,validResumeTemplate2],
+  }]));
+  await renderThisRoute();
+  const resumeTemplates: HTMLElement[] = queryResumeTemplates();
+  for (const resumeTemplate of resumeTemplates) {
+    const editButton: HTMLElement = getByRole(resumeTemplate, "button", {name: new RegExp("edit", "i")});
+    expect(editButton).toBeInTheDocument();
+  }
+});
+
 test("resume templates are displayed with a delete button", async () => {
   mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
     url: "../api/templates/",
@@ -169,46 +129,6 @@ test("resume templates are displayed with a download button", async () => {
   }
 });
 
-test("adding a resume template adds it to the list of resume templates", async () => {
-  await renderThisRoute();
-  const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
-
-  // add a resume template
-  mockFunctions.fetchData.mockImplementationOnce(generateResponse(validResumeTemplate1));
-  const addResumeTemplateModal: HTMLElement = await openAndGetAddResumeTemplateModal();
-  const nameInput: HTMLElement = getByRole(addResumeTemplateModal, "textbox", {name: new RegExp("name", "i")});
-  userEvent.type(nameInput, validResumeTemplate1.name);
-  const fileInput: HTMLElement = getByLabelText(addResumeTemplateModal, new RegExp("upload", "i"));
-  userEvent.upload(fileInput, new File([""], "test.docx", {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}));
-  const submitButton: HTMLElement = getSubmitButton(addResumeTemplateModal);
-  await act(async () => {
-    userEvent.click(submitButton);
-  });
-
-  // check that the API was called again to add the resume template
-  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(initialFetchDataCalls + 1);
-  expect(mockFunctions.fetchData).toHaveBeenLastCalledWith("../api/templates/", expect.objectContaining({
-    method: "POST",
-    body: expect.any(FormData)
-  }));
-
-  // check that the resume template was added
-  const resumeTemplates: HTMLElement[] = queryResumeTemplates();
-  expect(resumeTemplates.length).toBe(1);
-  const addedResumeTemplate: HTMLElement = resumeTemplates[0];
-  expect(addedResumeTemplate).toHaveTextContent(validResumeTemplate1.name);
-});
-
-function getResumeTemplateByName(name: string): HTMLElement {
-  const resumeTemplates: HTMLElement[] = queryResumeTemplates();
-  const matchingResumeTemplate: HTMLElement = resumeTemplates.find((resumeTemplate: HTMLElement) => {
-    const resumeHeading: HTMLElement | null = queryByRole(resumeTemplate, "heading", {name: name});
-    return resumeHeading && resumeHeading.textContent === name;
-  }
-  )!;
-  return matchingResumeTemplate;
-}
-
 test("deleting a resume template removes it from the list of resume templates", async () => {
   mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
     url: "../api/templates/",
@@ -221,9 +141,15 @@ test("deleting a resume template removes it from the list of resume templates", 
   mockFunctions.fetchData.mockImplementationOnce(generateResponse([], 204));
   const matchingResumeTemplate: HTMLElement = getResumeTemplateByName(validResumeTemplate2.name);
   const deleteButton: HTMLElement = getByRole(matchingResumeTemplate, "button", {name: new RegExp("delete", "i")});
+  const deleteConfirmationModal: HTMLElement = await openAndGetModal(deleteButton, "confirm delete", 1000);
+  const deleteConfirmationButton: HTMLElement = getByRole(deleteConfirmationModal, "button", {name: new RegExp("delete", "i")});
   await act(async () => {
-    userEvent.click(deleteButton);
+    userEvent.click(deleteConfirmationButton);
   });
+
+  // check that the modal was closed
+  expect(deleteConfirmationModal).not.toBeInTheDocument();
+
 
   // check that the API was called again to delete the resume template
   expect(mockFunctions.fetchData).toHaveBeenCalledTimes(initialFetchDataCalls + 1);

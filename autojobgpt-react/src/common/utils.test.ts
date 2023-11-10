@@ -1,4 +1,4 @@
-import { toPascalCase } from "./utilities";
+import { toPascalCase } from "./utils";
 
 
 test("toPascalCase", () => {
