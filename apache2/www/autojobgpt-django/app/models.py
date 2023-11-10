@@ -76,6 +76,17 @@ class ResumeTemplateManager(models.Manager):
       description=validated_data["description"]
     )
     resume_template.save()
+
+    # create default fillfields if they don't exist
+    fillfield_keys = resume_template.extract_fillfields()
+    for key in fillfield_keys:
+      if not FillField.objects.filter(key=key).exists():
+        FillField.objects.create(
+          key=key,
+          data_type="string",
+          description=key,
+        )
+    
     resume_template.generate_png()
     resume_template.save()
     return resume_template
