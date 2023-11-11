@@ -1,0 +1,2 @@
+# ignore all .py files except __init__.py
+*.py
