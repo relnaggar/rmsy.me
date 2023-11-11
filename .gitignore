@@ -30,6 +30,9 @@ backup/
 __pycache__/
 *.py[cod]
 
+### Django ###
+migrations/
+
 ### React ###
 apache2/www/public/static/js/
 apache2/www/public/static/css/
