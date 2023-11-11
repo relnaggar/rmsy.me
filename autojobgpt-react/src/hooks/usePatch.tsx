@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 
+import useAPI from "./useAPI";
 import { FetchDataContext } from "../routes/routesConfig";
 import { CSRFTokenContext } from "../routes/Layout";
 import { WithID } from "../common/types";
@@ -13,6 +14,7 @@ export default function usePatch<Resource extends WithID>(
   updateResource: (id: number, patch: Partial<Resource>) => void,
   error: string
 } {
+  const apiRoute: string = useAPI();
   const fetchData = useContext(FetchDataContext);
   const csrfToken = useContext(CSRFTokenContext);
 
@@ -22,7 +24,7 @@ export default function usePatch<Resource extends WithID>(
 
   useEffect(() => {
     async function patchResource(): Promise<void> {
-      await fetchData(`${apiPath}${updatedId}/`, { 
+      await fetchData(`${apiRoute}${apiPath}${updatedId}/`, { 
         method: "PATCH", 
         headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
         body: JSON.stringify(patch)
@@ -35,7 +37,7 @@ export default function usePatch<Resource extends WithID>(
     if (updatedId !== -1) {
       patchResource();
     }
-  }, [fetchData, apiPath, updatedId, setUpdatedId, patch, setError]);
+  }, [fetchData, apiRoute, apiPath, csrfToken, updatedId, setUpdatedId, patch, setError]);
 
   function updateResource(id: number, patch: Partial<Resource>): void {
     setJobs(

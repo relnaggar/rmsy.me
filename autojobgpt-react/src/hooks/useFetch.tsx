@@ -1,5 +1,6 @@
 import { useContext, useState, useEffect } from 'react';
 
+import useAPI from "./useAPI";
 import { FetchDataContext } from "../routes/routesConfig";
 
 
@@ -10,6 +11,7 @@ export default function useFetch<Resource>(apiPath: string): {
   setLoaded: React.Dispatch<React.SetStateAction<boolean>>,
   error: string
 } {
+  const apiRoute: string = useAPI();
   const fetchData = useContext(FetchDataContext);
 
   const [resources, setResources] = useState<Resource[]>([]);
@@ -18,7 +20,7 @@ export default function useFetch<Resource>(apiPath: string): {
 
   useEffect(() => {
     async function getResources(): Promise<void> {
-      await fetchData(apiPath, {
+      await fetchData(`${apiRoute}${apiPath}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       })
@@ -30,7 +32,7 @@ export default function useFetch<Resource>(apiPath: string): {
     if (!loaded) {
       getResources();
     }
-  }, [fetchData, apiPath, loaded, setResources, setError, setLoaded]);
+  }, [fetchData, apiRoute, apiPath, loaded, setResources, setError, setLoaded]);
 
   return { resources, setResources, loaded, setLoaded, error };
 }

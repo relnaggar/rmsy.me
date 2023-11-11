@@ -35,7 +35,7 @@ export default function ResumeList(): React.JSX.Element {
     removeResource: removeResume,
     addResource: addResume,
     errors
-  } = useResource<Resume,ResumeUpload>("../api/resumes/", getPlaceholderResume);
+  } = useResource<Resume,ResumeUpload>("resumes/", getPlaceholderResume);
 
   const [showEditResumeModal, setShowEditResumeModal] = useState<boolean>(false);
   const [editResumeID, setEditResumeID] = useState<number>(-1);

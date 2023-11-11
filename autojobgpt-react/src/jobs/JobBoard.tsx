@@ -65,7 +65,7 @@ export default function JobBoard(): React.JSX.Element {
     addResource: addJob,
     updateResource: updateJob,
     errors
-  } = useResource<Job,JobUpload>("../api/jobs/", generatePlaceholderJob);
+  } = useResource<Job,JobUpload>("jobs/", generatePlaceholderJob);
 
   const [draggingJobId, setDraggingJobId] = useState<number>(-1);
   const [editJobID, setEditJobID] = useState<number>(-1);

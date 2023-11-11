@@ -49,7 +49,7 @@ export default function GenerateResumeModal({ show, setShow, addResume }: {
           <div className="mb-3">
             <label htmlFor="job" className="form-label">Job</label>
             <SelectWithRefresh<Job>
-              apiPath="../api/jobs/"
+              apiPath="jobs/"
               id="job"
               optionToString={(job) => `${job.title}, ${job.company}`}
             />
@@ -57,7 +57,7 @@ export default function GenerateResumeModal({ show, setShow, addResume }: {
           <div className="mb-3">
             <label htmlFor="template" className="form-label">Template</label>
             <SelectWithRefresh<ResumeTemplate>
-              apiPath="../api/templates/"
+              apiPath="templates/"
               id="template"
               optionToString={(template) => template.name}
             />

@@ -31,7 +31,7 @@ export default function ResumeTemplateList(): React.JSX.Element {
     removeResource: removeTemplate,
     addResource: addTemplate,
     errors
-  } = useResource<ResumeTemplate,ResumeTemplateUpload>("../api/templates/", getPlaceholderTemplate);
+  } = useResource<ResumeTemplate,ResumeTemplateUpload>("templates/", getPlaceholderTemplate);
 
   const [showEditTemplateModal, setShowEditTemplateModal] = useState<boolean>(false);
   const [editTemplateID, setEditTemplateID] = useState<number>(-1);

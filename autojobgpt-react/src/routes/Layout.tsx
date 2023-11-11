@@ -1,6 +1,7 @@
 import React, { createContext, useEffect, useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 
+import useAPI from "../hooks/useAPI";
 import { FetchDataContext } from "../routes/routesConfig";
 import ConfirmationModal from "../common/ConfirmationModal";
 
@@ -20,8 +21,9 @@ export const ConfirmationModalContext = createContext<{
 export const CSRFTokenContext = createContext<string>("");
 
 export default function Layout(): React.JSX.Element {
+  const apiRoute: string = useAPI();
   const fetchData = React.useContext(FetchDataContext);
-
+    
   const [CSRFToken, setCSRFToken] = useState<string>("");
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
   const [confirmationAction, setConfirmationAction] = useState<() => void>(() => () => {});
@@ -30,15 +32,15 @@ export default function Layout(): React.JSX.Element {
   
   useEffect(() => {
     async function fetchCSRFToken() {
-      await fetchData('../api/csrf/', {
-        credentials: 'include',
+      await fetchData(`${apiRoute}csrf/`, {
+        credentials: "include",
       })
       .then(response => response.json())
       .then(data => setCSRFToken(data.csrfToken))
       .catch(error => console.error(error));
     }
     fetchCSRFToken();
-  }, [fetchData, setCSRFToken]);
+  }, [fetchData, apiRoute, setCSRFToken]);
 
   return (
     <div className="container">

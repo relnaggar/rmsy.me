@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 
+import useAPI from "./useAPI";
 import { FetchDataContext } from "../routes/routesConfig";
 import { CSRFTokenContext } from "../routes/Layout";
 import { WithID } from "../common/types";
@@ -14,6 +15,7 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
   addResource: (resource: ResourceUpload) => void,
   error: string,
 } {
+  const apiRoute: string = useAPI();
   const fetchData = useContext(FetchDataContext);
   const csrfToken = useContext(CSRFTokenContext);
   
@@ -26,7 +28,7 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
         "X-CSRFToken": csrfToken,
       };
       
-      await fetchData(apiPath, { 
+      await fetchData(`${apiRoute}${apiPath}`, { 
         method: "POST", 
         // if the body is a FormData, then we don't need to set the Content-Type header
         headers: body instanceof FormData ? headers : { ...headers, "Content-Type": "application/json" },
@@ -60,7 +62,7 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
         postResource(JSON.stringify(addedResourceUpload));
       }
     }
-  }, [fetchData, apiPath, addedResourceUpload, resources, setResources, setError]);
+  }, [fetchData, apiRoute, apiPath, csrfToken, addedResourceUpload, resources, setResources, setError]);
 
   function addResource(resourceUpload: ResourceUpload): void {
     const placeHolderResource: Resource = getPlaceholderResource(resourceUpload);
