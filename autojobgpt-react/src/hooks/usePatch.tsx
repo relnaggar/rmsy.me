@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 
 import { FetchDataContext } from "../routes/routesConfig";
+import { CSRFTokenContext } from "../routes/Layout";
 import { WithID } from "../common/types";
 
 
@@ -13,6 +14,7 @@ export default function usePatch<Resource extends WithID>(
   error: string
 } {
   const fetchData = useContext(FetchDataContext);
+  const csrfToken = useContext(CSRFTokenContext);
 
   const [updatedId, setUpdatedId] = useState<number>(-1);
   const [patch, setPatch] = useState<Partial<Resource>>({});
@@ -22,7 +24,7 @@ export default function usePatch<Resource extends WithID>(
     async function patchResource(): Promise<void> {
       await fetchData(`${apiPath}${updatedId}/`, { 
         method: "PATCH", 
-        headers: { "Content-Type": "application/json" },
+        headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
         body: JSON.stringify(patch)
       })
       .catch((error) => setError(error.message))

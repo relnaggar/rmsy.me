@@ -1,4 +1,7 @@
 from django.shortcuts import redirect
+from django.views.decorators.http import require_safe
+from django.middleware.csrf import get_token
+from django.http import JsonResponse
 
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -12,6 +15,10 @@ def app(request):
   return redirect(request.get_full_path() + 'app')
 
 ### API ###
+
+@require_safe
+def csrf(request):
+  return JsonResponse({'csrfToken': get_token(request)})
 
 class ResumeTemplateViewSet(viewsets.ModelViewSet):
   queryset = ResumeTemplate.objects.all()

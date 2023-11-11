@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 
 import { FetchDataContext } from "../routes/routesConfig";
+import { CSRFTokenContext } from "../routes/Layout";
 import { WithID } from "../common/types";
 
 
@@ -13,6 +14,7 @@ export default function useDelete<Resource extends WithID>(
   error: string
 } {
   const fetchData = useContext(FetchDataContext);
+  const csrfToken = useContext(CSRFTokenContext);
 
   const [removedId, setRemovedId] = useState<number>(-1);
   const [error, setError] = useState<string>("");
@@ -21,7 +23,7 @@ export default function useDelete<Resource extends WithID>(
     async function deleteResource(): Promise<void> {
       await fetchData(`${apiPath}${removedId}/`, { 
         method: "DELETE", 
-        headers: { "Content-Type": "application/json" },
+        headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
       })
       .then((response) => response.status === 204 && setRemovedId(-1))
       .catch((error) => setError(error));
@@ -34,6 +36,10 @@ export default function useDelete<Resource extends WithID>(
   function removeResource(id: number): void {
     setResources(resources.filter((resource) => resource.id !== id));
     setRemovedId(id);
+  }
+
+  if (error) {
+    console.error(error);
   }
   
   return { removeResource, error };

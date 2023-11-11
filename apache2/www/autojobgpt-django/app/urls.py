@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework import routers
 from .views import ResumeTemplateViewSet, FillFieldViewSet, JobViewSet, ResumeViewSet, ResumeSubstitutionViewSet
-from .views import app
+from .views import app, csrf
 
 router = routers.DefaultRouter()
 router.register("templates", ResumeTemplateViewSet)
@@ -11,6 +11,7 @@ router.register("resumes", ResumeViewSet)
 router.register("resumesubstitutions", ResumeSubstitutionViewSet)
 
 urlpatterns = [
-  path("api/", include(router.urls)),
+  path("api/csrf/", csrf),
+  path("api/", include(router.urls)),  
   path("", app, name="index"),
 ] 
