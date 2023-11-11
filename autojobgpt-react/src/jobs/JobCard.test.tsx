@@ -13,7 +13,10 @@ beforeEach(() => {
 });
 
 test("job cards are displayed with their titles", async () => {
-  mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
+    url: "../api/jobs/",
+    data: [validJob1,validJob2],
+  }]));
   await renderThisRoute();
   const jobs: HTMLElement[] = queryBacklogJobs();
   expect(jobs[0]).toHaveTextContent(validJob1.title);
@@ -21,7 +24,10 @@ test("job cards are displayed with their titles", async () => {
 });
 
 test("job cards are displayed with their companies", async () => {
-  mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
+    url: "../api/jobs/",
+    data: [validJob1,validJob2],
+  }]));
   await renderThisRoute();
   const jobs: HTMLElement[] = queryBacklogJobs();
   expect(jobs[0]).toHaveTextContent(validJob1.company);
@@ -121,7 +127,10 @@ describe("every delete job confirmation modal asks are you sure", () => {
 });
 
 test("deleting a job closes the confirmation modal, removes the job from the backlog column and calls the API", async () => {
-  mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
+    url: "../api/jobs/",
+    data: [validJob1,validJob2],
+  }]));
   await renderThisRoute();
 
   // delete validJob2
@@ -138,8 +147,7 @@ test("deleting a job closes the confirmation modal, removes the job from the bac
   expect(deleteConfirmationModal).not.toBeInTheDocument();
 
   // check that the API was called again to delete the job
-  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
-  expect(mockFunctions.fetchData).toHaveBeenCalledWith(`../api/jobs/${validJob2.id}/`, expect.objectContaining({
+  expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`../api/jobs/${validJob2.id}/`, expect.objectContaining({
     method: "DELETE"
   }));
 

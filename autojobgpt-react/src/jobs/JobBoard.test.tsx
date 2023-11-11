@@ -2,7 +2,7 @@ import { screen, queryAllByRole } from "@testing-library/react";
 
 import { renderThisRoute, getKanbanColumn, getBacklogJobByTitle, queryBacklogJobs, dragJob } from "./jobTestUtils";
 import { injectMocks, mockFunctions } from "../common/testUtils";
-import { generateResponse, validJob1, validJob2 } from "../common/mockAPI";
+import { generateConditionalResponseByRoute, validJob1, validJob2, generateResponse } from "../common/mockAPI";
 import { STATUSES } from "./JobBoard";
 
 
@@ -31,9 +31,11 @@ describe("every status (column title) has a kanban column", () => {
 });
 
 test("backlog jobs are initially fetched from the server if there are any", async () => {
-  mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
+    url: "../api/jobs/",
+    data: [validJob1,validJob2],
+  }]));
   await renderThisRoute();
-  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(1);
   expect(mockFunctions.fetchData).toHaveBeenCalledWith("../api/jobs/", expect.objectContaining({
     method: "GET"
   }));
@@ -44,7 +46,6 @@ test("backlog jobs are initially fetched from the server if there are any", asyn
 test("if there are no backlog jobs fetched then none are displayed", async () => {
   mockFunctions.fetchData.mockImplementation(generateResponse([]));
   await renderThisRoute();
-  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(1);
   expect(mockFunctions.fetchData).toHaveBeenCalledWith("../api/jobs/", expect.objectContaining({
     method: "GET"
   }));
@@ -54,7 +55,10 @@ test("if there are no backlog jobs fetched then none are displayed", async () =>
 
 describe("dragging a job according to allowed transitions results in the job being moved", () => {
   test("dragging a job from the backlog column to the applying column results in the job being moved", async () => {
-    mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
+    mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
+      url: "../api/jobs/",
+      data: [validJob1,validJob2],
+    }]));
     await renderThisRoute();
 
     // drag validJob2 from backlog to applying
@@ -80,7 +84,10 @@ describe("dragging a job according to allowed transitions results in the job bei
 
 describe("dragging a job when its new status is not allowed results in the job not being moved", () => {
   test("dragging a job from the backlog column to the pending column results in the job not being moved", async () => {
-    mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
+    mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
+      url: "../api/jobs/",
+      data: [validJob1,validJob2],
+    }]));
     await renderThisRoute();
 
     // drag validJob2 from backlog to pending
@@ -105,7 +112,10 @@ describe("dragging a job when its new status is not allowed results in the job n
 
 describe("dragging a job according to allowed transitions calls the API to update the job", () => {
   test("dragging a job from the backlog column to the applying column calls the API to update the job", async () => {  
-    mockFunctions.fetchData.mockImplementation(generateResponse([validJob1,validJob2]));
+    mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
+      url: "../api/jobs/",
+      data: [validJob1,validJob2],
+    }]));
     await renderThisRoute();
 
     // drag validJob2 from backlog to applying
@@ -114,8 +124,7 @@ describe("dragging a job according to allowed transitions calls the API to updat
     await dragJob(matchingJob, "applying");
 
     // check that the API was called again to update the job
-    expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
-    expect(mockFunctions.fetchData).toHaveBeenCalledWith(`../api/jobs/${validJob2.id}/`, expect.objectContaining({
+    expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`../api/jobs/${validJob2.id}/`, expect.objectContaining({
       method: "PATCH",
       body: expect.stringContaining("applying")
     }));

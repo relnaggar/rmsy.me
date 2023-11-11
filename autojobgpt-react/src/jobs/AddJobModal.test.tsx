@@ -58,8 +58,7 @@ test("adding a job adds the same job to the backlog column, closes the modal, an
   expect(addJobModal).not.toBeInTheDocument();
 
   // check that the API was called again to add the job
-  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
-  expect(mockFunctions.fetchData).toHaveBeenCalledWith("../api/jobs/", expect.objectContaining({
+  expect(mockFunctions.fetchData).toHaveBeenLastCalledWith("../api/jobs/", expect.objectContaining({
     method: "POST",
     body: expect.stringContaining(validJob1.url)
   }));
