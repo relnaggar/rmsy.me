@@ -24,7 +24,7 @@ export default function Layout(): React.JSX.Element {
   const apiRoute: string = useAPI();
   const fetchData = React.useContext(FetchDataContext);
     
-  const [CSRFToken, setCSRFToken] = useState<string>("");
+  const [csrfToken, setCsrfToken] = useState<string>("");
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
   const [confirmationAction, setConfirmationAction] = useState<() => void>(() => () => {});
   const [confirmationActionDescription, setConfirmationActionDescription] = useState<string>("");
@@ -36,11 +36,11 @@ export default function Layout(): React.JSX.Element {
         credentials: "include",
       })
       .then(response => response.json())
-      .then(data => setCSRFToken(data.csrfToken))
+      .then(data => setCsrfToken(data.csrfToken))
       .catch(error => console.error(error));
     }
     fetchCSRFToken();
-  }, [fetchData, apiRoute, setCSRFToken]);
+  }, [fetchData, apiRoute, setCsrfToken]);
 
   return (
     <div className="container">
@@ -66,14 +66,22 @@ export default function Layout(): React.JSX.Element {
         </ul>
       </nav>
 
-      <CSRFTokenContext.Provider value={CSRFToken}>
+      <CSRFTokenContext.Provider value={csrfToken}>
         <ConfirmationModalContext.Provider value={{
           setShow: setShowConfirmationModal,
           setAction: setConfirmationAction,
           setActionDescription: setConfirmationActionDescription,
           setActionVerb: setConfirmationActionVerb,
         }}>
-          <Outlet />
+          {csrfToken === "" ?
+            <div className="position-fixed top-50 start-50 translate-middle">
+              <div className="spinner-border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          :
+            <Outlet />
+          }
         </ConfirmationModalContext.Provider>
       </CSRFTokenContext.Provider>
 
