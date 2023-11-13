@@ -62,9 +62,10 @@ export default function JobBoard(): React.JSX.Element {
     resources: jobs,
     loaded,
     removeResource: removeJob,
+    removedID: jobBeingRemovedID,
     addResource: addJob,
     updateResource: updateJob,
-    errors
+    errors: { fetchError, deleteError, postError, patchError }
   } = useResource<Job,JobUpload>("jobs/", generatePlaceholderJob);
 
   const [draggingJobId, setDraggingJobId] = useState<number>(-1);
@@ -146,6 +147,7 @@ export default function JobBoard(): React.JSX.Element {
               onDragStart={handleDragStart}
               onClickEditJob={handleClickEditJob}
               onClickRemoveJob={handleClickRemoveJob}
+              jobBeingRemovedID={jobBeingRemovedID}
               onClickAddJob={status === "backlog" ? handleClickAddJob : undefined}
             />
           );

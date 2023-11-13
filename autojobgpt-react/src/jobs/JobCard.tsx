@@ -6,11 +6,12 @@ import { ReactComponent as Trash3 } from 'bootstrap-icons/icons/trash3.svg';
 import { Job } from './types';
 
 
-export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemoveJob }: {
+export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemoveJob, beingRemoved }: {
   job: Job,
   onDragStart: (e: React.DragEvent<HTMLDivElement>) => void
   onClickEditJob: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   onClickRemoveJob: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  beingRemoved: boolean
 }): React.JSX.Element {
 
   return (
@@ -30,6 +31,7 @@ export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemov
                 className="btn btn-secondary"
                 aria-label="Edit"
                 onClick={onClickEditJob}
+                disabled={beingRemoved}
               >
                 <PencilSquare />
               </button>
@@ -38,8 +40,15 @@ export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemov
                 className="btn btn-secondary"
                 aria-label="Delete"
                 onClick={onClickRemoveJob}
+                disabled={beingRemoved}
               >
-                <Trash3 />
+                { beingRemoved ?
+                  <div className="spinner-border spinner-border-sm" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                :
+                  <Trash3 />
+                }
               </button>
             </div>
         </span>

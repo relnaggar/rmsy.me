@@ -38,3 +38,10 @@ export type ResumeTemplateUpload = {
   docx: File,
   description?: string
 }
+
+export type FillField = {
+  id: number,
+  key: string,
+  description: string,
+  template: number | null,
+}

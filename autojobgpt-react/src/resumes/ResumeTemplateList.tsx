@@ -25,13 +25,16 @@ export default function ResumeTemplateList(): React.JSX.Element {
       description: templateUpload.description
     };
   };
+  const templateAPIPath: string = "templates/";
   const {
     resources: templates,
+    setResources: setTemplates,
     loaded: templatesLoaded,
     removeResource: removeTemplate,
+    removedID: templateBeingRemovedID,
     addResource: addTemplate,
-    errors
-  } = useResource<ResumeTemplate,ResumeTemplateUpload>("templates/", getPlaceholderTemplate);
+    errors: { fetchError, deleteError, postError },
+  } = useResource<ResumeTemplate,ResumeTemplateUpload>(templateAPIPath, getPlaceholderTemplate);
 
   const [showEditTemplateModal, setShowEditTemplateModal] = useState<boolean>(false);
   const [editTemplateID, setEditTemplateID] = useState<number>(-1);
@@ -66,11 +69,23 @@ export default function ResumeTemplateList(): React.JSX.Element {
         documentsLoaded={templatesLoaded}
         onClickEditDocument={handleClickEditTemplate}
         onClickRemoveDocument={handleClickRemoveResume}
+        documentBeingRemovedID={templateBeingRemovedID}
         onClickAddDocument={handleClickAddTemplate}
         addButtonText="Upload resume template"
       />
-      <EditTemplateModal show={showEditTemplateModal} setShow={setShowEditTemplateModal} id={editTemplateID} />
-      <AddTemplateModal show={showAddTemplateModal} setShow={setShowAddTemplateModal} onSubmitAddTemplate={addTemplate} />
+      <EditTemplateModal
+        apiPath={templateAPIPath}
+        show={showEditTemplateModal}
+        setShow={setShowEditTemplateModal}
+        templateID={editTemplateID}
+        templates={templates}
+        setTemplates={setTemplates}
+      />
+      <AddTemplateModal
+        show={showAddTemplateModal}
+        setShow={setShowAddTemplateModal}
+        onSubmitAddTemplate={addTemplate}
+      />
     </section>
   )
 }

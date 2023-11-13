@@ -13,6 +13,7 @@ export default function Column({
   onDrop,
   onClickEditJob,
   onClickRemoveJob,
+  jobBeingRemovedID,
   onClickAddJob,
 }: {
   title: string,
@@ -23,6 +24,7 @@ export default function Column({
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void,
   onClickEditJob: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   onClickRemoveJob: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  jobBeingRemovedID: number,
   onClickAddJob?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
 }): React.JSX.Element {
   return (
@@ -49,6 +51,7 @@ export default function Column({
               onDragStart={onDragStart(job.id)}
               onClickEditJob={onClickEditJob(job.id)}
               onClickRemoveJob={onClickRemoveJob(job.id)}
+              beingRemoved={jobBeingRemovedID === job.id}
             />
           )}
         </div>

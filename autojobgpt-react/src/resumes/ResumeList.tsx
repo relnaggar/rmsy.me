@@ -33,8 +33,9 @@ export default function ResumeList(): React.JSX.Element {
     resources: resumes,
     loaded: resumesLoaded,
     removeResource: removeResume,
+    removedID: resumeBeingRemovedID,
     addResource: addResume,
-    errors
+    errors: { fetchError, deleteError, postError }
   } = useResource<Resume,ResumeUpload>("resumes/", getPlaceholderResume);
 
   const [showEditResumeModal, setShowEditResumeModal] = useState<boolean>(false);
@@ -70,6 +71,7 @@ export default function ResumeList(): React.JSX.Element {
         documentsLoaded={resumesLoaded}
         onClickEditDocument={handleClickEditResume}
         onClickRemoveDocument={handleClickRemoveResume}
+        documentBeingRemovedID={resumeBeingRemovedID}
         onClickAddDocument={handleClickAddResume}
         addButtonText="Generate new resume"
       />

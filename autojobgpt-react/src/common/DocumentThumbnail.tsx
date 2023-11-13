@@ -5,8 +5,9 @@ import { ReactComponent as Trash3 } from "bootstrap-icons/icons/trash3.svg";
 import { generatePlaceholderWidths } from "./utils";
 import { Document } from "./types";
 
-export default function DocumentThumbnail({ document, onClickEditDocument, onClickRemoveDocument }: {
+export default function DocumentThumbnail({ document, beingRemoved, onClickEditDocument, onClickRemoveDocument }: {
   document: Document,
+  beingRemoved?: boolean,
   onClickEditDocument?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   onClickRemoveDocument?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }): React.JSX.Element {
@@ -53,6 +54,7 @@ export default function DocumentThumbnail({ document, onClickEditDocument, onCli
                 className="btn btn-secondary"
                 aria-label="Edit"
                 onClick={onClickEditDocument!}
+                disabled={document.png === "" || beingRemoved}
               >
                 <PencilSquare />
               </button>
@@ -61,8 +63,15 @@ export default function DocumentThumbnail({ document, onClickEditDocument, onCli
                 className="btn btn-secondary"
                 aria-label="Delete"
                 onClick={onClickRemoveDocument!}
+                disabled={document.png === "" || beingRemoved}
               >
-                <Trash3 />
+                {document.png !== "" && beingRemoved ?
+                  <div className="spinner-border spinner-border-sm" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                :
+                  <Trash3 />
+                }
               </button>
             </div>
           </>

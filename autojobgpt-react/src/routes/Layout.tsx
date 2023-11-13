@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 
 import useAPI from "../hooks/useAPI";
@@ -22,7 +22,7 @@ export const CSRFTokenContext = createContext<string>("");
 
 export default function Layout(): React.JSX.Element {
   const apiRoute: string = useAPI();
-  const fetchData = React.useContext(FetchDataContext);
+  const fetchData = useContext(FetchDataContext);
     
   const [csrfToken, setCsrfToken] = useState<string>("");
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
