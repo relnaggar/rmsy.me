@@ -2,8 +2,9 @@ from django.shortcuts import redirect
 from django.views.decorators.http import require_safe
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
+from django.db import IntegrityError
 
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
@@ -23,6 +24,13 @@ def csrf(request):
 class ResumeTemplateViewSet(viewsets.ModelViewSet):
   queryset = ResumeTemplate.objects.all()
   serializer_class = ResumeTemplateSerializer
+
+  def update(self, request, *args, **kwargs):
+    try:
+      return super().update(request, *args, **kwargs)
+    except IntegrityError as e:
+        content = {'error': 'integrity error', 'details': str(e)}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 class FillFieldViewSet(viewsets.ModelViewSet):
   queryset = FillField.objects.all()
