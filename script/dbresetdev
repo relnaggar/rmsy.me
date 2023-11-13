@@ -21,6 +21,7 @@ main() {
   log start
   cd "${SCRIPT_DIR}/.."
 
+  rm apache2/www/autojobgpt-django/app/migrations/0*.py
   script/dbclear
   script/server up
   script/dbsetup -d
