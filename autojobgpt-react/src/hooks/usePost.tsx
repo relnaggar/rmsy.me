@@ -36,14 +36,19 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
       })
       .then((response) => response.json())
       .then((data) => {
-        // replace placeholder resource with resource from server
-        setResources([
-          ...resources.filter((resource) => resource.id !== -1),
-          data
-        ]);
-        setAddedResourceUpload(null);
+        if (data.error) {
+          setError(`${data.error}: ${data.details}`);
+          console.error(`${data.error}: ${data.details}`);
+        } else {
+          setResources([...resources.filter((resource) => resource.id !== -1), data]);
+          setAddedResourceUpload(null);
+          setError("");
+        }
       })
-      .catch((error) => setError(error.message));
+      .catch(error => {
+        setError(error.message);
+        console.error(error.message);
+      });
     }
     if (addedResourceUpload !== null) {
       const formData = new FormData();

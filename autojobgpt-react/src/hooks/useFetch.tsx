@@ -8,7 +8,7 @@ export default function useFetch<Resource>(apiPath: string): {
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
   loaded: boolean,
-  setLoaded: React.Dispatch<React.SetStateAction<boolean>>,
+  refetch: () => void,
   error: string
 } {
   const apiRoute: string = useAPI();
@@ -25,14 +25,29 @@ export default function useFetch<Resource>(apiPath: string): {
         headers: { "Content-Type": "application/json" },
       })
       .then(response => response.json())
-      .then(data => setResources(data))
-      .catch(error => setError(error.message))
-      .finally(() => setLoaded(true));
+      .then(data => {
+        if (data.error) {
+          setError(`${data.error}: ${data.details}`);
+          console.error(`${data.error}: ${data.details}`);
+        } else {
+          setResources(data);
+          setLoaded(true);
+          setError("");
+        }
+      })
+      .catch(error => {
+        setError(error.message);
+        console.error(error.message);
+      })
     }
     if (!loaded) {
       getResources();
     }
   }, [fetchData, apiRoute, apiPath, loaded, setResources, setError, setLoaded]);
 
-  return { resources, setResources, loaded, setLoaded, error };
+  function refetch(): void {
+    setLoaded(false);
+  }
+
+  return { resources, setResources, loaded, refetch, error };
 }

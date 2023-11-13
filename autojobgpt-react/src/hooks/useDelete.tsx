@@ -12,37 +12,49 @@ export default function useDelete<Resource extends WithID>(
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
 ): {
   removeResource: (id: number) => void,
+  removedID: number,
   error: string
 } {
   const apiRoute: string = useAPI();
   const fetchData = useContext(FetchDataContext);
   const csrfToken = useContext(CSRFTokenContext);
 
-  const [removedId, setRemovedId] = useState<number>(-1);
+  const [removedID, setRemovedID] = useState<number>(-1);
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
     async function deleteResource(): Promise<void> {
-      await fetchData(`${apiRoute}${apiPath}${removedId}/`, { 
+      await fetchData(`${apiRoute}${apiPath}${removedID}/`, { 
         method: "DELETE", 
         headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
       })
-      .then((response) => response.status === 204 && setRemovedId(-1))
-      .catch((error) => setError(error));
+      .then((response) => {
+        if (response.status === 204) {
+          setResources(resources.filter((resource) => resource.id !== removedID));
+          setRemovedID(-1);
+          setError("");
+        } else {
+          response.json()
+          .then(data => {
+            setError(`${data.error}: ${data.details}`);
+            console.error(`${data.error}: ${data.details}`);
+          })
+          .catch(error => {
+            setError(error.message);
+            console.error(error.message);
+          });
+        }
+      })
+      .catch((error) => setError(error.message));
     }
-    if (removedId !== -1) {
+    if (removedID !== -1) {
       deleteResource();
     }
-  }, [fetchData, apiRoute, apiPath, csrfToken, removedId, setRemovedId, setError]);
+  }, [fetchData, apiRoute, apiPath, csrfToken, removedID, setRemovedID, setError, resources, setResources]);
 
   function removeResource(id: number): void {
-    setResources(resources.filter((resource) => resource.id !== id));
-    setRemovedId(id);
-  }
-
-  if (error) {
-    console.error(error);
+    setRemovedID(id);
   }
   
-  return { removeResource, error };
+  return { removeResource, removedID, error };
 }

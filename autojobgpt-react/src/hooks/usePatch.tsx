@@ -9,38 +9,50 @@ import { WithID } from "../common/types";
 export default function usePatch<Resource extends WithID>(
   apiPath: string,
   resources: Resource[],
-  setJobs: React.Dispatch<React.SetStateAction<Resource[]>>
+  setResources: React.Dispatch<React.SetStateAction<Resource[]>>
 ): {
   updateResource: (id: number, patch: Partial<Resource>) => void,
+  updated: boolean,
   error: string
 } {
   const apiRoute: string = useAPI();
   const fetchData = useContext(FetchDataContext);
   const csrfToken = useContext(CSRFTokenContext);
 
-  const [updatedId, setUpdatedId] = useState<number>(-1);
+  const [updatedID, setUpdatedID] = useState<number>(-1);
   const [patch, setPatch] = useState<Partial<Resource>>({});
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
     async function patchResource(): Promise<void> {
-      await fetchData(`${apiRoute}${apiPath}${updatedId}/`, { 
+      await fetchData(`${apiRoute}${apiPath}${updatedID}/`, { 
         method: "PATCH", 
         headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
         body: JSON.stringify(patch)
       })
-      .catch((error) => setError(error.message))
-      .finally(() => {
-        setUpdatedId(-1);
-      });
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          setError(`${data.error}: ${data.details}`);  
+          console.error(`${data.error}: ${data.details}`);
+        } else {
+          setResources(resources.map((resource) => resource.id === updatedID ? data : resource))
+          setError("");
+        }
+      })
+      .catch(error => {
+        setError(error.message);
+        console.error(error.message);
+      })
+      .finally(() => setUpdatedID(-1));
     }
-    if (updatedId !== -1) {
+    if (updatedID !== -1) {
       patchResource();
     }
-  }, [fetchData, apiRoute, apiPath, csrfToken, updatedId, setUpdatedId, patch, setError]);
+  }, [fetchData, apiRoute, apiPath, csrfToken, updatedID, setUpdatedID, patch, setError, resources, setResources]);
 
   function updateResource(id: number, patch: Partial<Resource>): void {
-    setJobs(
+    setResources(
       resources.map((resource) => {
         if (resource.id === id) {
           return { ...resource, ...patch };
@@ -50,8 +62,8 @@ export default function usePatch<Resource extends WithID>(
       })
     );
     setPatch(patch);
-    setUpdatedId(id);
+    setUpdatedID(id);
   }
 
-  return { updateResource, error }
+  return { updateResource, updated: updatedID === -1, error };
 }
