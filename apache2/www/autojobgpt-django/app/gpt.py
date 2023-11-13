@@ -13,8 +13,8 @@ ${job_text}
 </job_posting>
 
 Provide your output in JSON format with the following keys:
-key: job_title, data_type: string
-key: company, data_type: string
+* job_title
+* company
 """,
 
 

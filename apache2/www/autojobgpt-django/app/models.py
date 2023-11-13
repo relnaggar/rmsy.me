@@ -77,15 +77,19 @@ class ResumeTemplateManager(models.Manager):
     )
     resume_template.save()
 
-    # create default fillfields if they don't exist
     fillfield_keys = resume_template.extract_fillfields()
     for key in fillfield_keys:
-      if not FillField.objects.filter(key=key).exists():
-        FillField.objects.create(
-          key=key,
-          data_type="string",
-          description=key,
-        )
+      if key == "JOB_TITLE":
+        description = "The job title."
+      elif key == "COMPANY":
+        description = "The company name."
+      else:
+        description = key
+      FillField.objects.create(
+        key=key,
+        description=description,
+        template=resume_template,
+      )
     
     resume_template.generate_png()
     resume_template.save()
@@ -116,9 +120,18 @@ class ResumeTemplate(models.Model, IDocumentModel):
 
 
 class FillField(models.Model):
-  key = models.CharField(max_length=200, primary_key=True)
-  data_type = models.CharField(max_length=7)
-  description = models.TextField()
+  template = models.ForeignKey(
+    to="ResumeTemplate",
+    on_delete=models.CASCADE,
+    related_name="fillfields",
+  )
+  key = models.CharField(max_length=200)
+  description = models.TextField(blank=True)
+
+  class Meta:
+    constraints = [
+      models.UniqueConstraint(fields=['template', 'key'], name='unique_template_key'),
+    ]
 
   def __str__(self):
     return f"{self.key}"
@@ -272,15 +285,19 @@ class Resume(models.Model, IDocumentModel):
     # construct the fillfields_text part of the prompt    
     fillfields_text = ""
     for key in fillfield_keys:
-      fillfield = FillField.objects.get(key=key)
+      fillfield = FillField.objects.get(key=key, template=self.template)
       if fillfield is None:
         raise Exception(f"fillfield {key} not found")
+      if fillfield.description == "":
+        description = key
+      else:
+        description = fillfield.description
+
       fillfields_text +=\
 f"""<fillfield>
   <key>{key}</key>
-  <data_type>{fillfield.data_type}</data_type>
   <description>
-{fillfield.description}
+{description}
   </description>
 </fillfield>\n"""
 
