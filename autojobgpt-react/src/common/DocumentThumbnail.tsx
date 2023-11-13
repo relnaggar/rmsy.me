@@ -48,32 +48,34 @@ export default function DocumentThumbnail({ document, beingRemoved, onClickEditD
         :
           <>
             <h6 className="p-2 m-0 bg-body border rounded">{document.name}</h6>
-            <div className="btn-group ms-1" role="group">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                aria-label="Edit"
-                onClick={onClickEditDocument!}
-                disabled={document.png === "" || beingRemoved}
-              >
-                <PencilSquare />
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                aria-label="Delete"
-                onClick={onClickRemoveDocument!}
-                disabled={document.png === "" || beingRemoved}
-              >
-                {document.png !== "" && beingRemoved ?
-                  <div className="spinner-border spinner-border-sm" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                :
-                  <Trash3 />
-                }
-              </button>
-            </div>
+            {document.png !== "" && (
+              <div className="btn-group ms-1" role="group">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  aria-label="Edit"
+                  onClick={onClickEditDocument!}
+                  disabled={beingRemoved}
+                >
+                  <PencilSquare />
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  aria-label="Delete"
+                  onClick={onClickRemoveDocument!}
+                  disabled={beingRemoved}
+                >
+                  {beingRemoved ?
+                    <div className="spinner-border spinner-border-sm" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  :
+                    <Trash3 />
+                  }
+                </button>
+              </div>
+            )}
           </>
         }
       </div>
