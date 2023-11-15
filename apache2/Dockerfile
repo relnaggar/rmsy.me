@@ -47,7 +47,8 @@ RUN apt-get update -y \
   && pip3 install djangorestframework \
   # openai
   && pip3 install openai \
-  # BeautifulSoup
+  # scraping incl BeautifulSoup
+  && pip3 install requests \
   && pip3 install lxml \
   && pip3 install beautifulsoup4 \
   # docx
