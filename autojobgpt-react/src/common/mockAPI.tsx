@@ -1,5 +1,7 @@
 import { Job } from "../jobs/types";
-import { ResumeTemplate, Resume } from "../resumes/types";
+import { Resume } from "../resumes/types";
+import { ResumeTemplate } from "../templates/types";
+
 
 export function generateResponse(data: any, status: number = 200): () => Promise<Response> {
   return async () => new Response(

@@ -1,6 +1,6 @@
 import React from "react";
 
-import ResumeTemplateList from "../resumes/ResumeTemplateList";
+import ResumeTemplateList from "../templates/ResumeTemplateList";
 import ResumeList from "../resumes/ResumeList";
 
 

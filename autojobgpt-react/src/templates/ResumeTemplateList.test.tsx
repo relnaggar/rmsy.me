@@ -14,7 +14,7 @@ import {
   validResumeTemplate1,
   validResumeTemplate2
 } from "../common/mockAPI";
-import { ResumeTemplate } from "./types";
+import { ResumeTemplate } from "../templates/types";
 
 
 beforeEach(() => {

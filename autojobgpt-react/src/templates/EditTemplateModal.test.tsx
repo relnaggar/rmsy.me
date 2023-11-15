@@ -3,7 +3,7 @@ import { screen, getByRole, getAllByRole } from "@testing-library/react";
 import { renderThisRoute, getResumeTemplateByName } from "./resumeTemplateTestUtils";
 import { injectMocks, mockFunctions, openAndGetModal } from "../common/testUtils";
 import { validResumeTemplate1, validResumeTemplate2, generateConditionalResponseByRoute } from "../common/mockAPI";
-import { ResumeTemplate } from "./types";
+import { ResumeTemplate } from "../templates/types";
 
 
 beforeEach(() => {

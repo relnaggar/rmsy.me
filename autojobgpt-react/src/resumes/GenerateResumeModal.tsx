@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import SelectWithRefresh from "../common/SelectWithRefresh";
 import { ResumeUpload } from "./types";
 import { Job } from "../jobs/types";
-import { ResumeTemplate } from "../resumes/types";
+import { ResumeTemplate } from "../templates/types";
 
 
 export default function GenerateResumeModal({ show, setShow, addResume }: {

@@ -5,7 +5,7 @@ import useResource from "../hooks/useResource";
 import DocumentList from "../common/DocumentList";
 import EditTemplateModal from "./EditTemplateModal";
 import AddTemplateModal from "./AddTemplateModal";
-import { ResumeTemplate, ResumeTemplateUpload } from "./types";
+import { ResumeTemplate, ResumeTemplateUpload } from "../templates/types";
 
 
 export default function ResumeTemplateList(): React.JSX.Element {

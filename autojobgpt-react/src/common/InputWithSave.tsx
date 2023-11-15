@@ -5,7 +5,7 @@ import { toPascalCase } from "./utils";
 import { WithID } from "./types";
 
 
-export default function EditableInput<Resource extends WithID>({
+export default function InputWithSave<Resource extends WithID>({
   type,
   apiPath,
   resources,

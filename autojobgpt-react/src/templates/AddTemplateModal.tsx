@@ -1,7 +1,7 @@
 import React from "react";
 import Modal from 'react-bootstrap/Modal';
 
-import { ResumeTemplateUpload } from "./types";
+import { ResumeTemplateUpload } from "../templates/types";
 
 
 export default function AddTemplateModal({ show, setShow, onSubmitAddTemplate }: {

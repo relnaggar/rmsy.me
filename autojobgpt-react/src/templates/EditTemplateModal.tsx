@@ -2,8 +2,8 @@ import React from "react";
 import Modal from 'react-bootstrap/Modal';
 
 import useFetch from "../hooks/useFetch";
-import EditableInput from "../common/EditableInput";
-import { ResumeTemplate, FillField } from "./types";
+import InputWithSave from "../common/InputWithSave";
+import { ResumeTemplate, FillField } from "../templates/types";
 
 
 export default function EditTemplateModal({ apiPath, show, setShow, templates, setTemplates, templateID }: {
@@ -30,7 +30,7 @@ export default function EditTemplateModal({ apiPath, show, setShow, templates, s
         <Modal.Title id="editTemplateModalLabel">Edit Resume Template</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <EditableInput<ResumeTemplate>
+        <InputWithSave<ResumeTemplate>
           type="text"
           apiPath={apiPath}
           resources={templates}
@@ -39,7 +39,7 @@ export default function EditTemplateModal({ apiPath, show, setShow, templates, s
           editableProperty="name"
           labelText="Template Name"
         />
-        <EditableInput<ResumeTemplate>
+        <InputWithSave<ResumeTemplate>
           type="textarea"
           apiPath={apiPath}
           resources={templates}
@@ -66,7 +66,7 @@ export default function EditTemplateModal({ apiPath, show, setShow, templates, s
                 </div>
               )
             } else {
-              return <EditableInput<FillField>
+              return <InputWithSave<FillField>
                 type="textarea"
                 apiPath="fillfields/"
                 resources={fillFields}
