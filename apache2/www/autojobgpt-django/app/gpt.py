@@ -58,8 +58,7 @@ ${feedback}
 Provide your output in JSON format, with a JSON key for each fillfield.
 """,
 }
-
-  myopenai = None
+  client = None
   model = "gpt-4"
 
   def __init__(self, messages=None):
@@ -72,13 +71,14 @@ Provide your output in JSON format, with a JSON key for each fillfield.
       self.original_messages = messages
       self.additional_messages = []
     
-    import openai
-    with open("/run/secrets/OPENAI_API_KEY") as f:
-      openai.api_key = f.read().strip()
-    self.myopenai = openai
+    if self.client is None:
+      from openai import OpenAI
+      with open("/run/secrets/OPENAI_API_KEY") as f:
+        api_key = f.read().strip()
+      self.client = OpenAI(api_key=api_key)
 
   def ask_with_messages(self, messages):
-    completion = self.myopenai.ChatCompletion.create(
+    completion = self.client.chat.completions.create(
       model=self.model,
       messages=messages,
     )
@@ -86,12 +86,12 @@ Provide your output in JSON format, with a JSON key for each fillfield.
     if choice.finish_reason != "stop":
       raise Exception(f"OpenAI API failed with status '{choice.finish_reason}'")
     else:
-      return choice.message
+      return {"role": "system", "content": choice.message.content}
   
   def ask(self, prompt_name, substitutions={}):
     prompt_text = Template(self.prompts[prompt_name]).substitute(substitutions)
     self.additional_messages.append({"role": "user", "content": prompt_text})
-    completion = self.myopenai.ChatCompletion.create(
+    completion = self.client.chat.completions.create(
       model=self.model,
       messages=self.original_messages + self.additional_messages,
     )
@@ -99,8 +99,9 @@ Provide your output in JSON format, with a JSON key for each fillfield.
     if choice.finish_reason != "stop":
       raise Exception(f"OpenAI API failed with status '{choice.finish_reason}'")
     else:
-      self.additional_messages.append(choice.message)
-      return self.additional_messages[-1].content
+      message = {"role": "system", "content": choice.message.content}
+      self.additional_messages.append(message)
+      return message
     
   def get_additional_messages(self):
     return self.additional_messages

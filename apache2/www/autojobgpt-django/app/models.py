@@ -180,7 +180,7 @@ class Job(models.Model):
   def extract_job_details(self):
     chat = Chat()
     response = json.loads(chat.ask(prompt_name="extract_job_details",
-      substitutions={"job_text": self.text})
+      substitutions={"job_text": self.text})["content"]
     )
     self.title = response["job_title"]
     self.company = response["company"]
@@ -307,7 +307,7 @@ f"""<fillfield>
       chat.ask(prompt_name="fill_resume_template", substitutions={
         "resume_template_text": template_text,
         "fillfields_text": fillfields_text,
-      })
+      })["content"]
     )
 
     substitutions = self._validate_response_and_get_substitutions(
@@ -400,7 +400,7 @@ f"""<fillfield>
     response = json.loads(
       chat.ask(prompt_name="regenerate_resume", substitutions={
         "feedback": feedback,
-      })
+      })["content"]
     )
 
     fillfield_keys = self.template.extract_fillfields()
@@ -458,7 +458,7 @@ class ResumeSubstitution(models.Model):
     response = json.loads(chat.ask(prompt_name="regenerate_substitution", substitutions={
       "key": self.key,
       "feedback": feedback,
-    }))
+    })["content"])
 
     # copy the resume and its substitutions
     new_resume = Resume.objects.create(
