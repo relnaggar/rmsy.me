@@ -19,23 +19,6 @@ export const STATUSES: string[] = [
   "accepted",
 ];
 
-export const ALLOWED_TRANSITIONS: string[][] = [
-  ["backlog", "applying"],
-  ["applying", "backlog"],
-  ["applying", "pending"],
-  ["pending", "testing"],
-  ["pending", "interviewing"],
-  ["pending", "rejected"],
-  ["pending", "accepted"],
-  ["testing", "pending"],
-  ["testing", "interviewing"],
-  ["testing", "rejected"],
-  ["testing", "accepted"],
-  ["interviewing", "pending"],
-  ["interviewing", "rejected"],
-  ["interviewing", "accepted"],
-];
-
 export default function JobBoard(): React.JSX.Element {
   const {
     setShow: setShowConfirmationModal,
@@ -94,17 +77,7 @@ export default function JobBoard(): React.JSX.Element {
       const currentJob: Job = jobs.find((job) => job.id === draggingJobId)!;
       const startStatus: string = currentJob.status || "backlog";
       
-      // check if the transition is allowed
-      const allowedTransitions: string[] = ALLOWED_TRANSITIONS.filter(
-        (transition) => {
-          return transition[0] === startStatus;
-        }
-      ).map((transition) => transition[1]);
-
-      // if the transition is allowed, move the job by updating its status
-      if (allowedTransitions.includes(endStatus)) {
-        updateJob(draggingJobId, {status: endStatus});
-      }
+      updateJob(draggingJobId, {status: endStatus});
 
       // stop dragging
       setDraggingJobId(-1);
