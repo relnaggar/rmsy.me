@@ -3,13 +3,15 @@
 # required for chokidar-cli in watch script
 export SHELL=/bin/sh
 
-echo "npm install..."
+echo "npm install"
 npm install
 
 if [ "$1" = "watch" ]; then
-  echo "npm run watch..."
+  echo "npm run compile"
+  npm run compile
+  echo "npm run watch"
   npm run watch
 elif [ "$1" = "start" ]; then
-  echo "npm start..."
+  echo "npm start"
   npm start
 fi
