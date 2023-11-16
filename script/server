@@ -171,12 +171,14 @@ main() {
             log "warning: ignoring build option and using production image" \
               "anyway"
           fi
+          logfun docker images | grep -v 'REPOSITORY' | awk '{print $1 ":" $2}' | xargs -L 1 docker pull
           compose_down
           logfun sudo docker stack deploy \
             -c docker-compose.yml \
             -c build/docker-compose.prod.yml \
             -c build/docker-compose.prod.secrets.yml \
            "${STACK_NAME}"
+           logfun docker system prune -f
           ;;
       esac
       ;;
