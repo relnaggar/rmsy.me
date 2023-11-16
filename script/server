@@ -171,7 +171,9 @@ main() {
             log "warning: ignoring build option and using production image" \
               "anyway"
           fi
-          logfun docker images | grep -v 'REPOSITORY' | awk '{print $1 ":" $2}' | xargs -L 1 docker pull
+          set +e            
+            logfun docker images | grep -v 'REPOSITORY' | awk '{print $1 ":" $2}' | xargs -L 1 docker pull
+          set -e
           compose_down
           logfun sudo docker stack deploy \
             -c docker-compose.yml \
