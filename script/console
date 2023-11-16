@@ -56,8 +56,8 @@ parse_args() {
   fi 
 
   log "arguments (\
-service: ${service} \
-root: ${root:-} \
+service: ${service}, \
+root: ${root:-}, \
 command: ${command} \
 )"
 }

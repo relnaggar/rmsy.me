@@ -17,11 +17,67 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
 . "${SCRIPT_DIR}/lib/shared.sh"
 
+usage() {
+  die "$(cat <<END
+usage: ${SCRIPT_NAME} [-n taillength] [logfile]
+  where logfile is the name of the log file to display (default: all)
+  where taillength is the number of lines to display (default: 100)
+END
+  )"
+}
+
+parse_args() {
+  # optional arguments
+  logfile=""
+  taillength=""
+
+  while (( $# > 0 )); do
+    local arg="${1:-}"
+    case "${arg}" in
+      -n)
+        shift
+        taillength="${1:-}"
+        ;;
+      *)
+        if [[ -z "${logfile}" ]]; then
+          logfile="${arg}"
+        else
+          usage
+        fi
+        ;;
+    esac
+    shift
+  done  
+
+  if [[ -z "${logfile}" ]]; then
+    logfile="all"
+  fi
+  if [[ -z "${taillength}" ]]; then
+    taillength="100"
+  fi
+
+  log "arguments (\
+logfile: ${logfile},s \
+taillength: ${taillength} \
+)"
+}
+
 main() {
   log start
   cd "${SCRIPT_DIR}/.."
+  parse_args "$@"
 
-  script/console apache2 "cat /var/log/apache2/error.log"
+  # if logfile is "all"
+  # then display all log files
+  if [[ "${logfile}" == "all" ]]; then
+    script/console apache2 "for file in /var/log/apache2/*.log; do \
+echo \$file; \
+tail -n ${taillength} \$file; \
+echo -e \"\\n\\n\"; \
+done"
+  else
+    script/console apache2 "tail -n ${taillength} /var/log/apache2/${logfile}.log"
+  fi  
 
   log "end"
 }

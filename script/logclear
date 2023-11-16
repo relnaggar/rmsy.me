@@ -17,11 +17,53 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
 . "${SCRIPT_DIR}/lib/shared.sh"
 
+usage() {
+  die "$(cat <<END
+usage: ${SCRIPT_NAME} [logfile]
+  where logfile is the name of the log file to display (default: all)
+END
+  )"
+}
+
+parse_args() {
+  # optional arguments
+  logfile=""
+
+  while (( $# > 0 )); do
+    local arg="${1:-}"
+    case "${arg}" in
+      *)
+        if [[ -z "${logfile}" ]]; then
+          logfile="${arg}"
+        else
+          usage
+        fi
+        ;;
+    esac
+    shift
+  done  
+
+  if [[ -z "${logfile}" ]]; then
+    logfile="all"
+  fi
+
+  log "arguments (\
+logfile: ${logfile},s \
+)"
+}
+
 main() {
   log start
   cd "${SCRIPT_DIR}/.."
+  parse_args "$@"
 
-  script/console apache2 "echo > /var/log/apache2/error.log"
+  if [[ "${logfile}" == "all" ]]; then
+    log "clearing all log files"
+    script/console apache2 "for file in /var/log/apache2/*.log; do echo > \$file; done" 
+  else
+    log "clearing log file ${logfile}"
+    script/console apache2 "echo > /var/log/apache2/${logfile}.log"
+  fi
 
   log "end"
 }
