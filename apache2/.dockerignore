@@ -1,0 +1,5 @@
+# Ignore all .py files in the 'subdirectory' folder
+www/autojobgpt-django/app/migrations/*.py
+
+# But still include the __init__.py file
+!www/autojobgpt-django/app/migrations/__init__.py
