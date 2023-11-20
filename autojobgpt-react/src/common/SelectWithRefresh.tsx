@@ -9,7 +9,7 @@ export default function SelectWithRefresh<Option extends WithID>({apiPath, id, o
   id: string,
   optionToString: (option: Option) => string,
 }): React.JSX.Element {
-  const { resources: options, loaded, refetch, error } = useFetch<Option>(apiPath);
+  const { resource: options, fetching: loading, refetch } = useFetch<Option[]>(apiPath);
 
   function handleRefresh(): void {
     refetch();
@@ -17,8 +17,8 @@ export default function SelectWithRefresh<Option extends WithID>({apiPath, id, o
 
   return (
     <div className="input-group">
-      <select className="form-select" id={id} name={id} defaultValue="0" required disabled={!loaded} aria-busy={loaded}>
-        <option value="0">{ loaded ? "Open this select menu" : "Loading..."}</option>
+      <select className="form-select" id={id} name={id} defaultValue="0" required disabled={loading} aria-busy={!loading}>
+        <option value="0">{ loading ? "Loading..." : "Open this select menu" }</option>
         {options.map((option) => (
           <option key={option.id} value={option.id}>{optionToString(option)}</option>
         ))}

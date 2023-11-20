@@ -6,29 +6,16 @@ import { FetchDataContext } from "../routes/routesConfig";
 import ConfirmationModal from "../common/ConfirmationModal";
 
 
-export const ConfirmationModalContext = createContext<{
-  setShow: (show: boolean) => void,
-  setAction: (action: () => void) => void,
-  setActionDescription: (description: string) => void,
-  setActionVerb: (verb: string) => void,
-}>({
-  setShow: () => {},
-  setAction: () => {},
-  setActionDescription: () => {},
-  setActionVerb: () => {},
-});
+export const ConfirmationModalContext = createContext<
+  (action: () => void, actionDescription: string, actionVerb: string) => void
+>(() => {});
 
 export const CSRFTokenContext = createContext<string>("");
 
 export default function Layout(): React.JSX.Element {
   const apiRoute: string = useAPI();
-  const fetchData = useContext(FetchDataContext);
-    
-  const [csrfToken, setCsrfToken] = useState<string>("");
-  const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
-  const [confirmationAction, setConfirmationAction] = useState<() => void>(() => () => {});
-  const [confirmationActionDescription, setConfirmationActionDescription] = useState<string>("");
-  const [confirmationActionVerb, setConfirmationActionVerb] = useState<string>("");
+  const fetchData = useContext(FetchDataContext);    
+  const [csrfToken, setCsrfToken] = useState<string>("");  
   
   useEffect(() => {
     async function fetchCSRFToken() {
@@ -41,6 +28,18 @@ export default function Layout(): React.JSX.Element {
     }
     fetchCSRFToken();
   }, [fetchData, apiRoute, setCsrfToken]);
+
+  const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+  const [confirmationAction, setConfirmationAction] = useState<() => void>(() => () => {});
+  const [confirmationActionDescription, setConfirmationActionDescription] = useState<string>("");
+  const [confirmationActionVerb, setConfirmationActionVerb] = useState<string>("");
+
+  function openConfirmationModal(action: () => void, actionDescription: string, actionVerb: string): void {
+    setConfirmationAction(() => action);
+    setConfirmationActionDescription(actionDescription);
+    setConfirmationActionVerb(actionVerb);
+    setShowConfirmationModal(true);
+  }
 
   return (
     <div className="container">
@@ -67,12 +66,7 @@ export default function Layout(): React.JSX.Element {
       </nav>
 
       <CSRFTokenContext.Provider value={csrfToken}>
-        <ConfirmationModalContext.Provider value={{
-          setShow: setShowConfirmationModal,
-          setAction: setConfirmationAction,
-          setActionDescription: setConfirmationActionDescription,
-          setActionVerb: setConfirmationActionVerb,
-        }}>
+        <ConfirmationModalContext.Provider value={openConfirmationModal}>
           {csrfToken === "" ?
             <div className="position-fixed top-50 start-50 translate-middle">
               <div className="spinner-border" role="status">

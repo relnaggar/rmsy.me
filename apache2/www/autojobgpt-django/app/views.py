@@ -10,7 +10,7 @@ from rest_framework.decorators import action
 
 from .models import ResumeTemplate, FillField, Job, Resume, ResumeSubstitution
 from .serializers import ResumeTemplateSerializer, FillFieldSerializer, JobSerializer, ResumeSerializer, ResumeSubstitutionSerializer
-from .serializers import FeedbackSerializer
+from .serializers import FeedbackSerializer, JobURLSerializer, JobDetailsSerializer
 
 def app(request):
   return redirect(request.get_full_path() + 'app')
@@ -36,19 +36,35 @@ class FillFieldViewSet(viewsets.ModelViewSet):
   queryset = FillField.objects.all()
   serializer_class = FillFieldSerializer
 
+
 class JobViewSet(viewsets.ModelViewSet):
   queryset = Job.objects.all()
   serializer_class = JobSerializer
 
-  @action(detail=True, methods=['get', 'post'])
-  def apply(self, request, pk=None):
-    if request.method == 'GET':
-      chosen_resume_id = self.request.query_params.get('chosen_resume_id', None)
-    elif request.method == 'POST':
-      chosen_resume_id = self.request.data.get('chosen_resume_id', None)
-    chosen_resume = Resume.objects.get(pk=chosen_resume_id)  
-    self.get_object().apply(chosen_resume)
-    return Response(self.serializer_class(self.get_object()).data)
+  def create(self, request, *args, **kwargs):
+    try:
+      return super().create(request, *args, **kwargs)
+    except IntegrityError as e:
+        content = {'error': str(e)}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+  @action(detail=False, methods=['get'], url_path='extract-details-from-url')
+  def extract_details_from_url(self, request):
+    url = request.query_params.get('url', None)
+    urlSerializer = JobURLSerializer(data={'url': url})
+    urlSerializer.is_valid(raise_exception=True)
+    try:
+      title, company, posting = self.serializer_class.Meta.model.extract_details_from_url(
+        urlSerializer.validated_data['url']
+      )
+    except Exception as e:
+      return Response(
+        {'error': str(e)},
+        status=status.HTTP_400_BAD_REQUEST
+      )    
+    jobDetailsSerializer = JobDetailsSerializer(data={'title': title, 'company': company, 'posting': posting})
+    jobDetailsSerializer.is_valid(raise_exception=True)
+    return Response(jobDetailsSerializer.data)
 
 
 class RegeneratableViewSet(viewsets.ModelViewSet):

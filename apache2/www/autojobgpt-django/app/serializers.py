@@ -19,13 +19,22 @@ class FillFieldSerializer(serializers.ModelSerializer):
     fields = "__all__"
 
 
-class JobSerializer(serializers.ModelSerializer):
-  def create(self, validated_data):
-    return self.Meta.model._default_manager.create(validated_data)
+class JobURLSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Job
+    fields = ['url']
+    extra_kwargs = {'url': {'required': True}}
 
+class JobDetailsSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Job
+    fields = ['title', 'company', 'posting']
+
+class JobSerializer(serializers.ModelSerializer):
   class Meta:
     model = Job
     fields = "__all__"
+    extra_kwargs = {'chat_messages': {'read_only': True}}
 
 
 class ResumeSubstitutionSerializer(serializers.ModelSerializer):

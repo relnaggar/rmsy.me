@@ -9,12 +9,7 @@ import { ResumeTemplate, ResumeTemplateUpload } from "../templates/types";
 
 
 export default function ResumeTemplateList(): React.JSX.Element {
-  const {
-    setShow: setShowConfirmationModal,
-    setAction: setConfirmationAction,
-    setActionDescription: setConfirmationActionDescription,
-    setActionVerb: setConfirmationActionVerb,
-  } = useContext(ConfirmationModalContext);
+  const openConfirmationModal = useContext(ConfirmationModalContext);
 
   function getPlaceholderTemplate(templateUpload: ResumeTemplateUpload): ResumeTemplate {
     return {
@@ -29,11 +24,10 @@ export default function ResumeTemplateList(): React.JSX.Element {
   const {
     resources: templates,
     setResources: setTemplates,
-    loaded: templatesLoaded,
-    removeResource: removeTemplate,
-    removedID: templateBeingRemovedID,
-    addResource: addTemplate,
-    errors: { fetchError, deleteError, postError },
+    fetching: loadingTemplates,
+    deleteResource: removeTemplate,
+    idBeingDeleted: templateBeingRemovedID,
+    postResource: addTemplate,
   } = useResource<ResumeTemplate,ResumeTemplateUpload>(templateAPIPath, getPlaceholderTemplate);
 
   const [showEditTemplateModal, setShowEditTemplateModal] = useState<boolean>(false);
@@ -49,11 +43,8 @@ export default function ResumeTemplateList(): React.JSX.Element {
 
   function handleClickRemoveResume(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {    
     return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      setConfirmationAction(() => () => removeTemplate(id));
       const template: ResumeTemplate = templates.find((template) => template.id === id)!;
-      setConfirmationActionDescription(`delete resume template "${template.name}"`);
-      setConfirmationActionVerb("Delete");
-      setShowConfirmationModal(true);      
+      openConfirmationModal(() => removeTemplate(id), `delete resume template "${template.name}"`, "Delete");
     };
   }
   
@@ -66,7 +57,7 @@ export default function ResumeTemplateList(): React.JSX.Element {
       <h2>Templates</h2>
       <DocumentList
         documents={templates}
-        documentsLoaded={templatesLoaded}
+        loadingDocuments={loadingTemplates}
         onClickEditDocument={handleClickEditTemplate}
         onClickRemoveDocument={handleClickRemoveResume}
         documentBeingRemovedID={templateBeingRemovedID}

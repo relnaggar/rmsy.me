@@ -6,15 +6,17 @@ class Chat:
 "extract_job_details":
 
 """
-Extract the job_title and company name from this job posting.
+Extract the job_title and company name from the following job posting.
 
 <job_posting>
 ${job_text}
-</job_posting>
+</webpage_text>
 
 Provide your output in JSON format with the following keys:
 * job_title
 * company
+
+If you fail to extract any of these keys, please provide a single key "error" with a string value describing the error.
 """,
 
 
@@ -59,7 +61,8 @@ Provide your output in JSON format, with a JSON key for each fillfield.
 """,
 }
   client = None
-  model = "gpt-4"
+  model = "gpt-4-1106-preview"
+  response_format = { "type": "json_object" }
 
   def __init__(self, messages=None):
     if messages is None:
@@ -80,6 +83,7 @@ Provide your output in JSON format, with a JSON key for each fillfield.
   def ask_with_messages(self, messages):
     completion = self.client.chat.completions.create(
       model=self.model,
+      response_format=self.response_format,
       messages=messages,
     )
     choice = completion.choices[0]
@@ -93,6 +97,7 @@ Provide your output in JSON format, with a JSON key for each fillfield.
     self.additional_messages.append({"role": "user", "content": prompt_text})
     completion = self.client.chat.completions.create(
       model=self.model,
+      response_format=self.response_format,
       messages=self.original_messages + self.additional_messages,
     )
     choice = completion.choices[0]

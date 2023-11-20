@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import Alert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useResource from "../hooks/useResource";
@@ -6,7 +7,7 @@ import JobColumn from "./JobColumn";
 import EditJobModal from "./EditJobModal";
 import AddJobModal from "./AddJobModal";
 import { toPascalCase } from "../common/utils";
-import { Job, JobUpload } from "./types";
+import { Job, JobUpload, generatePlaceholderJob } from "./types";
 
 
 export const STATUSES: string[] = [
@@ -20,41 +21,72 @@ export const STATUSES: string[] = [
 ];
 
 export default function JobBoard(): React.JSX.Element {
-  const {
-    setShow: setShowConfirmationModal,
-    setAction: setConfirmationAction,
-    setActionDescription: setConfirmationActionDescription,
-    setActionVerb: setConfirmationActionVerb,
-  } = useContext(ConfirmationModalContext);
-
-  function generatePlaceholderJob(jobUpload: JobUpload): Job {
-    return {
-      "id": -1,
-      "url": jobUpload.url,
-      "title": "",
-      "company": "",
-      "text": "",
-      "chat_messages": [],
-      "date_applied": null,
-      "status": "",
-      "resume_template": null,
-      "chosen_resume": null,
-    }
-  }
-  const {
-    resources: jobs,
-    loaded,
-    removeResource: removeJob,
-    removedID: jobBeingRemovedID,
-    addResource: addJob,
-    updateResource: updateJob,
-    errors: { fetchError, deleteError, postError, patchError }
-  } = useResource<Job,JobUpload>("jobs/", generatePlaceholderJob);
+  const openConfirmationModal = useContext(ConfirmationModalContext);
 
   const [draggingJobId, setDraggingJobId] = useState<number>(-1);
   const [editJobID, setEditJobID] = useState<number>(-1);
   const [showEditJob, setShowEditJob] = useState<boolean>(false);
-  const [showAddJob, setShowAddJob] = useState<boolean>(false);  
+  const [showAddJob, setShowAddJob] = useState<boolean>(false);
+
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
+
+  const [addJobErrors, setAddJobErrors] = useState<Record<string,string>>({});
+  const [showAddJobErrorAlert, setShowAddJobErrorAlert] = useState<boolean>(false);
+
+  function handleErrors(errors: Record<string,string>): void {
+    if (errors["error"] && errors["error"] === "Failed to fetch") {
+      errors["error"] = "Failed to connect to server. Please check your internet connection and try again.";
+    }
+    setErrorMessage(Object.values(errors).join(" "));
+    setShowErrorAlert(true);    
+  }
+
+  function handleAddJobSuccess() {
+    setAddJobErrors({});
+    setShowAddJob(false);    
+  }
+
+  function handleAddJobFail(errors: Record<string,string>): void {
+    setAddJobErrors(errors);
+    if (errors["error"]) {
+      setShowAddJobErrorAlert(true);
+    }
+  }
+
+  const {
+    resources: jobs,
+    fetching: loading,
+    posting: addingJob,
+    postResource: addJob,
+    deleteResource: removeJob,
+    idBeingDeleted: jobIDBeingRemoved,
+    patchResource: updateJob,
+  } = useResource<Job,JobUpload>("jobs/", generatePlaceholderJob, {
+    onPostSuccess: handleAddJobSuccess,
+    onPostFail: handleAddJobFail,
+    onFetchFail: handleErrors,
+    onDeleteFail: handleErrors,
+    onPatchFail: handleErrors,
+  });
+
+  function handleClickAddJob(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    setShowAddJob(true);
+  }
+
+  function handleClickRemoveJob(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
+    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+      const job: Job = jobs.find((job) => job.id === id)!;
+      openConfirmationModal(() => removeJob(id), `delete job "${job.title}, ${job.company}"`, "Delete");
+    };
+  }
+
+  function handleClickEditJob(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
+    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+      setEditJobID(id);
+      setShowEditJob(true);
+    };
+  }
 
   function handleDragStart(id: number): (e: React.DragEvent<HTMLDivElement>) => void {
     return (e: React.DragEvent<HTMLDivElement>): void => {
@@ -71,63 +103,49 @@ export default function JobBoard(): React.JSX.Element {
 
   function handleDrop(endStatus: string): (e: React.DragEvent<HTMLDivElement>) => void {
     return (e: React.DragEvent<HTMLDivElement>): void => {
-      e.preventDefault();
-
-      // get the job that is being dragged
-      const currentJob: Job = jobs.find((job) => job.id === draggingJobId)!;
-      const startStatus: string = currentJob.status || "backlog";
+      e.preventDefault(); // prevent page from reloading
       
       updateJob(draggingJobId, {status: endStatus});
-
-      // stop dragging
       setDraggingJobId(-1);
     }
   }
 
-  function handleClickEditJob(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
-    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-      setEditJobID(id);
-      setShowEditJob(true);
-    };
-  }
-
-  function handleClickRemoveJob(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
-    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-      setConfirmationAction(() => () => removeJob(id));
-      const job: Job = jobs.find((job) => job.id === id)!;
-      setConfirmationActionDescription(`delete job "${job.title}, ${job.company}"`);
-      setConfirmationActionVerb("Delete");
-      setShowConfirmationModal(true);
-    };
-  }
-
-  function handleClickAddJob(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    setShowAddJob(true);
-  }
-
   return (
     <>
+      { showErrorAlert &&
+        <Alert variant="danger" onClose={() => setShowErrorAlert(false)} dismissible>
+          {errorMessage}
+        </Alert>
+      }
       <div className="kanban-board border">
         {STATUSES.map((status) => {
           return (
             <JobColumn
               key={status}
               title={toPascalCase(status)}
-              jobs={jobs.filter((job) => (job.status === "" && status === "backlog") || (job.status === status))}
-              loaded={loaded}
+              jobs={jobs.filter((job) => (job.status === status))}
+              loading={loading}
               onDrop={handleDrop(status)}
               onDragOver={handleDragOver}
               onDragStart={handleDragStart}
               onClickEditJob={handleClickEditJob}
               onClickRemoveJob={handleClickRemoveJob}
-              jobBeingRemovedID={jobBeingRemovedID}
+              jobIDBeingRemoved={jobIDBeingRemoved}
               onClickAddJob={status === "backlog" ? handleClickAddJob : undefined}
             />
           );
         })}
       </div>
       <EditJobModal show={showEditJob} setShow={setShowEditJob} id={editJobID} />
-      <AddJobModal show={showAddJob} setShow={setShowAddJob} addJob={addJob} />
+      <AddJobModal
+        show={showAddJob}
+        setShow={setShowAddJob}
+        addJob={addJob}
+        addingJob={addingJob}
+        addJobErrors={addJobErrors}
+        showAddJobErrorAlert={showAddJobErrorAlert}
+        setShowAddJobErrorAlert={setShowAddJobErrorAlert}
+      />
     </>
   );
 }

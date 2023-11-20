@@ -27,8 +27,13 @@ export default function InputWithSave<Resource extends WithID>({
   const resource: Resource = resources.find((resource) => resource.id === id)!;
   const elementID: string = `${apiPath.replace("/", "-")}${id}-${editableProperty}`;
 
-  const { updateResource, updated, error } = usePatch<Resource>(apiPath, resources, setResources);
   const [edited, setEdited] = useState<boolean>(true);
+  const [errors, setErrors] = useState<Record<string,string>>({});
+
+  const {patchResource: updateResource, patching: updating } = usePatch<Resource>(apiPath, resources, setResources, {
+    onFail: setErrors,  
+  });
+  
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     // prevent page from reloading
@@ -48,31 +53,30 @@ export default function InputWithSave<Resource extends WithID>({
       {type === "textarea" &&
         <textarea
           className={`form-control${
-            (!edited && updated && !error) ? " is-valid" : ""}${
-            (error && updated) ? " is-invalid" : ""
+            (!edited && !updating && !errors) ? " is-valid" : ""}${
+            (errors && !updating) ? " is-invalid" : ""
           }`}
-          style={{ minHeight: "64px" }}
           id={elementID}
           defaultValue={resource[editableProperty] as string}
           onChange={handleChange}
-          disabled={!updated}
+          disabled={updating}
         ></textarea>
       }
       {type === "text" &&
         <input
           type="text"
           className={`form-control${
-            (!edited && updated && !error) ? " is-valid" : ""}${
-            (error && updated) ? " is-invalid" : ""
+            (!edited && !updating && !errors) ? " is-valid" : ""}${
+            (errors && !updating) ? " is-invalid" : ""
           }`}
           id={elementID}
           defaultValue={resource[editableProperty] as string}
           onChange={handleChange}
-          disabled={!updated}
+          disabled={updating}
         />
       }
       <div className="invalid-feedback">
-        {error}
+        {Object.values(errors).join(" ")}
       </div>
     </>
   );
@@ -94,14 +98,16 @@ export default function InputWithSave<Resource extends WithID>({
           }
         </div>
         <div className="ps-2">
-          <button type="submit" className="btn btn-outline-primary" disabled={!updated}>
-            {updated?
-              "Save"
-            :
+          <button type="submit" className="btn btn-outline-primary" disabled={updating}>
+            {!updating?
               <>
                 <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
                 <span role="status">Saving...</span>
               </>
+            :
+              <>
+                Save
+              </>              
             }
           </button>
         </div>

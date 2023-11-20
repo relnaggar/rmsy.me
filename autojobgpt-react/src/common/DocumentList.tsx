@@ -7,7 +7,7 @@ import { Document } from './types';
 
 export default function DocumentList({
   documents,
-  documentsLoaded,
+  loadingDocuments,
   onClickEditDocument,
   onClickRemoveDocument,
   documentBeingRemovedID,
@@ -15,7 +15,7 @@ export default function DocumentList({
   addButtonText
 }: {
   documents: Document[],
-  documentsLoaded: boolean,
+  loadingDocuments: boolean,
   onClickEditDocument: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   onClickRemoveDocument: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   documentBeingRemovedID: number,
@@ -24,7 +24,7 @@ export default function DocumentList({
 }): React.JSX.Element {
   return (
     <div className="d-flex overflow-x-auto border border-5 p-2" role="list">
-      {documentsLoaded ?
+      {!loadingDocuments ?
         <>
           {documents.map((document, _) => 
             <DocumentThumbnail

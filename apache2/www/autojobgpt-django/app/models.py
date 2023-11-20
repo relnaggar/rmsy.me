@@ -137,29 +137,15 @@ class FillField(models.Model):
     return f"{self.key}"
 
 
-class JobManager(models.Manager):
-  def create(self, validated_data):
-    job = Job(url=validated_data["url"])
-    job.scrape()
-    job.extract_job_details()
-    job.save()
-    return job
-
 class Job(models.Model):
-  objects = JobManager()
-  url = models.URLField(unique=True)
-  title = models.CharField(max_length=26, blank=True)
-  company = models.CharField(max_length=26, blank=True)
-  text = models.TextField(blank=True)
-  chat_messages = models.JSONField(blank=True, null=True)
-  date_applied = models.DateTimeField(blank=True, null=True)
-  chosen_resume = models.ForeignKey(
-    to="Resume", on_delete=models.SET_NULL, null=True, blank=True,
-    related_name="chosen_jobs"
-  )
-  # "backlog", "applying", "pending", "testing"
-  # "interviewing", "rejected", "accepted"
-  status = models.CharField(max_length=26, blank=True) 
+  url = models.URLField(max_length=2000, blank=True)
+  title = models.CharField(max_length=160)
+  company = models.CharField(max_length=160)
+  posting = models.TextField()
+  status = models.CharField(max_length=30)
+  chat_messages = models.JSONField(default=list, blank=True)
+  # date_applied = models.DateTimeField(null=True, blank=True, default=timezone.now)
+  # chosen_resume = models.ForeignKey(to="Resume", on_delete=models.SET_NULL, null=True, blank=True)
 
   class Meta:
     constraints = [
@@ -169,28 +155,20 @@ class Job(models.Model):
     ]
 
   def __str__(self):
-    if self.title is None or self.company is None:
-      return self.url
-    else:
-      return f"{self.title}, {self.company}"
+    return f"{self.title}, {self.company}"
 
-  def scrape(self):    
-    self.text = scrape_text(self.url)
-
-  def extract_job_details(self):
+  @staticmethod
+  def extract_details_from_url(url):
+    posting = scrape_text(url)
     chat = Chat()
-    response = json.loads(chat.ask(prompt_name="extract_job_details",
-      substitutions={"job_text": self.text})["content"]
-    )
-    self.title = response["job_title"]
-    self.company = response["company"]
-    self.chat_messages = chat.get_additional_messages()
-
-  def apply(self, chosen_resume):
-    self.date_applied = timezone.now()
-    self.chosen_resume = chosen_resume
-    self.status = "pending"
-    self.save()
+    message = chat.ask(prompt_name="extract_job_details", substitutions={"job_text": posting})
+    response = json.loads(message["content"])
+    try:
+      title = response["job_title"]
+      company = response["company"]
+      return title, company, posting
+    except KeyError:
+      raise Exception(response["error"])
 
 
 class ResumeManager(models.Manager):

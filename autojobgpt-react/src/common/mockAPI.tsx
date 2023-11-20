@@ -41,12 +41,11 @@ export const validJob1: Job = {
   url: "https://www.example1.com",
   title: "Test Job 1",
   company: "Test Company 1",
-  text: "Test Text 1",    
-  chat_messages: [],
-  date_applied: null,
+  posting: "Test Text 1",
   status: "",
-  resume_template: null,
-  chosen_resume: null,
+  chat_messages: [],
+  // date_applied: null,
+  // chosen_resume: null,
 }
 
 export const validJob2: Job = {
@@ -54,12 +53,11 @@ export const validJob2: Job = {
   url: "https://www.example2.com",
   title: "Test Job 2",
   company: "Test Company 2",
-  text: "Test Text 2",    
-  chat_messages: [],
-  date_applied: null,
+  posting: "Test Text 2",
   status: "",
-  resume_template: null,
-  chosen_resume: null,
+  chat_messages: [],
+  // date_applied: null,
+  // chosen_resume: null,
 }
 
 export const validResumeTemplate1: ResumeTemplate = {

@@ -7,24 +7,24 @@ import { Job } from "./types";
 export default function Column({
   title,
   jobs,
-  loaded,
+  loading,
   onDragStart,
   onDragOver,
   onDrop,
   onClickEditJob,
   onClickRemoveJob,
-  jobBeingRemovedID,
+  jobIDBeingRemoved,
   onClickAddJob,
 }: {
   title: string,
   jobs: Job[],
-  loaded: boolean,
+  loading: boolean,
   onDragStart: (jobId: number) => (e: React.DragEvent<HTMLDivElement>) => void,
   onDragOver: (e: React.DragEvent<HTMLDivElement>) => void,
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void,
   onClickEditJob: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   onClickRemoveJob: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  jobBeingRemovedID: number,
+  jobIDBeingRemoved: number,
   onClickAddJob?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
 }): React.JSX.Element {
   return (
@@ -34,7 +34,7 @@ export default function Column({
           <h5 className="card-title">{title}</h5>
         </div>  
         <div className="card-body">
-          { !loaded && (
+          { loading && (
             <div className="card mb-2 p-2" aria-hidden="true">
               <h6 className="card-title placeholder-glow">
                 <span className="placeholder col-6"></span>
@@ -51,7 +51,7 @@ export default function Column({
               onDragStart={onDragStart(job.id)}
               onClickEditJob={onClickEditJob(job.id)}
               onClickRemoveJob={onClickRemoveJob(job.id)}
-              beingRemoved={jobBeingRemovedID === job.id}
+              beingRemoved={jobIDBeingRemoved === job.id}
             />
           )}
         </div>

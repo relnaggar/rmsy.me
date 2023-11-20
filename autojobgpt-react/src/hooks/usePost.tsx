@@ -11,49 +11,62 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
   getPlaceholderResource: (resourceUpload: ResourceUpload) => Resource,
+  options?: {
+    onSuccess?: (resource: Resource) => void,
+    onFail?: (errors: Record<string,string>) => void,
+  },
 ): {
-  addResource: (resource: ResourceUpload) => void,
-  error: string,
+  posting: boolean,
+  postResource: (resource: ResourceUpload) => void,
 } {
+  const { onSuccess, onFail } = options || {};
+
   const apiRoute: string = useAPI();
   const fetchData = useContext(FetchDataContext);
   const csrfToken = useContext(CSRFTokenContext);
-  
-  const [addedResourceUpload, setAddedResourceUpload] = useState<ResourceUpload | null>(null);
-  const [error, setError] = useState<string>("");
+
+  const [resourceBeingPosted, setResourceBeingPosted] = useState<ResourceUpload | null>(null);
 
   useEffect(() => {
-    async function postResource(body: FormData | string): Promise<void> {
-      const headers: HeadersInit = {
-        "X-CSRFToken": csrfToken,
-      };
-      
-      await fetchData(`${apiRoute}${apiPath}`, { 
-        method: "POST", 
-        // if the body is a FormData, then we don't need to set the Content-Type header
-        headers: body instanceof FormData ? headers : { ...headers, "Content-Type": "application/json" },
-        body: body
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          setError(`${data.error}: ${data.details}`);
-          console.error(`${data.error}: ${data.details}`);
+    async function doPost(body: FormData | string): Promise<void> {      
+      let errors: Record<string,string> = {};
+      const newResources: Resource[] = [...resources.filter(resource => resource.id !== -1)];
+      try {
+        const csrfHeader: HeadersInit = {
+          "X-CSRFToken": csrfToken,
+        };
+        const response: Response = await fetchData(`${apiRoute}${apiPath}`, {
+          method: "POST",
+          // if the body is a FormData then we shouldn't set the Content-Type header
+          headers: body instanceof FormData ? csrfHeader : { ...csrfHeader, "Content-Type": "application/json" },
+          body: body
+        });
+        if (response.ok) {
+          const resource: Resource = await response.json();
+          newResources.push(resource);
+          onSuccess?.(resource);
         } else {
-          setResources([...resources.filter((resource) => resource.id !== -1), data]);
-          setAddedResourceUpload(null);
-          setError("");
+          errors = await response.json();
         }
-      })
-      .catch(error => {
-        setError(error.message);
-        console.error(error.message);
-      });
+      } catch (error) {
+        if (error instanceof Error) {
+          errors["error"] = error.message;
+        } else {
+          errors["error"] = String(error);        
+        }
+      } finally {
+        setResources(newResources);
+        setResourceBeingPosted(null);
+        if (Object.keys(errors).length > 0) {
+          onFail?.(errors);
+          console.error(errors);
+        }
+      }
     }
-    if (addedResourceUpload !== null) {
+    if (resourceBeingPosted !== null) {
       const formData = new FormData();
       let containsFile = false;
-      for (const [key, value] of Object.entries(addedResourceUpload!)) {
+      for (const [key, value] of Object.entries(resourceBeingPosted!)) {
         if (value instanceof File) {
           containsFile = true;          
         }
@@ -61,22 +74,22 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
       }
       if (containsFile) {
         // if the addedResource contains a file, then we need to use FormData
-        postResource(formData);
+        doPost(formData);
       } else {
         // otherwise we should use JSON
-        postResource(JSON.stringify(addedResourceUpload));
+        doPost(JSON.stringify(resourceBeingPosted));
       }
     }
-  }, [fetchData, apiRoute, apiPath, csrfToken, addedResourceUpload, resources, setResources, setError]);
+  }, [fetchData, apiRoute, apiPath, csrfToken, resourceBeingPosted, resources, onSuccess, onFail, setResources]);
 
-  function addResource(resourceUpload: ResourceUpload): void {
+  function postResource(resourceUpload: ResourceUpload): void {
     const placeHolderResource: Resource = getPlaceholderResource(resourceUpload);
     if (placeHolderResource.id !== -1) {
       throw new Error("Placeholder resource must have an id of -1");
     }
     setResources([...resources, placeHolderResource]);
-    setAddedResourceUpload(resourceUpload);
+    setResourceBeingPosted(resourceUpload);
   }
 
-  return { addResource, error };
+  return { posting: resourceBeingPosted !== null, postResource };
 }

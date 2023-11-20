@@ -59,10 +59,14 @@ export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemov
       }
       {job.company ?
         <p className="card-subtitle">
-          <a href={job.url} target="_blank" rel="noreferrer" className="link-light">
-            {job.company}
-            <BoxArrowUpRight className="ms-1" />
-          </a>
+          {job.url ?
+            <a href={job.url} target="_blank" rel="noreferrer" className="link-light">
+              {job.company}
+              <BoxArrowUpRight className="ms-1" />
+            </a>
+          :
+            job.company
+          }
         </p>
       :
         <span className="placeholder-glow">

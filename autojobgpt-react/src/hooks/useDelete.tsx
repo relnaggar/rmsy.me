@@ -10,51 +10,58 @@ export default function useDelete<Resource extends WithID>(
   apiPath: string,
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
+  options?: {
+    onSuccess?: () => void,
+    onFail?: (errors: Record<string,string>) => void,
+  },
 ): {
-  removeResource: (id: number) => void,
-  removedID: number,
-  error: string
+  deleteResource: (id: number) => void,
+  idBeingDeleted: number,
 } {
+  const { onSuccess, onFail } = options || {};
+
   const apiRoute: string = useAPI();
   const fetchData = useContext(FetchDataContext);
   const csrfToken = useContext(CSRFTokenContext);
 
-  const [removedID, setRemovedID] = useState<number>(-1);
-  const [error, setError] = useState<string>("");
+  const [idBeingDeleted, setIDBeingDeleted] = useState<number>(-1);
 
   useEffect(() => {
-    async function deleteResource(): Promise<void> {
-      await fetchData(`${apiRoute}${apiPath}${removedID}/`, { 
-        method: "DELETE", 
-        headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
-      })
-      .then((response) => {
-        if (response.status === 204) {
-          setResources(resources.filter((resource) => resource.id !== removedID));
-          setRemovedID(-1);
-          setError("");
+    async function doDelete(): Promise<void> {
+      let errors: Record<string,string> = {};
+      try {
+        const response: Response = await fetchData(`${apiRoute}${apiPath}${idBeingDeleted}/`, { 
+          method: "DELETE", 
+          headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
+        })
+        if (response.ok) {
+          setResources(resources.filter((resource) => resource.id !== idBeingDeleted));
+          onSuccess?.();
         } else {
-          response.json()
-          .then(data => {
-            setError(`${data.error}: ${data.details}`);
-            console.error(`${data.error}: ${data.details}`);
-          })
-          .catch(error => {
-            setError(error.message);
-            console.error(error.message);
-          });
+          errors = await response.json();
         }
-      })
-      .catch((error) => setError(error.message));
+      } catch (error) {
+        if (error instanceof Error) {
+          errors["error"] = error.message;
+        } else {
+          errors["error"] = String(error);        
+        }
+      } finally {
+        setIDBeingDeleted(-1);
+        if (Object.keys(errors).length > 0) {
+          onFail?.(errors);
+          console.error(errors);
+        }
+      }
     }
-    if (removedID !== -1) {
-      deleteResource();
+    if (idBeingDeleted !== -1) {
+      doDelete();
     }
-  }, [fetchData, apiRoute, apiPath, csrfToken, removedID, setRemovedID, setError, resources, setResources]);
+  }, [fetchData, apiRoute, apiPath, csrfToken, idBeingDeleted, resources, onSuccess, onFail, setResources]);
 
-  function removeResource(id: number): void {
-    setRemovedID(id);
+  function deleteResource(id: number): void {
+    setIDBeingDeleted(id);
   }
   
-  return { removeResource, removedID, error };
+  return { deleteResource, idBeingDeleted };
 }

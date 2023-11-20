@@ -8,37 +8,65 @@ import { WithID } from '../common/types';
 export default function useResource<Resource extends WithID, ResourceUpload>(
   apiPath: string,
   getPlaceholderResource: (resourceUpload: ResourceUpload) => Resource,
+  options?: {
+    onFetchSuccess?: (resources: Resource[]) => void,
+    onFetchFail?: (errors: Record<string,string>) => void,
+    onPostSuccess?: (resource: Resource) => void,
+    onPostFail?: (errors: Record<string,string>) => void,
+    onDeleteSuccess?: () => void,
+    onDeleteFail?: (errors: Record<string,string>) => void,
+    onPatchSuccess?: (resource: Resource) => void,
+    onPatchFail?: (errors: Record<string,string>) => void,
+  },
 ): {
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
-  loaded: boolean,
+  fetching: boolean,
   refetch: () => void,
-  removeResource: (id: number) => void,
-  removedID: number,
-  addResource: (resourceUpload: ResourceUpload) => void,
-  updateResource: (id: number, patch: Partial<Resource>) => void,
-  updated: boolean,
-  errors: {
-    fetchError: string,
-    deleteError: string,
-    postError: string,
-    patchError: string,
-  }
+  posting: boolean,
+  postResource: (resourceUpload: ResourceUpload) => void,
+  deleteResource: (id: number) => void,
+  idBeingDeleted: number,
+  patching: boolean,
+  patchResource: (id: number, patch: Partial<Resource>) => void,
 } {
-  const { resources, setResources, loaded, refetch, error: fetchError } = useFetch<Resource>(apiPath);
-  const { removeResource, removedID, error: deleteError } = useDelete<Resource>(
-    apiPath, resources, setResources
-  );  
-  const { addResource, error: postError } = usePost<Resource,ResourceUpload>(
-    apiPath, resources, setResources, getPlaceholderResource
-  );
-  const { updateResource, updated, error: patchError } = usePatch<Resource>(apiPath, resources, setResources);
+  let {
+    onPostSuccess,
+    onPostFail,
+    onFetchSuccess,
+    onFetchFail,
+    onDeleteSuccess,
+    onDeleteFail,
+    onPatchSuccess,
+    onPatchFail,
+  } = options || {};
+
+  const { resource: resources, setResource: setResources, fetching, refetch } = useFetch<Resource[]>(apiPath, {
+    initialResource: [],
+    onSuccess: onFetchSuccess,
+    onFail: onFetchFail
+  });
+
+  const { posting, postResource } = usePost<Resource,ResourceUpload>(apiPath, resources, setResources,
+    getPlaceholderResource, {
+    onSuccess: onPostSuccess,
+    onFail: onPostFail,
+  });
+
+  const { deleteResource, idBeingDeleted } = useDelete<Resource>(apiPath, resources, setResources, {
+    onSuccess: onDeleteSuccess,
+    onFail: onDeleteFail
+  });
+
+  const { patchResource, patching } = usePatch<Resource>(apiPath, resources, setResources, {
+    onSuccess: onPatchSuccess,
+    onFail: onPatchFail
+  });
 
   return {
-    resources, setResources, loaded, refetch,
-    removeResource, removedID,
-    addResource,
-    updateResource, updated,
-    errors: { fetchError, deleteError, postError, patchError }
+    resources, setResources, fetching, refetch,
+    posting, postResource,
+    deleteResource, idBeingDeleted,    
+    patching, patchResource,
   };
 }

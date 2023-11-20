@@ -4,9 +4,9 @@ from .views import ResumeTemplateViewSet, FillFieldViewSet, JobViewSet, ResumeVi
 from .views import app, csrf
 
 router = routers.DefaultRouter()
+router.register("jobs", JobViewSet)
 router.register("templates", ResumeTemplateViewSet)
 router.register("fillfields", FillFieldViewSet)
-router.register("jobs", JobViewSet)
 router.register("resumes", ResumeViewSet)
 router.register("resumesubstitutions", ResumeSubstitutionViewSet)
 

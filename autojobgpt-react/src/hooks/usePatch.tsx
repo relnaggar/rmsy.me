@@ -9,61 +9,67 @@ import { WithID } from "../common/types";
 export default function usePatch<Resource extends WithID>(
   apiPath: string,
   resources: Resource[],
-  setResources: React.Dispatch<React.SetStateAction<Resource[]>>
+  setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
+  options?: {
+    onSuccess?: (resource: Resource) => void,
+    onFail?: (errors: Record<string,string>) => void,
+  },
 ): {
-  updateResource: (id: number, patch: Partial<Resource>) => void,
-  updated: boolean,
-  error: string
+  patching: boolean,
+  patchResource: (id: number, patch: Partial<Resource>) => void,
 } {
+  const {
+    onSuccess,
+    onFail,
+  } = options || {};
+
   const apiRoute: string = useAPI();
   const fetchData = useContext(FetchDataContext);
   const csrfToken = useContext(CSRFTokenContext);
 
-  const [updatedID, setUpdatedID] = useState<number>(-1);
+  const [idBeingPatched, setIDBeingPatched] = useState<number>(-1);
   const [patch, setPatch] = useState<Partial<Resource>>({});
-  const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    async function patchResource(): Promise<void> {
-      await fetchData(`${apiRoute}${apiPath}${updatedID}/`, { 
-        method: "PATCH", 
-        headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
-        body: JSON.stringify(patch)
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          setError(`${data.error}: ${data.details}`);  
-          console.error(`${data.error}: ${data.details}`);
-        } else {
-          setResources(resources.map((resource) => resource.id === updatedID ? data : resource))
-          setError("");
-        }
-      })
-      .catch(error => {
-        setError(error.message);
-        console.error(error.message);
-      })
-      .finally(() => setUpdatedID(-1));
-    }
-    if (updatedID !== -1) {
-      patchResource();
-    }
-  }, [fetchData, apiRoute, apiPath, csrfToken, updatedID, setUpdatedID, patch, setError, resources, setResources]);
+    async function doPatch(): Promise<void> {
+      let errors: Record<string,string> = {};
+      try {
+        const response: Response = await fetchData(`${apiRoute}${apiPath}${idBeingPatched}/`, { 
+          method: "PATCH", 
+          headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
+          body: JSON.stringify(patch)
+        });
 
-  function updateResource(id: number, patch: Partial<Resource>): void {
-    setResources(
-      resources.map((resource) => {
-        if (resource.id === id) {
-          return { ...resource, ...patch };
-        } else {
-          return resource;
+        if (response.ok) {
+          const patchedResource: Resource = await response.json();
+          setResources(resources.map((resource) => resource.id === idBeingPatched ? patchedResource : resource));
+          onSuccess?.(patchedResource);
+        } else {          
+          errors = await response.json();
         }
-      })
-    );
+      } catch (error) {
+        if (error instanceof Error) {
+          errors["error"] = error.message;
+        } else {
+          errors["error"] = String(error);        
+        }
+      } finally {    
+        setIDBeingPatched(-1);
+        if (Object.keys(errors).length > 0) {
+          onFail?.(errors);
+          console.error(errors);
+        }
+      }
+    }
+    if (idBeingPatched !== -1) {
+      doPatch();
+    }
+  }, [fetchData, apiRoute, apiPath, csrfToken, idBeingPatched, patch, resources, setResources, onSuccess, onFail]);
+
+  function patchResource(id: number, patch: Partial<Resource>): void {
     setPatch(patch);
-    setUpdatedID(id);
+    setIDBeingPatched(id);
   }
 
-  return { updateResource, updated: updatedID === -1, error };
+  return { patching: idBeingPatched !== -1, patchResource };
 }

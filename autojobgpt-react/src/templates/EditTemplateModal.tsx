@@ -1,7 +1,7 @@
 import React from "react";
 import Modal from 'react-bootstrap/Modal';
 
-import useFetch from "../hooks/useFetch";
+import useFetchResource from "../hooks/useFetch";
 import InputWithSave from "../common/InputWithSave";
 import { ResumeTemplate, FillField } from "../templates/types";
 
@@ -15,17 +15,21 @@ export default function EditTemplateModal({ apiPath, show, setShow, templates, s
   templateID: number,
 }): React.JSX.Element {
   const {
-    resources: fillFields,
-    setResources: setFillFields,
-    error: fetchError,
-  } = useFetch<FillField>("fillfields/");
+    resource: fillFields,
+    setResource: setFillFields,
+    refetch: refetchFillFields,
+  } = useFetchResource<FillField[]>("fillfields/");
 
   function handleClose() {
     setShow(false);
   }
 
+  function handleShow() {
+    refetchFillFields();
+  }
+
   return (
-    <Modal show={show} onHide={handleClose} aria-labelledby="editTemplateModalLabel">
+    <Modal show={show} onHide={handleClose} onShow={handleShow} aria-labelledby="editTemplateModalLabel">
       <Modal.Header closeButton>
         <Modal.Title id="editTemplateModalLabel">Edit Resume Template</Modal.Title>
       </Modal.Header>
@@ -76,6 +80,8 @@ export default function EditTemplateModal({ apiPath, show, setShow, templates, s
                 labelProperty="key"
               />
             }
+          } else {
+            return null;
           }
         })}
       </Modal.Body>
