@@ -10,6 +10,7 @@ export default function FormInput({
   editing,
   loading,
   error,
+  children,
   ...props
 }: {
   id: string,
@@ -20,13 +21,16 @@ export default function FormInput({
   editing: boolean,
   loading: boolean,
   error: string | undefined,
+  children?: React.ReactNode,
   [key: string]: any,
 }): React.JSX.Element {
+  const showError: string | false | undefined = !editing && !loading && error;
+
   const textAreaProps: React.TextareaHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> = {
-    className: `form-control${!editing && !loading && error ? " is-invalid" : ""}`,
+    className: `form-control${showError ? " is-invalid" : ""}`,
     id,
     name: id,
-    value,
+    value: value || "",
     onChange: handleChange,
     disabled: loading,
     ...props,
@@ -35,12 +39,30 @@ export default function FormInput({
   return (
     <div className="mb-3">
       <label className="form-label" htmlFor={id}>{label}</label>
-      {type === "textarea"?
-        <textarea {...textAreaProps} />
+      {children?
+        <div className="d-flex">
+          <div className="flex-grow-1">
+            {type === "textarea"?
+              <textarea {...textAreaProps} />
+            :
+              <input type={type} {...textAreaProps} />
+            }
+            <div className="invalid-feedback" role={showError? "alert": undefined}>{error}</div>
+          </div>
+          <div className="ps-2">
+            {children}
+          </div>
+        </div>
       :
-        <input type={type} {...textAreaProps} />      
+        <>
+          {type === "textarea"?
+            <textarea {...textAreaProps} />
+          :
+            <input type={type} {...textAreaProps} />
+          }
+          <div className="invalid-feedback" role={showError? "alert": undefined}>{error}</div>
+        </>
       }
-      {<div className="invalid-feedback">{error}</div>}
     </div>
   );
 }

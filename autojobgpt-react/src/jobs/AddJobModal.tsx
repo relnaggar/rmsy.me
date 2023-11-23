@@ -17,7 +17,7 @@ export default function AddJobModal({
   setShow: (show: boolean) => void,
   addingJob: boolean,
   addJob: (jobUpload: JobUpload) => void,
-  addJobErrors: {[key: string]: string},
+  addJobErrors: Record<string,string>,
   showAddJobErrorAlert: boolean,
   setShowAddJobErrorAlert: React.Dispatch<React.SetStateAction<boolean>>,
 }): React.JSX.Element {
@@ -96,44 +96,23 @@ export default function AddJobModal({
       </Modal.Header>
       <form onSubmit={handleSubmit} id="addJobForm">
         <Modal.Body>
-          <div className="mb-3">
-            <label className="form-label" htmlFor="url">URL</label>
-            <div className="d-flex">
-              <div className="flex-grow-1">
-                <input
-                  className={`form-control${
-                    !urlInput.editing && !loading && (addJobErrors["url"] || fillErrors["url"]) ? " is-invalid" : ""
-                  }`}
-                  type="url" id="url" name="url" value={urlInput.value}
-                  onChange={urlInput.handleChange} disabled={loading}
-                  maxLength={2000} minLength={4}
-                />
-                <div className="invalid-feedback">
-                  { addJobErrors["url"]?
-                    addJobErrors["url"]
-                  :
-                    fillErrors["url"]
-                  }
-                </div>
-              </div>
-              <div className="ps-2">
-                <button className="btn btn-outline-primary" type="button"
-                  onClick={filling ? () => cancelFill() : handleClickFillDetails }
-                >
-                  {filling?
-                    <>
-                      <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-                      Cancel
-                    </>
-                  :
-                    <>
-                      Fill Details
-                    </>
-                  }
-                </button>
-              </div>
-            </div>
-          </div>
+          <FormInput
+            id="url" label="URL" type="url" value={urlInput.value} handleChange={urlInput.handleChange}
+            editing={urlInput.editing} loading={loading} error={addJobErrors["url"] || fillErrors["url"]}
+            maxLength={2000} minLength={4}
+          >
+            <button className="btn btn-outline-primary" type="button"
+              onClick={filling ? () => cancelFill() : handleClickFillDetails }
+            >
+              {filling?<>
+                <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                Cancel
+              </>:<>
+                Fill Details
+              </>}
+            </button>
+          </FormInput>
+
           <Alert variant="danger" show={showFillErrorAlert} onClose={() => setShowFillErrorAlert(false)} dismissible>
             {Object.entries(fillErrors).filter(([key, _]) => key !== "url").map(([_, value]) => value).join(" ")}
           </Alert>
