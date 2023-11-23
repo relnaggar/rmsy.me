@@ -1,4 +1,4 @@
-export type WithID = {
+export interface WithID {
   id: number
 }
 

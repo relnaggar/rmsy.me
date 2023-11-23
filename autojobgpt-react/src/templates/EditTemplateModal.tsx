@@ -18,7 +18,7 @@ export default function EditTemplateModal({ apiPath, show, setShow, templates, s
     resource: fillFields,
     setResource: setFillFields,
     refetch: refetchFillFields,
-  } = useFetchResource<FillField[]>("fillfields/");
+  } = useFetchResource<FillField[]>("fillfields/", { initialResource: [] });
 
   function handleClose() {
     setShow(false);

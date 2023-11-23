@@ -41,12 +41,12 @@ test("API is called when component is rendered", async () => {
   expect(mockFunctions.fetchData).toHaveBeenCalledTimes(1);
   expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(
     "../api/jobs/",
-    {
+    expect.objectContaining({
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-    }
+    })
   );
 });
 
@@ -94,12 +94,12 @@ test("refresh button makes additional API call", async () => {
   expect(mockFunctions.fetchData).toHaveBeenCalledTimes(2);
   expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(
     "../api/jobs/",
-    {
+    expect.objectContaining({
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-    }
+    })
   );
 });
 

@@ -78,7 +78,7 @@ main() {
       react)
         log "running React tests:"
         set +e
-          # logfun script/console autojobgpt-react 'npm test -- --watchAll=false'
+          logfun script/console autojobgpt-react 'npm test -- --watchAll=false'
           local result="$?"
         set -e
         if [[ "${result}" -eq 127 ]]; then

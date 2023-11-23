@@ -48,15 +48,18 @@ export default function InputWithSave<Resource extends WithID>({
     setEdited(true);
   }
 
+  const thereAreErrors: boolean = Object.keys(errors).length > 0;
+
   const input: React.JSX.Element = (
     <>
       {type === "textarea" &&
         <textarea
           className={`form-control${
-            (!edited && !updating && !errors) ? " is-valid" : ""}${
-            (errors && !updating) ? " is-invalid" : ""
+            (!edited && !updating && !thereAreErrors) ? " is-valid" : ""}${
+            (thereAreErrors && !updating) ? " is-invalid" : ""
           }`}
           id={elementID}
+          name={elementID}
           defaultValue={resource[editableProperty] as string}
           onChange={handleChange}
           disabled={updating}
@@ -66,10 +69,11 @@ export default function InputWithSave<Resource extends WithID>({
         <input
           type="text"
           className={`form-control${
-            (!edited && !updating && !errors) ? " is-valid" : ""}${
-            (errors && !updating) ? " is-invalid" : ""
+            (!edited && !updating && !thereAreErrors) ? " is-valid" : ""}${
+            (thereAreErrors && !updating) ? " is-invalid" : ""
           }`}
           id={elementID}
+          name={elementID}
           defaultValue={resource[editableProperty] as string}
           onChange={handleChange}
           disabled={updating}
@@ -99,7 +103,7 @@ export default function InputWithSave<Resource extends WithID>({
         </div>
         <div className="ps-2">
           <button type="submit" className="btn btn-outline-primary" disabled={updating}>
-            {!updating?
+            {updating?
               <>
                 <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
                 <span role="status">Saving...</span>

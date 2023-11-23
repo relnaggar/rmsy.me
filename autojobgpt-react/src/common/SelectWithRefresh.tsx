@@ -9,7 +9,7 @@ export default function SelectWithRefresh<Option extends WithID>({apiPath, id, o
   id: string,
   optionToString: (option: Option) => string,
 }): React.JSX.Element {
-  const { resource: options, fetching: loading, refetch } = useFetch<Option[]>(apiPath);
+  const { resource: options, fetching: loading, refetch } = useFetch<Option[]>(apiPath, { initialResource: [] });
 
   function handleRefresh(): void {
     refetch();

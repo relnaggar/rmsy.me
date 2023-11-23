@@ -41,14 +41,17 @@ test("add job modal has a url input", async () => {
   expect(urlInput).toBeInTheDocument();
 });
 
-test("adding a job adds the same job to the backlog column, closes the modal, and calls the API", async () => {
+test("adding a valid job adds the same job to the backlog column, closes the modal, and calls the API", async () => {
   await renderThisRoute();
 
   // add a job
   mockFunctions.fetchData.mockImplementationOnce(generateResponse(validJob1));
   const addJobModal: HTMLElement = await openAndGetAddJobModal();
-  const urlInput: HTMLElement = getByRole(addJobModal, "textbox", {name: new RegExp("url", "i")});
-  userEvent.type(urlInput, validJob1.url);
+  userEvent.type(getByRole(addJobModal, "textbox", {name: new RegExp("url", "i")}), validJob1.url);
+  userEvent.type(getByRole(addJobModal, "textbox", {name: new RegExp("title", "i")}), validJob1.title);
+  userEvent.type(getByRole(addJobModal, "textbox", {name: new RegExp("company", "i")}), validJob1.company);
+  userEvent.type(getByRole(addJobModal, "textbox", {name: new RegExp("posting", "i")}), validJob1.posting);
+
   const submitButton: HTMLElement = getSubmitButton(addJobModal);
   await act(async () => {
     userEvent.click(submitButton);
