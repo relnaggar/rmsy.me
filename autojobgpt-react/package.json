@@ -18,6 +18,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:once": "react-scripts test --watchAll=false",
+    "test:log": "react-scripts test --watchAll=false > test-output.ansi 2>&1",
     "eject": "react-scripts eject",
     "compile": "npm run build && rm -rf /var/www/public/static/js/ && rm -rf /var/www/public/static/css/ && rm -rf /var/www/public/static/media/ && cp -r build/static/* /var/www/public/static && cp build/index.html /var/www/public/autojobgpt/index.html",
     "watch": "chokidar 'src/**/*' -c 'npm run compile'"
