@@ -57,7 +57,6 @@ export default function usePatch<Resource extends WithID>(
         setIDBeingPatched(-1);
         if (Object.keys(errors).length > 0) {
           onFail?.(errors);
-          console.error(errors);
         }
       }
     }

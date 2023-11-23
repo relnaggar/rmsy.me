@@ -59,7 +59,6 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
         setResourceBeingPosted(null);
         if (Object.keys(errors).length > 0) {
           onFail?.(errors);
-          console.error(errors);
         }
       }
     }

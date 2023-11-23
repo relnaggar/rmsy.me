@@ -65,7 +65,6 @@ export default function useFetch<Resource>(
           setFetching(false);
           if (Object.keys(errors).length > 0) {
             onFail?.(errors);
-            console.error(errors);
           }
         }
       }
