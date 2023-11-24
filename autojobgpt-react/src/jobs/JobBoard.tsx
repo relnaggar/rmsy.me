@@ -35,9 +35,6 @@ export default function JobBoard(): React.JSX.Element {
   const [showAddJobErrorAlert, setShowAddJobErrorAlert] = useState<boolean>(false);
 
   function handleErrors(errors: Record<string,string>): void {
-    if (errors["error"] && errors["error"] === "Failed to fetch") {
-      errors["error"] = "Failed to connect to server. Please check your internet connection and try again.";
-    }
     setErrorMessage(Object.values(errors).join(" "));
     setShowErrorAlert(true);    
   }
@@ -54,15 +51,17 @@ export default function JobBoard(): React.JSX.Element {
     }
   }
 
+  const jobAPIPath: string = "jobs/";
   const {
     resources: jobs,
+    setResources: setJobs,
     fetching: loading,
     posting: addingJob,
     postResource: addJob,
     deleteResource: removeJob,
     idBeingDeleted: jobIDBeingRemoved,
     patchResource: updateJob,
-  } = useResource<Job,JobUpload>("jobs/", generatePlaceholderJob, {
+  } = useResource<Job,JobUpload>(jobAPIPath, generatePlaceholderJob, {
     onPostSuccess: handleAddJobSuccess,
     onPostFail: handleAddJobFail,
     onFetchFail: handleErrors,
@@ -136,7 +135,14 @@ export default function JobBoard(): React.JSX.Element {
           );
         })}
       </div>
-      <EditJobModal show={showEditJob} setShow={setShowEditJob} id={editJobID} />
+      <EditJobModal
+        apiPath={jobAPIPath}
+        show={showEditJob}
+        setShow={setShowEditJob}
+        jobs={jobs}
+        setJobs={setJobs}
+        id={editJobID}
+      />
       <AddJobModal
         show={showAddJob}
         setShow={setShowAddJob}

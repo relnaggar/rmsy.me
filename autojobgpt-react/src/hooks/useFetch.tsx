@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 
 import useAPI from "./useAPI";
 import { FetchDataContext } from "../routes/routesConfig";
+import { makeErrorMessage } from "./hooksUtils";
 
 
 export default function useFetch<Resource>(
@@ -55,10 +56,8 @@ export default function useFetch<Resource>(
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
           // do nothing
-        } else if (error instanceof Error) { // including if the response body is not valid JSON
-          errors["error"] = error.message;
         } else {
-          errors["error"] = String(error);
+          errors["error"] = makeErrorMessage(error);
         }
       } finally {     
         if (!abortControllerRef.current.signal.aborted) {

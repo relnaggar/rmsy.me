@@ -41,7 +41,7 @@ test("add job modal has a url input", async () => {
   expect(urlInput).toBeInTheDocument();
 });
 
-test("add job modal puts url input in focus when opened within 1 second", async () => {
+test("add job modal puts url input in focus within 1 second when opened", async () => {
   await renderThisRoute();
   const urlInput: HTMLElement = getByRole(await openAndGetAddJobModal(), "textbox", {name: new RegExp("url", "i")});
   await waitFor(() => {

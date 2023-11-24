@@ -36,9 +36,6 @@ export default function AddJobModal({
   }
 
   function onFillFail(errors: Record<string,string>): void {
-    if (errors["error"] && errors["error"] === "Failed to fetch") {
-      errors["error"] = "Failed to connect to server. Please check your internet connection and try again.";
-    }
     setFillErrors(errors);
     if (Object.keys(errors).filter((key) => key !== "url").length > 0) {
       setShowFillErrorAlert(true);

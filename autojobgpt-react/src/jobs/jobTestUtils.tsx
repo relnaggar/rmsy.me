@@ -24,8 +24,17 @@ export function getAddJobButton(): HTMLElement {
   return getByRole(backlogColumn, "button", {name: new RegExp("add job", "i")});
 }
 
+export function getEditJobButton(jobTitle: string): HTMLElement {
+  const job: HTMLElement = getBacklogJobByTitle(jobTitle);
+  return getByRole(job, "button", {name: new RegExp("edit", "i")});
+}
+
 export async function openAndGetAddJobModal(timeout: number = 1000): Promise<HTMLElement> {
   return openAndGetModal(getAddJobButton(), "add job", timeout);
+}
+
+export async function openAndGetEditJobModal(jobTitle: string, timeout: number = 1000): Promise<HTMLElement> {
+  return openAndGetModal(getEditJobButton(jobTitle), "edit job", timeout);
 }
 
 export function queryBacklogJobs(): HTMLElement[] {

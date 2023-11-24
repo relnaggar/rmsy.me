@@ -4,6 +4,7 @@ import useAPI from "./useAPI";
 import { FetchDataContext } from "../routes/routesConfig";
 import { CSRFTokenContext } from "../routes/Layout";
 import { WithID } from "../common/types";
+import { makeErrorMessage } from "./hooksUtils";
 
 
 export default function usePatch<Resource extends WithID>(
@@ -48,11 +49,7 @@ export default function usePatch<Resource extends WithID>(
           errors = await response.json();
         }
       } catch (error) {
-        if (error instanceof Error) {
-          errors["error"] = error.message;
-        } else {
-          errors["error"] = String(error);        
-        }
+        errors["error"] = makeErrorMessage(error);
       } finally {    
         setIDBeingPatched(-1);
         if (Object.keys(errors).length > 0) {

@@ -1,30 +1,75 @@
 import React from "react";
 import Modal from 'react-bootstrap/Modal';
 
+import InputWithSave from "../common/InputWithSave";
+import { Job } from "../jobs/types";
 
-export default function EditJobModal({ show, setShow, id }: {
+
+export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id }: {
+  apiPath: string,
   show: boolean,
   setShow: (show: boolean) => void,
+  jobs: Job[],
+  setJobs: React.Dispatch<React.SetStateAction<Job[]>>,
   id: number
 }): React.JSX.Element {
-  function handleClose() {
-    setShow(false);
-  }
-
-  function onEntered(): void {
-    // document.getElementById("name")?.focus();
-  }
-
   return (
-    <Modal show={show} onHide={handleClose} onEntered={onEntered} aria-labelledby="editJobModalLabel">
+    <Modal show={show} onHide={() => setShow(false)}
+      onEntered={() => document.getElementsByTagName("input")[0].focus()}
+      aria-labelledby="editJobModalLabel"
+    >
       <Modal.Header closeButton>
         <Modal.Title id="editJobModalLabel">Edit Job</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>Job id: {id}</p>
+        <InputWithSave<Job>
+          type="url"
+          apiPath={apiPath}
+          resources={jobs}
+          setResources={setJobs}
+          id={id}
+          editableProperty="url"
+          labelText="URL"
+          maxLength={2000}
+          minLength={4}
+        />
+
+        <hr />
+
+        <h5>Details</h5>
+        <InputWithSave<Job>
+          type="text"
+          apiPath={apiPath}
+          resources={jobs}
+          setResources={setJobs}
+          id={id}
+          editableProperty="title"
+          labelText="Title"
+          required maxLength={160}
+        />
+        <InputWithSave<Job>
+          type="text"
+          apiPath={apiPath}
+          resources={jobs}
+          setResources={setJobs}
+          id={id}
+          editableProperty="company"
+          labelText="Company"
+          required maxLength={160}
+        />
+        <InputWithSave<Job>
+          type="textarea"
+          apiPath={apiPath}
+          resources={jobs}
+          setResources={setJobs}
+          id={id}
+          editableProperty="posting"
+          labelText="Posting"
+          required
+        />
       </Modal.Body>
       <Modal.Footer>
-        <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
+        <button type="button" className="btn btn-secondary" onClick={() => setShow(false)}>Close</button>
       </Modal.Footer>
     </Modal>
   )

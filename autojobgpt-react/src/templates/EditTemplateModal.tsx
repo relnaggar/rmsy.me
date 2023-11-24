@@ -20,16 +20,11 @@ export default function EditTemplateModal({ apiPath, show, setShow, templates, s
     refetch: refetchFillFields,
   } = useFetchResource<FillField[]>("fillfields/", { initialResource: [] });
 
-  function handleClose() {
-    setShow(false);
-  }
-
-  function handleShow() {
-    refetchFillFields();
-  }
-
   return (
-    <Modal show={show} onHide={handleClose} onShow={handleShow} aria-labelledby="editTemplateModalLabel">
+    <Modal show={show} onHide={() => setShow(false)}      
+      onEntered={() => document.getElementsByTagName("input")[0].focus()} aria-labelledby="editTemplateModalLabel"
+      onShow={refetchFillFields}
+    >
       <Modal.Header closeButton>
         <Modal.Title id="editTemplateModalLabel">Edit Resume Template</Modal.Title>
       </Modal.Header>
@@ -86,7 +81,7 @@ export default function EditTemplateModal({ apiPath, show, setShow, templates, s
         })}
       </Modal.Body>
       <Modal.Footer>
-        <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
+        <button type="button" className="btn btn-secondary" onClick={() => setShow(false)}>Close</button>
       </Modal.Footer>
     </Modal>
   )

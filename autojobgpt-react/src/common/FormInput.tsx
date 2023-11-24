@@ -33,8 +33,20 @@ export default function FormInput({
     value: value || "",
     onChange: handleChange,
     disabled: loading,
+    "aria-describedby": `${id}-feedback`,
     ...props,
   };
+
+  const input: React.JSX.Element = (
+    <>
+      {type === "textarea"?
+        <textarea {...textAreaProps} />
+      :
+        <input type={type} {...textAreaProps} />
+      }
+      <div className="invalid-feedback" id={`${id}-feedback`} role={showError? "alert": undefined}>{error}</div>
+    </>
+  );
 
   return (
     <div className="mb-3">
@@ -42,26 +54,14 @@ export default function FormInput({
       {children?
         <div className="d-flex">
           <div className="flex-grow-1">
-            {type === "textarea"?
-              <textarea {...textAreaProps} />
-            :
-              <input type={type} {...textAreaProps} />
-            }
-            <div className="invalid-feedback" role={showError? "alert": undefined}>{error}</div>
+            {input}
           </div>
           <div className="ps-2">
             {children}
           </div>
         </div>
       :
-        <>
-          {type === "textarea"?
-            <textarea {...textAreaProps} />
-          :
-            <input type={type} {...textAreaProps} />
-          }
-          <div className="invalid-feedback" role={showError? "alert": undefined}>{error}</div>
-        </>
+        input
       }
     </div>
   );

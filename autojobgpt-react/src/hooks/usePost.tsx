@@ -4,6 +4,7 @@ import useAPI from "./useAPI";
 import { FetchDataContext } from "../routes/routesConfig";
 import { CSRFTokenContext } from "../routes/Layout";
 import { WithID } from "../common/types";
+import { makeErrorMessage } from "./hooksUtils";
 
 
 export default function usePost<Resource extends WithID, ResourceUpload>(
@@ -49,11 +50,7 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
           errors = await response.json();
         }
       } catch (error) {
-        if (error instanceof Error) {
-          errors["error"] = error.message;
-        } else {
-          errors["error"] = String(error);        
-        }
+        errors["error"] = makeErrorMessage(error);
       } finally {
         setResources(newResources);
         setResourceBeingPosted(null);

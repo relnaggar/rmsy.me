@@ -1,7 +1,7 @@
-import { screen, getByRole, getAllByRole } from "@testing-library/react";
+import { screen, getByRole, getAllByRole, waitFor } from "@testing-library/react";
 
-import { renderThisRoute, getBacklogJobByTitle } from "./jobTestUtils";
-import { injectMocks, mockFunctions, openAndGetModal } from "../common/testUtils";
+import { renderThisRoute, openAndGetEditJobModal } from "./jobTestUtils";
+import { injectMocks, mockFunctions } from "../common/testUtils";
 import { generateConditionalResponseByRoute, validJob1, validJob2 } from "../common/mockAPI";
 import { Job } from "./types";
 
@@ -25,9 +25,7 @@ describe("clicking every edit job button shows edit job modal within 1 second", 
         data: validJobs,
       }]));
       await renderThisRoute();
-      const job: HTMLElement = getBacklogJobByTitle(validJob.title);
-      const editButton: HTMLElement = getByRole(job, "button", {name: new RegExp("edit", "i")});
-      const editJobModal: HTMLElement = await openAndGetModal(editButton, "edit job", 1000);
+      const editJobModal: HTMLElement = await openAndGetEditJobModal(validJob.title);
       expect(editJobModal).toBeInTheDocument();
     });
   }
@@ -41,12 +39,45 @@ describe("every edit job modal has a close button", () => {
         url: "../api/jobs/",
         data: validJobs,
       }]));
-      await renderThisRoute();
-      const job: HTMLElement = getBacklogJobByTitle(validJob.title);
-      const editButton: HTMLElement = getByRole(job, "button", {name: new RegExp("edit", "i")});
-      const editJobModal: HTMLElement = await openAndGetModal(editButton, "edit job", 1000);
+      await renderThisRoute();      
+      const editJobModal: HTMLElement = await openAndGetEditJobModal(validJob.title);
       const closeButtons: HTMLElement[] = getAllByRole(editJobModal, "button", {name: new RegExp("close", "i")});
       expect(closeButtons.length).toBeGreaterThan(0);
     });
+  }
+});
+
+test("edit job modal puts url input in focus within 1 second when opened", async () => {
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
+    url: "../api/jobs/",
+    data: [validJob1],
+  }]));
+  await renderThisRoute();
+  const editJobModal: HTMLElement = await openAndGetEditJobModal(validJob1.title);
+  const urlInput: HTMLElement = getByRole(editJobModal, "textbox", {name: new RegExp("url", "i")});
+  await waitFor(() => {
+    expect(document.activeElement).toEqual(urlInput);
+  }, { timeout: 1000 });
+});
+
+describe("every edit job modal has all the correct inputs, each with a save button", () => {
+  const inputFields: string[] = ["url", "title", "company", "posting"];
+  const validJobs: Job[] = [validJob1,validJob2];
+  for (const inputField of inputFields) {
+    for (const validJob of validJobs) {
+      test(`edit job modal for ${validJob.title} has a ${inputField} input`, async () => {
+        mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
+          url: "../api/jobs/",
+          data: validJobs,
+        }]));
+        await renderThisRoute();
+        const editJobModal: HTMLElement = await openAndGetEditJobModal(validJob.title);
+        const inputElement: HTMLElement = getByRole(editJobModal, "textbox", {name: new RegExp(inputField, "i")});
+        expect(inputElement).toBeInTheDocument();
+        const formElement: HTMLElement = inputElement.closest("form") as HTMLElement;
+        const saveButton: HTMLElement = getByRole(formElement, "button", {name: new RegExp("save", "i")});
+        expect(saveButton).toBeInTheDocument();
+      });
+    }
   }
 });
