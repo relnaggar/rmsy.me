@@ -32,6 +32,7 @@ force: ${force} \
 main() {
   log start
   cd "${SCRIPT_DIR}/.."
+  parse_args "$@"
 
   script/server down
   logfun docker container prune -f

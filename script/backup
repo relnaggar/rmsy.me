@@ -57,9 +57,9 @@ force: ${force} \
 }
 
 main() {
-  cd "${SCRIPT_DIR}/.."
-  parse_args "$@"
-  log "start"
+  log "start" 
+  cd "${SCRIPT_DIR}/.."  
+  parse_args "$@"  
 
   if "${force}"; then
     log "forcing overwrite of previous backup"

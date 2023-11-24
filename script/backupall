@@ -32,6 +32,7 @@ force: ${force} \
 main() {
   log start
   cd "${SCRIPT_DIR}/.."
+  parse_args "$@"
 
   # loop through all STACK_VOLUMES
   for volume in "${STACK_VOLUMES[@]}"; do
