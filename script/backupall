@@ -17,13 +17,29 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
 . "${SCRIPT_DIR}/lib/shared.sh"
 
+parse_args() {
+  # optional
+  force=false
+  if [[ "${1:-}" == "-f" ]]; then
+    force=true
+  fi
+
+  log "arguments (\
+force: ${force} \
+)"
+}
+
 main() {
   log start
   cd "${SCRIPT_DIR}/.."
 
   # loop through all STACK_VOLUMES
   for volume in "${STACK_VOLUMES[@]}"; do
-    script/backup "${volume}"
+    if "${force}"; then
+      script/backup "${volume}" -f
+    else
+      script/backup "${volume}"
+    fi
   done
 
   log "end"

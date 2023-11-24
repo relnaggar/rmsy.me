@@ -16,8 +16,9 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
 
 usage() {
   die "$(cat <<END
-usage: ${SCRIPT_NAME} volume
+usage: ${SCRIPT_NAME} volume [-f]
   where volume is a named Docker volume
+  where -f forces overwriting previous backup
 END
   )"
 }
@@ -28,6 +29,12 @@ parse_args() {
   # required
   if [[ -z "${volume}" ]]; then
     usage
+  fi
+
+  # optional
+  force=false
+  if [[ "${2:-}" == "-f" ]]; then
+    force=true
   fi
 
   # validation
@@ -45,6 +52,7 @@ parse_args() {
   
   log "arguments (\
 volume: ${volume} \
+force: ${force} \
 )"
 }
 
@@ -53,20 +61,24 @@ main() {
   parse_args "$@"
   log "start"
 
-  while true; do
-    log "continue with overwriting previous backup of ${volume}? [y/n]"
-    local yn;
-    read yn
-    case "${yn}" in
-        y)
-          break
-          ;;
-        n)
-          log "aborting"
-          die
-          ;;
-    esac
-  done
+  if "${force}"; then
+    log "forcing overwrite of previous backup"
+  else
+    while true; do
+      log "continue with overwriting previous backup of ${volume}? [y/n]"
+      local yn;
+      read yn
+      case "${yn}" in
+          y)
+            break
+            ;;
+          n)
+            log "aborting"
+            die
+            ;;
+      esac
+    done
+  fi
 
   set +e
     logfun sudo rm -r "backup/${volume}" 2>/dev/null

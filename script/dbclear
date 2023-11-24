@@ -17,13 +17,29 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
 . "${SCRIPT_DIR}/lib/shared.sh"
 
+parse_args() {
+  # optional
+  force=false
+  if [[ "${1:-}" == "-f" ]]; then
+    force=true
+  fi
+
+  log "arguments (\
+force: ${force} \
+)"
+}
+
 main() {
   log start
   cd "${SCRIPT_DIR}/.."
 
   script/server down
   logfun docker container prune -f
-  script/backupall
+  if "${force}"; then
+    script/backupall -f
+  else 
+    script/backupall
+  fi  
   set +e
     logfun docker volume rm db
     logfun docker volume rm django-media
