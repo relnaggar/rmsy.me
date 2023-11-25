@@ -30,8 +30,6 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
           id={id}
           editableProperty="url"
           labelText="URL"
-          maxLength={2000}
-          minLength={4}
         />
 
         <hr />
@@ -45,7 +43,7 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
           id={id}
           editableProperty="title"
           labelText="Title"
-          required maxLength={160}
+          required
         />
         <InputWithSave<Job>
           type="text"
@@ -55,7 +53,7 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
           id={id}
           editableProperty="company"
           labelText="Company"
-          required maxLength={160}
+          required
         />
         <InputWithSave<Job>
           type="textarea"

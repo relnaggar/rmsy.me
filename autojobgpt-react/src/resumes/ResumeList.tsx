@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import Alert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useResource from '../hooks/useResource';
@@ -10,6 +11,14 @@ import { Resume, ResumeUpload } from './types';
 
 export default function ResumeList(): React.JSX.Element {
   const openConfirmationModal = useContext(ConfirmationModalContext);
+
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
+
+  function handleErrors(errors: Record<string,string>): void {
+    setErrorMessage(Object.values(errors).join(" "));
+    setShowErrorAlert(true);    
+  }
 
   function getPlaceholderResume(resumeUpload: ResumeUpload): Resume {
     return {
@@ -30,7 +39,10 @@ export default function ResumeList(): React.JSX.Element {
     deleteResource: removeResume,
     idBeingDeleted: resumeBeingRemovedID,
     postResource: addResume,
-  } = useResource<Resume,ResumeUpload>("resumes/", getPlaceholderResume);
+  } = useResource<Resume,ResumeUpload>("resumes/", getPlaceholderResume, {
+    onFetchFail: handleErrors,
+    onDeleteFail: handleErrors,  
+  });
 
   const [showEditResumeModal, setShowEditResumeModal] = useState<boolean>(false);
   const [editResumeID, setEditResumeID] = useState<number>(-1);
@@ -57,6 +69,9 @@ export default function ResumeList(): React.JSX.Element {
   return(
     <section>
       <h2>Resumes</h2>
+      <Alert variant="danger" show={showErrorAlert} onClose={() => setShowErrorAlert(false)} dismissible>
+        {errorMessage}
+      </Alert>
       <DocumentList
         documents={resumes}
         loadingDocuments={loadingResumes}

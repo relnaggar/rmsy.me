@@ -26,29 +26,6 @@ export default function AddJobModal({
   const companyInput = useFormInput();
   const postingInput = useFormInput();
 
-  const [fillErrors, setFillErrors] = useState<Record<string,string>>({});
-  const [showFillErrorAlert, setShowFillErrorAlert] = useState<boolean>(false);
-
-  function onFillSuccess(jobDetails: JobDetails): void {
-    titleInput.edit(jobDetails.title);
-    companyInput.edit(jobDetails.company);
-    postingInput.edit(jobDetails.posting);
-  }
-
-  function onFillFail(errors: Record<string,string>): void {
-    setFillErrors(errors);
-    if (Object.keys(errors).filter((key) => key !== "url").length > 0) {
-      setShowFillErrorAlert(true);
-    }
-  }
-
-  const { fetching: filling, refetch: fill, cancel: cancelFill } = useFetch<JobDetails>(
-    `jobs/extract-details-from-url`, {
-    initialFetch: false,
-    onSuccess: onFillSuccess,
-    onFail: onFillFail,
-  });
-
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {    
     e.preventDefault(); // prevent page from reloading
 
@@ -70,6 +47,25 @@ export default function AddJobModal({
     }
   }
 
+  const [fillErrors, setFillErrors] = useState<Record<string,string>>({});
+  const [showFillErrorAlert, setShowFillErrorAlert] = useState<boolean>(false);
+  function onFillSuccess(jobDetails: JobDetails): void {
+    titleInput.edit(jobDetails.title);
+    companyInput.edit(jobDetails.company);
+    postingInput.edit(jobDetails.posting);
+  }
+  function onFillFail(errors: Record<string,string>): void {
+    setFillErrors(errors);
+    if (Object.keys(errors).filter((key) => key !== "url").length > 0) {
+      setShowFillErrorAlert(true);
+    }
+  }
+  const { fetching: filling, refetch: fill, cancel: cancelFill } = useFetch<JobDetails>(
+    `jobs/extract-details-from-url`, {
+    initialFetch: false,
+    onSuccess: onFillSuccess,
+    onFail: onFillFail,
+  });
   function handleClickFillDetails(): void {
     setShowFillErrorAlert(false);
     setShowAddJobErrorAlert(false);
@@ -81,7 +77,6 @@ export default function AddJobModal({
   }
 
   const loading: boolean = filling || addingJob;
-
   return (
     <Modal
       show={show} onHide={() => setShow(false)}
@@ -96,7 +91,6 @@ export default function AddJobModal({
           <FormInput
             id="url" label="URL" type="url" value={urlInput.value} handleChange={urlInput.handleChange}
             editing={urlInput.editing} loading={loading} error={addJobErrors["url"] || fillErrors["url"]}
-            maxLength={2000} minLength={4}
           >
             <button className="btn btn-outline-primary" type="button"
               onClick={filling ? () => cancelFill() : handleClickFillDetails }
@@ -119,11 +113,11 @@ export default function AddJobModal({
           <h5>Details</h5>
           <FormInput
             id="title" label="Title" type="text" value={titleInput.value} handleChange={titleInput.handleChange}
-            editing={titleInput.editing} loading={loading} error={addJobErrors["title"]} required maxLength={160}
+            editing={titleInput.editing} loading={loading} error={addJobErrors["title"]} required
           />
           <FormInput
             id="company" label="Company" type="text" value={companyInput.value} handleChange={companyInput.handleChange}
-            editing={companyInput.editing} loading={loading} error={addJobErrors["company"]} required maxLength={160}
+            editing={companyInput.editing} loading={loading} error={addJobErrors["company"]} required
           />
           <FormInput
             id="posting" label="Posting" type="textarea" value={postingInput.value} handleChange={postingInput.handleChange}

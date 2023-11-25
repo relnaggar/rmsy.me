@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import Alert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useResource from "../hooks/useResource";
@@ -10,6 +11,25 @@ import { ResumeTemplate, ResumeTemplateUpload } from "../templates/types";
 
 export default function ResumeTemplateList(): React.JSX.Element {
   const openConfirmationModal = useContext(ConfirmationModalContext);
+
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
+
+  function handleErrors(errors: Record<string,string>): void {
+    setErrorMessage(Object.values(errors).join(" "));
+    setShowErrorAlert(true);    
+  }
+
+  const [addTemplateErrors, setAddTemplateErrors] = useState<Record<string,string>>({});  
+  const [showAddTemplateErrorAlert, setShowAddTemplateErrorAlert] = useState<boolean>(false);
+
+  function handleAddTemplateFail(errors: Record<string,string>): void {
+    setAddTemplateErrors(errors);
+    setShowAddTemplateModal(true);
+    if (errors["error"]) {
+      setShowAddTemplateErrorAlert(true);
+    }
+  }
 
   function getPlaceholderTemplate(templateUpload: ResumeTemplateUpload): ResumeTemplate {
     return {
@@ -25,10 +45,14 @@ export default function ResumeTemplateList(): React.JSX.Element {
     resources: templates,
     setResources: setTemplates,
     fetching: loadingTemplates,
-    deleteResource: removeTemplate,
-    idBeingDeleted: templateBeingRemovedID,
     postResource: addTemplate,
-  } = useResource<ResumeTemplate,ResumeTemplateUpload>(templateAPIPath, getPlaceholderTemplate);
+    deleteResource: removeTemplate,
+    idBeingDeleted: templateBeingRemovedID,    
+  } = useResource<ResumeTemplate,ResumeTemplateUpload>(templateAPIPath, getPlaceholderTemplate, {
+    onFetchFail: handleErrors,
+    onPostFail: handleAddTemplateFail,
+    onDeleteFail: handleErrors,
+  });
 
   const [showEditTemplateModal, setShowEditTemplateModal] = useState<boolean>(false);
   const [editTemplateID, setEditTemplateID] = useState<number>(-1);
@@ -55,6 +79,11 @@ export default function ResumeTemplateList(): React.JSX.Element {
   return(
     <section>
       <h2>Templates</h2>
+      { showErrorAlert &&
+        <Alert variant="danger" onClose={() => setShowErrorAlert(false)} dismissible>
+          {errorMessage}
+        </Alert>
+      }
       <DocumentList
         documents={templates}
         loadingDocuments={loadingTemplates}
@@ -76,6 +105,9 @@ export default function ResumeTemplateList(): React.JSX.Element {
         show={showAddTemplateModal}
         setShow={setShowAddTemplateModal}
         onSubmitAddTemplate={addTemplate}
+        errors={addTemplateErrors}
+        showErrorAlert={showAddTemplateErrorAlert}
+        setShowErrorAlert={setShowAddTemplateErrorAlert}
       />
     </section>
   )

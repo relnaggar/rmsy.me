@@ -4,23 +4,24 @@ import React from 'react';
 export default function FormInput({
   id,
   label,
-  type,
-  value,
+  type,  
   handleChange,
-  editing,
-  loading,
+  editing,  
   error,
+  value,
+  loading,
   children,
   ...props
 }: {
   id: string,
   label: string,
   type: string,
-  value: string,
+  
   handleChange: ((e: React.ChangeEvent<HTMLInputElement>) => void) | ((e: React.ChangeEvent<HTMLTextAreaElement>) => void),
   editing: boolean,
-  loading: boolean,
   error: string | undefined,
+  value: string,
+  loading?: boolean,
   children?: React.ReactNode,
   [key: string]: any,
 }): React.JSX.Element {
@@ -30,10 +31,10 @@ export default function FormInput({
     className: `form-control${showError ? " is-invalid" : ""}`,
     id,
     name: id,
-    value: value || "",
+    value: type == "file" ? undefined : (value ?? ""),
     onChange: handleChange,
     disabled: loading,
-    "aria-describedby": `${id}-feedback`,
+    "aria-describedby": showError? `${id}-feedback`: undefined,
     ...props,
   };
 

@@ -25,12 +25,26 @@ class ResumeTemplateViewSet(viewsets.ModelViewSet):
   queryset = ResumeTemplate.objects.all()
   serializer_class = ResumeTemplateSerializer
 
+  def error_response(self, error):
+    return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+  def create(self, request, *args, **kwargs):
+    try:
+      return super().create(request, *args, **kwargs)
+    except IntegrityError as e:
+      return self.error_response(str(e))
+    
   def update(self, request, *args, **kwargs):
     try:
       return super().update(request, *args, **kwargs)
     except IntegrityError as e:
-        content = {'error': 'integrity error', 'details': str(e)}
-        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+      return self.error_response(str(e))
+  
+  def partial_update(self, request, *args, **kwargs):
+    try:
+      return super().partial_update(request, *args, **kwargs)
+    except IntegrityError as e:
+      return self.error_response(str(e))
 
 class FillFieldViewSet(viewsets.ModelViewSet):
   queryset = FillField.objects.all()

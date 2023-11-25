@@ -99,7 +99,7 @@ class ResumeTemplate(models.Model, IDocumentModel):
   objects = ResumeTemplateManager()
   docx = models.FileField(upload_to='templates/')
   png = models.FileField(upload_to='templates/')
-  name = models.CharField(max_length=200)
+  name = models.TextField()
   description = models.TextField(blank=True)
 
   class Meta:
@@ -138,11 +138,11 @@ class FillField(models.Model):
 
 
 class Job(models.Model):
-  url = models.URLField(max_length=2000, blank=True)
-  title = models.CharField(max_length=160)
-  company = models.CharField(max_length=160)
+  url = models.URLField(blank=True)
+  title = models.TextField()
+  company = models.TextField()
   posting = models.TextField()
-  status = models.CharField(max_length=30)
+  status = models.TextField()
   chat_messages = models.JSONField(default=list, blank=True)
   # date_applied = models.DateTimeField(null=True, blank=True, default=timezone.now)
   # chosen_resume = models.ForeignKey(to="Resume", on_delete=models.SET_NULL, null=True, blank=True)
@@ -394,7 +394,7 @@ f"""<fillfield>
 
 class ResumeSubstitution(models.Model):
   resume = models.ForeignKey(to="Resume", on_delete=models.CASCADE, related_name="substitutions")
-  key = models.CharField(max_length=200)
+  key = models.TextField()
   value = models.TextField()
 
   class Meta:

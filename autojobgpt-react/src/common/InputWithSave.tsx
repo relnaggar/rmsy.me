@@ -62,7 +62,7 @@ export default function InputWithSave<Resource extends WithID>({
     defaultValue: resource[editableProperty] as string,
     onChange: handleChange,
     disabled: updating,
-    "aria-describedby": `${elementID}-feedback`,
+    "aria-describedby": showError? `${elementID}-feedback` : undefined,
     ...props,
   };
   const input: React.JSX.Element = (
