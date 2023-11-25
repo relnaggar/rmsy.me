@@ -1,4 +1,4 @@
-import { screen, act, getByRole, getAllByRole } from "@testing-library/react";
+import { screen, act, getByRole, getAllByRole, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { injectMocks, mockFunctions, openAndGetModal } from "../common/testUtils";
@@ -143,8 +143,10 @@ test("deleting a job closes the confirmation modal, removes the job from the bac
     userEvent.click(deleteConfirmationButton);
   });
 
-  // check that the confirmation modal is closed
-  expect(deleteConfirmationModal).not.toBeInTheDocument();
+  // check that the confirmation modal is closed within 1 second
+  await waitFor(() => {
+    expect(deleteConfirmationModal).not.toBeInTheDocument();
+  }, {timeout: 1000});
 
   // check that the API was called again to delete the job
   expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`../api/jobs/${validJob2.id}/`, expect.objectContaining({

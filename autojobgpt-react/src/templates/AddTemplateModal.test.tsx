@@ -1,4 +1,4 @@
-import { screen, getAllByRole, getByRole, act, getByLabelText } from "@testing-library/react";
+import { screen, getAllByRole, getByRole, act, getByLabelText, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { renderThisRoute,  queryResumeTemplates, openAndGetAddResumeTemplateModal } from "./resumeTemplateTestUtils";
@@ -57,19 +57,27 @@ test("adding a resume template closes the modal and adds the resume template to 
   const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
 
   // add a resume template
-  mockFunctions.fetchData.mockImplementationOnce(generateResponse(validResumeTemplate1));
   const addResumeTemplateModal: HTMLElement = await openAndGetAddResumeTemplateModal();
-  const nameInput: HTMLElement = getByRole(addResumeTemplateModal, "textbox", {name: new RegExp("name", "i")});
-  userEvent.type(nameInput, validResumeTemplate1.name);
-  const fileInput: HTMLElement = getByLabelText(addResumeTemplateModal, new RegExp("upload", "i"));
-  userEvent.upload(fileInput, new File([""], "test.docx", {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}));
+  const nameInput: HTMLInputElement = getByRole(addResumeTemplateModal, "textbox", {name: new RegExp("name", "i")});
+  await act(async () => {
+    userEvent.type(nameInput, validResumeTemplate1.name);
+  });
+  const fileInput: HTMLInputElement = getByLabelText(addResumeTemplateModal, new RegExp("upload", "i"));
+  await act(async () => {
+    userEvent.upload(fileInput, new File([""], "test.docx", {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}));
+  });
+  fileInput.required = false; // workaround for limitation of userEvent.upload
+
   const submitButton: HTMLElement = getSubmitButton(addResumeTemplateModal);
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse(validResumeTemplate1));
   await act(async () => {
     userEvent.click(submitButton);
   });
 
-  // check that the modal was closed
-  expect(addResumeTemplateModal).not.toBeInTheDocument();
+  // check that the modal was closed within 1 second
+  await waitFor(() => {
+    expect(addResumeTemplateModal).not.toBeInTheDocument();
+  }, {timeout: 1000});  
 
   // check that the API was called again to add the resume template
   expect(mockFunctions.fetchData).toHaveBeenCalledTimes(initialFetchDataCalls + 1);

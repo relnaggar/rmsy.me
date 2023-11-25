@@ -29,7 +29,7 @@ export default function AddTemplateModal({
     setShowErrorAlert(false);
 
     const formElement: HTMLFormElement = document.getElementById("addTemplateForm") as HTMLFormElement;
-    if (formElement.reportValidity()) {    
+    if (formElement.reportValidity()) {
       const name: string = (document.getElementById("name") as HTMLInputElement).value;
       const docx: File = (document.getElementById("upload") as HTMLInputElement).files![0];
       const description: string = (document.getElementById("description") as HTMLInputElement).value;
@@ -61,7 +61,7 @@ export default function AddTemplateModal({
             id="upload" label="Upload" type="file" value={uploadInput.value} handleChange={uploadInput.handleChange}
             editing={uploadInput.editing} error={errors["upload"]} required
             accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          />          
+          />
           <FormInput
             id="description" label="Description (optional)" type="textarea" value={descriptionInput.value}
             handleChange={descriptionInput.handleChange} rows={3}

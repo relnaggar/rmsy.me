@@ -16,7 +16,6 @@ export default function FormInput({
   id: string,
   label: string,
   type: string,
-  
   handleChange: ((e: React.ChangeEvent<HTMLInputElement>) => void) | ((e: React.ChangeEvent<HTMLTextAreaElement>) => void),
   editing: boolean,
   error: string | undefined,
