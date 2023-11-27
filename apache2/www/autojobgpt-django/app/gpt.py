@@ -6,39 +6,45 @@ class Chat:
 "extract_job_details":
 
 """
-Extract the job_title and company name from the following job posting.
+Extract the job title and company name from the given job posting.
 
 <job_posting>
-${job_text}
-</webpage_text>
+${job_posting}
+</job_posting>
 
 Provide your output in JSON format with the following keys:
 * job_title
 * company
 
-If you fail to extract any of these keys, please provide a single key "error" with a string value describing the error.
+If you fail to extract any of these keys, please provide a single JSON key "error" with a string value describing the error.
 """,
 
 
 "fill_resume_template":
 
 """
-Fill in the fillfields in this resume_template, tailored to this job_posting.
+Fill in the fillfields in the given resume template, tailoring the resume to the given job details.
 
-<resume_template>
-${resume_template_text}
-</resume_template>
+<resume_template>${resume_template_text}</resume_template>
+
+<job_details>
+<job_title>${job_title}</job_title>
+<company>${company}</company>
+<job_posting>${job_posting}</job_posting>
+</job_details>
 
 <fillfields>
 ${fillfields_text}
 </fillfields>
 
-Provide your output in JSON format, with JSON keys only for each of the fillfields listed above.
+Provide your output in JSON format, with a JSON key for each fillfield listed.
+
+If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
 """,
 
 "regenerate_substitution":
 """
-I'm not happy with your output for ${key}.
+I'm not happy with your output for the fillfield ${key}.
 Please try again, adhering to the following feedback:
 
 <feedback>
@@ -46,6 +52,8 @@ ${feedback}
 </feedback>
 
 Provide your output in JSON format, with one JSON key for this fillfield.
+
+If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
 """,
 
 "regenerate_resume":
@@ -58,6 +66,8 @@ ${feedback}
 </feedback>
 
 Provide your output in JSON format, with a JSON key for each fillfield.
+
+If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
 """,
 }
   client = None

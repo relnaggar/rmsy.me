@@ -11,6 +11,11 @@ import os
 from .scraping import scrape_text
 from .gpt import Chat
 
+default_fillfields = {
+  "JOB_TITLE": "The job title.",
+  "COMPANY": "The company name.",
+}
+
 
 class IDocumentModel:
   @property
@@ -57,7 +62,7 @@ class IDocumentModel:
     # open the template with docx
     return docx.Document(self.docx.path)
   
-  def extract_text(self):
+  def extract_text(self, substitutions=None):
     # open the template with docx
     document = self.open_document()
     
@@ -65,7 +70,13 @@ class IDocumentModel:
     paragraphs = []
     for paragraph in document.paragraphs:
       paragraphs.append(paragraph.text)
-    return "\n".join(paragraphs)
+    text = "\n".join(paragraphs)
+
+    if substitutions is not None:  
+      for key, value in substitutions.items():
+        text = text.replace("{{" + key + "}}", value)
+    
+    return text
 
 
 class ResumeTemplateManager(models.Manager):
@@ -77,14 +88,12 @@ class ResumeTemplateManager(models.Manager):
     )
     resume_template.save()
 
-    fillfield_keys = resume_template.extract_fillfields()
+    fillfield_keys = resume_template.extract_fillfield_keys()
     for key in fillfield_keys:
-      if key == "JOB_TITLE":
-        description = "The job title."
-      elif key == "COMPANY":
-        description = "The company name."
+      if key in default_fillfields.keys():
+        description = default_fillfields[key]
       else:
-        description = key
+        description = ""
       FillField.objects.create(
         key=key,
         description=description,
@@ -110,13 +119,18 @@ class ResumeTemplate(models.Model, IDocumentModel):
   def __str__(self):
     return self.name
   
-  def extract_fillfields(self, text=None):
+  def extract_fillfield_keys(self, text=None, include_default=True):
     if text is None:
       text = self.extract_text()
 
     # extract all the fillfields from the template text
     # fillfields must be in the format {{key}}
-    return re.findall(r"{{(.*?)}}", text)
+    fillfield_keys = re.findall(r"{{(.*?)}}", text)
+
+    if include_default:
+      return fillfield_keys
+    else:
+      return [key for key in fillfield_keys if key not in default_fillfields]
 
 
 class FillField(models.Model):
@@ -143,7 +157,6 @@ class Job(models.Model):
   company = models.TextField()
   posting = models.TextField()
   status = models.TextField()
-  chat_messages = models.JSONField(default=list, blank=True)
   # date_applied = models.DateTimeField(null=True, blank=True, default=timezone.now)
   # chosen_resume = models.ForeignKey(to="Resume", on_delete=models.SET_NULL, null=True, blank=True)
 
@@ -161,7 +174,7 @@ class Job(models.Model):
   def extract_details_from_url(url):
     posting = scrape_text(url)
     chat = Chat()
-    message = chat.ask(prompt_name="extract_job_details", substitutions={"job_text": posting})
+    message = chat.ask(prompt_name="extract_job_details", substitutions={"job_posting": posting})
     response = json.loads(message["content"])
     try:
       title = response["job_title"]
@@ -221,11 +234,6 @@ class Resume(models.Model, IDocumentModel):
       models.Max('version')
     )["version__max"] + 1
 
-  def _remove_default_substitutions(self, fillfield_keys):
-    for default_key in self.default_substitutions.keys():
-      if default_key in fillfield_keys:
-        fillfield_keys.remove(default_key)
-
   def _validate_response_and_get_substitutions(self, response, fillfield_keys):
     # validate the response by checking that all the fillfields are present
     substitutions = {}
@@ -256,9 +264,8 @@ class Resume(models.Model, IDocumentModel):
     if self.is_filled:
       raise Exception("you can only fill a resume once")
     
-    template_text = self.template.extract_text()
-    fillfield_keys = self.template.extract_fillfields(text=template_text)
-    self._remove_default_substitutions(fillfield_keys)
+    template_text = self.template.extract_text(substitutions=self.default_substitutions)
+    fillfield_keys = self.template.extract_fillfield_keys(text=template_text, include_default=False)
     
     # construct the fillfields_text part of the prompt    
     fillfields_text = ""
@@ -273,17 +280,18 @@ class Resume(models.Model, IDocumentModel):
 
       fillfields_text +=\
 f"""<fillfield>
-  <key>{key}</key>
-  <description>
-{description}
-  </description>
+<key>{key}</key>
+<description>{description}</description>
 </fillfield>\n"""
 
     # ask GPT to fill in the fillfields
-    chat = Chat(self.job.chat_messages)
+    chat = Chat()
     response = json.loads(
       chat.ask(prompt_name="fill_resume_template", substitutions={
         "resume_template_text": template_text,
+        "job_posting": self.job.posting,
+        "job_title": self.job.title,
+        "company": self.job.company,
         "fillfields_text": fillfields_text,
       })["content"]
     )
@@ -291,6 +299,8 @@ f"""<fillfield>
     substitutions = self._validate_response_and_get_substitutions(
       response, fillfield_keys
     )
+    for key, value in self.default_substitutions.items():
+      substitutions[key] = value
 
     # save the chat messages 
     self.chat_messages = chat.get_additional_messages()
@@ -301,8 +311,7 @@ f"""<fillfield>
   def generate_docx(self):
     if not self.is_filled:
       raise Exception(
-        "you have to fill the resume with .fill() before you can generate " +
-        "the docx file"
+        "you have to fill the resume with .fill() before you can generate the docx file"
       )
 
     # open the template with docx
@@ -310,8 +319,8 @@ f"""<fillfield>
 
     # get all the fillfields
     all_substitutions = self.default_substitutions
-    for resume_substitution in self.substitutions.all():
-      all_substitutions[resume_substitution.key] = resume_substitution.value
+    for substitution in self.substitutions.all():
+      all_substitutions[substitution.key] = substitution.value
 
     # substitute the fillfields into the template document
     for para in template_document.paragraphs:
@@ -331,8 +340,7 @@ f"""<fillfield>
   def regenerate(self, feedback=None):
     if not self.is_filled:
       raise Exception(
-        "you have to fill the resume with .fill() before you can regenerate " +
-        "the resume"
+        "you have to fill the resume with .fill() before you can regenerate the resume"
       )
     
     if feedback is None:
@@ -348,7 +356,7 @@ f"""<fillfield>
     # re-ask GPT the most recent question
     chat_messages_rewinded_1 = self.chat_messages[:-1]
     chat_message = Chat().ask_with_messages(
-      self.job.chat_messages + chat_messages_rewinded_1
+      chat_messages_rewinded_1
     )
     response = json.loads(chat_message.content)
 
@@ -360,7 +368,7 @@ f"""<fillfield>
     )
 
     # copy the resume substitutions from the previous resume
-    for key in self.template.extract_fillfields():
+    for key in self.template.extract_fillfield_keys():
       if key not in fillfield_keys and \
           key not in self.default_substitutions.keys():
         # copy the resume substitution
@@ -374,14 +382,14 @@ f"""<fillfield>
     return new_resume
 
   def _regenerate_with_feedback(self, feedback):
-    chat = Chat(self.job.chat_messages + self.chat_messages)
+    chat = Chat(self.chat_messages)
     response = json.loads(
       chat.ask(prompt_name="regenerate_resume", substitutions={
         "feedback": feedback,
       })["content"]
     )
 
-    fillfield_keys = self.template.extract_fillfields()
+    fillfield_keys = self.template.extract_fillfield_keys()
     self._remove_default_substitutions(fillfield_keys)
     substitutions = self._validate_response_and_get_substitutions(
       response, fillfield_keys
@@ -409,7 +417,7 @@ class ResumeSubstitution(models.Model):
     # re-ask GPT the most recent question
     chat_messages_rewinded_1 = self.chat_messages[:-1]
     chat_message = Chat().ask_with_messages(
-      self.resume.job.chat_messages + self.resume.chat_messages + chat_messages_rewinded_1
+      self.resume.chat_messages + chat_messages_rewinded_1
     )
     response = json.loads(chat_message.content)
     new_resume = Resume.objects.create(
@@ -432,7 +440,7 @@ class ResumeSubstitution(models.Model):
 
 
   def regenerate(self, feedback):
-    chat = Chat(self.resume.job.chat_messages + self.resume.chat_messages)
+    chat = Chat(self.resume.chat_messages)
     response = json.loads(chat.ask(prompt_name="regenerate_substitution", substitutions={
       "key": self.key,
       "feedback": feedback,
