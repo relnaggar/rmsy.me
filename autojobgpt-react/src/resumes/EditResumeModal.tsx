@@ -12,7 +12,7 @@ export default function EditResumeModal({ show, setShow, id }: {
   }
 
   function onEntered(): void {
-    // document.getElementById("name")?.focus();
+    document.getElementById("name")?.focus();
   }
 
   return (

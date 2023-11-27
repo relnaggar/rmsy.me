@@ -30,7 +30,7 @@ export default function FormInput({
     className: `form-control${showError ? " is-invalid" : ""}`,
     id,
     name: id,
-    value: type == "file" ? undefined : (value ?? ""),
+    value: type === "file" ? undefined : (value ?? ""),
     onChange: handleChange,
     disabled: loading,
     "aria-describedby": showError? `${id}-feedback`: undefined,

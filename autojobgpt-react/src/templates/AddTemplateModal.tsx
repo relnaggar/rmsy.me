@@ -70,7 +70,7 @@ export default function AddTemplateModal({
         </Modal.Body>
         <Modal.Footer>
           <Alert
-            variant="danger" dismissible
+            variant="danger" dismissible className="d-block"
             show={showErrorAlert} onClose={() => setShowErrorAlert(false)}
           >
             {errors["error"]}

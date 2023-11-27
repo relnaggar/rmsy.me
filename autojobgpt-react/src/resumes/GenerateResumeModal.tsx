@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import Modal from 'react-bootstrap/Modal';
+import Alert from 'react-bootstrap/Alert';
 
 import SelectWithRefresh from "../common/SelectWithRefresh";
 import { ResumeUpload } from "./types";
@@ -12,18 +13,12 @@ export default function GenerateResumeModal({ show, setShow, addResume }: {
   setShow: (show: boolean) => void,
   addResume: (resume: ResumeUpload) => void
 }): React.JSX.Element {
-  function handleClose() {
-    setShow(false);
-  }
+  const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
-    // prevent page from reloading
-    e.preventDefault();
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {    
+    e.preventDefault(); // prevent page from reloading
 
-    // close modal
-    handleClose();
-
-    // add resume
     const job: number = parseInt((document.getElementById("job") as HTMLSelectElement).value);
     const template: number = parseInt((document.getElementById("template") as HTMLSelectElement).value);
     addResume({
@@ -31,40 +26,55 @@ export default function GenerateResumeModal({ show, setShow, addResume }: {
       template: template,
     });
 
-    // reset form
-    e.currentTarget.reset();
+    setShow(false);
   }
 
-  function onEntered(): void {
-    document.getElementById("job")?.focus();
+  function handleRefreshSuccess(): void {
+    setShowErrorAlert(false);
+    setErrors({});
+  }
+
+  function handleRefreshFail(errors: Record<string, string>): void {
+    setShowErrorAlert(true);
+    setErrors(errors);
   }
 
   return (
-    <Modal show={show} onHide={handleClose} onEntered={onEntered} aria-labelledby="generateResumeModalLabel">
+    <Modal
+      show={show} onHide={() => setShow(false)} aria-labelledby="generateResumeModalLabel"
+      onEntered={() => document.getElementsByTagName("select")[0]?.focus()} 
+    >
       <Modal.Header closeButton>
         <Modal.Title id="generateResumeModalLabel">Generate Resume</Modal.Title>
       </Modal.Header>        
       <form onSubmit={handleSubmit}>
         <Modal.Body>
-          <div className="mb-3">
-            <label htmlFor="job" className="form-label">Job</label>
-            <SelectWithRefresh<Job>
-              apiPath="jobs/"
-              id="job"
-              optionToString={(job) => `${job.title}, ${job.company}`}
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="template" className="form-label">Template</label>
-            <SelectWithRefresh<ResumeTemplate>
-              apiPath="templates/"
-              id="template"
-              optionToString={(template) => template.name}
-            />
-          </div>
+          <SelectWithRefresh<Job>
+            apiPath="jobs/"
+            id="job"
+            label="Job"
+            optionToString={(job) => `${job.title}, ${job.company}`}
+            onRefreshSuccess={handleRefreshSuccess}
+            onRefreshFail={handleRefreshFail}
+          />
+          <SelectWithRefresh<ResumeTemplate>
+            apiPath="templates/"
+            id="template"
+            label="Template"
+            optionToString={(template) => template.name}
+            onRefreshSuccess={handleRefreshSuccess}
+            onRefreshFail={handleRefreshFail}
+          />
         </Modal.Body>
         <Modal.Footer>
-          <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
+          <Alert
+            variant="danger" dismissible className="d-block"
+            show={showErrorAlert} onClose={() => setShowErrorAlert(false)}
+          >
+            {Object.values(errors).join(" ")}
+          </Alert>
+
+          <button type="button" className="btn btn-secondary" onClick={() => setShow(false)}>Close</button>
           <button type="submit" className="btn btn-primary">Submit</button>
         </Modal.Footer>
       </form>

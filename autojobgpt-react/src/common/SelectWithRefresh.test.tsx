@@ -13,15 +13,16 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-async function renderSelectWithRefresh<Option extends WithID>({ apiPath, id, optionToString }: {
+async function renderSelectWithRefresh<Option extends WithID>({ apiPath, id, label, optionToString }: {
   apiPath: string,
   id: string,
+  label: string,
   optionToString: (option: Option) => string,
 }) {
   await act(async () => {
     render(
       <FetchDataContext.Provider value={mockFunctions.fetchData}>
-        <SelectWithRefresh<Option> apiPath={apiPath} id={id} optionToString={optionToString} />
+        <SelectWithRefresh<Option> apiPath={apiPath} id={id} label={label} optionToString={optionToString} />
       </FetchDataContext.Provider>
     )
   });
@@ -31,6 +32,7 @@ async function renderJobSelectWithRefresh() {
   await renderSelectWithRefresh<Job>({
     apiPath: "../api/jobs/",
     id: "job",
+    label: "Job",
     optionToString: (job) => job.title + ", " + job.company,
   });
 }
