@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { ReactComponent as PencilSquare } from "bootstrap-icons/icons/pencil-square.svg";
 import { ReactComponent as Trash3 } from "bootstrap-icons/icons/trash3.svg";
 
@@ -11,6 +11,12 @@ export default function DocumentThumbnail({ document, beingRemoved, onClickEditD
   onClickEditDocument?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   onClickRemoveDocument?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }): React.JSX.Element {
+  const placeholderWidths = useRef<number[]>([]);
+
+  if (placeholderWidths.current.length === 0) {
+    placeholderWidths.current = generatePlaceholderWidths(15);
+  }
+
   return (
     <div
       className="document text-center me-3"
@@ -22,7 +28,7 @@ export default function DocumentThumbnail({ document, beingRemoved, onClickEditD
       {document.png === "" ?
         <div className="document-image img-thumbnail">
           <p className="placeholder-glow pt-5 text-start">
-            {generatePlaceholderWidths(15).map((width, index) => {
+            {placeholderWidths.current.map((width, index) => {
               return (
                 width === 0 ?
                   <br key={index} />

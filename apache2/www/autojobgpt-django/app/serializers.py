@@ -37,7 +37,13 @@ class JobSerializer(serializers.ModelSerializer):
     extra_kwargs = {'chat_messages': {'read_only': True}}
 
 
-class ResumeSubstitutionSerializer(serializers.ModelSerializer):
+class ResumeSubstitutionSerializer(serializers.ModelSerializer):  
+  def update(self, instance, validated_data):
+    instance = super().update(instance, validated_data)
+    instance.resume.generate_docx()
+    instance.resume.generate_png()
+    return instance
+
   class Meta:
     model = ResumeSubstitution
     fields = "__all__"

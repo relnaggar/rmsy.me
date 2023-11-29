@@ -1,29 +1,29 @@
 import React from "react";
 import Modal from 'react-bootstrap/Modal';
 
-import useFetch from "../hooks/useFetch";
 import InputWithSave from "../common/InputWithSave";
 import { ResumeTemplate, FillField } from "../templates/types";
 
 
-export default function EditTemplateModal({ apiPath, show, setShow, templates, setTemplates, templateID }: {
+export default function EditTemplateModal({
+  apiPath,
+  show, setShow,
+  templateID,
+  templates, setTemplates,
+  fillFields, setFillFields,
+}: {
   apiPath: string,
   show: boolean,
   setShow: React.Dispatch<React.SetStateAction<boolean>>,
+  templateID: number,
   templates: ResumeTemplate[],
   setTemplates: React.Dispatch<React.SetStateAction<ResumeTemplate[]>>,
-  templateID: number,
+  fillFields: FillField[],
+  setFillFields: React.Dispatch<React.SetStateAction<FillField[]>>,
 }): React.JSX.Element {
-  const {
-    resource: fillFields,
-    setResource: setFillFields,
-    refetch: refetchFillFields,
-  } = useFetch<FillField[]>("fillfields/", { initialResource: [] });
-
   return (
     <Modal show={show} onHide={() => setShow(false)}      
       onEntered={() => document.getElementsByTagName("input")[0].focus()} aria-labelledby="editTemplateModalLabel"
-      onShow={refetchFillFields}
     >
       <Modal.Header closeButton>
         <Modal.Title id="editTemplateModalLabel">Edit Resume Template</Modal.Title>

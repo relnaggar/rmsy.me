@@ -3,10 +3,11 @@ import Alert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useResource from "../hooks/useResource";
+import useFetch from "../hooks/useFetch";
 import DocumentList from "../common/DocumentList";
 import EditTemplateModal from "./EditTemplateModal";
 import AddTemplateModal from "./AddTemplateModal";
-import { ResumeTemplate, ResumeTemplateUpload } from "../templates/types";
+import { ResumeTemplate, ResumeTemplateUpload, FillField } from "../templates/types";
 
 
 export default function ResumeTemplateList(): React.JSX.Element {
@@ -77,6 +78,11 @@ export default function ResumeTemplateList(): React.JSX.Element {
     setShowAddTemplateModal(true);
   }
 
+  const {
+    resource: fillFields,
+    setResource: setFillFields
+  } = useFetch<FillField[]>("fillfields/", { initialResource: [], onFail: handleErrors });
+
   return(
     <section>
       <h2>Templates</h2>
@@ -102,6 +108,8 @@ export default function ResumeTemplateList(): React.JSX.Element {
         templateID={editTemplateID}
         templates={templates}
         setTemplates={setTemplates}
+        fillFields={fillFields}
+        setFillFields={setFillFields}
       />
       <AddTemplateModal
         show={showAddTemplateModal}

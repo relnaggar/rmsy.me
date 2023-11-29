@@ -11,25 +11,18 @@ import os
 from .scraping import scrape_text
 from .gpt import Chat
 
+import logging
+logger = logging.getLogger("app")
+
+
 default_fillfields = {
   "JOB_TITLE": "The job title.",
   "COMPANY": "The company name.",
 }
 
 
-class IDocumentModel:
-  @property
-  def has_docx(self):
-    return self.docx.name != ""
-
-  @property
-  def has_png(self):
-    return self.png.name != ""
-  
-  def generate_png(self):
-    if self.has_png:
-      raise Exception("the template already has a png file")
-    
+class IDocumentModel:  
+  def generate_png(self):    
     # generate the pdf using libreoffice
     outdir = "/".join(self.docx.path.split("/")[:-1])
     os.system(f"libreoffice --headless --convert-to pdf {self.docx.path} " +
@@ -403,7 +396,7 @@ f"""<fillfield>
 class ResumeSubstitution(models.Model):
   resume = models.ForeignKey(to="Resume", on_delete=models.CASCADE, related_name="substitutions")
   key = models.TextField()
-  value = models.TextField()
+  value = models.TextField(blank=True)
 
   class Meta:
     constraints = [
@@ -437,7 +430,6 @@ class ResumeSubstitution(models.Model):
       key=self.key,
       value=response[self.key],
     )
-
 
   def regenerate(self, feedback):
     chat = Chat(self.resume.chat_messages)

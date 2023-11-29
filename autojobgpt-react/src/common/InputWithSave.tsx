@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useRef, useEffect } from "react";
 
 import usePatch from "../hooks/usePatch";
 import { WithID } from "./types";
@@ -13,6 +13,7 @@ export default function InputWithSave<Resource extends WithID>({
   editableProperty,
   labelProperty,
   labelText,
+  onSaveSuccess,
   ...props
 }: {
   type: string,
@@ -23,6 +24,7 @@ export default function InputWithSave<Resource extends WithID>({
   editableProperty: keyof Resource & string,
   labelProperty?: keyof Resource,
   labelText?: string,
+  onSaveSuccess?: () => void,
   [key: string]: any,
 }): React.JSX.Element {
   if (!labelProperty && !labelText) throw new Error("InputWithSave must have either labelProperty or labelText");
@@ -39,7 +41,8 @@ export default function InputWithSave<Resource extends WithID>({
 
   const handleUpdateSuccess = useCallback(() => {
     setErrors({});
-  }, []);
+    onSaveSuccess && onSaveSuccess();
+  }, [onSaveSuccess]);
 
   const {patchResource: updateResource, patching: updating } = usePatch<Resource>(apiPath, resources, setResources, {
     onFail: handleUpdateFail,
@@ -73,10 +76,24 @@ export default function InputWithSave<Resource extends WithID>({
     "aria-describedby": showError? `${elementID}-feedback` : undefined,
     ...props,
   };
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const adjustHeight = () => {
+      const textarea = textareaRef.current;
+      if (textarea) {
+        textarea.style.height = 'auto'; // Reset height
+        textarea.style.height = `${textarea.scrollHeight}px`; // Set to scrollHeight
+      }
+    };
+
+    adjustHeight();
+  }, [resource[editableProperty]]);
+
   const input: React.JSX.Element = (
     <>
       {type === "textarea"?
-        <textarea {...textAreaProps}></textarea>
+        <textarea {...textAreaProps} ref={textareaRef}></textarea>
       :
         <input type={type} {...textAreaProps} />
       }

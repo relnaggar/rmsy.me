@@ -3,10 +3,11 @@ import Alert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useResource from '../hooks/useResource';
+import useFetch from '../hooks/useFetch';
 import DocumentList from '../common/DocumentList';
 import EditResumeModal from './EditResumeModal';
 import GenerateResumeModal from './GenerateResumeModal';
-import { Resume, ResumeUpload } from './types';
+import { Resume, ResumeUpload, Substitution } from './types';
 
 
 export default function ResumeList(): React.JSX.Element {
@@ -50,6 +51,7 @@ export default function ResumeList(): React.JSX.Element {
   const {    
     resources: resumes,
     fetching: loadingResumes,
+    refetch: refetchResumes,
     posting: addingResume,
     postResource: addResume,
     deleteResource: removeResume,
@@ -83,6 +85,15 @@ export default function ResumeList(): React.JSX.Element {
     setShowGenerateResume(true);
   }
 
+  const {
+    resource: substitutions,
+    setResource: setSubstitutions,
+  } = useFetch<Substitution[]>("resumesubstitutions/", { initialResource: [], onFail: handleErrors });
+
+  function handleSubstitutionSaveSuccess(): void {
+    refetchResumes();
+  }
+
   return(
     <section>
       <h2>Resumes</h2>
@@ -99,7 +110,12 @@ export default function ResumeList(): React.JSX.Element {
         addButtonText="Generate new resume"
         addDisabled={addingResume}
       />
-      <EditResumeModal show={showEditResumeModal} setShow={setShowEditResumeModal} id={editResumeID} />
+      <EditResumeModal
+        show={showEditResumeModal} setShow={setShowEditResumeModal}
+        id={editResumeID}
+        substitutions={substitutions} setSubstitutions={setSubstitutions}
+        onSubstitutionSaveSuccess={handleSubstitutionSaveSuccess}
+      />
       <GenerateResumeModal
         show={showGenerateResume} setShow={setShowGenerateResume}
         addResume={addResume}

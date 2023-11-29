@@ -1,7 +1,7 @@
 import { Job } from "../jobs/types";
 import { ChatMessage } from "../common/types";
 
-type Substition = {
+export type Substitution = {
   id: number,
   key: string,
   value: string,
@@ -10,7 +10,7 @@ type Substition = {
 
 export type Resume = {
   id: number,
-  substitutions: Substition[],
+  substitutions: Substitution[],
   version: number,
   docx: string,
   png: string,
