@@ -20,10 +20,16 @@ export default function EditResumeModal({
   setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
   onSubstitutionSaveSuccess: () => void,
 }): React.JSX.Element {
+  function handleOnEntered() {
+    if (document.getElementsByTagName("textarea").length > 0) {
+      document.getElementsByTagName("textarea")[0].focus();
+    }
+  }
+
   return (
     <Modal
       show={show} onHide={() => setShow(false)} aria-labelledby="editResumeModalLabel"
-      onEntered={() => document.getElementsByTagName("textarea")[0].focus()}
+      onEntered={handleOnEntered}
     >
       <Modal.Header closeButton>
         <Modal.Title id="editResumeModalLabel">Edit Resume</Modal.Title>
