@@ -13,7 +13,7 @@ export default function AddTemplateModal({
   showErrorAlert, setShowErrorAlert
 }: {
   show: boolean,
-  setShow: (show: boolean) => void,
+  setShow: React.Dispatch<React.SetStateAction<boolean>>,
   onSubmitAddTemplate: (template: ResumeTemplateUpload) => void,
   errors: Record<string,string>,
   showErrorAlert: boolean,

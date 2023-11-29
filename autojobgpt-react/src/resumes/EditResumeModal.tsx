@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 
 export default function EditResumeModal({ show, setShow, id }: {
   show: boolean,
-  setShow: (show: boolean) => void,
+  setShow: React.Dispatch<React.SetStateAction<boolean>>,
   id: number
 }): React.JSX.Element {
   function handleClose() {

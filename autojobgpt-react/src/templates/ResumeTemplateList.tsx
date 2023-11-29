@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import Alert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
@@ -15,21 +15,21 @@ export default function ResumeTemplateList(): React.JSX.Element {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
 
-  function handleErrors(errors: Record<string,string>): void {
+  const handleErrors = useCallback((errors: Record<string,string>) => {
     setErrorMessage(Object.values(errors).join(" "));
     setShowErrorAlert(true);    
-  }
+  }, []);
 
   const [addTemplateErrors, setAddTemplateErrors] = useState<Record<string,string>>({});  
   const [showAddTemplateErrorAlert, setShowAddTemplateErrorAlert] = useState<boolean>(false);
 
-  function handleAddTemplateFail(errors: Record<string,string>): void {
+  const handleAddTemplateFail = useCallback((errors: Record<string,string>) => {
     setAddTemplateErrors(errors);
     setShowAddTemplateModal(true);
     if (errors["error"]) {
       setShowAddTemplateErrorAlert(true);
     }
-  }
+  }, []);
 
   function getPlaceholderTemplate(templateUpload: ResumeTemplateUpload): ResumeTemplate {
     return {
@@ -45,6 +45,7 @@ export default function ResumeTemplateList(): React.JSX.Element {
     resources: templates,
     setResources: setTemplates,
     fetching: loadingTemplates,
+    posting: addingTemplate,
     postResource: addTemplate,
     deleteResource: removeTemplate,
     idBeingDeleted: templateBeingRemovedID,    
@@ -92,6 +93,7 @@ export default function ResumeTemplateList(): React.JSX.Element {
         documentBeingRemovedID={templateBeingRemovedID}
         onClickAddDocument={handleClickAddTemplate}
         addButtonText="Upload resume template"
+        addDisabled={addingTemplate}
       />
       <EditTemplateModal
         apiPath={templateAPIPath}

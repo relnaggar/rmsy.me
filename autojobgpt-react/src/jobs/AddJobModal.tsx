@@ -14,7 +14,7 @@ export default function AddJobModal({
   addJobErrors, showAddJobErrorAlert, setShowAddJobErrorAlert,
 }: {
   show: boolean,
-  setShow: (show: boolean) => void,
+  setShow: React.Dispatch<React.SetStateAction<boolean>>,
   addingJob: boolean,
   addJob: (jobUpload: JobUpload) => void,
   addJobErrors: Record<string,string>,

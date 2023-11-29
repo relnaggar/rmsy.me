@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useCallback } from 'react';
 import Alert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
@@ -12,13 +12,27 @@ import { Resume, ResumeUpload } from './types';
 export default function ResumeList(): React.JSX.Element {
   const openConfirmationModal = useContext(ConfirmationModalContext);
 
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
 
-  function handleErrors(errors: Record<string,string>): void {
-    setErrorMessage(Object.values(errors).join(" "));
-    setShowErrorAlert(true);    
-  }
+  const handleErrors = useCallback((errors: Record<string,string>) => {
+    setErrors(errors);
+    setShowErrorAlert(true);
+  }, []);
+
+  const [generateResumeErrors, setGenerateResumeErrors] = useState<Record<string,string>>({});
+  const [showGenerateResumeErrorsAlert, setShowGenerateResumeErrorsAlert] = useState<boolean>(false);
+
+  const handleGenerateResumeSuccess = useCallback(() => {
+    setShowGenerateResumeErrorsAlert(false);
+    setGenerateResumeErrors({});
+  }, []);
+  
+  const handleGenerateResumeFail = useCallback((errors: Record<string,string>) => {
+    setGenerateResumeErrors(errors);
+    setShowGenerateResumeErrorsAlert(true);
+    setShowGenerateResume(true);
+  }, []);
 
   function getPlaceholderResume(resumeUpload: ResumeUpload): Resume {
     return {
@@ -33,15 +47,18 @@ export default function ResumeList(): React.JSX.Element {
       name: "",
     }
   };
-  const {
+  const {    
     resources: resumes,
     fetching: loadingResumes,
-    deleteResource: removeResume,
-    idBeingDeleted: resumeBeingRemovedID,
+    posting: addingResume,
     postResource: addResume,
+    deleteResource: removeResume,
+    idBeingDeleted: resumeBeingRemovedID,    
   } = useResource<Resume,ResumeUpload>("resumes/", getPlaceholderResume, {
     onFetchFail: handleErrors,
-    onDeleteFail: handleErrors,  
+    onPostSuccess: handleGenerateResumeSuccess,
+    onPostFail: handleGenerateResumeFail,
+    onDeleteFail: handleErrors,    
   });
 
   const [showEditResumeModal, setShowEditResumeModal] = useState<boolean>(false);
@@ -64,13 +81,13 @@ export default function ResumeList(): React.JSX.Element {
   
   function handleClickAddResume(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
     setShowGenerateResume(true);
-  }  
+  }
 
   return(
     <section>
       <h2>Resumes</h2>
       <Alert variant="danger" show={showErrorAlert} onClose={() => setShowErrorAlert(false)} dismissible>
-        {errorMessage}
+        {Object.values(errors).join(" ")}
       </Alert>
       <DocumentList
         documents={resumes}
@@ -80,9 +97,15 @@ export default function ResumeList(): React.JSX.Element {
         documentBeingRemovedID={resumeBeingRemovedID}
         onClickAddDocument={handleClickAddResume}
         addButtonText="Generate new resume"
+        addDisabled={addingResume}
       />
       <EditResumeModal show={showEditResumeModal} setShow={setShowEditResumeModal} id={editResumeID} />
-      <GenerateResumeModal show={showGenerateResume} setShow={setShowGenerateResume} addResume={addResume} />
+      <GenerateResumeModal
+        show={showGenerateResume} setShow={setShowGenerateResume}
+        addResume={addResume}
+        errors={generateResumeErrors} setErrors={setGenerateResumeErrors}
+        showErrorAlert={showGenerateResumeErrorsAlert} setShowErrorAlert={setShowGenerateResumeErrorsAlert}
+      />
     </section>
   )
 }

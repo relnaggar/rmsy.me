@@ -8,21 +8,17 @@ export default function ConfirmationModal({ show, setShow, action, actionDescrip
   actionDescription: string
   actionVerb: string
 }): React.JSX.Element {
-  function handleClose(): void {
+  function handleClickAction(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    action();
     setShow(false);
   }
 
-  function onEntered(): void {
-    document.getElementById("confirmationCloseButton")?.focus();
-  }
-
-  function handleClickAction(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    action();
-    handleClose();
-  }
-
   return (
-    <Modal show={show} onHide={handleClose} onEntered={onEntered} aria-labelledby="confirmationModalLabel">
+    <Modal
+      show={show} onHide={() => setShow(false)}
+      onEntered={() => document.getElementById("confirmationCloseButton")?.focus()}
+      aria-labelledby="confirmationModalLabel"
+    >
       <Modal.Header closeButton>
         <Modal.Title id="confirmationModalLabel">Confirm {actionVerb}</Modal.Title>
       </Modal.Header>
@@ -34,7 +30,7 @@ export default function ConfirmationModal({ show, setShow, action, actionDescrip
         <button
           type="button"
           className="btn btn-secondary"
-          onClick={handleClose}
+          onClick={() => setShow(false)}
           id="confirmationCloseButton"
         >Close</button>
       </Modal.Footer>

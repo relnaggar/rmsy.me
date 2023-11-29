@@ -12,7 +12,8 @@ export default function DocumentList({
   onClickRemoveDocument,
   documentBeingRemovedID,
   onClickAddDocument,
-  addButtonText
+  addButtonText,
+  addDisabled,
 }: {
   documents: Document[],
   loadingDocuments: boolean,
@@ -21,6 +22,7 @@ export default function DocumentList({
   documentBeingRemovedID: number,
   onClickAddDocument: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   addButtonText: string,
+  addDisabled: boolean,
 }): React.JSX.Element {
   return (
     <div className="d-flex overflow-x-auto border border-5 p-2" role="list">
@@ -35,7 +37,7 @@ export default function DocumentList({
               beingRemoved={documentBeingRemovedID === document.id}
             />
           )}
-          <AddDocument onClickAddDocument={onClickAddDocument} buttonText={addButtonText} />
+          <AddDocument onClickAddDocument={onClickAddDocument} buttonText={addButtonText} disabled={addDisabled} />
         </>
       :
         // display 3 placeholders while templates are being fetched

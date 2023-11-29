@@ -15,6 +15,7 @@ export default function Column({
   onClickRemoveJob,
   jobIDBeingRemoved,
   onClickAddJob,
+  addDisabled,
 }: {
   title: string,
   jobs: Job[],
@@ -26,6 +27,7 @@ export default function Column({
   onClickRemoveJob: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   jobIDBeingRemoved: number,
   onClickAddJob?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  addDisabled?: boolean,
 }): React.JSX.Element {
   return (
     <div className="kanban-column me-2" onDragOver={onDragOver} onDrop={onDrop}>
@@ -61,6 +63,7 @@ export default function Column({
               type="button"
               className="btn btn-primary"
               onClick={onClickAddJob}
+              disabled={addDisabled}
             >+ Add job</button>
           : "" }
         </div>

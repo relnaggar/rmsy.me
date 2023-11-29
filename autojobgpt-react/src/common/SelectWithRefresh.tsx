@@ -1,40 +1,34 @@
-import React, {useState} from "react";
+import React from "react";
 
-import useFetch from "../hooks/useFetch";
 import { WithID } from "./types";
 
 
 export default function SelectWithRefresh<Option extends WithID>({
-  apiPath,
   id,
   label,
   optionToString,
-  onRefreshSuccess,
-  onRefreshFail,
+  value,
+  onChange,
+  options,
+  loading,
+  refetch,
 }: {
-  apiPath: string,
   id: string,
   label: string,
   optionToString: (option: Option) => string,
-  onRefreshSuccess?: () => void,
-  onRefreshFail?: (errors: Record<string, string>) => void,
+  value: string,
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void,
+  options: Option[],
+  loading: boolean,
+  refetch: () => void,
 }): React.JSX.Element {
-  const { resource: options, fetching: loading, refetch } = useFetch<Option[]>(apiPath, {
-    initialResource: [],
-    onSuccess: onRefreshSuccess ?? (() => {}),
-    onFail: onRefreshFail ?? (() => {}),
-  });
-
-  function handleRefresh(): void {
-    refetch();
-  }
-
   return (
     <div className="mb-3">
       <label htmlFor={id} className="form-label">{label}</label>
       <div className="input-group">
         <select
-          id={id} name={id} className="form-select" defaultValue="0"
+          id={id} name={id} className="form-select"
+          value={value} onChange={onChange}
           required disabled={loading} aria-busy={!loading} 
         >
           <option value="0">{ loading ? "Loading..." : "Open this select menu" }</option>
@@ -45,7 +39,7 @@ export default function SelectWithRefresh<Option extends WithID>({
         <button
           className="btn btn-outline-primary"
           type="button"
-          onClick={handleRefresh}
+          onClick={() => refetch()}
           aria-controls={id}
         >Refresh</button>
       </div>

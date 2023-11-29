@@ -1,20 +1,31 @@
-import React, {useState} from "react";
+import React, { useCallback } from "react";
 import Modal from 'react-bootstrap/Modal';
 import Alert from 'react-bootstrap/Alert';
 
 import SelectWithRefresh from "../common/SelectWithRefresh";
+import useFormInput from "../hooks/useFormInput";
+import useFetch from "../hooks/useFetch";
 import { ResumeUpload } from "./types";
 import { Job } from "../jobs/types";
 import { ResumeTemplate } from "../templates/types";
 
 
-export default function GenerateResumeModal({ show, setShow, addResume }: {
+export default function GenerateResumeModal({
+  show, setShow,
+  addResume,
+  errors, setErrors,
+  showErrorAlert, setShowErrorAlert
+}: {
   show: boolean,
-  setShow: (show: boolean) => void,
-  addResume: (resume: ResumeUpload) => void
+  setShow: React.Dispatch<React.SetStateAction<boolean>>,
+  addResume: (resume: ResumeUpload) => void,
+  errors: Record<string, string>,
+  setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>,
+  showErrorAlert: boolean,
+  setShowErrorAlert: React.Dispatch<React.SetStateAction<boolean>>,
 }): React.JSX.Element {
-  const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const jobInput = useFormInput();
+  const templateInput = useFormInput();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {    
     e.preventDefault(); // prevent page from reloading
@@ -29,15 +40,31 @@ export default function GenerateResumeModal({ show, setShow, addResume }: {
     setShow(false);
   }
 
-  function handleRefreshSuccess(): void {
+  const handleRefreshSuccess = useCallback(() => {
     setShowErrorAlert(false);
     setErrors({});
-  }
+  }, [setShowErrorAlert, setErrors]);
 
-  function handleRefreshFail(errors: Record<string, string>): void {
+  const handleRefreshFail = useCallback((errors: Record<string, string>) => {
     setShowErrorAlert(true);
     setErrors(errors);
-  }
+  }, [setShowErrorAlert, setErrors]);
+
+  const { resource: jobs, fetching: loadingJobs, refetch: refetchJobs } = useFetch<Job[]>("jobs/", {
+    initialResource: [],
+    onSuccess: handleRefreshSuccess,
+    onFail: handleRefreshFail,
+  });
+
+  const {
+    resource: templates,
+    fetching: loadingTemplates,
+    refetch: refetchTemplates
+  } = useFetch<ResumeTemplate[]>("templates/", {
+    initialResource: [],
+    onSuccess: handleRefreshSuccess,
+    onFail: handleRefreshFail,
+  });
 
   return (
     <Modal
@@ -50,20 +77,24 @@ export default function GenerateResumeModal({ show, setShow, addResume }: {
       <form onSubmit={handleSubmit}>
         <Modal.Body>
           <SelectWithRefresh<Job>
-            apiPath="jobs/"
             id="job"
             label="Job"
             optionToString={(job) => `${job.title}, ${job.company}`}
-            onRefreshSuccess={handleRefreshSuccess}
-            onRefreshFail={handleRefreshFail}
+            value={jobInput.value}
+            onChange={jobInput.handleChange}
+            options={jobs}
+            loading={loadingJobs}
+            refetch={refetchJobs}
           />
           <SelectWithRefresh<ResumeTemplate>
-            apiPath="templates/"
             id="template"
             label="Template"
             optionToString={(template) => template.name}
-            onRefreshSuccess={handleRefreshSuccess}
-            onRefreshFail={handleRefreshFail}
+            value={templateInput.value}
+            onChange={templateInput.handleChange}
+            options={templates}
+            loading={loadingTemplates}
+            refetch={refetchTemplates}
           />
         </Modal.Body>
         <Modal.Footer>

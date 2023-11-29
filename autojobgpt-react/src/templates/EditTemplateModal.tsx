@@ -1,7 +1,7 @@
 import React from "react";
 import Modal from 'react-bootstrap/Modal';
 
-import useFetchResource from "../hooks/useFetch";
+import useFetch from "../hooks/useFetch";
 import InputWithSave from "../common/InputWithSave";
 import { ResumeTemplate, FillField } from "../templates/types";
 
@@ -9,7 +9,7 @@ import { ResumeTemplate, FillField } from "../templates/types";
 export default function EditTemplateModal({ apiPath, show, setShow, templates, setTemplates, templateID }: {
   apiPath: string,
   show: boolean,
-  setShow: (show: boolean) => void,
+  setShow: React.Dispatch<React.SetStateAction<boolean>>,
   templates: ResumeTemplate[],
   setTemplates: React.Dispatch<React.SetStateAction<ResumeTemplate[]>>,
   templateID: number,
@@ -18,7 +18,7 @@ export default function EditTemplateModal({ apiPath, show, setShow, templates, s
     resource: fillFields,
     setResource: setFillFields,
     refetch: refetchFillFields,
-  } = useFetchResource<FillField[]>("fillfields/", { initialResource: [] });
+  } = useFetch<FillField[]>("fillfields/", { initialResource: [] });
 
   return (
     <Modal show={show} onHide={() => setShow(false)}      

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import Alert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
@@ -34,22 +34,22 @@ export default function JobBoard(): React.JSX.Element {
   const [addJobErrors, setAddJobErrors] = useState<Record<string,string>>({});
   const [showAddJobErrorAlert, setShowAddJobErrorAlert] = useState<boolean>(false);
 
-  function handleErrors(errors: Record<string,string>): void {
+  const handleErrors = useCallback((errors: Record<string,string>) => {
     setErrorMessage(Object.values(errors).join(" "));
-    setShowErrorAlert(true);    
-  }
+    setShowErrorAlert(true);
+  }, []);
 
-  function handleAddJobSuccess() {
+  const handleAddJobSuccess = useCallback(() => {
     setAddJobErrors({});
     setShowAddJob(false);    
-  }
+  }, []);
 
-  function handleAddJobFail(errors: Record<string,string>): void {
+  const handleAddJobFail = useCallback((errors: Record<string,string>) => {
     setAddJobErrors(errors);
     if (errors["error"]) {
       setShowAddJobErrorAlert(true);
     }
-  }
+  }, []);
 
   const jobAPIPath: string = "jobs/";
   const {
@@ -131,6 +131,7 @@ export default function JobBoard(): React.JSX.Element {
               onClickRemoveJob={handleClickRemoveJob}
               jobIDBeingRemoved={jobIDBeingRemoved}
               onClickAddJob={status === "backlog" ? handleClickAddJob : undefined}
+              addDisabled={status === "backlog"? addingJob: undefined}
             />
           );
         })}

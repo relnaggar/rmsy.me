@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import usePatch from "../hooks/usePatch";
 import { WithID } from "./types";
@@ -33,9 +33,17 @@ export default function InputWithSave<Resource extends WithID>({
   const [edited, setEdited] = useState<boolean>(true);
   const [errors, setErrors] = useState<Record<string,string>>({});
 
+  const handleUpdateFail = useCallback((errors: Record<string,string>) => {
+    setErrors(errors);
+  }, []);
+
+  const handleUpdateSuccess = useCallback(() => {
+    setErrors({});
+  }, []);
+
   const {patchResource: updateResource, patching: updating } = usePatch<Resource>(apiPath, resources, setResources, {
-    onFail: setErrors,
-    onSuccess: () => setErrors({}),
+    onFail: handleUpdateFail,
+    onSuccess: handleUpdateSuccess,
   });
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {    

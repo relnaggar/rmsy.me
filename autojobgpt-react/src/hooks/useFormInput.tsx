@@ -3,14 +3,22 @@ import React, { useState } from "react";
 export default function useFormInput(): {
   value: string,
   editing: boolean,
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void,
+  handleChange: (e:
+    React.ChangeEvent<HTMLInputElement> |
+    React.ChangeEvent<HTMLTextAreaElement> |
+    React.ChangeEvent<HTMLSelectElement>
+  ) => void,
   edit: (value: string) => void,
   stopEditing: () => void,
 } {
   const [value, setValue] = useState<string>("");
   const [editing, setEditing] = useState<boolean>(false);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void {
+  function handleChange(e:
+    React.ChangeEvent<HTMLInputElement> |
+    React.ChangeEvent<HTMLTextAreaElement> |
+    React.ChangeEvent<HTMLSelectElement>
+  ) {
     setValue(e.target.value);
     setEditing(true);
   }

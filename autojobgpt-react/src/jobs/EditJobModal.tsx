@@ -8,7 +8,7 @@ import { Job } from "../jobs/types";
 export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id }: {
   apiPath: string,
   show: boolean,
-  setShow: (show: boolean) => void,
+  setShow: React.Dispatch<React.SetStateAction<boolean>>,
   jobs: Job[],
   setJobs: React.Dispatch<React.SetStateAction<Job[]>>,
   id: number
