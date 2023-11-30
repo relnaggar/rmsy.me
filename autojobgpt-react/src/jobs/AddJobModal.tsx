@@ -26,11 +26,16 @@ export default function AddJobModal({
   const companyInput = useFormInput();
   const postingInput = useFormInput();
 
+  function clearErrors(): void {
+    setShowFillErrorAlert(false);
+    setShowAddJobErrorAlert(false);
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {    
     e.preventDefault(); // prevent page from reloading
 
-    setShowFillErrorAlert(false);
-    setShowAddJobErrorAlert(false);
+    clearErrors();
+    setFillErrors({});
 
     const formElement: HTMLFormElement = document.getElementById("addJobForm") as HTMLFormElement;
     if (formElement.reportValidity()) {
@@ -67,11 +72,17 @@ export default function AddJobModal({
     onFail: onFillFail,
   });
   function handleClickFillDetails(): void {
-    setShowFillErrorAlert(false);
-    setShowAddJobErrorAlert(false);
+    clearErrors();
+
     const urlElement: HTMLInputElement = document.getElementById("url") as HTMLInputElement;
+    if (urlElement.value === "") {
+      setFillErrors({"url": "Please enter a URL."});
+      return;
+    }
+
+    setFillErrors({});
     if (urlElement.reportValidity()) {
-      fill(`url=${urlElement.value}`);
+      fill(`url=${urlElement.value}`);      
       urlInput.stopEditing();
     }
   }

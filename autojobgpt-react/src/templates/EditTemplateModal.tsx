@@ -37,6 +37,7 @@ export default function EditTemplateModal({
           id={templateID}
           editableProperty="name"
           labelText="Template Name"
+          required
         />
         <InputWithSave<ResumeTemplate>
           type="textarea"
