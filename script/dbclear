@@ -34,7 +34,7 @@ main() {
   cd "${SCRIPT_DIR}/.."
   parse_args "$@"
 
-  script/server down
+  logfun script/server down
   logfun docker container prune -f
   # if "${force}"; then
   #   script/backupall -f
