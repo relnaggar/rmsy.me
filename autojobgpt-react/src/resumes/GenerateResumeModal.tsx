@@ -32,6 +32,23 @@ export default function GenerateResumeModal({
 
     const job: number = parseInt((document.getElementById("job") as HTMLSelectElement).value);
     const template: number = parseInt((document.getElementById("template") as HTMLSelectElement).value);
+
+    jobInput.stopEditing();
+    templateInput.stopEditing();
+
+    if (job === 0 || template === 0) {
+      const newErrors: Record<string, string> = {};
+      if (job === 0) {
+        newErrors["job"] = "Please select a job.";
+      }
+      if (template === 0) {
+        newErrors["template"] = "Please select a template.";
+      }
+      setErrors(newErrors);
+      setShowErrorAlert(true);
+      return;
+    }
+
     addResume({
       job: job,
       template: template,
@@ -82,9 +99,11 @@ export default function GenerateResumeModal({
             optionToString={(job) => `${job.title}, ${job.company}`}
             value={jobInput.value}
             onChange={jobInput.handleChange}
+            editing={jobInput.editing}
             options={jobs}
             loading={loadingJobs}
             refetch={refetchJobs}
+            error={errors["job"]}
           />
           <SelectWithRefresh<ResumeTemplate>
             id="template"
@@ -92,17 +111,25 @@ export default function GenerateResumeModal({
             optionToString={(template) => template.name}
             value={templateInput.value}
             onChange={templateInput.handleChange}
+            editing={templateInput.editing}
             options={templates}
             loading={loadingTemplates}
             refetch={refetchTemplates}
+            error={errors["template"]}
           />
         </Modal.Body>
         <Modal.Footer>
           <Alert
-            variant="danger" dismissible className="d-block"
+            variant="danger" dismissible className="w-100"
             show={showErrorAlert} onClose={() => setShowErrorAlert(false)}
-          >
-            {Object.values(errors).join(" ")}
+          >            
+            { Object.keys(errors).length > 0 &&
+              <ul>
+                {Object.entries(errors).map(([key, value]) => (
+                  <li key={key}>{value}</li>
+                ))}
+              </ul>
+            }
           </Alert>
 
           <button type="button" className="btn btn-secondary" onClick={() => setShow(false)}>Close</button>

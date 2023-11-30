@@ -126,7 +126,7 @@ export default function AddJobModal({
         </Modal.Body>
         <Modal.Footer>
           <Alert
-            variant="danger" dismissible className="d-block"
+            variant="danger" dismissible className="w-100"
             show={showAddJobErrorAlert} onClose={() => setShowAddJobErrorAlert(false)}
           >
             {addJobErrors["error"]}

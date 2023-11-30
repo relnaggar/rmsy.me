@@ -78,6 +78,10 @@ export default function InputWithSave<Resource extends WithID>({
   };
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  let textAreaText: string = "";
+  if (labelProperty) {
+    textAreaText = resource[editableProperty] as string;
+  }
   useEffect(() => {
     const adjustHeight = () => {
       const textarea = textareaRef.current;
@@ -88,7 +92,7 @@ export default function InputWithSave<Resource extends WithID>({
     };
 
     adjustHeight();
-  }, [resource[editableProperty]]);
+  }, [textAreaText]);
 
   const input: React.JSX.Element = (
     <>
