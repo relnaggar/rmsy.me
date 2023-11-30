@@ -73,9 +73,13 @@ test("add job modal has a fill button", async () => {
   expect(fillButton).toBeInTheDocument();
 });
 
-test("clicking fill button calls the API", async () => {
+test("clicking the fill button calls the API", async () => {
   await renderThisRoute();
-  const fillButton: HTMLElement = getByRole(await openAndGetAddJobModal(), "button", {name: new RegExp("fill", "i")});
+  const addJobModal: HTMLElement = await openAndGetAddJobModal();
+  const fillButton: HTMLElement = getByRole(addJobModal, "button", {name: new RegExp("fill", "i")});
+  await act(async () => {
+    userEvent.type(getByRole(addJobModal, "textbox", {name: new RegExp("url", "i")}), validJob1.url);
+  });
   await act(async () => {
     userEvent.click(fillButton);
   });
@@ -96,6 +100,9 @@ test("clicking the fill button when the API fails shows an error alert", async (
   mockFunctions.fetchData.mockRejectedValueOnce(new Error("Failed to fetch"));
 
   const fillButton: HTMLElement = getByRole(addJobModal, "button", {name: new RegExp("fill", "i")});
+  await act(async () => {
+    userEvent.type(getByRole(addJobModal, "textbox", {name: new RegExp("url", "i")}), validJob1.url);
+  });
   await act(async () => {
     userEvent.click(fillButton);
   });
@@ -125,7 +132,7 @@ describe("clicking the fill button invalid URLs calls the API and shows an error
     }, {
       "test_description": "an empty URL",
       "url": "",
-      "data": {"url": ["This field may not be blank."]},
+      "data": {"error": ["Please enter a URL."]},
       "status": 400,
     }, {
       "test_description": "a server error",
