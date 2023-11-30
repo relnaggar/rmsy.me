@@ -36,11 +36,11 @@ main() {
 
   script/server down
   logfun docker container prune -f
-  if "${force}"; then
-    script/backupall -f
-  else 
-    script/backupall
-  fi  
+  # if "${force}"; then
+  #   script/backupall -f
+  # else 
+  #   script/backupall
+  # fi  
   set +e
     logfun docker volume rm db
     logfun docker volume rm django-media
