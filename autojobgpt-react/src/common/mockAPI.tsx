@@ -43,7 +43,6 @@ export const validJob1: Job = {
   company: "Test Company 1",
   posting: "Test Text 1",
   status: "backlog",
-  chat_messages: [],
   // date_applied: null,
   // chosen_resume: null,
 }
@@ -55,7 +54,6 @@ export const validJob2: Job = {
   company: "Test Company 2",
   posting: "Test Text 2",
   status: "backlog",
-  chat_messages: [],
   // date_applied: null,
   // chosen_resume: null,
 }
@@ -85,8 +83,8 @@ export const validResume1: Resume = {
   docx: "https://www.example.com/test1.docx",
   png: "https://www.example.com/test1.png",
   chat_messages: [],
-  job: validJob1.id,
-  template: validResumeTemplate1.id,
+  job: validJob1,
+  template: validResumeTemplate1,
   name: validJob1.title + ", " + validJob1.company + ", " + 1
 };
 
@@ -97,7 +95,7 @@ export const validResume2: Resume = {
   docx: "https://www.example.com/test2.docx",
   png: "https://www.example.com/test2.png",
   chat_messages: [],
-  job: validJob2.id,
-  template: validResumeTemplate2.id,
+  job: validJob2,
+  template: validResumeTemplate2,
   name: validJob2.title + ", " + validJob2.company + ", " + 1
 };

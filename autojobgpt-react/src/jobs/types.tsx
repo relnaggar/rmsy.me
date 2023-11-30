@@ -1,5 +1,3 @@
-import { ChatMessage } from '../common/types';
-
 export type Job = {
   id: number,
   url: string,
@@ -7,7 +5,6 @@ export type Job = {
   company: string,
   posting: string,
   status: string,
-  chat_messages: ChatMessage[],
   // date_applied: string | null,
   // chosen_resume: number | null,
 };
@@ -36,7 +33,6 @@ export function generatePlaceholderJob(jobUpload: JobUpload): Job {
     "company": "",
     "posting": "",
     "status": "",
-    "chat_messages": [],
     // "date_applied": null,
     // "chosen_resume": null,
   }

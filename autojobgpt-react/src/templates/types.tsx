@@ -17,5 +17,16 @@ export type FillField = {
   id: number,
   key: string,
   description: string,
-  template: number | null,
+  template: number,
 }
+
+export function getPlaceholderTemplate(templateUpload: ResumeTemplateUpload): ResumeTemplate {
+  return {
+    id: -1,
+    name: templateUpload.name,
+    docx: "",
+    png: "",
+    description: templateUpload.description,
+    fillFields: [],
+  };
+};

@@ -3,6 +3,8 @@ import Modal from 'react-bootstrap/Modal';
 
 import InputWithSave from "../common/InputWithSave";
 import { Resume, Substitution } from "./types";
+import { Job } from "../jobs/types";
+import { ResumeTemplate } from "../templates/types";
 
 
 export default function EditResumeModal({
@@ -32,6 +34,8 @@ export default function EditResumeModal({
     }
   }
 
+  const resume: Resume | undefined = resumes.find((resume: Resume) => resume.id === resumeID);
+
   return (
     <Modal
       show={show} onHide={() => setShow(false)} aria-labelledby="editResumeModalLabel"
@@ -51,6 +55,26 @@ export default function EditResumeModal({
           labelText="Resume Name"
           required
         />
+
+        {resume &&
+          <>
+            <div className="mb-3">
+              <label htmlFor="job" className="form-label">Job</label>
+              <input
+                type="text" className="form-control" id="job" readOnly disabled
+                value={(resume.job as Job).title + ", " + (resume.job as Job).company}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="template" className="form-label">Template</label>
+              <input
+                type="text" className="form-control" id="template" readOnly disabled
+                value={(resume.template as ResumeTemplate).name}
+              />
+            </div>
+          </>
+        }
+
         <hr />
         <h6>Fill Field Substitutions</h6>
         {substitutions

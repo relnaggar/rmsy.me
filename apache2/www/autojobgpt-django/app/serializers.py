@@ -60,6 +60,7 @@ class ResumeSerializer(serializers.ModelSerializer):
   
   substitutions = ResumeSubstitutionSerializer(many=True, read_only=True)
   job_details = JobSerializer(source='job', read_only=True)
+  template_details = ResumeTemplateSerializer(source='template', read_only=True)
   
   class Meta:
     model = Resume
@@ -74,4 +75,5 @@ class ResumeSerializer(serializers.ModelSerializer):
   def to_representation(self, instance):
     representation = super().to_representation(instance)
     representation['job'] = representation.pop('job_details')
+    representation['template'] = representation.pop('template_details')
     return representation

@@ -7,7 +7,7 @@ import useFetch from "../hooks/useFetch";
 import DocumentList from "../common/DocumentList";
 import EditTemplateModal from "./EditTemplateModal";
 import AddTemplateModal from "./AddTemplateModal";
-import { ResumeTemplate, ResumeTemplateUpload, FillField } from "../templates/types";
+import { ResumeTemplate, ResumeTemplateUpload, FillField, getPlaceholderTemplate } from "./types";
 
 
 export default function ResumeTemplateList(): React.JSX.Element {
@@ -42,16 +42,6 @@ export default function ResumeTemplateList(): React.JSX.Element {
     }
   }, []);
 
-  function getPlaceholderTemplate(templateUpload: ResumeTemplateUpload): ResumeTemplate {
-    return {
-      id: -1,
-      name: templateUpload.name,
-      docx: "",
-      png: "",
-      description: templateUpload.description,
-      fillFields: [],
-    };
-  };
   const templateAPIPath: string = "templates/";
   const {
     resources: templates,

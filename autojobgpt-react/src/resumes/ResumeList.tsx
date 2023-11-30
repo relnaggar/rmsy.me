@@ -7,7 +7,7 @@ import useFetch from '../hooks/useFetch';
 import DocumentList from '../common/DocumentList';
 import EditResumeModal from './EditResumeModal';
 import GenerateResumeModal from './GenerateResumeModal';
-import { Resume, ResumeUpload, Substitution } from './types';
+import { Resume, ResumeUpload, Substitution, getPlaceholderResume } from './types';
 
 
 export default function ResumeList(): React.JSX.Element {
@@ -41,19 +41,6 @@ export default function ResumeList(): React.JSX.Element {
     setShowGenerateResume(true);
   }, []);
 
-  function getPlaceholderResume(resumeUpload: ResumeUpload): Resume {
-    return {
-      id: -1,
-      substitutions: [],
-      version: -1,
-      docx: "",
-      png: "",
-      chat_messages: [],
-      job: resumeUpload.job,
-      template: resumeUpload.template,
-      name: "",
-    }
-  };
   const resumeAPIPath: string = "resumes/";
   const {    
     resources: resumes,
