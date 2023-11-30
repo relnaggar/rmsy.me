@@ -1,5 +1,7 @@
 import React from "react";
 import Modal from 'react-bootstrap/Modal';
+import { ReactComponent as BoxArrowUpRight } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
+import { ReactComponent as FileArrowDown } from 'bootstrap-icons/icons/file-arrow-down.svg';
 
 import InputWithSave from "../common/InputWithSave";
 import { Resume, Substitution } from "./types";
@@ -59,24 +61,30 @@ export default function EditResumeModal({
         {resume &&
           <>
             <div className="mb-3">
-              <label htmlFor="job" className="form-label">Job</label>
-              <input
-                type="text" className="form-control" id="job" readOnly disabled
-                value={(resume.job as Job).title + ", " + (resume.job as Job).company}
-              />
+              <span className="form-label">Job</span>
+              <a
+                id="job" href={(resume.job as Job).url} target="_blank" rel="noreferrer"
+                className="form-control link-primary border border-0"
+              >
+                {(resume.job as Job).title + ", " + (resume.job as Job).company}
+                <BoxArrowUpRight className="ms-1" />
+              </a>
             </div>
             <div className="mb-3">
-              <label htmlFor="template" className="form-label">Template</label>
-              <input
-                type="text" className="form-control" id="template" readOnly disabled
-                value={(resume.template as ResumeTemplate).name}
-              />
+              <span className="form-label">Template</span>
+              <a
+                id="template" href={(resume.template as ResumeTemplate).docx}
+                className="form-control link-primary border border-0"
+              >
+                {(resume.template as ResumeTemplate).name}
+                <FileArrowDown className="ms-1" />
+              </a>
             </div>
           </>
         }
 
         <hr />
-        <h6>Fill Field Substitutions</h6>
+        <h5 className="mb-3">Fill Field Substitutions</h5>
         {substitutions
           .filter((substitution: Substitution) => substitution.resume === resumeID)
           .map((substitution: Substitution) => {

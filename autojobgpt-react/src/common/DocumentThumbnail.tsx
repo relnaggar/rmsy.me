@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { ReactComponent as PencilSquare } from "bootstrap-icons/icons/pencil-square.svg";
 import { ReactComponent as Trash3 } from "bootstrap-icons/icons/trash3.svg";
+import { ReactComponent as FileArrowDown } from "bootstrap-icons/icons/file-arrow-down.svg";
 
 import { generatePlaceholderWidths } from "./utils";
 import { Document } from "./types";
@@ -98,7 +99,10 @@ export default function DocumentThumbnail({ document, beingRemoved, onClickEditD
       {/* document footer */}
       {document.docx !== "" && 
         <div className="document-footer pb-4">
-          <a href={document.docx} className="btn btn-primary" role="button">Download</a>       
+          <a href={document.docx} className="btn btn-primary" role="button">
+            Download
+            <FileArrowDown className="ms-1" />
+          </a>
         </div>
       }
     </div>

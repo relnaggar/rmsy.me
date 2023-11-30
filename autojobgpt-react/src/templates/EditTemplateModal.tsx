@@ -49,7 +49,7 @@ export default function EditTemplateModal({
           labelText="Description (optional)"
         />
         <hr />
-        <h6>Fill Field Descriptions</h6>
+        <h5 className="mb-3">Fill Field Descriptions</h5>
         {fillFields.map((fillField: FillField) => {
           if (fillField.template === templateID) {
             if (fillField.key === "JOB_TITLE" || fillField.key === "COMPANY") {
