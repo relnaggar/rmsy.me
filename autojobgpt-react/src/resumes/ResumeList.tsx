@@ -27,14 +27,13 @@ export default function ResumeList(): React.JSX.Element {
   const {
     resource: substitutions,
     setResource: setSubstitutions,
-    refetch: refetchSubstitutions,
   } = useFetch<Substitution[]>("resumesubstitutions/", { initialResource: [], onFail: handleErrors });
 
-  const handleGenerateResumeSuccess = useCallback(() => {
+  const handleGenerateResumeSuccess = useCallback((resume: Resume) => {
     setShowGenerateResumeErrorsAlert(false);
     setGenerateResumeErrors({});
-    refetchSubstitutions();
-  }, []);
+    setSubstitutions([...substitutions, ...resume.substitutions]);
+  }, [substitutions, setSubstitutions]);
   
   const handleGenerateResumeFail = useCallback((errors: Record<string,string>) => {
     setGenerateResumeErrors(errors);
