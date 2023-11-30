@@ -21,8 +21,18 @@ export default function ResumeTemplateList(): React.JSX.Element {
     setShowErrorAlert(true);    
   }, []);
 
+  const {
+    resource: fillFields,
+    setResource: setFillFields
+  } = useFetch<FillField[]>("fillfields/", { initialResource: [], onFail: handleErrors });
+
+
   const [addTemplateErrors, setAddTemplateErrors] = useState<Record<string,string>>({});  
   const [showAddTemplateErrorAlert, setShowAddTemplateErrorAlert] = useState<boolean>(false);
+
+  const handleAddTemplateSuccess = useCallback((template: ResumeTemplate) => {
+    setFillFields([...fillFields, ...template.fillFields]);
+  }, [fillFields, setFillFields]);
 
   const handleAddTemplateFail = useCallback((errors: Record<string,string>) => {
     setAddTemplateErrors(errors);
@@ -38,7 +48,8 @@ export default function ResumeTemplateList(): React.JSX.Element {
       name: templateUpload.name,
       docx: "",
       png: "",
-      description: templateUpload.description
+      description: templateUpload.description,
+      fillFields: [],
     };
   };
   const templateAPIPath: string = "templates/";
@@ -52,6 +63,7 @@ export default function ResumeTemplateList(): React.JSX.Element {
     idBeingDeleted: templateBeingRemovedID,    
   } = useResource<ResumeTemplate,ResumeTemplateUpload>(templateAPIPath, getPlaceholderTemplate, {
     onFetchFail: handleErrors,
+    onPostSuccess: handleAddTemplateSuccess,
     onPostFail: handleAddTemplateFail,
     onDeleteFail: handleErrors,
   });
@@ -77,11 +89,6 @@ export default function ResumeTemplateList(): React.JSX.Element {
   function handleClickAddTemplate(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
     setShowAddTemplateModal(true);
   }
-
-  const {
-    resource: fillFields,
-    setResource: setFillFields
-  } = useFetch<FillField[]>("fillfields/", { initialResource: [], onFail: handleErrors });
 
   return(
     <section>

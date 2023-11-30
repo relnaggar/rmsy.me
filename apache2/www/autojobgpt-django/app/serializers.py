@@ -3,20 +3,22 @@ from rest_framework import serializers
 from .models import ResumeTemplate, FillField, Job, Resume, ResumeSubstitution
 
 
+class FillFieldSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = FillField
+    fields = "__all__"
+
+
 class ResumeTemplateSerializer(serializers.ModelSerializer):
   def create(self, validated_data):
     return self.Meta.model._default_manager.create(validated_data)
+  
+  fillFields = FillFieldSerializer(many=True, read_only=True)
 
   class Meta:
     model = ResumeTemplate
     fields = "__all__"
     extra_kwargs = {'png': {'required': False}}
-
-
-class FillFieldSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = FillField
-    fields = "__all__"
 
 
 class JobURLSerializer(serializers.ModelSerializer):
@@ -58,18 +60,15 @@ class ResumeSerializer(serializers.ModelSerializer):
   
   substitutions = ResumeSubstitutionSerializer(many=True, read_only=True)
   job_details = JobSerializer(source='job', read_only=True)
-  name = serializers.SerializerMethodField(required=False)
   
   class Meta:
     model = Resume
     fields = "__all__"
     extra_kwargs = {
+      'name': {'required': False},
       'docx': {'required': False},
       'png': {'required': False},      
     }
-
-  def get_name(self, obj):
-    return str(obj)
 
   # override to_representation to return job_details as job instead of just the id
   def to_representation(self, instance):

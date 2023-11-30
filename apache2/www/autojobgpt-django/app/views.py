@@ -21,10 +21,7 @@ def app(request):
 def csrf(request):
   return JsonResponse({'csrfToken': get_token(request)})
 
-class ResumeTemplateViewSet(viewsets.ModelViewSet):
-  queryset = ResumeTemplate.objects.all()
-  serializer_class = ResumeTemplateSerializer
-
+class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
   def error_response(self, error):
     return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -45,36 +42,20 @@ class ResumeTemplateViewSet(viewsets.ModelViewSet):
       return super().partial_update(request, *args, **kwargs)
     except IntegrityError as e:
       return self.error_response(str(e))
+
+
+class ResumeTemplateViewSet(ModelViewSetWithErrorHandling):
+  queryset = ResumeTemplate.objects.all()
+  serializer_class = ResumeTemplateSerializer
 
 class FillFieldViewSet(viewsets.ModelViewSet):
   queryset = FillField.objects.all()
   serializer_class = FillFieldSerializer
 
 
-class JobViewSet(viewsets.ModelViewSet):
+class JobViewSet(ModelViewSetWithErrorHandling):
   queryset = Job.objects.all()
   serializer_class = JobSerializer
-
-  def error_response(self, error):
-    return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
-
-  def create(self, request, *args, **kwargs):
-    try:
-      return super().create(request, *args, **kwargs)
-    except IntegrityError as e:
-      return self.error_response(str(e))
-    
-  def update(self, request, *args, **kwargs):
-    try:
-      return super().update(request, *args, **kwargs)
-    except IntegrityError as e:
-      return self.error_response(str(e))
-  
-  def partial_update(self, request, *args, **kwargs):
-    try:
-      return super().partial_update(request, *args, **kwargs)
-    except IntegrityError as e:
-      return self.error_response(str(e))
 
   @action(detail=False, methods=['get'], url_path='extract-details-from-url')
   def extract_details_from_url(self, request):
@@ -95,7 +76,7 @@ class JobViewSet(viewsets.ModelViewSet):
     return Response(jobDetailsSerializer.data)
 
 
-class RegeneratableViewSet(viewsets.ModelViewSet):
+class RegenerateMixin():
   def regenerate(self, request, pk=None):
     serializer = None
     if request.method == 'GET' and 'feedback' in request.query_params:
@@ -109,7 +90,7 @@ class RegeneratableViewSet(viewsets.ModelViewSet):
     else:
       return Response(self.serializer_class(self.get_object().regenerate()).data)
 
-class ResumeViewSet(RegeneratableViewSet):
+class ResumeViewSet(ModelViewSetWithErrorHandling, RegenerateMixin):
   queryset = Resume.objects.all()
   serializer_class = ResumeSerializer
   
@@ -117,7 +98,7 @@ class ResumeViewSet(RegeneratableViewSet):
   def regenerate(self, request, pk=None):
     return super().regenerate(request, pk)
 
-class ResumeSubstitutionViewSet(RegeneratableViewSet):
+class ResumeSubstitutionViewSet(ModelViewSetWithErrorHandling, RegenerateMixin):
   queryset = ResumeSubstitution.objects.all()
   serializer_class = ResumeSubstitutionSerializer
 

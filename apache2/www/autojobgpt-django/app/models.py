@@ -21,7 +21,7 @@ default_fillfields = {
 }
 
 
-class IDocumentModel:  
+class DocumentMixin():
   def generate_png(self):    
     # generate the pdf using libreoffice
     outdir = "/".join(self.docx.path.split("/")[:-1])
@@ -97,7 +97,7 @@ class ResumeTemplateManager(models.Manager):
     resume_template.save()
     return resume_template
 
-class ResumeTemplate(models.Model, IDocumentModel):
+class ResumeTemplate(models.Model, DocumentMixin):
   objects = ResumeTemplateManager()
   docx = models.FileField(upload_to='templates/')
   png = models.FileField(upload_to='templates/')
@@ -130,7 +130,7 @@ class FillField(models.Model):
   template = models.ForeignKey(
     to="ResumeTemplate",
     on_delete=models.CASCADE,
-    related_name="fillfields",
+    related_name="fillFields",
   )
   key = models.CharField(max_length=200)
   description = models.TextField(blank=True)
@@ -182,6 +182,11 @@ class ResumeManager(models.Manager):
     # if the job already has a resume, then we need to increment the version
     if Resume.objects.filter(job=validated_data["job"]).exists():
       validated_data["version"] = Resume.get_next_version(validated_data["job"])
+    else:
+      validated_data["version"] = Resume._meta.get_field("version").default
+
+    # set the name of the resume
+    validated_data["name"] = f'{validated_data["job"].title}, {validated_data["job"].company}, v{validated_data["version"]}'
 
     resume = Resume(**validated_data)
     resume.save()
@@ -191,10 +196,11 @@ class ResumeManager(models.Manager):
     resume.save()
     return resume
 
-class Resume(models.Model, IDocumentModel):
+class Resume(models.Model, DocumentMixin):
   objects = ResumeManager()
-  job = models.ForeignKey(to="Job", on_delete=models.SET_NULL, related_name="resumes", null=True)  
-  template = models.ForeignKey(to="ResumeTemplate", on_delete=models.SET_NULL, null=True)
+  name = models.TextField(unique=True)
+  job = models.ForeignKey(to="Job", on_delete=models.RESTRICT, related_name="resumes", null=True)
+  template = models.ForeignKey(to="ResumeTemplate", on_delete=models.RESTRICT, null=True)
   version = models.IntegerField(default=1)
   docx = models.FileField(upload_to='resumes/')
   png = models.FileField(upload_to='resumes/')
@@ -206,9 +212,6 @@ class Resume(models.Model, IDocumentModel):
         fields=['job', 'version'], name='unique_job_version'
       )
     ]
-
-  def __str__(self):
-    return f"{self.job.title}, {self.job.company}, v{self.version}"
   
   @property
   def default_substitutions(self):

@@ -2,20 +2,26 @@ import React from "react";
 import Modal from 'react-bootstrap/Modal';
 
 import InputWithSave from "../common/InputWithSave";
-import { Substitution } from "./types";
+import { Resume, Substitution } from "./types";
 
 
 export default function EditResumeModal({
+  apiPath,
+  resumes,
+  setResumes,
   show,
   setShow,
-  id,
+  resumeID,
   substitutions,
   setSubstitutions,
   onSubstitutionSaveSuccess,
 }: {
+  apiPath: string,
+  resumes: Resume[],
+  setResumes: React.Dispatch<React.SetStateAction<Resume[]>>,
   show: boolean,
   setShow: React.Dispatch<React.SetStateAction<boolean>>,
-  id: number,
+  resumeID: number,
   substitutions: Substitution[],
   setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
   onSubstitutionSaveSuccess: () => void,
@@ -29,14 +35,26 @@ export default function EditResumeModal({
   return (
     <Modal
       show={show} onHide={() => setShow(false)} aria-labelledby="editResumeModalLabel"
-      onEntered={handleOnEntered}
+      onEntered={handleOnEntered} size="lg"
     >
       <Modal.Header closeButton>
         <Modal.Title id="editResumeModalLabel">Edit Resume</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        <InputWithSave<Resume>
+          type="text"
+          apiPath={apiPath}
+          resources={resumes}
+          setResources={setResumes}
+          id={resumeID}
+          editableProperty="name"
+          labelText="Resume Name"
+          required
+        />
+        <hr />
+        <h6>Fill Field Substitutions</h6>
         {substitutions
-          .filter((substitution: Substitution) => substitution.resume === id)
+          .filter((substitution: Substitution) => substitution.resume === resumeID)
           .map((substitution: Substitution) => {
             return <InputWithSave<Substitution>
               type="textarea"
@@ -47,7 +65,10 @@ export default function EditResumeModal({
               editableProperty="value"
               labelProperty="key"
               onSaveSuccess={onSubstitutionSaveSuccess}
-            />
+              style={{minHeight: "84px"}}
+            >
+              <button type="button" className="btn btn-outline-primary" onClick={() => {}}>Autofill</button>
+            </InputWithSave>
           })
         }
       </Modal.Body>

@@ -3,6 +3,7 @@ export type ResumeTemplate = {
   name: string,
   docx: string,
   png: string,
+  fillFields: FillField[],
   description?: string
 }
 

@@ -66,6 +66,7 @@ export const validResumeTemplate1: ResumeTemplate = {
   description: "Test Description 1",
   docx: "https://www.example.com/test1.docx",
   png: "https://www.example.com/test1.png",
+  fillFields: [],
 };
 
 export const validResumeTemplate2: ResumeTemplate = {
@@ -74,6 +75,7 @@ export const validResumeTemplate2: ResumeTemplate = {
   description: "Test Description 2",
   docx: "https://www.example.com/test2.docx",
   png: "https://www.example.com/test2.png",
+  fillFields: [],
 };
 
 export const validResume1: Resume = {

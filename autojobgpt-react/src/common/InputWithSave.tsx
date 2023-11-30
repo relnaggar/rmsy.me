@@ -14,6 +14,7 @@ export default function InputWithSave<Resource extends WithID>({
   labelProperty,
   labelText,
   onSaveSuccess,
+  children,
   ...props
 }: {
   type: string,
@@ -25,6 +26,7 @@ export default function InputWithSave<Resource extends WithID>({
   labelProperty?: keyof Resource,
   labelText?: string,
   onSaveSuccess?: () => void,
+  children?: React.ReactNode,
   [key: string]: any,
 }): React.JSX.Element {
   if (!labelProperty && !labelText) throw new Error("InputWithSave must have either labelProperty or labelText");
@@ -131,7 +133,7 @@ export default function InputWithSave<Resource extends WithID>({
               input
             }
           </div>
-          <div className="ps-2">
+          <div className="ps-2 d-flex flex-column gap-2">
             <button type="submit" className="btn btn-outline-primary" disabled={updating}>
               {updating?
                 <>
@@ -144,6 +146,7 @@ export default function InputWithSave<Resource extends WithID>({
                 </>              
               }
             </button>
+            {children}
           </div>
         </div>
       </form>

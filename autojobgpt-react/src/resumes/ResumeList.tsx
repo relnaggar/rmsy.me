@@ -54,6 +54,7 @@ export default function ResumeList(): React.JSX.Element {
       name: "",
     }
   };
+  const resumeAPIPath: string = "resumes/";
   const {    
     resources: resumes,
     fetching: loadingResumes,
@@ -62,7 +63,7 @@ export default function ResumeList(): React.JSX.Element {
     postResource: addResume,
     deleteResource: removeResume,
     idBeingDeleted: resumeBeingRemovedID,    
-  } = useResource<Resume,ResumeUpload>("resumes/", getPlaceholderResume, {
+  } = useResource<Resume,ResumeUpload>(resumeAPIPath, getPlaceholderResume, {
     onFetchFail: handleErrors,
     onPostSuccess: handleGenerateResumeSuccess,
     onPostFail: handleGenerateResumeFail,
@@ -112,8 +113,10 @@ export default function ResumeList(): React.JSX.Element {
         addDisabled={addingResume}
       />
       <EditResumeModal
+        apiPath={resumeAPIPath}
+        resumes={resumes} setResumes={refetchResumes}
         show={showEditResumeModal} setShow={setShowEditResumeModal}
-        id={editResumeID}
+        resumeID={editResumeID}
         substitutions={substitutions} setSubstitutions={setSubstitutions}
         onSubstitutionSaveSuccess={handleSubstitutionSaveSuccess}
       />

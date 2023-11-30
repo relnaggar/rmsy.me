@@ -90,7 +90,7 @@ export default function AddJobModal({
   const loading: boolean = filling || addingJob;
   return (
     <Modal
-      show={show} onHide={() => setShow(false)}
+      show={show} onHide={() => setShow(false)} size="lg"
       onEntered={() => document.getElementById("url")?.focus()}
       aria-labelledby="addJobModalLabel"
     >
@@ -110,7 +110,7 @@ export default function AddJobModal({
                 <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
                 Cancel
               </>:<>
-                Fill Details
+                Autofill Details
               </>}
             </button>
           </FormInput>
