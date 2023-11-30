@@ -76,12 +76,13 @@ export default function useFetch<Resource>(
   }, [fetchData, apiRoute, apiPath, paramString, fetching, onSuccess, onFail]);
 
   function refetch(paramString?: string): void {
-    if (!fetching) {
-      if (paramString) {
-        setParamString(`?${paramString}`);
-      }
-      setFetching(true);
+    if (fetching) {
+      abortControllerRef.current.abort();
     }
+    if (paramString) {
+      setParamString(`?${paramString}`);
+    }
+    setFetching(true);
   }
 
   function cancel(): void {

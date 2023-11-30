@@ -24,9 +24,16 @@ export default function ResumeList(): React.JSX.Element {
   const [generateResumeErrors, setGenerateResumeErrors] = useState<Record<string,string>>({});
   const [showGenerateResumeErrorsAlert, setShowGenerateResumeErrorsAlert] = useState<boolean>(false);
 
+  const {
+    resource: substitutions,
+    setResource: setSubstitutions,
+    refetch: refetchSubstitutions,
+  } = useFetch<Substitution[]>("resumesubstitutions/", { initialResource: [], onFail: handleErrors });
+
   const handleGenerateResumeSuccess = useCallback(() => {
     setShowGenerateResumeErrorsAlert(false);
     setGenerateResumeErrors({});
+    refetchSubstitutions();
   }, []);
   
   const handleGenerateResumeFail = useCallback((errors: Record<string,string>) => {
@@ -84,11 +91,6 @@ export default function ResumeList(): React.JSX.Element {
   function handleClickAddResume(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
     setShowGenerateResume(true);
   }
-
-  const {
-    resource: substitutions,
-    setResource: setSubstitutions,
-  } = useFetch<Substitution[]>("resumesubstitutions/", { initialResource: [], onFail: handleErrors });
 
   function handleSubstitutionSaveSuccess(): void {
     refetchResumes();
