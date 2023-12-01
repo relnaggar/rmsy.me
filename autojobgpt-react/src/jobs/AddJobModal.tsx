@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Modal from 'react-bootstrap/Modal';
 import Alert from 'react-bootstrap/Alert';
+import { ReactComponent as Robot } from "bootstrap-icons/icons/robot.svg";
 
 import useFetch from "../hooks/useFetch";
 import useFormInput from "../hooks/useFormInput";
@@ -110,6 +111,7 @@ export default function AddJobModal({
                 <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
                 Cancel
               </>:<>
+                <Robot className="me-1" />
                 Autofill Details
               </>}
             </button>

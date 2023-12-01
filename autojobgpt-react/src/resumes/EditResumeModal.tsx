@@ -2,6 +2,7 @@ import React from "react";
 import Modal from 'react-bootstrap/Modal';
 import { ReactComponent as BoxArrowUpRight } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
 import { ReactComponent as FileArrowDown } from 'bootstrap-icons/icons/file-arrow-down.svg';
+import { ReactComponent as Robot } from "bootstrap-icons/icons/robot.svg";
 
 import InputWithSave from "../common/InputWithSave";
 import { Resume, Substitution } from "./types";
@@ -99,7 +100,10 @@ export default function EditResumeModal({
               onSaveSuccess={onSubstitutionSaveSuccess}
               style={{minHeight: "84px"}}
             >
-              <button type="button" className="btn btn-outline-primary" onClick={() => {}}>Autofill</button>
+              <button type="button" className="btn btn-outline-primary" onClick={() => {}}>
+                <Robot className="me-1" />
+                Autofill
+              </button>
             </InputWithSave>
           })
         }

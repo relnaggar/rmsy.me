@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useRef, useEffect } from "react";
+import { ReactComponent as Floppy } from "bootstrap-icons/icons/floppy.svg";
 
 import usePatch from "../hooks/usePatch";
 import { WithID } from "./types";
@@ -134,7 +135,9 @@ export default function InputWithSave<Resource extends WithID>({
             }
           </div>
           <div className="ps-2 d-flex flex-column gap-2">
-            <button type="submit" className="btn btn-outline-primary" disabled={updating}>
+            <button
+              type="submit" className="btn btn-outline-primary" disabled={updating} aria-busy={updating}
+            >
               {updating?
                 <>
                   <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
@@ -142,8 +145,9 @@ export default function InputWithSave<Resource extends WithID>({
                 </>
               :
                 <>
+                  <Floppy className="me-1" />
                   Save
-                </>              
+                </>
               }
             </button>
             {children}

@@ -100,8 +100,8 @@ export default function DocumentThumbnail({ document, beingRemoved, onClickEditD
       {document.docx !== "" && 
         <div className="document-footer pb-4">
           <a href={document.docx} className="btn btn-primary" role="button">
+            <FileArrowDown className="me-1" />
             Download
-            <FileArrowDown className="ms-1" />
           </a>
         </div>
       }

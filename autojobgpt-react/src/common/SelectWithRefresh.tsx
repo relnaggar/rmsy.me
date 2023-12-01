@@ -1,4 +1,5 @@
 import React from "react";
+import { ReactComponent as ArrowClockwise } from "bootstrap-icons/icons/arrow-clockwise.svg";
 
 import { WithID } from "./types";
 
@@ -46,7 +47,12 @@ export default function SelectWithRefresh<Option extends WithID>({
           type="button"
           onClick={() => refetch()}
           aria-controls={id}
-        >Refresh</button>
+          disabled={loading}
+          aria-busy={loading}
+        >
+          <ArrowClockwise className="me-1" />
+          Refresh
+        </button>
       </div>
     </div>
   );
