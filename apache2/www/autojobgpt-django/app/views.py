@@ -23,7 +23,21 @@ def csrf(request):
 
 class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
   def error_response(self, error):
-    return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+    user_friendly_error = "An integrity error occurred: {}."
+
+    if "unique_name" in error:
+      user_friendly_error = user_friendly_error.format("This resume template name already exists. Please choose a different name")
+    elif "unique_title_company" in error:
+      user_friendly_error = user_friendly_error.format("A job with this title and company already exists")
+    else:
+      if "Job" in error:
+        user_friendly_error = user_friendly_error.format("You cannot delete this job because it is being used by a resume")
+      elif "ResumeTemplate" in error:
+        user_friendly_error = user_friendly_error.format("You cannot delete this resume template because it is being used by a resume")
+      else:
+        user_friendly_error = user_friendly_error.format(error)
+
+    return Response({'error': user_friendly_error}, status=status.HTTP_400_BAD_REQUEST)
 
   def create(self, request, *args, **kwargs):
     try:
@@ -40,6 +54,12 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
   def partial_update(self, request, *args, **kwargs):
     try:
       return super().partial_update(request, *args, **kwargs)
+    except IntegrityError as e:
+      return self.error_response(str(e))
+    
+  def destroy(self, request, *args, **kwargs):
+    try:
+      return super().destroy(request, *args, **kwargs)
     except IntegrityError as e:
       return self.error_response(str(e))
 

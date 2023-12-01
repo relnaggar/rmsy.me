@@ -403,7 +403,7 @@ class ResumeSubstitution(models.Model):
 
   class Meta:
     constraints = [
-      models.UniqueConstraint(fields=['resume', 'key', 'value'], name='unique_resume_key_value'),
+      models.UniqueConstraint(fields=['resume', 'key'], name='unique_resume_key'),
     ]
 
   def __str__(self):
