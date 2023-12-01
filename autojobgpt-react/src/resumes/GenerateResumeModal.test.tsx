@@ -89,9 +89,9 @@ test("generating a resume closes the modal and adds a new resume to the list of 
   // generate resume
   mockFunctions.fetchData.mockImplementationOnce(generateResponse(validResume1));
   const jobSelect: HTMLElement = getByRole(generateResumeModal, "combobox", {name: new RegExp("job", "i")});
-  userEvent.selectOptions(jobSelect, validResume1.job.toString());
+  userEvent.selectOptions(jobSelect, validResume1.job.id.toString());
   const templateSelect: HTMLElement = getByRole(generateResumeModal, "combobox", {name: new RegExp("template", "i")});
-  userEvent.selectOptions(templateSelect, validResume1.template.toString());
+  userEvent.selectOptions(templateSelect, validResume1.template.id.toString());
   
   const submitButton: HTMLElement = getSubmitButton(generateResumeModal);
   await act(async () => {
@@ -106,8 +106,8 @@ test("generating a resume closes the modal and adds a new resume to the list of 
   expect(mockFunctions.fetchData).toHaveBeenLastCalledWith("../api/resumes/", expect.objectContaining({
     method: "POST",
     body: expect.stringContaining(JSON.stringify({
-      job: validResume1.job,
-      template: validResume1.template,
+      job: validResume1.job.id,
+      template: validResume1.template.id,
     })),
   }));
 
@@ -188,9 +188,12 @@ test("clicking a refresh button makes an additional API call", async () => {
   const generateResumeModal: HTMLElement = await openAndGetGenerateResumeModal();
   const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
 
-  const refreshButton: HTMLElement[] = getAllByRole(generateResumeModal, "button", { name: "Refresh" });
+  const buttons: HTMLElement[] = getAllByRole(generateResumeModal, "button");
+  const refreshButtons: HTMLElement[] = buttons.filter((button: HTMLElement) => {
+    return button.getAttribute("aria-controls") !== null;
+  });
   await act(async () => {
-    userEvent.click(refreshButton[0]);
+    userEvent.click(refreshButtons[0]);
   });
   expect(mockFunctions.fetchData).toHaveBeenCalledTimes(initialFetchDataCalls + 1);
 });
@@ -211,7 +214,10 @@ test("clicking a refresh button updates select options if API call returns new d
   const allOptionsBefore: HTMLElement[] = getAllByRole(generateResumeModal, "option");
   expect(allOptionsBefore.length).toBe(6);
 
-  const refreshButton: HTMLElement[] = getAllByRole(generateResumeModal, "button", { name: "Refresh" });
+  const buttons: HTMLElement[] = getAllByRole(generateResumeModal, "button");
+  const refreshButtons: HTMLElement[] = buttons.filter((button: HTMLElement) => {
+    return button.getAttribute("aria-controls") !== null;
+  });
   mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute(
     [{
       url: "../api/jobs/",
@@ -222,7 +228,7 @@ test("clicking a refresh button updates select options if API call returns new d
     }]
   ));
   await act(async () => {
-    userEvent.click(refreshButton[0]);
+    userEvent.click(refreshButtons[0]);
   });
 
   const allOptionsAfter: HTMLElement[] = getAllByRole(generateResumeModal, "option");
