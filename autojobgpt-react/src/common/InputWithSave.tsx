@@ -97,23 +97,15 @@ export default function InputWithSave<Resource extends WithID>({
     "aria-describedby": showError? `${elementID}-feedback` : undefined,
     ...props,
   };
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  let textAreaText: string = "";
-  if (labelProperty) {
-    textAreaText = resource[editableProperty] as string;
-  }
   useEffect(() => {
-    const adjustHeight = () => {
-      const textarea = textareaRef.current;
-      if (textarea) {
-        textarea.style.height = 'auto'; // Reset height
-        textarea.style.height = `${textarea.scrollHeight}px`; // Set to scrollHeight
-      }
-    };
-
-    adjustHeight();
-  }, [textAreaText]);
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto'; // Reset height
+      textarea.style.height = `${textarea.scrollHeight}px`; // Set to scrollHeight
+    }
+  }, [value]);
 
   const input: React.JSX.Element = (
     <>
