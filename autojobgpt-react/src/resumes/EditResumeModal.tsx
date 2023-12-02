@@ -2,9 +2,9 @@ import React from "react";
 import Modal from 'react-bootstrap/Modal';
 import { ReactComponent as BoxArrowUpRight } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
 import { ReactComponent as FileArrowDown } from 'bootstrap-icons/icons/file-arrow-down.svg';
-import { ReactComponent as Robot } from "bootstrap-icons/icons/robot.svg";
 
 import InputWithSave from "../common/InputWithSave";
+import SubstitutionInput from "./SubstitutionInput";
 import { Resume, Substitution } from "./types";
 import { Job } from "../jobs/types";
 import { ResumeTemplate } from "../templates/types";
@@ -42,7 +42,7 @@ export default function EditResumeModal({
   return (
     <Modal
       show={show} onHide={() => setShow(false)} aria-labelledby="editResumeModalLabel"
-      onEntered={handleOnEntered} size="lg"
+      onEntered={handleOnEntered} size="lg" backdrop="static"
     >
       <Modal.Header closeButton>
         <Modal.Title id="editResumeModalLabel">Edit Resume</Modal.Title>
@@ -89,22 +89,14 @@ export default function EditResumeModal({
         {substitutions
           .filter((substitution: Substitution) => substitution.resume === resumeID)
           .map((substitution: Substitution) => {
-            return <InputWithSave<Substitution>
-              type="textarea"
-              apiPath="resumesubstitutions/"
-              resources={substitutions}
-              setResources={setSubstitutions}
-              id={substitution.id}
-              editableProperty="value"
-              labelProperty="key"
-              onSaveSuccess={onSubstitutionSaveSuccess}
-              style={{minHeight: "84px"}}
-            >
-              <button type="button" className="btn btn-outline-primary" onClick={() => {}}>
-                <Robot className="me-1" />
-                Autofill
-              </button>
-            </InputWithSave>
+            return (
+              <SubstitutionInput
+                substitution={substitution}
+                substitutions={substitutions}
+                setSubstitutions={setSubstitutions}
+                onSubstitutionSaveSuccess={onSubstitutionSaveSuccess}
+              />
+            );
           })
         }
       </Modal.Body>

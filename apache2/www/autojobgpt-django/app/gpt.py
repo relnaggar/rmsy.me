@@ -42,7 +42,23 @@ Provide your output in JSON format, with a JSON key for each fillfield listed.
 If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
 """,
 
-"regenerate_substitution":
+"regenerate_substitution_without_feedback":
+"""
+I'm not happy with your output for the fillfield ${key}.
+Please try again.
+
+Here's the description of the fillfield:
+<fillfield>
+<key>${key}</key>
+<description>${description}</description>
+</fillfield>
+
+Provide your output in JSON format, with one JSON key for this fillfield.
+
+If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
+""",
+
+"regenerate_substitution_with_feedback":
 """
 I'm not happy with your output for the fillfield ${key}.
 Please try again, adhering to the following feedback:
@@ -70,30 +86,25 @@ Provide your output in JSON format, with a JSON key for each fillfield.
 If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
 """,
 }
-  client = None
+  __client = None
   model = "gpt-4-1106-preview"
   response_format = { "type": "json_object" }
 
-  def __init__(self, messages=None):
-    if messages is None:
-      self.original_messages = []
-      self.additional_messages = [
-        {"role": "system", "content": self.system_message_content}
-      ]
-    else:
-      self.original_messages = messages
-      self.additional_messages = []
-    
-    if self.client is None:
+  @classmethod
+  def get_client(cls):
+    if cls.__client is None:
       from openai import OpenAI
       with open("/run/secrets/OPENAI_API_KEY") as f:
         api_key = f.read().strip()
-      self.client = OpenAI(api_key=api_key)
+      cls.__client = OpenAI(api_key=api_key)
+    return cls.__client
 
-  def ask_with_messages(self, messages):
-    completion = self.client.chat.completions.create(
-      model=self.model,
-      response_format=self.response_format,
+  @staticmethod
+  def ask_again(messages):
+    client = Chat.get_client()
+    completion = client.chat.completions.create(
+      model=Chat.model,
+      response_format=Chat.response_format,
       messages=messages,
     )
     choice = completion.choices[0]
@@ -101,22 +112,31 @@ If you fail for any reason, please provide a single JSON key "error" with a stri
       raise Exception(f"OpenAI API failed with status '{choice.finish_reason}'")
     else:
       return {"role": "system", "content": choice.message.content}
+    
+  def __init__(self, messages=None):
+    if messages is None:
+      self.messages = [
+        {"role": "system", "content": self.system_message_content}
+      ]
+    else:
+      self.messages = messages
   
   def ask(self, prompt_name, substitutions={}):
+    client = Chat.get_client()
     prompt_text = Template(self.prompts[prompt_name]).substitute(substitutions)
-    self.additional_messages.append({"role": "user", "content": prompt_text})
-    completion = self.client.chat.completions.create(
-      model=self.model,
-      response_format=self.response_format,
-      messages=self.original_messages + self.additional_messages,
+    self.messages.append({"role": "user", "content": prompt_text})
+    completion = client.chat.completions.create(
+      model=Chat.model,
+      response_format=Chat.response_format,
+      messages=self.messages,
     )
     choice = completion.choices[0]
     if choice.finish_reason != "stop":
       raise Exception(f"OpenAI API failed with status '{choice.finish_reason}'")
     else:
       message = {"role": "system", "content": choice.message.content}
-      self.additional_messages.append(message)
+      self.messages.append(message)
       return message
     
-  def get_additional_messages(self):
-    return self.additional_messages
+  def get_messages(self):
+    return self.messages

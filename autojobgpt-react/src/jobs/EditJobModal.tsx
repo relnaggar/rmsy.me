@@ -16,7 +16,7 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
   return (
     <Modal show={show} onHide={() => setShow(false)} size="lg"
       onEntered={() => document.getElementsByTagName("input")[0].focus()}
-      aria-labelledby="editJobModalLabel"
+      aria-labelledby="editJobModalLabel" backdrop="static"
     >
       <Modal.Header closeButton>
         <Modal.Title id="editJobModalLabel">Edit Job</Modal.Title>

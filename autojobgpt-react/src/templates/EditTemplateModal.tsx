@@ -22,7 +22,7 @@ export default function EditTemplateModal({
   setFillFields: React.Dispatch<React.SetStateAction<FillField[]>>,
 }): React.JSX.Element {
   return (
-    <Modal show={show} onHide={() => setShow(false)} size="lg"
+    <Modal show={show} onHide={() => setShow(false)} size="lg" backdrop="static"
       onEntered={() => document.getElementsByTagName("input")[0].focus()} aria-labelledby="editTemplateModalLabel"
     >
       <Modal.Header closeButton>

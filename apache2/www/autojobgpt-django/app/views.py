@@ -98,23 +98,32 @@ class JobViewSet(ModelViewSetWithErrorHandling):
 
 class RegenerateMixin():
   def regenerate(self, request, pk=None):
-    serializer = None
-    if request.method == 'GET' and 'feedback' in request.query_params:
-      serializer = FeedbackSerializer(data=request.query_params)
-    elif request.method == 'POST' and 'feedback' in request.data:
-      serializer = FeedbackSerializer(data=request.data)
-    if serializer is not None:
-      serializer.is_valid(raise_exception=True)
-      feedback = serializer.validated_data['feedback']
-      return Response(self.serializer_class(self.get_object().regenerate(feedback)).data)
-    else:
-      return Response(self.serializer_class(self.get_object().regenerate()).data)
+    feedback_serializer = None
+    feedback = None
+    if request.method == 'POST' and 'feedback' in request.data:
+      feedback_serializer = FeedbackSerializer(data=request.data)
+    if feedback_serializer is not None:
+      feedback_serializer.is_valid(raise_exception=True)
+      feedback = feedback_serializer.validated_data['feedback']
+    
+    try:
+      if feedback is not None:
+        regenerated_object = self.get_object().regenerate(feedback)
+      else:
+        regenerated_object = self.get_object().regenerate()
+    except Exception as e:
+      return Response(
+        {'error': str(e)},
+        status=status.HTTP_400_BAD_REQUEST
+      )
+    
+    return Response(self.serializer_class(regenerated_object).data)
 
 class ResumeViewSet(ModelViewSetWithErrorHandling, RegenerateMixin):
   queryset = Resume.objects.all()
   serializer_class = ResumeSerializer
   
-  @action(detail=True, methods=['get', 'post'])
+  @action(detail=True, methods=['post'])
   def regenerate(self, request, pk=None):
     return super().regenerate(request, pk)
 
@@ -122,6 +131,6 @@ class ResumeSubstitutionViewSet(ModelViewSetWithErrorHandling, RegenerateMixin):
   queryset = ResumeSubstitution.objects.all()
   serializer_class = ResumeSubstitutionSerializer
 
-  @action(detail=True, methods=['get', 'post'])
+  @action(detail=True, methods=['post'])
   def regenerate(self, request, pk=None):
     return super().regenerate(request, pk)

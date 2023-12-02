@@ -35,7 +35,8 @@ export default function InputWithSave<Resource extends WithID>({
   const resource: Resource = resources.find((resource) => resource.id === id)!;
   const elementID: string = `${apiPath.replace("/", "-")}${id}-${editableProperty}`;
 
-  const [edited, setEdited] = useState<boolean>(true);
+  const [editing, setEditing] = useState<boolean>(true);
+  const [saved, setSaved] = useState<boolean>(true);
   const [errors, setErrors] = useState<Record<string,string>>({});
 
   const handleUpdateFail = useCallback((errors: Record<string,string>) => {
@@ -44,6 +45,7 @@ export default function InputWithSave<Resource extends WithID>({
 
   const handleUpdateSuccess = useCallback(() => {
     setErrors({});
+    setSaved(true);
     onSaveSuccess && onSaveSuccess();
   }, [onSaveSuccess]);
 
@@ -57,18 +59,23 @@ export default function InputWithSave<Resource extends WithID>({
 
     const value: string = (document.getElementById(elementID) as HTMLTextAreaElement).value;
     updateResource(id, { [editableProperty]: value } as Partial<Resource>);
-    setEdited(false);
+    setEditing(false);
   }
 
-  function handleChange(_: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void {
-    setEdited(true);
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void {
+    if (e.target.value === resource[editableProperty]) {
+      setSaved(true);
+    } else {
+      setSaved(false);
+    }
+    setEditing(true);
   }
 
   const thereAreErrors: boolean = Object.keys(errors).length > 0;
-  const showError: boolean = !edited && !updating && thereAreErrors;
+  const showError: boolean = !editing && !updating && thereAreErrors;
   const textAreaProps: React.TextareaHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> = {
     className: `form-control${
-      (!edited && !updating && !thereAreErrors) ? " is-valid" : ""}${
+      saved ? " is-valid" : ""}${
       showError ? " is-invalid" : ""
     }`,
     id: elementID,
@@ -136,19 +143,24 @@ export default function InputWithSave<Resource extends WithID>({
           </div>
           <div className="ps-2 d-flex flex-column gap-2">
             <button
-              type="submit" className="btn btn-outline-primary" disabled={updating} aria-busy={updating}
+              type="submit" className="btn btn-outline-primary" disabled={updating || saved} aria-busy={updating}
             >
               {updating?
                 <>
                   <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
                   <span role="status">Saving...</span>
                 </>
+              : (saved?
+                <>
+                  <Floppy className="me-1" />
+                  Saved
+                </>
               :
                 <>
                   <Floppy className="me-1" />
                   Save
                 </>
-              }
+              )}
             </button>
             {children}
           </div>

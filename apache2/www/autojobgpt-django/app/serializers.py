@@ -10,9 +10,6 @@ class FillFieldSerializer(serializers.ModelSerializer):
 
 
 class ResumeTemplateSerializer(serializers.ModelSerializer):
-  def create(self, validated_data):
-    return self.Meta.model._default_manager.create(validated_data)
-  
   fillFields = FillFieldSerializer(many=True, read_only=True)
 
   class Meta:
@@ -54,10 +51,7 @@ class FeedbackSerializer(serializers.Serializer):
   feedback = serializers.CharField()
 
 
-class ResumeSerializer(serializers.ModelSerializer):   
-  def create(self, validated_data):
-    return self.Meta.model._default_manager.create(validated_data)
-  
+class ResumeSerializer(serializers.ModelSerializer):
   substitutions = ResumeSubstitutionSerializer(many=True, read_only=True)
   job_details = JobSerializer(source='job', read_only=True)
   template_details = ResumeTemplateSerializer(source='template', read_only=True)
