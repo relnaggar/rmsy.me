@@ -6,12 +6,10 @@ export default function useControlledState<T>(
   valueProp?: T,
   setValueProp?: React.Dispatch<React.SetStateAction<T>>,
 ): readonly [T, (newValue: T) => void] {
-  console.log("useControlledState", valueProp);
   const [value, setInternalValue] = useState<T>(valueProp || initialValue);
 
   useEffect(() => {
     if (valueProp !== undefined) {
-      console.log("useControlledState useEffect", valueProp);
       setInternalValue(valueProp);
     }
   }, [valueProp]);
