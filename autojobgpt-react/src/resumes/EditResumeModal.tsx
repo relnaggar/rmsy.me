@@ -31,18 +31,12 @@ export default function EditResumeModal({
   setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
   onSubstitutionSaveSuccess: () => void,
 }): React.JSX.Element {
-  function handleOnEntered() {
-    if (document.getElementsByTagName("textarea").length > 0) {
-      document.getElementsByTagName("textarea")[0].focus();
-    }
-  }
-
   const resume: Resume | undefined = resumes.find((resume: Resume) => resume.id === resumeID);
 
   return (
     <Modal
       show={show} onHide={() => setShow(false)} aria-labelledby="editResumeModalLabel"
-      onEntered={handleOnEntered} size="lg" backdrop="static"
+      onEntered={() => document.getElementsByTagName("input")[0].focus()} size="xl" backdrop="static"
     >
       <Modal.Header closeButton>
         <Modal.Title id="editResumeModalLabel">Edit Resume</Modal.Title>

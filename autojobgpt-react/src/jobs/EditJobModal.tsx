@@ -14,9 +14,9 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
   id: number
 }): React.JSX.Element {
   return (
-    <Modal show={show} onHide={() => setShow(false)} size="lg"
-      onEntered={() => document.getElementsByTagName("input")[0].focus()}
-      aria-labelledby="editJobModalLabel" backdrop="static"
+    <Modal aria-labelledby="editJobModalLabel" size="lg" backdrop="static"
+      show={show} onHide={() => setShow(false)}
+      onEntered={() => document.getElementsByTagName("input")[0].focus()}      
     >
       <Modal.Header closeButton>
         <Modal.Title id="editJobModalLabel">Edit Job</Modal.Title>

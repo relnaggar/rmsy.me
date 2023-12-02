@@ -22,8 +22,9 @@ export default function EditTemplateModal({
   setFillFields: React.Dispatch<React.SetStateAction<FillField[]>>,
 }): React.JSX.Element {
   return (
-    <Modal show={show} onHide={() => setShow(false)} size="lg" backdrop="static"
-      onEntered={() => document.getElementsByTagName("input")[0].focus()} aria-labelledby="editTemplateModalLabel"
+    <Modal aria-labelledby="editTemplateModalLabel" size="xl" backdrop="static"
+      show={show} onHide={() => setShow(false)}
+      onEntered={() => document.getElementsByTagName("input")[0].focus()}      
     >
       <Modal.Header closeButton>
         <Modal.Title id="editTemplateModalLabel">Edit Resume Template</Modal.Title>
