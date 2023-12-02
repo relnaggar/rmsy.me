@@ -417,7 +417,7 @@ class ResumeSubstitution(models.Model):
     else:
       return self._regenerate_with_feedback(feedback)
   
-  def _regenerate_without_feedback(self):
+  def _regenerate_without_feedback(self):  
     current_fillfield_description = ResumeTemplate.objects.get(pk=self.resume.template.pk).fillFields.get(key=self.key).description
 
     chat = Chat(self.resume.chat_messages)
@@ -425,9 +425,6 @@ class ResumeSubstitution(models.Model):
       "key": self.key,
       "description": current_fillfield_description if current_fillfield_description != "" else self.key,
     })
-
-    self.resume.chat_messages = chat.get_messages()
-    self.resume.save()
     
     try:
       response_content = response_message["content"]
@@ -437,7 +434,11 @@ class ResumeSubstitution(models.Model):
         resume=self.resume,
         key=self.key,
         value=response[self.key],
-      )      
+      )    
+
+      self.resume.chat_messages = chat.get_messages()
+      self.resume.save()
+
       return substitution
     except KeyError:
       raise Exception(response["error"])

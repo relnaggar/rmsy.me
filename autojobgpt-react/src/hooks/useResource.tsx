@@ -1,6 +1,6 @@
 import useFetch from './useFetch';
 import useDelete from './useDelete';
-import usePost from './usePost';
+import usePostResource from './usePostResource';
 import usePatch from './usePatch';
 import { WithID } from '../common/types';
 
@@ -47,7 +47,7 @@ export default function useResource<Resource extends WithID, ResourceUpload>(
     onFail: onFetchFail
   });
 
-  const { posting, postResource } = usePost<Resource,ResourceUpload>(apiPath, resources, setResources,
+  const { posting, postResource } = usePostResource<Resource,ResourceUpload>(apiPath, resources, setResources,
     getPlaceholderResource, {
     onSuccess: onPostSuccess,
     onFail: onPostFail,

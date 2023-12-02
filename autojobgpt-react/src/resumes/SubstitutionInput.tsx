@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
+import Alert from 'react-bootstrap/Alert';
 import { ReactComponent as Robot } from "bootstrap-icons/icons/robot.svg";
 
-import useFetch from "../hooks/useFetch";
+import usePost from "../hooks/usePost";
 import InputWithSave from "../common/InputWithSave";
 import { Substitution } from "./types";
 
@@ -17,11 +18,22 @@ export default function SubstitutionInput({
   setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
   onSubstitutionSaveSuccess: () => void,
 }): React.JSX.Element {
-  const { fetching: filling, refetch: fill, cancel: cancelFill } = useFetch<Substitution>(
+  const [errors, setErrors] = useState<Record<string,string>>({});
+  const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
+
+  const onFillSuccess = (_: Substitution): void => {
+    setShowErrorAlert(false);
+  }
+
+  const onFillFail = (errors: Record<string,string>): void => {
+    setErrors(errors);
+    setShowErrorAlert(true);
+  };
+
+  const { posting: filling, post: fill, cancel: cancelFill } = usePost(
     `resumesubstitutions/${substitution.id}/regenerate/`, {
-      initialFetch: false,
-      // onSuccess: onFillSuccess,
-      // onFail: onFillFail,
+      onSuccess: onFillSuccess,
+      onFail: onFillFail,
     }
   );
 
@@ -30,30 +42,38 @@ export default function SubstitutionInput({
   }
 
   return (
-    <InputWithSave<Substitution>
-      type="textarea"
-      apiPath="resumesubstitutions/"
-      resources={substitutions}
-      setResources={setSubstitutions}
-      id={substitution.id}
-      editableProperty="value"
-      labelProperty="key"
-      onSaveSuccess={onSubstitutionSaveSuccess}
-      style={{minHeight: "84px"}}
-    >
-      {!["JOB_TITLE", "COMPANY"].includes(substitution.key) &&
-        <button className="btn btn-outline-primary" type="button"
-          onClick={filling ? () => cancelFill() : handleClickFillDetails }
-        >
-          {filling?<>
-            <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-            Cancel
-          </>:<>
-            <Robot className="me-1" />
-            Autofill
-          </>}
-        </button>
-      }
-    </InputWithSave>
+    <>
+      <InputWithSave<Substitution>
+        type="textarea"
+        apiPath="resumesubstitutions/"
+        resources={substitutions}
+        setResources={setSubstitutions}
+        id={substitution.id}
+        editableProperty="value"
+        labelProperty="key"
+        onSaveSuccess={onSubstitutionSaveSuccess}
+        style={{minHeight: "84px"}}
+      >
+        {!["JOB_TITLE", "COMPANY"].includes(substitution.key) &&
+          <button className="btn btn-outline-primary" type="button"
+            onClick={filling ? () => cancelFill() : handleClickFillDetails }
+          >
+            {filling?<>
+              <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+              Cancel
+            </>:<>
+              <Robot className="me-1" />
+              Autofill
+            </>}
+          </button>
+        }
+      </InputWithSave>
+      <Alert 
+        variant="danger" dismissible className="w-100"
+        show={showErrorAlert} onClose={() => setShowErrorAlert(false)}
+      >            
+        {Object.values(errors).join(" ")}
+      </Alert>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 from string import Template
 
 class Chat:
-  system_message_content = "You are an experienced hiring manager using your industry knowledge to help tailor a resume and cover letter to a job posting."
+  system_message_content = "You are an experienced hiring manager using your industry knowledge to help tailor a resume or cover letter to a job posting."
   prompts = {
 "extract_job_details":
 
@@ -44,8 +44,8 @@ If you fail for any reason, please provide a single JSON key "error" with a stri
 
 "regenerate_substitution_without_feedback":
 """
-I'm not happy with your output for the fillfield ${key}.
-Please try again.
+Please try again for the following fillfield.
+Remember to tailor the fillfield to the previously supplied resume template and job posting.
 
 Here's the description of the fillfield:
 <fillfield>

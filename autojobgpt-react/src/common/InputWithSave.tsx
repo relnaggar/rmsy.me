@@ -41,13 +41,13 @@ export default function InputWithSave<Resource extends WithID>({
 
   const handleUpdateFail = useCallback((errors: Record<string,string>) => {
     setErrors(errors);
-  }, []);
+  }, [setErrors]);
 
   const handleUpdateSuccess = useCallback(() => {
     setErrors({});
     setSaved(true);
     onSaveSuccess && onSaveSuccess();
-  }, [onSaveSuccess]);
+  }, [setErrors, onSaveSuccess]);
 
   const {patchResource: updateResource, patching: updating } = usePatch<Resource>(apiPath, resources, setResources, {
     onFail: handleUpdateFail,

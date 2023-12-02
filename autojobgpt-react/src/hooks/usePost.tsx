@@ -1,24 +1,21 @@
-import React, { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 
 import useAPI from "./useAPI";
 import { FetchDataContext } from "../routes/routesConfig";
 import { CSRFTokenContext } from "../routes/Layout";
-import { WithID } from "../common/types";
 import { makeErrorMessage } from "./hooksUtils";
 
 
-export default function usePost<Resource extends WithID, ResourceUpload>(
+export default function usePost<Resource>(
   apiPath: string,
-  resources: Resource[],
-  setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
-  getPlaceholderResource: (resourceUpload: ResourceUpload) => Resource,
   options?: {
     onSuccess?: (resource: Resource) => void,
     onFail?: (errors: Record<string,string>) => void,
   },
 ): {
   posting: boolean,
-  postResource: (resource: ResourceUpload) => void,
+  post: (postData?: any) => void,
+  cancel: () => void,
 } {
   const { onSuccess, onFail } = options || {};
 
@@ -26,25 +23,23 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
   const fetchData = useContext(FetchDataContext);
   const csrfToken = useContext(CSRFTokenContext);
 
-  const [resourceBeingPosted, setResourceBeingPosted] = useState<ResourceUpload | null>(null);
+  const [posting, setPosting] = useState<boolean>(false);
+  const [postData, setPostData] = useState<any>(null);
+
+  const abortControllerRef = useRef<AbortController>(new AbortController());
 
   useEffect(() => {
-    async function doPost(body: FormData | string): Promise<void> {      
+    async function doPost(): Promise<void> {      
       let errors: Record<string,string> = {};
-      const newResources: Resource[] = [...resources.filter(resource => resource.id !== -1)];
       try {
-        const csrfHeader: HeadersInit = {
-          "X-CSRFToken": csrfToken,
-        };
         const response: Response = await fetchData(`${apiRoute}${apiPath}`, {
           method: "POST",
-          // if the body is a FormData then we shouldn't set the Content-Type header
-          headers: body instanceof FormData ? csrfHeader : { ...csrfHeader, "Content-Type": "application/json" },
-          body: body
+          headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
+          body: postData? JSON.stringify(postData) : undefined,
+          signal: abortControllerRef.current.signal,
         });
         if (response.ok) {
           const resource: Resource = await response.json();
-          newResources.push(resource);
           onSuccess?.(resource);
         } else {
           errors = await response.json();
@@ -52,40 +47,32 @@ export default function usePost<Resource extends WithID, ResourceUpload>(
       } catch (error) {
         errors["error"] = makeErrorMessage(error);
       } finally {
-        setResources(newResources);
-        setResourceBeingPosted(null);
-        if (Object.keys(errors).length > 0) {
-          onFail?.(errors);
+        if (!abortControllerRef.current.signal.aborted) {
+          setPosting(false);
+          if (Object.keys(errors).length > 0) {
+            onFail?.(errors);
+          }
         }
       }
     }
-    if (resourceBeingPosted !== null) {
-      const formData = new FormData();
-      let containsFile = false;
-      for (const [key, value] of Object.entries(resourceBeingPosted!)) {
-        if (value instanceof File) {
-          containsFile = true;          
-        }
-        formData.append(key, value);
-      }
-      if (containsFile) {
-        // if the addedResource contains a file, then we need to use FormData
-        doPost(formData);
-      } else {
-        // otherwise we should use JSON
-        doPost(JSON.stringify(resourceBeingPosted));
-      }
+    if (posting) {
+      abortControllerRef.current = new AbortController();
+      doPost();
     }
-  }, [fetchData, apiRoute, apiPath, csrfToken, resourceBeingPosted, resources, onSuccess, onFail, setResources]);
+  }, [fetchData, apiRoute, apiPath, csrfToken, posting, postData, onSuccess, onFail]);
 
-  function postResource(resourceUpload: ResourceUpload): void {
-    const placeHolderResource: Resource = getPlaceholderResource(resourceUpload);
-    if (placeHolderResource.id !== -1) {
-      throw new Error("Placeholder resource must have an id of -1");
+  function post(postData?: any): void {
+    if (posting) {
+      abortControllerRef.current.abort();
     }
-    setResources([...resources, placeHolderResource]);
-    setResourceBeingPosted(resourceUpload);
+    setPosting(true);
+    setPostData(postData);
   }
 
-  return { posting: resourceBeingPosted !== null, postResource };
+  function cancel(): void {
+    abortControllerRef.current.abort();
+    setPosting(false);
+  }
+
+  return { posting, post, cancel };
 }
