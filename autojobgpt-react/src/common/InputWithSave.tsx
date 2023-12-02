@@ -3,6 +3,7 @@ import { ReactComponent as Floppy } from "bootstrap-icons/icons/floppy.svg";
 
 import usePatch from "../hooks/usePatch";
 import { WithID } from "./types";
+import useControlledState from "../hooks/useControlledState";
 
 
 export default function InputWithSave<Resource extends WithID>({
@@ -15,6 +16,8 @@ export default function InputWithSave<Resource extends WithID>({
   labelProperty,
   labelText,
   onSaveSuccess,
+  value: valueProp,
+  setValue: setValueProp,
   children,
   ...props
 }: {
@@ -27,6 +30,8 @@ export default function InputWithSave<Resource extends WithID>({
   labelProperty?: keyof Resource,
   labelText?: string,
   onSaveSuccess?: () => void,
+  value?: string,
+  setValue?: React.Dispatch<React.SetStateAction<string>>,
   children?: React.ReactNode,
   [key: string]: any,
 }): React.JSX.Element {
@@ -34,10 +39,21 @@ export default function InputWithSave<Resource extends WithID>({
 
   const resource: Resource = resources.find((resource) => resource.id === id)!;
   const elementID: string = `${apiPath.replace("/", "-")}${id}-${editableProperty}`;
+  const resourceEditableProperty: string = resource[editableProperty] as string;
 
   const [editing, setEditing] = useState<boolean>(true);
   const [saved, setSaved] = useState<boolean>(true);
   const [errors, setErrors] = useState<Record<string,string>>({});
+  const [value, setValue] = useControlledState<string>(resourceEditableProperty, valueProp, setValueProp);
+  
+  useEffect(() => {
+    if (value === resourceEditableProperty) {
+      setSaved(true);
+    } else {
+      setSaved(false);
+    }
+    setEditing(true);
+  }, [value, resourceEditableProperty]);
 
   const handleUpdateFail = useCallback((errors: Record<string,string>) => {
     setErrors(errors);
@@ -63,12 +79,7 @@ export default function InputWithSave<Resource extends WithID>({
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void {
-    if (e.target.value === resource[editableProperty]) {
-      setSaved(true);
-    } else {
-      setSaved(false);
-    }
-    setEditing(true);
+    setValue(e.target.value);
   }
 
   const thereAreErrors: boolean = Object.keys(errors).length > 0;
@@ -80,7 +91,7 @@ export default function InputWithSave<Resource extends WithID>({
     }`,
     id: elementID,
     name: elementID,
-    defaultValue: resource[editableProperty] as string,
+    value: value ?? "",
     onChange: handleChange,
     disabled: updating,
     "aria-describedby": showError? `${elementID}-feedback` : undefined,

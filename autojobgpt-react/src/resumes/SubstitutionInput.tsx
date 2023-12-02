@@ -20,8 +20,10 @@ export default function SubstitutionInput({
 }): React.JSX.Element {
   const [errors, setErrors] = useState<Record<string,string>>({});
   const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
+  const [value, setValue] = useState<string>(substitution.value);
 
-  const onFillSuccess = (_: Substitution): void => {
+  const onFillSuccess = (substitution: Substitution): void => {
+    setValue(substitution.value);
     setShowErrorAlert(false);
   }
 
@@ -52,6 +54,8 @@ export default function SubstitutionInput({
         editableProperty="value"
         labelProperty="key"
         onSaveSuccess={onSubstitutionSaveSuccess}
+        value={value}
+        setValue={setValue}
         style={{minHeight: "84px"}}
       >
         {!["JOB_TITLE", "COMPANY"].includes(substitution.key) &&
