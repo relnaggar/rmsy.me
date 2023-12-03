@@ -10,7 +10,7 @@ from rest_framework.decorators import action
 
 from .models import ResumeTemplate, FillField, Job, Resume, ResumeSubstitution
 from .serializers import ResumeTemplateSerializer, FillFieldSerializer, JobSerializer, ResumeSerializer, ResumeSubstitutionSerializer
-from .serializers import FeedbackSerializer, JobURLSerializer, JobDetailsSerializer
+from .serializers import RegenerateSerializer, JobURLSerializer, JobDetailsSerializer
 
 def app(request):
   return redirect(request.get_full_path() + 'app')
@@ -63,16 +63,7 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
     except IntegrityError as e:
       return self.error_response(str(e))
 
-
-class ResumeTemplateViewSet(ModelViewSetWithErrorHandling):
-  queryset = ResumeTemplate.objects.all()
-  serializer_class = ResumeTemplateSerializer
-
-class FillFieldViewSet(viewsets.ModelViewSet):
-  queryset = FillField.objects.all()
-  serializer_class = FillFieldSerializer
-
-
+ 
 class JobViewSet(ModelViewSetWithErrorHandling):
   queryset = Job.objects.all()
   serializer_class = JobSerializer
@@ -96,21 +87,34 @@ class JobViewSet(ModelViewSetWithErrorHandling):
     return Response(jobDetailsSerializer.data)
 
 
-class RegenerateMixin():
-  def regenerate(self, request, pk=None):
-    feedback_serializer = None
-    feedback = None
-    if request.method == 'POST' and 'feedback' in request.data:
-      feedback_serializer = FeedbackSerializer(data=request.data)
-    if feedback_serializer is not None:
-      feedback_serializer.is_valid(raise_exception=True)
-      feedback = feedback_serializer.validated_data['feedback']
+class FillFieldViewSet(viewsets.ModelViewSet):
+  queryset = FillField.objects.all()
+  serializer_class = FillFieldSerializer
+
+class ResumeTemplateViewSet(ModelViewSetWithErrorHandling):
+  queryset = ResumeTemplate.objects.all()
+  serializer_class = ResumeTemplateSerializer
+
+
+class ResumeSubstitutionViewSet(ModelViewSetWithErrorHandling):
+  queryset = ResumeSubstitution.objects.all()
+  serializer_class = ResumeSubstitutionSerializer
+
+  @action(detail=True, methods=['post'])
+  def regenerate(self, request, pk=None):    
+    regenerate_serializer = RegenerateSerializer(data=request.data)
+    regenerate_serializer.is_valid(raise_exception=True)
+    value = regenerate_serializer.validated_data['value']
+    try:
+      feedback = regenerate_serializer.validated_data['feedback']
+    except KeyError:
+      feedback = None
     
     try:
-      if feedback is not None:
-        regenerated_object = self.get_object().regenerate(feedback)
+      if feedback is None:
+        regenerated_object = self.get_object().regenerate(value)
       else:
-        regenerated_object = self.get_object().regenerate()
+        regenerated_object = self.get_object().regenerate(value, feedback)
     except Exception as e:
       return Response(
         {'error': str(e)},
@@ -119,18 +123,6 @@ class RegenerateMixin():
     
     return Response(self.serializer_class(regenerated_object).data)
 
-class ResumeViewSet(ModelViewSetWithErrorHandling, RegenerateMixin):
+class ResumeViewSet(ModelViewSetWithErrorHandling):
   queryset = Resume.objects.all()
   serializer_class = ResumeSerializer
-  
-  @action(detail=True, methods=['post'])
-  def regenerate(self, request, pk=None):
-    return super().regenerate(request, pk)
-
-class ResumeSubstitutionViewSet(ModelViewSetWithErrorHandling, RegenerateMixin):
-  queryset = ResumeSubstitution.objects.all()
-  serializer_class = ResumeSubstitutionSerializer
-
-  @action(detail=True, methods=['post'])
-  def regenerate(self, request, pk=None):
-    return super().regenerate(request, pk)

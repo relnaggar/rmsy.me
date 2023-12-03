@@ -3,21 +3,6 @@ from rest_framework import serializers
 from .models import ResumeTemplate, FillField, Job, Resume, ResumeSubstitution
 
 
-class FillFieldSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = FillField
-    fields = "__all__"
-
-
-class ResumeTemplateSerializer(serializers.ModelSerializer):
-  fillFields = FillFieldSerializer(many=True, read_only=True)
-
-  class Meta:
-    model = ResumeTemplate
-    fields = "__all__"
-    extra_kwargs = {'png': {'required': False}}
-
-
 class JobURLSerializer(serializers.ModelSerializer):
   class Meta:
     model = Job
@@ -36,6 +21,23 @@ class JobSerializer(serializers.ModelSerializer):
     extra_kwargs = {'chat_messages': {'read_only': True}}
 
 
+class FillFieldSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = FillField
+    fields = "__all__"
+
+class ResumeTemplateSerializer(serializers.ModelSerializer):
+  fillFields = FillFieldSerializer(many=True, read_only=True)
+
+  class Meta:
+    model = ResumeTemplate
+    fields = "__all__"
+    extra_kwargs = {'png': {'required': False}}
+
+class RegenerateSerializer(serializers.Serializer):
+  value = serializers.CharField()
+  feedback = serializers.CharField(required=False)
+
 class ResumeSubstitutionSerializer(serializers.ModelSerializer):  
   def update(self, instance, validated_data):
     instance = super().update(instance, validated_data)
@@ -46,10 +48,6 @@ class ResumeSubstitutionSerializer(serializers.ModelSerializer):
   class Meta:
     model = ResumeSubstitution
     fields = "__all__"
-
-class FeedbackSerializer(serializers.Serializer):
-  feedback = serializers.CharField()
-
 
 class ResumeSerializer(serializers.ModelSerializer):
   substitutions = ResumeSubstitutionSerializer(many=True, read_only=True)

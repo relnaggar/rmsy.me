@@ -21,6 +21,8 @@ export default function SubstitutionInput({
   const [errors, setErrors] = useState<Record<string,string>>({});
   const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
   const [value, setValue] = useState<string>(substitution.value);
+  const [showFeedback, setShowFeedback] = useState<boolean>(false);
+  const [feedback, setFeedback] = useState<string>("");
 
   const onFillSuccess = (substitution: Substitution): void => {
     setValue(substitution.value);
@@ -40,7 +42,11 @@ export default function SubstitutionInput({
   );
 
   function handleClickFillDetails(): void {
-    fill();
+    if (showFeedback) {
+      fill({value: value, feedback: feedback});
+    } else {
+      fill({value: value});
+    }
   }
 
   return (
@@ -57,25 +63,44 @@ export default function SubstitutionInput({
         value={value}
         setValue={setValue}
         style={{minHeight: "84px"}}
+        disabled={filling}
       >
-        {!["JOB_TITLE", "COMPANY"].includes(substitution.key) &&
+        {!["JOB_TITLE", "COMPANY"].includes(substitution.key) && <>
           <button className="btn btn-outline-primary" type="button"
             onClick={filling ? () => cancelFill() : handleClickFillDetails }
+            disabled={!filling && showFeedback && feedback === ""}
           >
             {filling?<>
               <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
               Cancel
             </>:<>
               <Robot className="me-1" />
-              Autofill
+              Regenerate
             </>}
           </button>
-        }
+          <div className="form-check form-switch">
+            <input
+              className="form-check-input" type="checkbox" role="switch"
+              id={`feedback-switch-${substitution.key}`} onChange={() => setShowFeedback(!showFeedback)}
+            />
+            <label className="form-check-label" htmlFor={`feedback-switch-${substitution.key}`}>with feedback</label>
+          </div>
+        </>}
       </InputWithSave>
-      <Alert 
+
+      {showFeedback &&
+        <div className="mb-3">
+          <textarea
+            className="form-control" value={feedback} onChange={(e) => setFeedback(e.target.value)}
+            placeholder="Write your feedback here..." disabled={filling}
+          />
+        </div>
+      }
+
+      <Alert
         variant="danger" dismissible className="w-100"
         show={showErrorAlert} onClose={() => setShowErrorAlert(false)}
-      >            
+      >
         {Object.values(errors).join(" ")}
       </Alert>
     </>

@@ -333,70 +333,8 @@ f"""<fillfield>
     
     # save the file stream to the file field
     file_name = f"{self.job.title}_{self.job.company}_v{self.version}.docx"    
-    self.docx.save(file_name, files.File(file_stream))    
+    self.docx.save(file_name, files.File(file_stream))
 
-  def regenerate(self, feedback=None):
-    raise NotImplementedError
-  #   if not self.is_filled:
-  #     raise Exception(
-  #       "you have to fill the resume with .fill() before you can regenerate the resume"
-  #     )
-    
-  #   if feedback is None:
-  #     return self._regenerate_without_feedback()
-  #   else:
-  #     return self._regenerate_with_feedback(feedback)
-
-  # def _regenerate_without_feedback(self):    
-  #   # the expected fillfields are the keys of the most recent response
-  #   fillfield_keys = list(json.loads(self.chat_messages[-1]['content']).keys())
-  #   self._remove_default_substitutions(fillfield_keys)    
-
-  #   # re-ask GPT the most recent question
-  #   chat_messages_rewinded_1 = self.chat_messages[:-1]
-  #   chat_message = Chat().ask_with_messages(
-  #     chat_messages_rewinded_1
-  #   )
-  #   response = json.loads(chat_message.content)
-
-  #   substitutions = self._validate_response_and_get_substitutions(
-  #     response, fillfield_keys
-  #   )
-  #   new_resume = self._create_new_resume_and_substitutions(
-  #     substitutions, chat_messages_rewinded_1 + [chat_message]
-  #   )
-
-  #   # copy the resume substitutions from the previous resume
-  #   for key in self.template.extract_fillfield_keys():
-  #     if key not in fillfield_keys and \
-  #         key not in self.default_substitutions.keys():
-  #       # copy the resume substitution
-  #       old_resume_substitution = self.substitutions.get(key=key)
-  #       ResumeSubstitution.objects.create(
-  #         resume=new_resume,
-  #         key=old_resume_substitution.key,
-  #         value=old_resume_substitution.value,
-  #       )
-    
-  #   return new_resume
-
-  # def _regenerate_with_feedback(self, feedback):
-  #   chat = Chat(self.chat_messages)
-  #   response = json.loads(
-  #     chat.ask(prompt_name="regenerate_resume", substitutions={
-  #       "feedback": feedback,
-  #     })["content"]
-  #   )
-
-  #   fillfield_keys = self.template.extract_fillfield_keys()
-  #   self._remove_default_substitutions(fillfield_keys)
-  #   substitutions = self._validate_response_and_get_substitutions(
-  #     response, fillfield_keys
-  #   )
-
-  #   return self._create_new_resume_and_substitutions(
-  #     substitutions, self.chat_messages+chat.get_additional_messages()
-  #   )
 
 class ResumeSubstitution(models.Model):
   resume = models.ForeignKey(to="Resume", on_delete=models.CASCADE, related_name="substitutions")
@@ -411,20 +349,22 @@ class ResumeSubstitution(models.Model):
   def __str__(self):
     return f"{self.key} for {self.resume}"
   
-  def regenerate(self, feedback=None):
-    if feedback is None:
-      return self._regenerate_without_feedback()
-    else:
-      return self._regenerate_with_feedback(feedback)
-  
-  def _regenerate_without_feedback(self):  
+  def regenerate(self, current_value, feedback=None):  
     current_fillfield_description = ResumeTemplate.objects.get(pk=self.resume.template.pk).fillFields.get(key=self.key).description
 
     chat = Chat(self.resume.chat_messages)
-    response_message = chat.ask(prompt_name="regenerate_substitution_without_feedback", substitutions={
+
+    substitutions = {
       "key": self.key,
       "description": current_fillfield_description if current_fillfield_description != "" else self.key,
-    })
+      "saved_value": self.value,
+      "current_value": current_value,      
+    }
+    if feedback is None:
+      response_message = chat.ask(prompt_name="regenerate_substitution_without_feedback", substitutions=substitutions)
+    else:
+      substitutions["feedback"] = feedback
+      response_message = chat.ask(prompt_name="regenerate_substitution_with_feedback", substitutions=substitutions)
     
     try:
       response_content = response_message["content"]
@@ -442,31 +382,3 @@ class ResumeSubstitution(models.Model):
       return substitution
     except KeyError:
       raise Exception(response["error"])
-
-  def _regenerate_with_feedback(self, feedback):
-    raise NotImplementedError
-
-    # chat = Chat(self.resume.chat_messages)
-    # response = json.loads(chat.ask(prompt_name="regenerate_substitution", substitutions={
-    #   "key": self.key,
-    #   "feedback": feedback,
-    # })["content"])
-
-    # # copy the resume and its substitutions
-    # new_resume = Resume.objects.create(
-    #   job=self.resume.job,
-    #   template=self.resume.template,
-    #   chat_messages=self.resume.chat_messages + chat.get_additional_messages(),
-    # )
-    # for resume_substitution in self.resume.substitutions.all():
-    #   if resume_substitution.key != self.key:
-    #     ResumeSubstitution.objects.create(
-    #       resume=new_resume,
-    #       key=resume_substitution.key,
-    #       value=resume_substitution.value,
-    #     )
-    # return ResumeSubstitution.objects.create(
-    #   resume=new_resume,
-    #   key=self.key,
-    #   value=response[self.key],
-    # )

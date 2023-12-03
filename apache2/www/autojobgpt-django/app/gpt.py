@@ -1,7 +1,7 @@
 from string import Template
 
 class Chat:
-  system_message_content = "You are an experienced hiring manager using your industry knowledge to help tailor a resume or cover letter to a job posting."
+  system_message_content = "You are an experienced hiring manager using your industry knowledge to help tailor a user's resume or cover letter to a job posting."
   prompts = {
 "extract_job_details":
 
@@ -44,14 +44,24 @@ If you fail for any reason, please provide a single JSON key "error" with a stri
 
 "regenerate_substitution_without_feedback":
 """
-Please try again for the following fillfield.
-Remember to tailor the fillfield to the previously supplied resume template and job posting.
+The user has indicated that they'd like a different output for the fillfield ${key}.
+They haven't provided any feedback, so you should just regenerate the fillfield.
+Try to make it different from the previous output, but still relevant to the previously supplied job details and resume template.
 
-Here's the description of the fillfield:
+Here's the description of the fillfield again (this may have changed since the last time you saw it, depending on whether the user has updated it):
 <fillfield>
 <key>${key}</key>
 <description>${description}</description>
 </fillfield>
+
+Here are the values of the fillfield when the user pressed the "regenerate" button:
+<values>
+<saved>${saved_value}</saved>
+<current>${current_value}</current>
+</values>
+
+The saved value is the value that the user had saved for this fillfield before they started editing it.
+The current value is the value that the user was editing when they pressed the "regenerate" button.
 
 Provide your output in JSON format, with one JSON key for this fillfield.
 
@@ -60,28 +70,30 @@ If you fail for any reason, please provide a single JSON key "error" with a stri
 
 "regenerate_substitution_with_feedback":
 """
-I'm not happy with your output for the fillfield ${key}.
-Please try again, adhering to the following feedback:
+The user has indicated that they'd like a different output for the fillfield ${key}.
+They have provided feedback, so you should respond directly to the feedback to regenerate the fillfield.
 
-<feedback>
-${feedback}
-</feedback>
+Here's the feedback that the user provided:
+<feedback>${feedback}</feedback>
+
+Remember to make sure that the new output is still relevant to the previously supplied job details and resume template.
+
+Here's the description of the fillfield again (this may have changed since the last time you saw it, depending on whether the user has updated it):
+<fillfield>
+<key>${key}</key>
+<description>${description}</description>
+</fillfield>
+
+Here are the values of the fillfield when the user pressed the "regenerate" button:
+<values>
+<saved>${saved_value}</saved>
+<current>${current_value}</current>
+</values>
+
+The saved value is the value that the user had saved for this fillfield before they started editing it.
+The current value is the value that the user was editing when they pressed the "regenerate" button.
 
 Provide your output in JSON format, with one JSON key for this fillfield.
-
-If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
-""",
-
-"regenerate_resume":
-"""
-I'm not happy with your output for all of the fillfields.
-Please try again, adhering to the following feedback:
-
-<feedback>
-${feedback}
-</feedback>
-
-Provide your output in JSON format, with a JSON key for each fillfield.
 
 If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
 """,
