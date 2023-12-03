@@ -115,7 +115,7 @@ export default function ResumeList(): React.JSX.Element {
           >
             <option value="0">All Jobs</option>
             {jobsWithAtLeastOneResume.map((job) => (
-              <option value={job.id}>{`${job.title}, ${job.company}`}</option>
+              <option key={job.id} value={job.id}>{`${job.title}, ${job.company}`}</option>
             ))}
           </select>
         </div>

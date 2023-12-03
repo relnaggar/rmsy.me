@@ -1,12 +1,10 @@
 import React from "react";
 import Modal from 'react-bootstrap/Modal';
 
-import useFetch from "../hooks/useFetch";
 import InputWithSave from "../common/InputWithSave";
 import { STATUSES } from "../jobs/JobBoard";
 import { toPascalCase } from "../common/utils";
 import { Job } from "../jobs/types";
-import { Resume } from "../resumes/types";
 
 
 export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id }: {
@@ -17,8 +15,6 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
   setJobs: React.Dispatch<React.SetStateAction<Job[]>>,
   id: number,
 }): React.JSX.Element {
-  const { resource: resumes } = useFetch<Resume[]>("resumes/", { initialResource: [] });
-
   return (
     <Modal aria-labelledby="editJobModalLabel" size="lg" backdrop="static"
       show={show} onHide={() => setShow(false)}
