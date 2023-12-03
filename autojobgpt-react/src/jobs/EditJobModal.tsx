@@ -1,8 +1,12 @@
 import React from "react";
 import Modal from 'react-bootstrap/Modal';
 
+import useFetch from "../hooks/useFetch";
 import InputWithSave from "../common/InputWithSave";
+import { STATUSES } from "../jobs/JobBoard";
+import { toPascalCase } from "../common/utils";
 import { Job } from "../jobs/types";
+import { Resume } from "../resumes/types";
 
 
 export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id }: {
@@ -11,8 +15,10 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
   setShow: React.Dispatch<React.SetStateAction<boolean>>,
   jobs: Job[],
   setJobs: React.Dispatch<React.SetStateAction<Job[]>>,
-  id: number
+  id: number,
 }): React.JSX.Element {
+  const { resource: resumes } = useFetch<Resume[]>("resumes/", { initialResource: [] });
+
   return (
     <Modal aria-labelledby="editJobModalLabel" size="lg" backdrop="static"
       show={show} onHide={() => setShow(false)}
@@ -30,7 +36,10 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
           id={id}
           editableProperty="status"
           labelText="Status"
-          required
+          selectOptions={STATUSES.map((status: string) => {
+            return {value: status, label: toPascalCase(status)}
+          })}
+          required              
         />
         <InputWithSave<Job>
           type="url"

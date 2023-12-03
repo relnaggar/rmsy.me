@@ -43,8 +43,6 @@ export const validJob1: Job = {
   company: "Test Company 1",
   posting: "Test Text 1",
   status: "backlog",
-  // date_applied: null,
-  // chosen_resume: null,
 }
 
 export const validJob2: Job = {
@@ -54,8 +52,6 @@ export const validJob2: Job = {
   company: "Test Company 2",
   posting: "Test Text 2",
   status: "backlog",
-  // date_applied: null,
-  // chosen_resume: null,
 }
 
 export const validResumeTemplate1: ResumeTemplate = {

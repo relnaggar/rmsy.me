@@ -5,8 +5,6 @@ export type Job = {
   company: string,
   posting: string,
   status: string,
-  // date_applied: string | null,
-  // chosen_resume: number | null,
 };
 
 export type JobUpload = Pick<
@@ -33,7 +31,5 @@ export function generatePlaceholderJob(jobUpload: JobUpload): Job {
     "company": "",
     "posting": "",
     "status": "",
-    // "date_applied": null,
-    // "chosen_resume": null,
   }
 }

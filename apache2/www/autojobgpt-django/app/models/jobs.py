@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 import json
 
@@ -12,8 +13,6 @@ class Job(models.Model):
   company = models.TextField()
   posting = models.TextField()
   status = models.TextField()
-  # date_applied = models.DateTimeField(null=True, blank=True, default=timezone.now)
-  # chosen_resume = models.ForeignKey(to="Resume", on_delete=models.SET_NULL, null=True, blank=True)
 
   class Meta:
     constraints = [

@@ -3,10 +3,12 @@ import { ReactComponent as Floppy } from "bootstrap-icons/icons/floppy.svg";
 
 import usePatch from "../hooks/usePatch";
 import useControlledState from "../hooks/useControlledState";
-import { STATUSES } from "../jobs/JobBoard";
 import { WithID } from "./types";
-import { toPascalCase } from "./utils";
 
+export type SelectOption = {
+  value: string,
+  label: string,
+};
 
 export default function InputWithSave<Resource extends WithID>({
   type,
@@ -20,6 +22,7 @@ export default function InputWithSave<Resource extends WithID>({
   onSaveSuccess,
   value: valueProp,
   setValue: setValueProp,
+  selectOptions,
   children,
   ...props
 }: {
@@ -34,6 +37,7 @@ export default function InputWithSave<Resource extends WithID>({
   onSaveSuccess?: () => void,
   value?: string,
   setValue?: React.Dispatch<React.SetStateAction<string>>,
+  selectOptions?: SelectOption[],
   children?: React.ReactNode,
   [key: string]: any,
 }): React.JSX.Element {
@@ -116,8 +120,9 @@ export default function InputWithSave<Resource extends WithID>({
       :
         (type === "select"?
           <select {...textAreaProps}>
-            {STATUSES.map((status) => (
-              <option key={status} value={status}>{toPascalCase(status)}</option>
+            {!textAreaProps.required && <option value="">Select...</option>}
+            {selectOptions!.map((selectOption) => (
+              <option key={selectOption.value} value={selectOption.value}>{selectOption.label}</option>
             ))}
           </select>
         :
