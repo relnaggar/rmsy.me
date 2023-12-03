@@ -46,10 +46,13 @@ class Resume(models.Model, DocumentMixin):
     else:
       self.version = Resume._meta.get_field("version").default
     self.name = f'{self.job.title}, {self.job.company}, v{self.version}'
+
+    fill = kwargs.pop("fill", True)
     super().save(*args, **kwargs)
-    self.fill()
-    self.generate_docx()
-    self.generate_png()
+    if fill:
+      self.fill()
+      self.generate_docx()
+      self.generate_png()
 
   def __update(self, *args, **kwargs):
     super().save(*args, **kwargs)
@@ -146,6 +149,24 @@ f"""<fillField>
     # save the file stream to the file field
     file_name = f"{self.job.title}_{self.job.company}_v{self.version}.docx"    
     self.docx.save(file_name, files.File(file_stream))
+
+  def duplicate(self):
+    new_resume = Resume(
+      job=self.job,
+      template=self.template,
+    )
+    new_resume.save(fill=False)
+    for substitution in self.substitutions.all():
+      new_substitution = ResumeSubstitution(
+        resume=new_resume,
+        key=substitution.key,
+        value=substitution.value,
+      )
+      new_substitution.save()
+    new_resume.chat_messages = self.chat_messages
+    new_resume.generate_docx()
+    new_resume.generate_png()
+    return new_resume
 
 
 class ResumeSubstitution(models.Model):

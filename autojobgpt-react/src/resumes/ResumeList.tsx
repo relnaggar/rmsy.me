@@ -44,6 +44,7 @@ export default function ResumeList(): React.JSX.Element {
   const resumeAPIPath: string = "resumes/";
   const {    
     resources: resumes,
+    setResources: setResumes,
     fetching: loadingResumes,
     refetch: refetchResumes,
     posting: addingResume,
@@ -101,7 +102,7 @@ export default function ResumeList(): React.JSX.Element {
       />
       <EditResumeModal
         apiPath={resumeAPIPath}
-        resumes={resumes} setResumes={refetchResumes}
+        resumes={resumes} setResumes={setResumes}
         show={showEditResumeModal} setShow={setShowEditResumeModal}
         resumeID={editResumeID}
         substitutions={substitutions} setSubstitutions={setSubstitutions}

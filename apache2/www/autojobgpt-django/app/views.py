@@ -138,3 +138,15 @@ class ResumeSubstitutionViewSet(ModelViewSetWithErrorHandling):
 class ResumeViewSet(ModelViewSetWithErrorHandling):
   queryset = Resume.objects.all()
   serializer_class = ResumeSerializer
+
+  @action(detail=True, methods=['post'])
+  def duplicate(self, request, pk=None):
+    resume = self.get_object()
+    try:
+      duplicated_resume = resume.duplicate()
+    except Exception as e:
+      return Response(
+        {'error': str(e)},
+        status=status.HTTP_400_BAD_REQUEST
+      )
+    return Response(self.serializer_class(duplicated_resume).data)

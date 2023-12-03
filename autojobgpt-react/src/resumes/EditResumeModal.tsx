@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import Modal from 'react-bootstrap/Modal';
+import Alert from 'react-bootstrap/Alert';
 import { ReactComponent as BoxArrowUpRight } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
 import { ReactComponent as FileArrowDown } from 'bootstrap-icons/icons/file-arrow-down.svg';
+import { ReactComponent as Copy } from 'bootstrap-icons/icons/copy.svg';
 
+import usePost from "../hooks/usePost";
 import InputWithSave from "../common/InputWithSave";
 import SubstitutionInput from "./SubstitutionInput";
 import { Resume, Substitution } from "./types";
 import { Job } from "../jobs/types";
-import { ResumeTemplate } from "../templates/types";
 
 
 export default function EditResumeModal({
@@ -33,9 +35,39 @@ export default function EditResumeModal({
 }): React.JSX.Element {
   const resume: Resume | undefined = resumes.find((resume: Resume) => resume.id === resumeID);
 
+  const [errors, setErrors] = useState<Record<string,string>>({});
+  const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
+
+  const handleDuplicateSuccess = useCallback((resume: Resume) => {
+    setResumes([...resumes, resume]);
+    setShowErrorAlert(false);
+  }, [resumes, setResumes]);
+
+  const handleDuplicateFail = useCallback((es: Record<string,string>) => {
+    setErrors(es);
+    setShowErrorAlert(true);
+  }, []);
+
+  const { posting: duplicating, post: duplicate, cancel: cancelDuplicate } = usePost<Resume>(
+    `${apiPath}${resumeID}/duplicate/`, {
+      onSuccess: handleDuplicateSuccess,
+      onFail: handleDuplicateFail,
+    }
+  );
+
+  function handleClickDuplicate(): void {
+    setShowErrorAlert(false);
+    duplicate();
+  }
+
+  function handleClose(): void {
+    setShowErrorAlert(false);
+    setShow(false);    
+  }  
+
   return (
     <Modal
-      show={show} onHide={() => setShow(false)} aria-labelledby="editResumeModalLabel"
+      show={show} onHide={handleClose} aria-labelledby="editResumeModalLabel"
       onEntered={() => document.getElementsByTagName("input")[0].focus()} size="xl" backdrop="static"
     >
       <Modal.Header closeButton>
@@ -99,7 +131,24 @@ export default function EditResumeModal({
         }
       </Modal.Body>
       <Modal.Footer>
-        <button type="button" className="btn btn-secondary" onClick={() => setShow(false)}>Close</button>
+        <Alert
+            variant="danger" dismissible className="w-100"
+            show={showErrorAlert} onClose={() => setShowErrorAlert(false)}
+          >
+            {Object.values(errors).join(" ")}
+        </Alert>
+        <button className="btn btn-outline-primary" type="button"
+          onClick={duplicating ? () => cancelDuplicate() : handleClickDuplicate }
+        >
+          {duplicating?<>
+            <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+            Cancel
+          </>:<>
+            <Copy className="me-1" />
+            Duplicate
+          </>}
+        </button>
+        <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
       </Modal.Footer>
     </Modal>
   )
