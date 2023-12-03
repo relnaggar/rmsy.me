@@ -69,7 +69,7 @@ export default function EditTemplateModal({
             } else {
               return <InputWithSave<FillField>
                 type="textarea"
-                apiPath="fillfields/"
+                apiPath="fillFields/"
                 resources={fillFields}
                 setResources={setFillFields}
                 id={fillField.id}

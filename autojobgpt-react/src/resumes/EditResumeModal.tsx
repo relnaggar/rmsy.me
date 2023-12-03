@@ -54,28 +54,32 @@ export default function EditResumeModal({
         />
 
         {resume &&
-          <>
-            <div className="mb-3">
+          <div className="d-flex flex-wrap">
+            <div className="mb-3 flex-fill">
               <span className="form-label">Job</span>
               <a
-                id="job" href={(resume.job as Job).url} target="_blank" rel="noreferrer"
-                className="form-control link-primary border border-0"
+                href={resume.job!.url} target="_blank" rel="noreferrer"
+                className="link-primary form-control border border-0"
               >
-                {(resume.job as Job).title + ", " + (resume.job as Job).company}
+                {resume.job!.title + ", " + (resume.job as Job).company}
                 <BoxArrowUpRight className="ms-1" />
               </a>
             </div>
-            <div className="mb-3">
+            <div className="mb-3 flex-fill">
               <span className="form-label">Template</span>
-              <a
-                id="template" href={(resume.template as ResumeTemplate).docx}
-                className="form-control link-primary border border-0"
-              >
-                {(resume.template as ResumeTemplate).name}
+              <a href={resume.template!.docx} className="form-control link-primary border border-0">
+                {resume!.template.name}
                 <FileArrowDown className="ms-1" />
               </a>
             </div>
-          </>
+            <div className="mb-3 flex-fill">
+              <span className="form-label">Resume</span>
+              <a href={resume!.docx} className="form-control link-primary border border-0">
+                Version {resume.version}
+                <FileArrowDown className="ms-1" />
+              </a>
+            </div>
+          </div>
         }
 
         <hr />

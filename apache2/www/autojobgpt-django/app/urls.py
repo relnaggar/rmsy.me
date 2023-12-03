@@ -6,9 +6,9 @@ from .views import app, csrf
 router = routers.DefaultRouter()
 router.register("jobs", JobViewSet)
 router.register("templates", ResumeTemplateViewSet)
-router.register("fillfields", FillFieldViewSet)
+router.register("fillFields", FillFieldViewSet)
 router.register("resumes", ResumeViewSet)
-router.register("resumesubstitutions", ResumeSubstitutionViewSet)
+router.register("substitutions", ResumeSubstitutionViewSet, basename="substitutions")
 
 urlpatterns = [
   path("api/csrf/", csrf),

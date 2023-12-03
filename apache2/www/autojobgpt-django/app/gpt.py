@@ -23,7 +23,7 @@ If you fail to extract any of these keys, please provide a single JSON key "erro
 "fill_resume_template":
 
 """
-Fill in the fillfields in the given resume template, tailoring the resume to the given job details.
+Fill in the fillFields in the given resume template, tailoring the resume to the given job details.
 
 <resume_template>${resume_template_text}</resume_template>
 
@@ -33,67 +33,40 @@ Fill in the fillfields in the given resume template, tailoring the resume to the
 <job_posting>${job_posting}</job_posting>
 </job_details>
 
-<fillfields>
-${fillfields_text}
-</fillfields>
+<fillFields>
+${fillFields_text}
+</fillFields>
 
-Provide your output in JSON format, with a JSON key for each fillfield listed.
+Provide your output in JSON format, with a JSON key for each fillField listed.
 
 If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
 """,
 
 "regenerate_substitution_without_feedback":
 """
-The user has indicated that they'd like a different output for the fillfield ${key}.
-They haven't provided any feedback, so you should just regenerate the fillfield.
-Try to make it different from the previous output, but still relevant to the previously supplied job details and resume template.
+The user has indicated that they'd like a different value for the fillField with the key `${key}`.
+They haven't provided any feedback, so you should just regenerate the fillField.
 
-Here's the description of the fillfield again (this may have changed since the last time you saw it, depending on whether the user has updated it):
-<fillfield>
-<key>${key}</key>
-<description>${description}</description>
-</fillfield>
+Try to make it different from the previous value, but still relevant to the previously supplied job details and resume template.
 
-Here are the values of the fillfield when the user pressed the "regenerate" button:
-<values>
-<saved>${saved_value}</saved>
-<current>${current_value}</current>
-</values>
-
-The saved value is the value that the user had saved for this fillfield before they started editing it.
-The current value is the value that the user was editing when they pressed the "regenerate" button.
-
-Provide your output in JSON format, with one JSON key for this fillfield.
+${current_value_message}
+Provide your output in JSON format, with one JSON key for this fillField.
 
 If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
 """,
 
 "regenerate_substitution_with_feedback":
 """
-The user has indicated that they'd like a different output for the fillfield ${key}.
-They have provided feedback, so you should respond directly to the feedback to regenerate the fillfield.
+The user has indicated that they'd like a different value for the fillField with the key `${key}`.
+They have provided feedback, so you should respond directly to the feedback to regenerate the fillField.
 
 Here's the feedback that the user provided:
 <feedback>${feedback}</feedback>
 
-Remember to make sure that the new output is still relevant to the previously supplied job details and resume template.
+Make sure that the new value is still relevant to the previously supplied job details and resume template.
 
-Here's the description of the fillfield again (this may have changed since the last time you saw it, depending on whether the user has updated it):
-<fillfield>
-<key>${key}</key>
-<description>${description}</description>
-</fillfield>
-
-Here are the values of the fillfield when the user pressed the "regenerate" button:
-<values>
-<saved>${saved_value}</saved>
-<current>${current_value}</current>
-</values>
-
-The saved value is the value that the user had saved for this fillfield before they started editing it.
-The current value is the value that the user was editing when they pressed the "regenerate" button.
-
-Provide your output in JSON format, with one JSON key for this fillfield.
+${current_value_message}
+Provide your output in JSON format, with one JSON key for this fillField.
 
 If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
 """,
@@ -149,6 +122,9 @@ If you fail for any reason, please provide a single JSON key "error" with a stri
       message = {"role": "system", "content": choice.message.content}
       self.messages.append(message)
       return message
+    
+  def log(self, message):
+    self.messages.append({"role": "user", "content": message})
     
   def get_messages(self):
     return self.messages

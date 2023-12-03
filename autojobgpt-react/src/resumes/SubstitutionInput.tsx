@@ -35,7 +35,7 @@ export default function SubstitutionInput({
   };
 
   const { posting: filling, post: fill, cancel: cancelFill } = usePost(
-    `resumesubstitutions/${substitution.id}/regenerate/`, {
+    `substitutions/${substitution.id}/regenerate/`, {
       onSuccess: onFillSuccess,
       onFail: onFillFail,
     }
@@ -53,7 +53,7 @@ export default function SubstitutionInput({
     <>
       <InputWithSave<Substitution>
         type="textarea"
-        apiPath="resumesubstitutions/"
+        apiPath="substitutions/"
         resources={substitutions}
         setResources={setSubstitutions}
         id={substitution.id}
@@ -91,8 +91,8 @@ export default function SubstitutionInput({
       {showFeedback &&
         <div className="mb-3">
           <textarea
-            className="form-control" value={feedback} onChange={(e) => setFeedback(e.target.value)}
-            placeholder="Write your feedback here..." disabled={filling}
+            className="form-control" value={feedback} onChange={(e) => setFeedback(e.target.value)} disabled={filling}
+            placeholder="Write your feedback here..." aria-label="Feedback"
           />
         </div>
       }

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from .models import ResumeTemplate, FillField, Job, Resume, ResumeSubstitution
+from .models import Job, ResumeTemplate, FillField, Resume, ResumeSubstitution
+from .models import DEFAULT_FILLFIELDS
 
 
 class JobURLSerializer(serializers.ModelSerializer):
@@ -25,6 +26,10 @@ class FillFieldSerializer(serializers.ModelSerializer):
   class Meta:
     model = FillField
     fields = "__all__"
+    extra_kwargs = {
+      'template': {'read_only': True},
+      'key': {'read_only': True},
+    }
 
 class ResumeTemplateSerializer(serializers.ModelSerializer):
   fillFields = FillFieldSerializer(many=True, read_only=True)
@@ -32,25 +37,26 @@ class ResumeTemplateSerializer(serializers.ModelSerializer):
   class Meta:
     model = ResumeTemplate
     fields = "__all__"
-    extra_kwargs = {'png': {'required': False}}
+    extra_kwargs = {
+      'png': {'read_only': True}
+    }
+
 
 class RegenerateSerializer(serializers.Serializer):
-  value = serializers.CharField()
+  value = serializers.CharField(allow_blank=True)
   feedback = serializers.CharField(required=False)
 
-class ResumeSubstitutionSerializer(serializers.ModelSerializer):  
-  def update(self, instance, validated_data):
-    instance = super().update(instance, validated_data)
-    instance.resume.generate_docx()
-    instance.resume.generate_png()
-    return instance
-
+class ResumeSubstitutionSerializer(serializers.ModelSerializer):
   class Meta:
     model = ResumeSubstitution
     fields = "__all__"
+    extra_kwargs = {
+      'resume': {'read_only': True},
+      'key': {'read_only': True},
+    }
 
 class ResumeSerializer(serializers.ModelSerializer):
-  substitutions = ResumeSubstitutionSerializer(many=True, read_only=True)
+  substitutions = serializers.SerializerMethodField()
   job_details = JobSerializer(source='job', read_only=True)
   template_details = ResumeTemplateSerializer(source='template', read_only=True)
   
@@ -59,11 +65,20 @@ class ResumeSerializer(serializers.ModelSerializer):
     fields = "__all__"
     extra_kwargs = {
       'name': {'required': False},
-      'docx': {'required': False},
-      'png': {'required': False},      
+      'version': {'read_only': True},
+      'docx': {'read_only': True},
+      'png': {'read_only': True},  
+      'chat_messages': {'read_only': True},
     }
 
-  # override to_representation to return job_details as job instead of just the id
+  def get_substitutions(self, obj):
+    substitutions = [
+      s for s in obj.substitutions.all() if s.key in DEFAULT_FILLFIELDS.keys()
+    ] + [
+      s for s in obj.substitutions.all() if s.key not in DEFAULT_FILLFIELDS.keys()
+    ]
+    return ResumeSubstitutionSerializer(substitutions, many=True).data
+
   def to_representation(self, instance):
     representation = super().to_representation(instance)
     representation['job'] = representation.pop('job_details')

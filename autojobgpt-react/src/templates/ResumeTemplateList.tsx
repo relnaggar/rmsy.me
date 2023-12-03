@@ -24,7 +24,7 @@ export default function ResumeTemplateList(): React.JSX.Element {
   const {
     resource: fillFields,
     setResource: setFillFields
-  } = useFetch<FillField[]>("fillfields/", { initialResource: [], onFail: handleErrors });
+  } = useFetch<FillField[]>("fillFields/", { initialResource: [], onFail: handleErrors });
 
 
   const [addTemplateErrors, setAddTemplateErrors] = useState<Record<string,string>>({});  

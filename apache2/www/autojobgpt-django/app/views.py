@@ -3,14 +3,17 @@ from django.views.decorators.http import require_safe
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
 from django.db import IntegrityError
+from django.db.models import Case, When, Value, IntegerField
 
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from .models import ResumeTemplate, FillField, Job, Resume, ResumeSubstitution
+from .models import DEFAULT_FILLFIELDS
 from .serializers import ResumeTemplateSerializer, FillFieldSerializer, JobSerializer, ResumeSerializer, ResumeSubstitutionSerializer
 from .serializers import RegenerateSerializer, JobURLSerializer, JobDetailsSerializer
+
 
 def app(request):
   return redirect(request.get_full_path() + 'app')
@@ -97,13 +100,25 @@ class ResumeTemplateViewSet(ModelViewSetWithErrorHandling):
 
 
 class ResumeSubstitutionViewSet(ModelViewSetWithErrorHandling):
-  queryset = ResumeSubstitution.objects.all()
   serializer_class = ResumeSubstitutionSerializer
+
+  def get_queryset(self):
+    # Annotate the queryset with a 'priority' field
+    # Substitutions with keys in DEFAULT_FILLFIELDS get priority 1, others get priority 2
+    prioritized_queryset = ResumeSubstitution.objects.annotate(
+      priority=Case(
+        When(key__in=DEFAULT_FILLFIELDS.keys(), then=Value(1)),
+        default=Value(2),
+        output_field=IntegerField()
+      )
+    ).order_by('priority')
+    return prioritized_queryset
 
   @action(detail=True, methods=['post'])
   def regenerate(self, request, pk=None):    
     regenerate_serializer = RegenerateSerializer(data=request.data)
     regenerate_serializer.is_valid(raise_exception=True)
+    
     value = regenerate_serializer.validated_data['value']
     try:
       feedback = regenerate_serializer.validated_data['feedback']
@@ -111,10 +126,7 @@ class ResumeSubstitutionViewSet(ModelViewSetWithErrorHandling):
       feedback = None
     
     try:
-      if feedback is None:
-        regenerated_object = self.get_object().regenerate(value)
-      else:
-        regenerated_object = self.get_object().regenerate(value, feedback)
+      regenerated_object = self.get_object().regenerate(value, feedback)
     except Exception as e:
       return Response(
         {'error': str(e)},
