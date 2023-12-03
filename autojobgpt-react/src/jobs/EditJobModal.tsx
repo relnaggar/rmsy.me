@@ -23,6 +23,16 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
       </Modal.Header>
       <Modal.Body>
         <InputWithSave<Job>
+          type="select"
+          apiPath={apiPath}
+          resources={jobs}
+          setResources={setJobs}
+          id={id}
+          editableProperty="status"
+          labelText="Status"
+          required
+        />
+        <InputWithSave<Job>
           type="url"
           apiPath={apiPath}
           resources={jobs}
@@ -31,10 +41,6 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
           editableProperty="url"
           labelText="URL"
         />
-
-        <hr />
-
-        <h5>Details</h5>
         <InputWithSave<Job>
           type="text"
           apiPath={apiPath}

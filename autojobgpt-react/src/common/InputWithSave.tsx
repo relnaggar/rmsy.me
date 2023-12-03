@@ -2,8 +2,10 @@ import React, { useCallback, useState, useRef, useEffect } from "react";
 import { ReactComponent as Floppy } from "bootstrap-icons/icons/floppy.svg";
 
 import usePatch from "../hooks/usePatch";
-import { WithID } from "./types";
 import useControlledState from "../hooks/useControlledState";
+import { STATUSES } from "../jobs/JobBoard";
+import { WithID } from "./types";
+import { toPascalCase } from "./utils";
 
 
 export default function InputWithSave<Resource extends WithID>({
@@ -73,18 +75,18 @@ export default function InputWithSave<Resource extends WithID>({
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {    
     e.preventDefault(); // prevent page from reloading
 
-    const value: string = (document.getElementById(elementID) as HTMLTextAreaElement).value;
+    const value: string = (document.getElementById(elementID) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
     updateResource(id, { [editableProperty]: value } as Partial<Resource>);
     setEditing(false);
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void {
     setValue(e.target.value);
   }
 
   const thereAreErrors: boolean = Object.keys(errors).length > 0;
   const showError: boolean = !editing && !updating && thereAreErrors;
-  const textAreaProps: React.TextareaHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> = {
+  const textAreaProps: React.TextareaHTMLAttributes<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> = {
     className: `form-control${
       saved ? " is-valid" : ""}${
       showError ? " is-invalid" : ""
@@ -112,7 +114,15 @@ export default function InputWithSave<Resource extends WithID>({
       {type === "textarea"?
         <textarea {...textAreaProps} ref={textareaRef}></textarea>
       :
-        <input type={type} {...textAreaProps} />
+        (type === "select"?
+          <select {...textAreaProps}>
+            {STATUSES.map((status) => (
+              <option key={status} value={status}>{toPascalCase(status)}</option>
+            ))}
+          </select>
+        :
+          <input type={type} {...textAreaProps} />
+        )
       }
       <div className="invalid-feedback" id={`${elementID}-feedback`} role={showError? "alert": undefined}>
         {Object.values(errors).join(" ")}

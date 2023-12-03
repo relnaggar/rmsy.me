@@ -30,8 +30,8 @@ export default function GenerateResumeModal({
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {    
     e.preventDefault(); // prevent page from reloading
 
-    const job: number = parseInt((document.getElementById("job") as HTMLSelectElement).value);
-    const template: number = parseInt((document.getElementById("template") as HTMLSelectElement).value);
+    const job: number = parseInt((document.getElementById("generate-resume-modal-job") as HTMLSelectElement).value);
+    const template: number = parseInt((document.getElementById("generate-resume-modal-template") as HTMLSelectElement).value);
 
     jobInput.stopEditing();
     templateInput.stopEditing();
@@ -94,7 +94,7 @@ export default function GenerateResumeModal({
       <form onSubmit={handleSubmit}>
         <Modal.Body>
           <SelectWithRefresh<Job>
-            id="job"
+            id="generate-resume-modal-job"
             label="Job"
             optionToString={(job) => `${job.title}, ${job.company}`}
             value={jobInput.value}
@@ -106,7 +106,7 @@ export default function GenerateResumeModal({
             error={errors["job"]}
           />
           <SelectWithRefresh<ResumeTemplate>
-            id="template"
+            id="generate-resume-modal-template"
             label="Template"
             optionToString={(template) => template.name}
             value={templateInput.value}
