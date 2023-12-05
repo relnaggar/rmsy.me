@@ -14,7 +14,6 @@ class Status(models.Model):
     except Status.DoesNotExist:
       return Status.objects.create(name="Backlog", order=1).pk
 
-  @staticmethod
   def get_default_order():
     try:
       return Status.objects.latest('order').order + 1
