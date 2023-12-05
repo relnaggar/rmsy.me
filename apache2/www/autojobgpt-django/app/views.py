@@ -9,10 +9,12 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from .models import ResumeTemplate, FillField, Job, Resume, ResumeSubstitution
+from .models import Template, FillField, Job, Resume, Substitution, Status
 from .models import DEFAULT_FILLFIELDS
-from .serializers import ResumeTemplateSerializer, FillFieldSerializer, JobSerializer, ResumeSerializer, ResumeSubstitutionSerializer
-from .serializers import RegenerateSerializer, JobURLSerializer, JobDetailsSerializer
+from .serializers import StatusSerializer, JobSerializer
+from .serializers import TemplateSerializer, FillFieldSerializer
+from .serializers import ResumeSerializer, SubstitutionSerializer
+from .serializers import RegenerateSerializer, JobURLSerializer, JobDetailsSerializer, StatusSerializer
 
 
 def app(request):
@@ -33,10 +35,12 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
     elif "unique_title_company" in error:
       user_friendly_error = user_friendly_error.format("A job with this title and company already exists")
     else:
-      if "Job" in error:
+      if "Status" in error:
+        user_friendly_error = user_friendly_error.format("You cannot delete this job status because it is being used by a job")
+      elif "Job" in error:
         user_friendly_error = user_friendly_error.format("You cannot delete this job because it is being used by a resume")
       elif "ResumeTemplate" in error:
-        user_friendly_error = user_friendly_error.format("You cannot delete this resume template because it is being used by a resume")
+        user_friendly_error = user_friendly_error.format("You cannot delete this resume template because it is being used by a resume")      
       else:
         user_friendly_error = user_friendly_error.format(error)
 
@@ -66,6 +70,10 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
     except IntegrityError as e:
       return self.error_response(str(e))
 
+
+class StatusViewSet(ModelViewSetWithErrorHandling):
+  queryset = Status.objects.all()
+  serializer_class = StatusSerializer
  
 class JobViewSet(ModelViewSetWithErrorHandling):
   queryset = Job.objects.all()
@@ -94,18 +102,18 @@ class FillFieldViewSet(viewsets.ModelViewSet):
   queryset = FillField.objects.all()
   serializer_class = FillFieldSerializer
 
-class ResumeTemplateViewSet(ModelViewSetWithErrorHandling):
-  queryset = ResumeTemplate.objects.all()
-  serializer_class = ResumeTemplateSerializer
+class TemplateViewSet(ModelViewSetWithErrorHandling):
+  queryset = Template.objects.all()
+  serializer_class = TemplateSerializer
 
 
-class ResumeSubstitutionViewSet(ModelViewSetWithErrorHandling):
-  serializer_class = ResumeSubstitutionSerializer
+class SubstitutionViewSet(ModelViewSetWithErrorHandling):
+  serializer_class = SubstitutionSerializer
 
   def get_queryset(self):
     # Annotate the queryset with a 'priority' field
     # Substitutions with keys in DEFAULT_FILLFIELDS get priority 1, others get priority 2
-    prioritized_queryset = ResumeSubstitution.objects.annotate(
+    prioritized_queryset = Substitution.objects.annotate(
       priority=Case(
         When(key__in=DEFAULT_FILLFIELDS.keys(), then=Value(1)),
         default=Value(2),

@@ -1,10 +1,29 @@
+export type Status = {
+  id: number,
+  name: string,
+  order: number,
+};
+
+export type StatusUpload = Pick<
+  Status,
+  "name"
+>;
+
+export function generatePlaceholderStatus(): Status {
+  return {
+    "id": -1,
+    "name": "",
+    "order": -1
+  }
+}
+
 export type Job = {
   id: number,
   url: string,
   title: string,
   company: string,
   posting: string,
-  status: string,
+  status: number,
 };
 
 export type JobUpload = Pick<
@@ -12,8 +31,7 @@ export type JobUpload = Pick<
   "url" |
   "title" |
   "company" |
-  "posting" |
-  "status"
+  "posting"
 >;
 
 export type JobDetails = Pick<
@@ -23,13 +41,13 @@ export type JobDetails = Pick<
   "posting"
 >;
 
-export function generatePlaceholderJob(jobUpload: JobUpload): Job {
+export function generatePlaceholderJob(): Job {
   return {
     "id": -1,
-    "url": jobUpload.url,
+    "url": "",
     "title": "",
     "company": "",
     "posting": "",
-    "status": "",
+    "status": 1
   }
 }

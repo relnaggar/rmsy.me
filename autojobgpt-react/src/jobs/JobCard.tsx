@@ -23,12 +23,12 @@ export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemov
       aria-busy={job.title ? false : true}
     >
       {job.title ?
-        <span className="d-flex justify-content-between">
-          <h6 className="pt-2 card-title">{job.title}</h6>
+        <span className="d-flex">
+          <h6 className="mt-2 card-title flex-grow-1">{job.title}</h6>
           <div className="btn-group ms-1" role="group">
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="btn btn-secondary btn-sm"
                 aria-label="Edit"
                 onClick={onClickEditJob}
                 disabled={beingRemoved}
@@ -37,7 +37,7 @@ export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemov
               </button>
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="btn btn-secondary btn-sm"
                 aria-label="Delete"
                 onClick={onClickRemoveJob}
                 disabled={beingRemoved}

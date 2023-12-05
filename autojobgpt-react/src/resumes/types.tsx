@@ -41,7 +41,7 @@ export function getPlaceholderResume(resumeUpload: ResumeUpload): Resume {
       "title": "",
       "company": "",
       "posting": "",
-      "status": "",
+      "status": 1
     },
     template: {
       "id": resumeUpload.template,

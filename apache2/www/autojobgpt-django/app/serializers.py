@@ -1,8 +1,13 @@
 from rest_framework import serializers
 
-from .models import Job, ResumeTemplate, FillField, Resume, ResumeSubstitution
+from .models import Status, Job, Template, FillField, Resume, Substitution
 from .models import DEFAULT_FILLFIELDS
 
+
+class StatusSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Status
+    fields = "__all__"
 
 class JobURLSerializer(serializers.ModelSerializer):
   class Meta:
@@ -31,11 +36,11 @@ class FillFieldSerializer(serializers.ModelSerializer):
       'key': {'read_only': True},
     }
 
-class ResumeTemplateSerializer(serializers.ModelSerializer):
+class TemplateSerializer(serializers.ModelSerializer):
   fillFields = FillFieldSerializer(many=True, read_only=True)
 
   class Meta:
-    model = ResumeTemplate
+    model = Template
     fields = "__all__"
     extra_kwargs = {
       'png': {'read_only': True}
@@ -46,9 +51,9 @@ class RegenerateSerializer(serializers.Serializer):
   value = serializers.CharField(allow_blank=True)
   feedback = serializers.CharField(required=False)
 
-class ResumeSubstitutionSerializer(serializers.ModelSerializer):
+class SubstitutionSerializer(serializers.ModelSerializer):
   class Meta:
-    model = ResumeSubstitution
+    model = Substitution
     fields = "__all__"
     extra_kwargs = {
       'resume': {'read_only': True},
@@ -58,7 +63,7 @@ class ResumeSubstitutionSerializer(serializers.ModelSerializer):
 class ResumeSerializer(serializers.ModelSerializer):
   substitutions = serializers.SerializerMethodField()
   job_details = JobSerializer(source='job', read_only=True)
-  template_details = ResumeTemplateSerializer(source='template', read_only=True)
+  template_details = TemplateSerializer(source='template', read_only=True)
   
   class Meta:
     model = Resume
@@ -77,7 +82,7 @@ class ResumeSerializer(serializers.ModelSerializer):
     ] + [
       s for s in obj.substitutions.all() if s.key not in DEFAULT_FILLFIELDS.keys()
     ]
-    return ResumeSubstitutionSerializer(substitutions, many=True).data
+    return SubstitutionSerializer(substitutions, many=True).data
 
   def to_representation(self, instance):
     representation = super().to_representation(instance)

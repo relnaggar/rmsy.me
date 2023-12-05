@@ -12,7 +12,7 @@ from ..gpt import Chat
 class Resume(models.Model, DocumentMixin):
   name = models.TextField(unique=True)
   job = models.ForeignKey(to="Job", on_delete=models.RESTRICT, related_name="resumes")
-  template = models.ForeignKey(to="ResumeTemplate", on_delete=models.RESTRICT, related_name="resumes")
+  template = models.ForeignKey(to="Template", on_delete=models.RESTRICT, related_name="resumes")
   version = models.IntegerField(default=1)
   docx = models.FileField(upload_to='resumes/')
   png = models.FileField(upload_to='resumes/')
@@ -116,7 +116,7 @@ f"""<fillField>
 
     # create the substitutions from substitutions
     for key, value in substitutions.items():
-      substitution = ResumeSubstitution(
+      substitution = Substitution(
         resume=self,
         key=key,
         value=value,
@@ -169,7 +169,7 @@ f"""<fillField>
     return new_resume
 
 
-class ResumeSubstitution(models.Model):
+class Substitution(models.Model):
   resume = models.ForeignKey(to="Resume", on_delete=models.CASCADE, related_name="substitutions")
   key = models.TextField()
   value = models.TextField(blank=True)
@@ -227,7 +227,7 @@ class ResumeSubstitution(models.Model):
     try:
       response_content = response_message["content"]
       response = json.loads(response_content)
-      substitution = ResumeSubstitution(
+      substitution = Substitution(
         id=self.id,
         resume=self.resume,
         key=self.key,

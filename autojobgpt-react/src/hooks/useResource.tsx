@@ -15,7 +15,7 @@ export default function useResource<Resource extends WithID, ResourceUpload>(
     onPostFail?: (errors: Record<string,string>) => void,
     onDeleteSuccess?: () => void,
     onDeleteFail?: (errors: Record<string,string>) => void,
-    onPatchSuccess?: (resource: Resource) => void,
+    onPatchSuccess?: (resource: Resource, resources: Resource[], setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
     onPatchFail?: (errors: Record<string,string>) => void,
   },
 ): {

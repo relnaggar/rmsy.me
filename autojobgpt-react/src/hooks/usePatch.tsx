@@ -12,7 +12,7 @@ export default function usePatch<Resource extends WithID>(
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
   options?: {
-    onSuccess?: (resource: Resource) => void,
+    onSuccess?: (resource: Resource, resources: Resource[], setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
     onFail?: (errors: Record<string,string>) => void,
   },
 ): {
@@ -44,7 +44,7 @@ export default function usePatch<Resource extends WithID>(
         if (response.ok) {
           const patchedResource: Resource = await response.json();
           setResources(resources.map((resource) => resource.id === idBeingPatched ? patchedResource : resource));
-          onSuccess?.(patchedResource);
+          onSuccess?.(patchedResource, resources, setResources);
         } else {          
           errors = await response.json();
         }

@@ -44,7 +44,7 @@ export default function AddJobModal({
       const title: string = (document.getElementById("title") as HTMLInputElement).value;
       const company: string = (document.getElementById("company") as HTMLInputElement).value;
       const posting: string = (document.getElementById("posting") as HTMLTextAreaElement).value;
-      const jobUpload: JobUpload = {url, title, company, posting, status: "backlog"};
+      const jobUpload: JobUpload = {url, title, company, posting};
       addJob(jobUpload);
       urlInput.stopEditing();
       titleInput.stopEditing();

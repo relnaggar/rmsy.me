@@ -13,7 +13,7 @@ DEFAULT_FILLFIELDS = {
 
 class FillField(models.Model):
   template = models.ForeignKey(
-    to="ResumeTemplate",
+    to="Template",
     on_delete=models.CASCADE,
     related_name="fillFields",
   )
@@ -49,7 +49,7 @@ class FillField(models.Model):
       resume.chat_messages = chat.get_messages()
       resume.save()
 
-class ResumeTemplate(models.Model, DocumentMixin):
+class Template(models.Model, DocumentMixin):
   docx = models.FileField(upload_to='templates/')
   png = models.FileField(upload_to='templates/')
   name = models.TextField()

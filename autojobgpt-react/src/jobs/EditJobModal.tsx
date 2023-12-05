@@ -2,18 +2,17 @@ import React from "react";
 import Modal from 'react-bootstrap/Modal';
 
 import InputWithSave from "../common/InputWithSave";
-import { STATUSES } from "../jobs/JobBoard";
-import { toPascalCase } from "../common/utils";
-import { Job } from "../jobs/types";
+import { Status, Job } from "../jobs/types";
 
 
-export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id }: {
+export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id, statuses }: {
   apiPath: string,
   show: boolean,
   setShow: React.Dispatch<React.SetStateAction<boolean>>,
   jobs: Job[],
   setJobs: React.Dispatch<React.SetStateAction<Job[]>>,
   id: number,
+  statuses: Status[],
 }): React.JSX.Element {
   return (
     <Modal aria-labelledby="editJobModalLabel" size="lg" backdrop="static"
@@ -32,8 +31,8 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
           id={id}
           editableProperty="status"
           labelText="Status"
-          selectOptions={STATUSES.map((status: string) => {
-            return {value: status, label: toPascalCase(status)}
+          selectOptions={statuses.map((status: Status) => {
+            return {value: status.id.toString(), label: status.name}
           })}
           required              
         />

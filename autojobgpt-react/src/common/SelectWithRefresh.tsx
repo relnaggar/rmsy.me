@@ -15,6 +15,7 @@ export default function SelectWithRefresh<Option extends WithID>({
   loading,
   refetch,
   error,
+  optionZeroLabel,
 }: {
   id: string,
   label: string,
@@ -26,7 +27,12 @@ export default function SelectWithRefresh<Option extends WithID>({
   loading: boolean,
   refetch: () => void,
   error?: string,
+  optionZeroLabel?: string,
 }): React.JSX.Element {
+  if (optionZeroLabel === undefined) {
+    optionZeroLabel = "Select...";
+  }
+
   const showError = !editing && error !== undefined;
   return (
     <div className="mb-3">
@@ -37,7 +43,7 @@ export default function SelectWithRefresh<Option extends WithID>({
           value={value} onChange={onChange}
           required disabled={loading} aria-busy={!loading} 
         >
-          <option value="0">{ loading ? "Loading..." : "Open this select menu" }</option>
+          <option value="0">{ loading ? "Loading..." : optionZeroLabel }</option>
           {options.map((opt) => (
             <option key={opt.id} value={opt.id}>{optionToString(opt)}</option>
           ))}
