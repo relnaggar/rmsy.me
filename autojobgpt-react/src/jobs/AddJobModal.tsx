@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import Modal from 'react-bootstrap/Modal';
 import Alert from 'react-bootstrap/Alert';
 import { ReactComponent as Robot } from "bootstrap-icons/icons/robot.svg";
@@ -11,12 +11,11 @@ import { JobUpload, JobDetails } from "./types";
 
 export default function AddJobModal({
   show, setShow,
-  addingJob, addJob,
-  addJobErrors, showAddJobErrorAlert, setShowAddJobErrorAlert,
+  addJob, addJobErrors,
+  showAddJobErrorAlert, setShowAddJobErrorAlert,
 }: {
   show: boolean,
   setShow: React.Dispatch<React.SetStateAction<boolean>>,
-  addingJob: boolean,
   addJob: (jobUpload: JobUpload) => void,
   addJobErrors: Record<string,string>,
   showAddJobErrorAlert: boolean,
@@ -50,22 +49,26 @@ export default function AddJobModal({
       titleInput.stopEditing();
       companyInput.stopEditing();
       postingInput.stopEditing();
+      setShow(false);
     }
   }
 
   const [fillErrors, setFillErrors] = useState<Record<string,string>>({});
   const [showFillErrorAlert, setShowFillErrorAlert] = useState<boolean>(false);
-  function onFillSuccess(jobDetails: JobDetails): void {
+
+  const onFillSuccess = useCallback((jobDetails: JobDetails) => {
     titleInput.edit(jobDetails.title);
     companyInput.edit(jobDetails.company);
     postingInput.edit(jobDetails.posting);
-  }
-  function onFillFail(errors: Record<string,string>): void {
+  }, [titleInput, companyInput, postingInput]);
+
+  const onFillFail = useCallback((errors: Record<string,string>) => {
     setFillErrors(errors);
     if (Object.keys(errors).filter((key) => key !== "url").length > 0) {
       setShowFillErrorAlert(true);
     }
-  }
+  }, []);
+
   const { fetching: filling, refetch: fill, cancel: cancelFill } = useFetch<JobDetails>(
     `jobs/extract-details-from-url`, {
     initialFetch: false,
@@ -88,7 +91,6 @@ export default function AddJobModal({
     }
   }
 
-  const loading: boolean = filling || addingJob;
   return (
     <Modal
       show={show} onHide={() => setShow(false)} size="lg"
@@ -102,7 +104,7 @@ export default function AddJobModal({
         <Modal.Body>
           <FormInput
             id="url" label="URL" type="url" value={urlInput.value} handleChange={urlInput.handleChange}
-            editing={urlInput.editing} loading={loading} error={addJobErrors["url"] || fillErrors["url"]}
+            editing={urlInput.editing} loading={filling} error={addJobErrors["url"] || fillErrors["url"]}
           >
             <button className="btn btn-outline-primary" type="button"
               onClick={filling ? () => cancelFill() : handleClickFillDetails }
@@ -126,15 +128,15 @@ export default function AddJobModal({
           <h5>Details</h5>
           <FormInput
             id="title" label="Title" type="text" value={titleInput.value} handleChange={titleInput.handleChange}
-            editing={titleInput.editing} loading={loading} error={addJobErrors["title"]} required
+            editing={titleInput.editing} loading={filling} error={addJobErrors["title"]} required
           />
           <FormInput
             id="company" label="Company" type="text" value={companyInput.value} handleChange={companyInput.handleChange}
-            editing={companyInput.editing} loading={loading} error={addJobErrors["company"]} required
+            editing={companyInput.editing} loading={filling} error={addJobErrors["company"]} required
           />
           <FormInput
             id="posting" label="Posting" type="textarea" value={postingInput.value} handleChange={postingInput.handleChange}
-            editing={postingInput.editing} loading={loading} error={addJobErrors["posting"]} required
+            editing={postingInput.editing} loading={filling} error={addJobErrors["posting"]} required
           />
         </Modal.Body>
         <Modal.Footer>
@@ -146,18 +148,7 @@ export default function AddJobModal({
           </Alert>
 
           <button className="btn btn-secondary" type="button" onClick={() => setShow(false)}>Close</button>
-          <button className="btn btn-primary" type="submit" disabled={loading} formNoValidate>
-            {addingJob?
-              <>
-                <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-                Submitting...
-              </>
-            :
-              <>
-                Submit
-              </>
-            }
-          </button>
+          <button className="btn btn-primary" type="submit" disabled={filling} formNoValidate>Submit</button>
         </Modal.Footer>        
       </form>
     </Modal>

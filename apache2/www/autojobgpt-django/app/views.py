@@ -41,7 +41,7 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
           user_friendly_error = user_friendly_error.format("You cannot delete this job status because it is being used by a job")
         elif "Job" in error_message:
           user_friendly_error = user_friendly_error.format("You cannot delete this job because it is being used by a resume")
-        elif "ResumeTemplate" in error_message:
+        elif "Template" in error_message:
           user_friendly_error = user_friendly_error.format("You cannot delete this resume template because it is being used by a resume")      
         else:
           user_friendly_error = user_friendly_error.format(error_message)

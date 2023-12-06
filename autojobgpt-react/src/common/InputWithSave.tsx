@@ -45,7 +45,16 @@ export default function InputWithSave<Resource extends WithID>({
 
   const resource: Resource = resources.find((resource) => resource.id === id)!;
   const elementID: string = `${apiPath.replace("/", "-")}${id}-${editableProperty}`;
-  const resourceEditableProperty: string = resource[editableProperty] as string;
+  
+  let tmp: string;
+  if (typeof resource[editableProperty] === "string") {
+    tmp = resource[editableProperty] as string;
+  } else if (typeof resource[editableProperty] === "number") {
+    tmp = (resource[editableProperty] as number).toString();
+  } else {
+    throw new Error(`resourceEditableProperty must be a string or number, but it is a ${typeof resource[editableProperty]}`);
+  }
+  const resourceEditableProperty: string = tmp;
 
   const [editing, setEditing] = useState<boolean>(true);
   const [saved, setSaved] = useState<boolean>(true);
@@ -53,7 +62,7 @@ export default function InputWithSave<Resource extends WithID>({
   const [value, setValue] = useControlledState<string>(resourceEditableProperty, valueProp, setValueProp);
   
   useEffect(() => {
-    if (value == resourceEditableProperty) {
+    if (value === resourceEditableProperty) {
       setSaved(true);
     } else {
       setSaved(false);
@@ -140,49 +149,59 @@ export default function InputWithSave<Resource extends WithID>({
   } else {
     ariaLabel = labelText!;
   }
+
+  const saveButton: React.JSX.Element = (
+    <button
+      type="submit" className="btn btn-outline-primary" disabled={updating || saved} aria-busy={updating}
+    >
+      {updating?
+        <>
+          <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+          <span role="status">Saving...</span>
+        </>
+      : (saved?
+        <>
+          <Floppy className="me-1" />
+          Saved
+        </>
+      :
+        <>
+          <Floppy className="me-1" />
+          Save
+        </>
+      )}
+    </button>
+  );
   
   return (
-    <div className="mb-3">
-      <form onSubmit={handleSubmit} aria-label={`Form for updating ${ariaLabel}`}>
-        {!labelProperty && <label className="form-label" htmlFor={elementID}>
-          {labelText}
-        </label>}
-        <div className="d-flex">        
-          <div className="flex-grow-1">
-            {labelProperty ?
-              <div className="form-floating">        
-                {input}
-                <label htmlFor={elementID}>{resource[labelProperty] as string}</label>              
-              </div>
-            :
-              input
-            }
-          </div>
-          <div className="ps-2 d-flex flex-column gap-2">
-            <button
-              type="submit" className="btn btn-outline-primary" disabled={updating || saved} aria-busy={updating}
-            >
-              {updating?
-                <>
-                  <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-                  <span role="status">Saving...</span>
-                </>
-              : (saved?
-                <>
-                  <Floppy className="me-1" />
-                  Saved
-                </>
+    <>
+      <div className="mb-3">
+        <form onSubmit={handleSubmit} aria-label={`Form for updating ${ariaLabel}`}>
+          {!labelProperty && <label className="form-label" htmlFor={elementID}>
+            {labelText}
+          </label>}
+          <div className="d-flex">        
+            <div className="flex-grow-1">
+              {labelProperty ?
+                <div className="form-floating">        
+                  {input}
+                  <label htmlFor={elementID}>{resource[labelProperty] as string}</label>              
+                </div>
               :
-                <>
-                  <Floppy className="me-1" />
-                  Save
-                </>
-              )}
-            </button>
-            {children}
-          </div>
-        </div>
-      </form>
-    </div>
+                input
+              }
+            </div>
+            <div className="d-none ps-2 d-md-flex flex-column gap-2">
+              {saveButton}
+              {children}
+            </div>
+          </div>        
+        </form>
+      </div>
+      <div className="d-md-none d-flex justify-content-end mb-3 gap-2">
+        {saveButton}
+        {children}
+      </div>
+    </>
   )
 }

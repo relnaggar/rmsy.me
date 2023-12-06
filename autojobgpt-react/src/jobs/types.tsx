@@ -48,6 +48,6 @@ export function generatePlaceholderJob(): Job {
     "title": "",
     "company": "",
     "posting": "",
-    "status": 1
+    "status": -1,
   }
 }

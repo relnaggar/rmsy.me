@@ -59,11 +59,11 @@ export default function Column({
     }
   }
 
-  function onClickMoveLeft(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+  function onClickMoveLeft(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
     moveStatus("left");    
   }
 
-  function onClickMoveRight(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+  function onClickMoveRight(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
     moveStatus("right");
   }
 
@@ -133,14 +133,28 @@ export default function Column({
             </div>)
           )}
           {jobs.map((job) =>
-            <JobCard
-              key={job.id}
-              job={job}
-              onDragStart={onDragStart(job.id)}
-              onClickEditJob={onClickEditJob(job.id)}
-              onClickRemoveJob={onClickRemoveJob(job.id)}
-              beingRemoved={jobIDBeingRemoved === job.id}
-            />
+            job.id !== -1 && (
+              <JobCard
+                key={job.id}
+                job={job}
+                onDragStart={onDragStart(job.id)}
+                onClickEditJob={onClickEditJob(job.id)}
+                onClickRemoveJob={onClickRemoveJob(job.id)}
+                beingRemoved={jobIDBeingRemoved === job.id}
+              />
+            )
+          )}
+          {jobs.map((job) =>
+            job.id === -1 && (
+              <JobCard
+                key={job.id}
+                job={job}
+                onDragStart={onDragStart(job.id)}
+                onClickEditJob={onClickEditJob(job.id)}
+                onClickRemoveJob={onClickRemoveJob(job.id)}
+                beingRemoved={jobIDBeingRemoved === job.id}
+              />
+            )
           )}
         </div>
         <div className="card-footer">

@@ -13,7 +13,6 @@ export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemov
   onClickRemoveJob: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   beingRemoved: boolean
 }): React.JSX.Element {
-
   return (
     <div
       className="card mb-2 p-2 text-bg-primary"

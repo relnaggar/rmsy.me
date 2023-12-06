@@ -29,8 +29,17 @@ export default function DocumentList({
       {!loadingDocuments ?
         <>
           {documents.map((document, _) => 
-            <DocumentThumbnail
+            document.id !== -1 && <DocumentThumbnail
               key={document.id}
+              document={document}              
+              onClickEditDocument={onClickEditDocument(document.id)}
+              onClickRemoveDocument={onClickRemoveDocument(document.id)}
+              beingRemoved={documentBeingRemovedID === document.id}
+            />
+          )}
+          {documents.map((document, index) => 
+            document.id === -1 && <DocumentThumbnail
+              key={index}
               document={document}              
               onClickEditDocument={onClickEditDocument(document.id)}
               onClickRemoveDocument={onClickRemoveDocument(document.id)}

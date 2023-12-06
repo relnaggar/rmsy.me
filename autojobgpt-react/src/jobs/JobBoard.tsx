@@ -40,6 +40,7 @@ export default function JobBoard(): React.JSX.Element {
     if (errors["error"]) {
       setShowAddJobErrorAlert(true);
     }
+    setShowAddJob(true);
   }, []);
 
   const jobAPIPath: string = "jobs/";
@@ -234,7 +235,7 @@ export default function JobBoard(): React.JSX.Element {
                   <JobColumn
                     key={status.id}
                     title={status.name}
-                    jobs={jobs.filter((job) => (job.status === status.id))}
+                    jobs={jobs.filter((job) => (job.status === status.id || (job.status === -1 && status.order === sortedStatuses[0].order)))}
                     statusID={status.id}
                     sortedStatuses={sortedStatuses}
                     loading={loading}
@@ -254,21 +255,23 @@ export default function JobBoard(): React.JSX.Element {
                 )
               );
             })}
-            {statuses.some((status) => status.id === -1) &&
-              <div className="kanban-column me-2">
-                <div className="card">
-                  <div className="card-header">
-                    <h5 className="mt-2 card-title">
-                      <span className="placeholder-glow">
-                        <span className="placeholder col-6"></span>
-                      </span>
-                    </h5>
-                  </div>  
-                  <div className="card-body"></div>
-                  <div className="card-footer"></div>
+            {sortedStatuses.map((status, index) =>
+              status.id === -1 && (
+                <div className="kanban-column me-2" key={index}>
+                  <div className="card">
+                    <div className="card-header">
+                      <h5 className="mt-2 card-title">
+                        <span className="placeholder-glow">
+                          <span className="placeholder col-6"></span>
+                        </span>
+                      </h5>
+                    </div>
+                    <div className="card-body"></div>
+                    <div className="card-footer"></div>
+                  </div>
                 </div>
-              </div>
-            }
+              )
+            )}
           </>
         )}
         <div className="kanban-column me-2">
@@ -299,7 +302,6 @@ export default function JobBoard(): React.JSX.Element {
         show={showAddJob}
         setShow={setShowAddJob}
         addJob={addJob}
-        addingJob={addingJob}
         addJobErrors={addJobErrors}
         showAddJobErrorAlert={showAddJobErrorAlert}
         setShowAddJobErrorAlert={setShowAddJobErrorAlert}
