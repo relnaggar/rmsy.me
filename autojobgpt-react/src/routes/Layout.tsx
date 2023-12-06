@@ -43,26 +43,31 @@ export default function Layout(): React.JSX.Element {
 
   return (
     <div className="container">
-      <nav className="navbar navbar-expand bg-body-tertiary">
-        <div className="container-fluid justify-content-start">
+      <nav className="navbar navbar-expand-sm bg-body-tertiary">
+        <div className="container-fluid">
           <Link to="/" className="navbar-brand">AutoJobGPT</Link>
-          <ul className="navbar-nav">
-            <li className="nav-item">
-              <Link to="/jobs" className="nav-link">Jobs</Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/resumes" className="nav-link">Resumes</Link>
-            </li>
-          </ul>
-        </div>
-        <ul className="navbar-nav">
-          <li className="nav-item">
-            <a href="/autojobgpt/api" className="nav-link">API</a>
-          </li>
-          <li className="nav-item">
-          <a href="/autojobgpt/admin" className="nav-link">Admin</a>
-          </li>
-        </ul>
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div className="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
+            <ul className="navbar-nav">
+              <li className="nav-item">
+                <Link to="/jobs" className="nav-link">Jobs</Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/resumes" className="nav-link">Resumes</Link>
+              </li>
+            </ul>
+            <ul className="navbar-nav">
+              <li className="nav-item">
+                <a href="/autojobgpt/api" className="nav-link">API</a>
+              </li>
+              <li className="nav-item">
+                <a href="/autojobgpt/admin" className="nav-link">Admin</a>
+              </li>
+            </ul>
+          </div>
+        </div>        
       </nav>
 
       <CSRFTokenContext.Provider value={csrfToken}>
