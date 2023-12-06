@@ -46,6 +46,9 @@ export default function useFetch<Resource>(
           signal: abortControllerRef.current.signal,
         });
 
+        // wait for 3 seconds before continuing
+        // await new Promise(resolve => setTimeout(resolve, 3000));
+
         if (response.ok) {
           const resource: Resource = await response.json();
           setResource(resource);

@@ -41,6 +41,9 @@ export default function usePatch<Resource extends WithID>(
           body: JSON.stringify(patch)
         });
 
+        // wait for 3 seconds before continuing
+        // await new Promise(resolve => setTimeout(resolve, 3000));
+
         if (response.ok) {
           const patchedResource: Resource = await response.json();
           setResources(resources.map((resource) => resource.id === idBeingPatched ? patchedResource : resource));

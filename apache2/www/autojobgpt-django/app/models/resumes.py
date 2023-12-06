@@ -6,7 +6,7 @@ import io
 
 from .documents import DocumentMixin
 from .templates import FillField
-from ..gpt import Chat
+from ..gpt import Chat, ChatException
 
 
 class Resume(models.Model, DocumentMixin):
@@ -50,9 +50,13 @@ class Resume(models.Model, DocumentMixin):
     fill = kwargs.pop("fill", True)
     super().save(*args, **kwargs)
     if fill:
-      self.fill()
-      self.generate_docx()
-      self.generate_png()
+      try:
+        self.fill()
+        self.generate_docx()
+        self.generate_png()
+      except Exception as e:
+        self.delete()
+        raise e
 
   def __update(self, *args, **kwargs):
     super().save(*args, **kwargs)
@@ -105,8 +109,11 @@ f"""<fillField>
     )
 
     substitutions = {}
-    for key in fillField_keys:
-      substitutions[key] = response[key]
+    try:
+      for key in fillField_keys:
+        substitutions[key] = response[key]
+    except KeyError:
+      raise ChatException(response["error"])
     for key, value in self.default_substitutions.items():
       substitutions[key] = value
 
@@ -157,7 +164,7 @@ f"""<fillField>
     )
     new_resume.save(fill=False)
     for substitution in self.substitutions.all():
-      new_substitution = ResumeSubstitution(
+      new_substitution = Substitution(
         resume=new_resume,
         key=substitution.key,
         value=substitution.value,

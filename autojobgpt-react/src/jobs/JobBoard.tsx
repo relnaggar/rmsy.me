@@ -141,6 +141,17 @@ export default function JobBoard(): React.JSX.Element {
     setShowAddColumn(false);
   }, []);
 
+  const handleDeleteStatusSuccess = useCallback((deletedStatus: Status, statuses: Status[], setStatuses: React.Dispatch<React.SetStateAction<Status[]>>) => {
+    // decrease order of all statuses with order greater than the deleted status
+    const newStatuses: Status[] = [...statuses];
+    for (let i = 0; i < newStatuses.length; i++) {
+      if (newStatuses[i].order > deletedStatus.order) {
+        newStatuses[i].order--;
+      }
+    }
+    setStatuses(newStatuses);
+  }, []);
+
   const [editStatusID, setEditStatusID] = useState<number>(-1);
   const [showEditColumn, setShowEditColumn] = useState<boolean>(false);
 
@@ -158,6 +169,7 @@ export default function JobBoard(): React.JSX.Element {
     onFetchFail: handleErrors,
     onPostFail: handlePostStatusFail,
     onPostSuccess: handlePostStatusSuccess,
+    onDeleteSuccess: handleDeleteStatusSuccess,
     onDeleteFail: handleErrors,
     onPatchSuccess: handlePatchStatusSuccess,
     onPatchFail: handleErrors,
@@ -178,7 +190,7 @@ export default function JobBoard(): React.JSX.Element {
   }
 
   const sortedStatuses: Status[] = statuses.sort((a,b) => a.order - b.order);
-
+  const loading: boolean = fetchingJobs || fetchingStatuses;
   return (
     <>
       { showErrorAlert &&
@@ -187,31 +199,78 @@ export default function JobBoard(): React.JSX.Element {
         </Alert>
       }
       <div className="kanban-board border">
-        {sortedStatuses
-          .map((status) => {
-          return (
-            <JobColumn
-              key={status.name}
-              title={status.name}
-              jobs={jobs.filter((job) => (job.status === status.id))}
-              statusID={status.id}
-              sortedStatuses={sortedStatuses}
-              loading={fetchingJobs || fetchingStatuses}
-              onDrop={handleDrop(status)}
-              onDragOver={handleDragOver}
-              onDragStart={handleDragStart}
-              onClickEditJob={handleClickEditJob}
-              onClickRemoveJob={handleClickRemoveJob}
-              jobIDBeingRemoved={jobIDBeingRemoved}
-              onClickAddJob={status.order === sortedStatuses[0].order ? handleClickAddJob : undefined}
-              addDisabled={status.order === sortedStatuses[0].order ? addingJob: undefined}
-              updateStatus={updateStatus}
-              beingRemoved={statusIDBeingRemoved === status.id}
-              onClickRemoveColumn={handleClickRemoveColumn(status.id)}
-              onClickEditColumn={handleClickEditStatus(status.id)}
-            />
-          );
-        })}
+        { loading ? (
+          [...Array(3)].map((_, index) =>
+            <div className="kanban-column me-2" key={index}>
+              <div className="card">
+                <div className="card-header">
+                  <h5 className="mt-2 card-title">
+                    <span className="placeholder-glow">
+                      <span className="placeholder col-6"></span>
+                    </span>
+                  </h5>
+                </div>  
+                <div className="card-body">
+                  {[...Array(3)].map((_, index) => 
+                    <div className="card mb-2 p-2" aria-hidden="true" key={index}>
+                      <h6 className="card-title placeholder-glow">
+                        <span className="placeholder col-6"></span>
+                      </h6>
+                      <p className="card-subtitle placeholder-glow">
+                        <span className="placeholder col-7"></span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="card-footer"></div>
+              </div>
+            </div>
+          )
+        ) : (
+          <>
+            {sortedStatuses.map((status) => {
+              return (
+                status.id !== -1 && (
+                  <JobColumn
+                    key={status.id}
+                    title={status.name}
+                    jobs={jobs.filter((job) => (job.status === status.id))}
+                    statusID={status.id}
+                    sortedStatuses={sortedStatuses}
+                    loading={loading}
+                    onDrop={handleDrop(status)}
+                    onDragOver={handleDragOver}
+                    onDragStart={handleDragStart}
+                    onClickEditJob={handleClickEditJob}
+                    onClickRemoveJob={handleClickRemoveJob}
+                    jobIDBeingRemoved={jobIDBeingRemoved}
+                    onClickAddJob={status.order === sortedStatuses[0].order ? handleClickAddJob : undefined}
+                    addDisabled={status.order === sortedStatuses[0].order ? addingJob: undefined}
+                    updateStatus={updateStatus}
+                    beingRemoved={statusIDBeingRemoved === status.id}
+                    onClickRemoveColumn={handleClickRemoveColumn(status.id)}
+                    onClickEditColumn={handleClickEditStatus(status.id)}
+                  />
+                )
+              );
+            })}
+            {statuses.some((status) => status.id === -1) &&
+              <div className="kanban-column me-2">
+                <div className="card">
+                  <div className="card-header">
+                    <h5 className="mt-2 card-title">
+                      <span className="placeholder-glow">
+                        <span className="placeholder col-6"></span>
+                      </span>
+                    </h5>
+                  </div>  
+                  <div className="card-body"></div>
+                  <div className="card-footer"></div>
+                </div>
+              </div>
+            }
+          </>
+        )}
         <div className="kanban-column me-2">
           <div className="card">
             <div className="card-body text-center">

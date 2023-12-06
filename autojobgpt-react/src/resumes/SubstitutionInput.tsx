@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Alert from 'react-bootstrap/Alert';
 import { ReactComponent as Robot } from "bootstrap-icons/icons/robot.svg";
+import { ReactComponent as LightbulbFill } from "bootstrap-icons/icons/lightbulb-fill.svg";
 
 import usePost from "../hooks/usePost";
 import InputWithSave from "../common/InputWithSave";
@@ -75,15 +76,17 @@ export default function SubstitutionInput({
               Cancel
             </>:<>
               <Robot className="me-1" />
-              Regenerate
+              Autofill
             </>}
           </button>
-          <div className="form-check form-switch">
+          <div className="form-check form-switch d-flex justify-content-evenly">
             <input
               className="form-check-input" type="checkbox" role="switch"
               id={`feedback-switch-${substitution.key}`} onChange={() => setShowFeedback(!showFeedback)}
             />
-            <label className="form-check-label" htmlFor={`feedback-switch-${substitution.key}`}>with feedback</label>
+            <label className="form-check-label text-primary" htmlFor={`feedback-switch-${substitution.key}`}>
+              <LightbulbFill />
+            </label>
           </div>
         </>}
       </InputWithSave>

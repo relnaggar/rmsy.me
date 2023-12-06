@@ -12,7 +12,7 @@ export default function useDelete<Resource extends WithID>(
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
   options?: {
-    onSuccess?: () => void,
+    onSuccess?: (deletedResource: Resource, resources: Resource[], setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
     onFail?: (errors: Record<string,string>) => void,
   },
 ): {
@@ -35,9 +35,15 @@ export default function useDelete<Resource extends WithID>(
           method: "DELETE", 
           headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
         })
+
+        // wait for 3 seconds before continuing
+        // await new Promise(resolve => setTimeout(resolve, 3000));
+
         if (response.ok) {
-          setResources(resources.filter((resource) => resource.id !== idBeingDeleted));
-          onSuccess?.();
+          const deletedResource: Resource = resources.find((resource) => resource.id === idBeingDeleted)!;
+          const newResources: Resource[] = resources.filter((resource) => resource.id !== idBeingDeleted);
+          setResources(newResources);
+          onSuccess?.(deletedResource, newResources, setResources);
         } else {
           errors = await response.json();
         }
@@ -56,6 +62,10 @@ export default function useDelete<Resource extends WithID>(
   }, [fetchData, apiRoute, apiPath, csrfToken, idBeingDeleted, resources, onSuccess, onFail, setResources]);
 
   function deleteResource(id: number): void {
+    if (idBeingDeleted !== -1) {
+      return;
+    }
+    
     setIDBeingDeleted(id);
   }
   

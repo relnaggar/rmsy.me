@@ -128,3 +128,6 @@ If you fail for any reason, please provide a single JSON key "error" with a stri
     
   def get_messages(self):
     return self.messages
+  
+class ChatException(Exception):
+  pass

@@ -90,7 +90,7 @@ export default function ResumeList(): React.JSX.Element {
   const jobIDsWithAtLeastOneResume: number[] = [];
   const jobsWithAtLeastOneResume: Job[] = [];
   resumes.forEach((resume) => {
-    if (!jobIDsWithAtLeastOneResume.includes(resume.job.id)) {
+    if (resume.id !== -1 && !jobIDsWithAtLeastOneResume.includes(resume.job.id)) {
       jobIDsWithAtLeastOneResume.push(resume.job.id);
       
       let i: number = 0;
@@ -106,20 +106,22 @@ export default function ResumeList(): React.JSX.Element {
   return(
     <section className="mt-3">
       <h2>Resumes</h2>
-      <div className="mb-3 row">
-        <label htmlFor="resume-job-select" className="col-auto col-form-label me-3">Filter by job:</label>
-        <div className="col-auto">
-          <select
-            id="resume-job-select" className="form-select"
-            value={jobInput.value} onChange={jobInput.handleChange}
-          >
-            <option value="0">All Jobs</option>
-            {jobsWithAtLeastOneResume.map((job) => (
-              <option key={job.id} value={job.id}>{`${job.title}, ${job.company}`}</option>
-            ))}
-          </select>
+      { jobsWithAtLeastOneResume.length > 1 &&
+        <div className="mb-3 row">
+          <label htmlFor="resume-job-select" className="col-auto col-form-label me-3">Filter by job:</label>
+          <div className="col-auto">
+            <select
+              id="resume-job-select" className="form-select"
+              value={jobInput.value} onChange={jobInput.handleChange}
+            >
+              <option value="0">All Jobs</option>
+              {jobsWithAtLeastOneResume.map((job) => (
+                <option key={job.id} value={job.id}>{`${job.title}, ${job.company}`}</option>
+              ))}
+            </select>
+          </div>
         </div>
-      </div>
+      }
       <Alert variant="danger" show={showErrorAlert} onClose={() => setShowErrorAlert(false)} dismissible>
         {Object.values(errors).join(" ")}
       </Alert>

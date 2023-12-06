@@ -38,6 +38,10 @@ export default function usePost<Resource>(
           body: postData? JSON.stringify(postData) : undefined,
           signal: abortControllerRef.current.signal,
         });
+
+        // wait for 3 seconds before continuing
+        // await new Promise(resolve => setTimeout(resolve, 3000));
+
         if (response.ok) {
           const resource: Resource = await response.json();
           onSuccess?.(resource);

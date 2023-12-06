@@ -15,6 +15,7 @@ from .serializers import StatusSerializer, JobSerializer
 from .serializers import TemplateSerializer, FillFieldSerializer
 from .serializers import ResumeSerializer, SubstitutionSerializer
 from .serializers import RegenerateSerializer, JobURLSerializer, JobDetailsSerializer, StatusSerializer
+from .gpt import ChatException
 
 
 def app(request):
@@ -28,47 +29,51 @@ def csrf(request):
 
 class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
   def error_response(self, error):
-    user_friendly_error = "An integrity error occurred: {}."
-
-    if "unique_name" in error:
-      user_friendly_error = user_friendly_error.format("This resume template name already exists. Please choose a different name")
-    elif "unique_title_company" in error:
-      user_friendly_error = user_friendly_error.format("A job with this title and company already exists")
-    else:
-      if "Status" in error:
-        user_friendly_error = user_friendly_error.format("You cannot delete this job status because it is being used by a job")
-      elif "Job" in error:
-        user_friendly_error = user_friendly_error.format("You cannot delete this job because it is being used by a resume")
-      elif "ResumeTemplate" in error:
-        user_friendly_error = user_friendly_error.format("You cannot delete this resume template because it is being used by a resume")      
+    if isinstance(error, IntegrityError):
+      error_message = str(error)
+      user_friendly_error = "An integrity error occurred: {}."
+      if "unique_name" in error_message:
+        user_friendly_error = user_friendly_error.format("This resume template name already exists. Please choose a different name")
+      elif "unique_title_company" in error_message:
+        user_friendly_error = user_friendly_error.format("A job with this title and company already exists")
       else:
-        user_friendly_error = user_friendly_error.format(error)
-
-    return Response({'error': user_friendly_error}, status=status.HTTP_400_BAD_REQUEST)
+        if "Status" in error_message:
+          user_friendly_error = user_friendly_error.format("You cannot delete this job status because it is being used by a job")
+        elif "Job" in error_message:
+          user_friendly_error = user_friendly_error.format("You cannot delete this job because it is being used by a resume")
+        elif "ResumeTemplate" in error_message:
+          user_friendly_error = user_friendly_error.format("You cannot delete this resume template because it is being used by a resume")      
+        else:
+          user_friendly_error = user_friendly_error.format(error_message)
+      return Response({'error': user_friendly_error}, status=status.HTTP_400_BAD_REQUEST)
+    elif isinstance(error, ChatException):
+      return Response({'error': str(error)}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+      raise error
 
   def create(self, request, *args, **kwargs):
     try:
       return super().create(request, *args, **kwargs)
-    except IntegrityError as e:
-      return self.error_response(str(e))
+    except Exception as e:
+      return self.error_response(e)
     
   def update(self, request, *args, **kwargs):
     try:
       return super().update(request, *args, **kwargs)
-    except IntegrityError as e:
-      return self.error_response(str(e))
+    except Exception as e:
+      return self.error_response(e)
   
   def partial_update(self, request, *args, **kwargs):
     try:
       return super().partial_update(request, *args, **kwargs)
-    except IntegrityError as e:
-      return self.error_response(str(e))
+    except Exception as e:
+      return self.error_response(e)
     
   def destroy(self, request, *args, **kwargs):
     try:
       return super().destroy(request, *args, **kwargs)
-    except IntegrityError as e:
-      return self.error_response(str(e))
+    except Exception as e:
+      return self.error_response(e)
 
 
 class StatusViewSet(ModelViewSetWithErrorHandling):

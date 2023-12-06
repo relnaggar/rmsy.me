@@ -42,6 +42,10 @@ export default function usePostResource<Resource extends WithID, ResourceUpload>
           headers: body instanceof FormData ? csrfHeader : { ...csrfHeader, "Content-Type": "application/json" },
           body: body
         });
+        
+        // wait for 3 seconds before continuing
+        // await new Promise(resolve => setTimeout(resolve, 3000));
+
         if (response.ok) {
           const resource: Resource = await response.json();
           newResources.push(resource);

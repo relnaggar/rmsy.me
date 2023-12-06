@@ -53,12 +53,11 @@ export default function InputWithSave<Resource extends WithID>({
   const [value, setValue] = useControlledState<string>(resourceEditableProperty, valueProp, setValueProp);
   
   useEffect(() => {
-    if (value === resourceEditableProperty) {
+    if (value == resourceEditableProperty) {
       setSaved(true);
     } else {
       setSaved(false);
     }
-    setEditing(true);
   }, [value, resourceEditableProperty]);
 
   const handleUpdateFail = useCallback((errors: Record<string,string>) => {

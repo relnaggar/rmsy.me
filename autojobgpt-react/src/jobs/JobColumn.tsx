@@ -123,14 +123,14 @@ export default function Column({
         </div>  
         <div className="card-body">
           { loading && (
-            <div className="card mb-2 p-2" aria-hidden="true">
+            [...Array(3)].map((_, index) => <div className="card mb-2 p-2" aria-hidden="true" key={index}>
               <h6 className="card-title placeholder-glow">
                 <span className="placeholder col-6"></span>
               </h6>
               <p className="card-subtitle placeholder-glow">
                 <span className="placeholder col-7"></span>
               </p>
-            </div>
+            </div>)
           )}
           {jobs.map((job) =>
             <JobCard
