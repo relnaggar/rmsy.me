@@ -161,7 +161,6 @@ export default function JobBoard(): React.JSX.Element {
     resources: statuses,
     setResources: setStatuses,
     fetching: fetchingStatuses,
-    posting: addingStatus,
     postResource: addStatus,
     deleteResource: removeStatus,
     idBeingDeleted: statusIDBeingRemoved,
@@ -299,12 +298,10 @@ export default function JobBoard(): React.JSX.Element {
         statuses={statuses}
       />
       <AddJobModal
-        show={showAddJob}
-        setShow={setShowAddJob}
+        show={showAddJob} setShow={setShowAddJob}        
+        errors={addJobErrors} setErrors={setAddJobErrors}
+        showErrorAlert={showAddJobErrorAlert} setShowErrorAlert={setShowAddJobErrorAlert}
         addJob={addJob}
-        addJobErrors={addJobErrors}
-        showAddJobErrorAlert={showAddJobErrorAlert}
-        setShowAddJobErrorAlert={setShowAddJobErrorAlert}
       />
       <EditColumnModal
         apiPath={statusAPIPath}
@@ -315,13 +312,11 @@ export default function JobBoard(): React.JSX.Element {
         setStatuses={setStatuses}
       />
       <AddColumnModal
-        show={showAddColumn}
-        setShow={setShowAddColumn}
-        addColumn={addStatus}
-        addingColumn={addingStatus}
-        errors={addStatusErrors}
+        show={showAddColumn} setShow={setShowAddColumn}        
+        errors={addStatusErrors} setErrors={setAddStatusErrors}
         showErrorAlert={showAddStatusErrorAlert}
         setShowErrorAlert={setShowAddStatusErrorAlert}
+        addColumn={addStatus}
       />
     </>
   );

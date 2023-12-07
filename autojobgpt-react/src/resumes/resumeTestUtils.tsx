@@ -13,7 +13,7 @@ function getResumeSection(): HTMLElement {
   return resumeSection;
 }
 
-export function getGenerateResumeButton(): HTMLElement {
+export function getAddResumeButton(): HTMLElement {
   const resumeTemplateSection: HTMLElement = getResumeSection();
   return getByRole(resumeTemplateSection, "button", {name: new RegExp("generate new resume", "i")});
 }
@@ -37,6 +37,6 @@ export function getResumeByName(name: string): HTMLElement {
   return matchingResume;
 }
 
-export async function openAndGetGenerateResumeModal(timeout: number = 1000): Promise<HTMLElement> {
-  return openAndGetModal(getGenerateResumeButton(), "generate resume", timeout);
+export async function openAndGetAddResumeModal(timeout: number = 1000): Promise<HTMLElement> {
+  return openAndGetModal(getAddResumeButton(), "add resume", timeout);
 }

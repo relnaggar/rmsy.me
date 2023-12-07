@@ -7,7 +7,7 @@ import useFetch from '../hooks/useFetch';
 import useFormInput from '../hooks/useFormInput';
 import DocumentList from '../common/DocumentList';
 import EditResumeModal from './EditResumeModal';
-import GenerateResumeModal from './GenerateResumeModal';
+import AddResumeModal from './AddResumeModal';
 import { Resume, ResumeUpload, Substitution, getPlaceholderResume } from './types';
 import { Job } from '../jobs/types';
 
@@ -23,24 +23,24 @@ export default function ResumeList(): React.JSX.Element {
     setShowErrorAlert(true);
   }, []);
 
-  const [generateResumeErrors, setGenerateResumeErrors] = useState<Record<string,string>>({});
-  const [showGenerateResumeErrorsAlert, setShowGenerateResumeErrorsAlert] = useState<boolean>(false);
+  const [addResumeErrors, setAddResumeErrors] = useState<Record<string,string>>({});
+  const [showAddResumeErrorsAlert, setShowAddResumeErrorsAlert] = useState<boolean>(false);
 
   const {
     resource: substitutions,
     setResource: setSubstitutions,
   } = useFetch<Substitution[]>("substitutions/", { initialResource: [], onFail: handleErrors });
 
-  const handleGenerateResumeSuccess = useCallback((resume: Resume) => {
-    setShowGenerateResumeErrorsAlert(false);
-    setGenerateResumeErrors({});
+  const handleAddResumeSuccess = useCallback((resume: Resume) => {
+    setShowAddResumeErrorsAlert(false);
+    setAddResumeErrors({});
     setSubstitutions([...substitutions, ...resume.substitutions]);
   }, [substitutions, setSubstitutions]);
   
-  const handleGenerateResumeFail = useCallback((errors: Record<string,string>) => {
-    setGenerateResumeErrors(errors);
-    setShowGenerateResumeErrorsAlert(true);
-    setShowGenerateResume(true);
+  const handleAddResumeFail = useCallback((errors: Record<string,string>) => {
+    setAddResumeErrors(errors);
+    setShowAddResumeErrorsAlert(true);
+    setShowAddResume(true);
   }, []);
 
   const resumeAPIPath: string = "resumes/";
@@ -55,14 +55,14 @@ export default function ResumeList(): React.JSX.Element {
     idBeingDeleted: resumeBeingRemovedID,    
   } = useResource<Resume,ResumeUpload>(resumeAPIPath, getPlaceholderResume, {
     onFetchFail: handleErrors,
-    onPostSuccess: handleGenerateResumeSuccess,
-    onPostFail: handleGenerateResumeFail,
+    onPostSuccess: handleAddResumeSuccess,
+    onPostFail: handleAddResumeFail,
     onDeleteFail: handleErrors,    
   });
 
   const [showEditResumeModal, setShowEditResumeModal] = useState<boolean>(false);
   const [editResumeID, setEditResumeID] = useState<number>(-1);
-  const [showGenerateResume, setShowGenerateResume] = useState<boolean>(false);
+  const [showAddResume, setShowAddResume] = useState<boolean>(false);
 
   function handleClickEditResume(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
     return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -79,7 +79,7 @@ export default function ResumeList(): React.JSX.Element {
   }
   
   function handleClickAddResume(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    setShowGenerateResume(true);
+    setShowAddResume(true);
   }
 
   function handleSubstitutionSaveSuccess(): void {
@@ -148,11 +148,11 @@ export default function ResumeList(): React.JSX.Element {
         substitutions={substitutions} setSubstitutions={setSubstitutions}
         onSubstitutionSaveSuccess={handleSubstitutionSaveSuccess}
       />
-      <GenerateResumeModal
-        show={showGenerateResume} setShow={setShowGenerateResume}
+      <AddResumeModal
+        show={showAddResume} setShow={setShowAddResume}
+        errors={addResumeErrors} setErrors={setAddResumeErrors}
+        showErrorAlert={showAddResumeErrorsAlert} setShowErrorAlert={setShowAddResumeErrorsAlert}
         addResume={addResume}
-        errors={generateResumeErrors} setErrors={setGenerateResumeErrors}
-        showErrorAlert={showGenerateResumeErrorsAlert} setShowErrorAlert={setShowGenerateResumeErrorsAlert}
       />
     </section>
   )

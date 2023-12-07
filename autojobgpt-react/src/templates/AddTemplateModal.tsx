@@ -1,85 +1,58 @@
 import React from "react";
-import Modal from 'react-bootstrap/Modal';
-import Alert from 'react-bootstrap/Alert';
 
 import useFormInput from "../hooks/useFormInput";
+import AddModal from "../common/AddModal";
 import FormInput from "../common/FormInput";
 import { ResumeTemplateUpload } from "../templates/types";
+import { ModalProps } from "../common/types";
 
 
-export default function AddTemplateModal({
-  show, setShow,
-  onSubmitAddTemplate, errors,
-  showErrorAlert, setShowErrorAlert
-}: {
-  show: boolean,
-  setShow: React.Dispatch<React.SetStateAction<boolean>>,
-  onSubmitAddTemplate: (template: ResumeTemplateUpload) => void,
-  errors: Record<string,string>,
-  showErrorAlert: boolean,
-  setShowErrorAlert: React.Dispatch<React.SetStateAction<boolean>>,
-}): React.JSX.Element {
+interface AddTemplateModalProps extends ModalProps {
+  addTemplate: (template: ResumeTemplateUpload) => void,
+};
+
+const AddTemplateModal: (props: AddTemplateModalProps) => React.JSX.Element = ({
+  show, setShow, errors, setErrors, showErrorAlert, setShowErrorAlert,
+  addTemplate,
+}) => {
   const nameInput = useFormInput();
   const uploadInput = useFormInput();
   const descriptionInput = useFormInput();
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
-    e.preventDefault(); // prevent page from reloading
+  const modalID: string = `addTemplateModal`;
 
-    setShowErrorAlert(false);
+  const handleSuccessfulSubmit = (): void => {
+    const docx: File = (document.getElementById(`${modalID}Upload`) as HTMLInputElement).files![0];
+    addTemplate({ name: nameInput.value, docx, description: descriptionInput.value });
 
-    const formElement: HTMLFormElement = document.getElementById("addTemplateForm") as HTMLFormElement;
-    if (formElement.reportValidity()) {
-      const name: string = (document.getElementById("name") as HTMLInputElement).value;
-      const docx: File = (document.getElementById("upload") as HTMLInputElement).files![0];
-      const description: string = (document.getElementById("description") as HTMLInputElement).value;
-      const templateUpload: ResumeTemplateUpload = { name, docx, description };
-      onSubmitAddTemplate(templateUpload);
-
-      nameInput.stopEditing();
-      uploadInput.stopEditing();
-      descriptionInput.stopEditing();
-      setShow(false);
+    for (const input of [nameInput, uploadInput, descriptionInput]) {
+      input.stopEditing();
     }
-  }
+  };
 
   return (
-    <Modal
-      show={show} onHide={() => setShow(false)}
-      onEntered={() => document.getElementsByTagName("input")[0].focus()} aria-labelledby="addTemplateModalLabel"
+    <AddModal
+      show={show} setShow={setShow} errors={{error: errors["error"]}} setErrors={setErrors}
+      showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
+      title="Add Resume Template" modalID={modalID}
+      onSuccessfulSubmit={handleSuccessfulSubmit}
     >
-      <Modal.Header closeButton>
-        <Modal.Title id="addTemplateModalLabel">Add Resume Template</Modal.Title>
-      </Modal.Header>
-      <form onSubmit={handleSubmit} id="addTemplateForm">
-        <Modal.Body>
-          <FormInput 
-            id="name" label="Template Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
-            editing={nameInput.editing} error={errors["name"]} required
-          />
-          <FormInput
-            id="upload" label="Upload" type="file" value={uploadInput.value} handleChange={uploadInput.handleChange}
-            editing={uploadInput.editing} error={errors["upload"]} required
-            accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          />
-          <FormInput
-            id="description" label="Description (optional)" type="textarea" value={descriptionInput.value}
-            handleChange={descriptionInput.handleChange} rows={3}
-            editing={descriptionInput.editing} error={errors["description"]}
-          />
-        </Modal.Body>
-        <Modal.Footer>
-          <Alert
-            variant="danger" dismissible className="w-100"
-            show={showErrorAlert} onClose={() => setShowErrorAlert(false)}
-          >
-            {errors["error"]}
-          </Alert>
-
-          <button type="button" className="btn btn-secondary" onClick={() => setShow(false)}>Close</button>
-          <button type="submit" className="btn btn-primary" formNoValidate>Submit</button>
-        </Modal.Footer>
-      </form>
-    </Modal>
+      <FormInput id={`${modalID}Name`}
+        label="Template Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
+        editing={nameInput.editing} error={errors["name"]} required
+      />
+      <FormInput id={`${modalID}Upload`}
+        label="Upload" type="file" value={uploadInput.value} handleChange={uploadInput.handleChange}
+        editing={uploadInput.editing} error={errors["upload"]} required
+        accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      />
+      <FormInput id={`${modalID}Description`}
+        label="Description (optional)" type="textarea" value={descriptionInput.value}
+        handleChange={descriptionInput.handleChange}
+        editing={descriptionInput.editing} error={errors["description"]} rows={3}         
+      />
+    </AddModal>
   )
-}
+};
+
+export default AddTemplateModal;

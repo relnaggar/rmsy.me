@@ -1,7 +1,7 @@
 import { screen, getByRole, act,  getAllByRole } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { renderThisRoute, getGenerateResumeButton, queryResumes, getResumeByName } from "./resumeTestUtils";
+import { renderThisRoute, getAddResumeButton, queryResumes, getResumeByName } from "./resumeTestUtils";
 import { injectMocks, mockFunctions, openAndGetModal } from "../common/testUtils";
 import {
   generateConditionalResponseByRoute,
@@ -17,10 +17,10 @@ beforeEach(() => {
   injectMocks();
 });
 
-test("generate resume button appears", async () => {
+test("add resume button appears", async () => {
   await renderThisRoute();
-  const generateResumeButton: HTMLElement = getGenerateResumeButton();
-  expect(generateResumeButton).toBeInTheDocument();
+  const addResumeButton: HTMLElement = getAddResumeButton();
+  expect(addResumeButton).toBeInTheDocument();
 });
 
 test("resumes are initially fetched from the server", async () => {

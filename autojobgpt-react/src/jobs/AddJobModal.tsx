@@ -1,60 +1,35 @@
 import React, { useState, useCallback } from "react";
-import Modal from 'react-bootstrap/Modal';
-import Alert from 'react-bootstrap/Alert';
-import { ReactComponent as Robot } from "bootstrap-icons/icons/robot.svg";
+import { ReactComponent as RobotIcon } from "bootstrap-icons/icons/robot.svg";
 
 import useFetch from "../hooks/useFetch";
 import useFormInput from "../hooks/useFormInput";
+import AddModal from "../common/AddModal";
 import FormInput from "../common/FormInput";
+import ErrorAlert from "../common/ErrorAlert";
 import { JobUpload, JobDetails } from "./types";
+import { ModalProps } from "../common/types";
 
 
-export default function AddJobModal({
-  show, setShow,
-  addJob, addJobErrors,
-  showAddJobErrorAlert, setShowAddJobErrorAlert,
-}: {
-  show: boolean,
-  setShow: React.Dispatch<React.SetStateAction<boolean>>,
-  addJob: (jobUpload: JobUpload) => void,
-  addJobErrors: Record<string,string>,
-  showAddJobErrorAlert: boolean,
-  setShowAddJobErrorAlert: React.Dispatch<React.SetStateAction<boolean>>,
-}): React.JSX.Element {
+interface AddJobModalProps extends ModalProps {
+  addJob: (jobUpload: JobUpload) => void,  
+};
+
+const AddJobModal: (props: AddJobModalProps) => React.JSX.Element = ({
+  show, setShow, errors, setErrors, showErrorAlert, setShowErrorAlert,
+  addJob,
+}) => {
+  const modalID = "addJobModal";
   const urlInput = useFormInput();
   const titleInput = useFormInput();
   const companyInput = useFormInput();
   const postingInput = useFormInput();
-
-  function clearErrors(): void {
-    setShowFillErrorAlert(false);
-    setShowAddJobErrorAlert(false);
-  }
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {    
-    e.preventDefault(); // prevent page from reloading
-
-    clearErrors();
-    setFillErrors({});
-
-    const formElement: HTMLFormElement = document.getElementById("addJobForm") as HTMLFormElement;
-    if (formElement.reportValidity()) {
-      const url: string = (document.getElementById("url") as HTMLInputElement).value;
-      const title: string = (document.getElementById("title") as HTMLInputElement).value;
-      const company: string = (document.getElementById("company") as HTMLInputElement).value;
-      const posting: string = (document.getElementById("posting") as HTMLTextAreaElement).value;
-      const jobUpload: JobUpload = {url, title, company, posting};
-      addJob(jobUpload);
-      urlInput.stopEditing();
-      titleInput.stopEditing();
-      companyInput.stopEditing();
-      postingInput.stopEditing();
-      setShow(false);
-    }
-  }
-
+  
   const [fillErrors, setFillErrors] = useState<Record<string,string>>({});
-  const [showFillErrorAlert, setShowFillErrorAlert] = useState<boolean>(false);
+  const [showFillErrorAlert, setShowFillErrorAlert] = useState<boolean>(false);  
+  const { url: urlFillErrors, ...nonURLFillErrors } = fillErrors;
+
+  console.log("fillErrors");
+  console.log(fillErrors);
 
   const onFillSuccess = useCallback((jobDetails: JobDetails) => {
     titleInput.edit(jobDetails.title);
@@ -75,82 +50,89 @@ export default function AddJobModal({
     onSuccess: onFillSuccess,
     onFail: onFillFail,
   });
-  function handleClickFillDetails(): void {
-    clearErrors();
 
-    const urlElement: HTMLInputElement = document.getElementById("url") as HTMLInputElement;
-    if (urlElement.value === "") {
-      setFillErrors({"url": "Please enter a URL."});
-      return;
-    }
-
+  const handleClickFillDetails = (): void => {
     setFillErrors({});
-    if (urlElement.reportValidity()) {
-      fill(`url=${urlElement.value}`);      
+    setShowFillErrorAlert(false);
+    setShowErrorAlert(false);
+
+    if (urlInput.value === "") {
+      setFillErrors({"url": "Please enter a URL."});
       urlInput.stopEditing();
+    } else {      
+      if ((document.getElementById(`${modalID}URL`) as HTMLInputElement).reportValidity()) {
+        fill(`url=${urlInput.value}`);      
+        urlInput.stopEditing();
+      }
     }
-  }
+  };
+
+  const handleClickSubmit = (): void => {
+    setShowFillErrorAlert(false);
+    setFillErrors({});
+  };
+
+  const handleSuccessfulSubmit = (): void => { 
+    addJob({
+      url: urlInput.value,
+      title: titleInput.value,
+      company: companyInput.value,
+      posting: postingInput.value,
+    });
+    for (const input of [urlInput, titleInput, companyInput, postingInput]) {
+      input.stopEditing();
+    }
+  };
+
+  const handleClickCancelFill = (): void => {
+    cancelFill();
+  };
 
   return (
-    <Modal
-      show={show} onHide={() => setShow(false)} size="lg"
-      onEntered={() => document.getElementById("url")?.focus()}
-      aria-labelledby="addJobModalLabel"
+    <AddModal
+      show={show} setShow={setShow} errors={{error: errors["error"]}} setErrors={setErrors}
+      showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
+      title="Add Job" modalID={modalID} size="lg"
+      onClickSubmit={handleClickSubmit}
+      onSuccessfulSubmit={handleSuccessfulSubmit}
+      submitDisabled={filling}      
     >
-      <Modal.Header closeButton>
-        <Modal.Title id="addJobModalLabel">Add Job</Modal.Title>
-      </Modal.Header>
-      <form onSubmit={handleSubmit} id="addJobForm">
-        <Modal.Body>
-          <FormInput
-            id="url" label="URL" type="url" value={urlInput.value} handleChange={urlInput.handleChange}
-            editing={urlInput.editing} loading={filling} error={addJobErrors["url"] || fillErrors["url"]}
-          >
-            <button className="btn btn-outline-primary" type="button"
-              onClick={filling ? () => cancelFill() : handleClickFillDetails }
-            >
-              {filling?<>
-                <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-                Cancel
-              </>:<>
-                <Robot className="me-1" />
-                Autofill Details
-              </>}
-            </button>
-          </FormInput>
-
-          <Alert variant="danger" show={showFillErrorAlert} onClose={() => setShowFillErrorAlert(false)} dismissible>
-            {Object.entries(fillErrors).filter(([key, _]) => key !== "url").map(([_, value]) => value).join(" ")}
-          </Alert>
-
-          <hr />
-
-          <h5>Details</h5>
-          <FormInput
-            id="title" label="Title" type="text" value={titleInput.value} handleChange={titleInput.handleChange}
-            editing={titleInput.editing} loading={filling} error={addJobErrors["title"]} required
-          />
-          <FormInput
-            id="company" label="Company" type="text" value={companyInput.value} handleChange={companyInput.handleChange}
-            editing={companyInput.editing} loading={filling} error={addJobErrors["company"]} required
-          />
-          <FormInput
-            id="posting" label="Posting" type="textarea" value={postingInput.value} handleChange={postingInput.handleChange}
-            editing={postingInput.editing} loading={filling} error={addJobErrors["posting"]} required
-          />
-        </Modal.Body>
-        <Modal.Footer>
-          <Alert
-            variant="danger" dismissible className="w-100"
-            show={showAddJobErrorAlert} onClose={() => setShowAddJobErrorAlert(false)}
-          >
-            {addJobErrors["error"]}
-          </Alert>
-
-          <button className="btn btn-secondary" type="button" onClick={() => setShow(false)}>Close</button>
-          <button className="btn btn-primary" type="submit" disabled={filling} formNoValidate>Submit</button>
-        </Modal.Footer>        
-      </form>
-    </Modal>
+      <FormInput id={`${modalID}URL`}
+        label="URL" type="url" value={urlInput.value} handleChange={urlInput.handleChange}
+        editing={urlInput.editing} loading={filling} error={errors["url"] || urlFillErrors}
+      >
+        <button className="btn btn-outline-primary" type="button"
+          onClick={filling ? handleClickCancelFill : handleClickFillDetails }
+        >
+          {filling?<>
+            <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+            Cancel
+          </>:<>
+            <RobotIcon className="me-1" />
+            Autofill Details
+          </>}
+        </button>
+      </FormInput>
+      <ErrorAlert
+        errors={nonURLFillErrors}
+        showErrorAlert={showFillErrorAlert} setShowErrorAlert={setShowFillErrorAlert}
+      />
+      <hr />
+      <h5>Details</h5>
+      <FormInput id={`${modalID}Title`}
+        label="Title" type="text" value={titleInput.value} handleChange={titleInput.handleChange}
+        editing={titleInput.editing} loading={filling} error={errors["title"]} required
+      />
+      <FormInput id={`${modalID}Company`}
+        label="Company" type="text" value={companyInput.value} handleChange={companyInput.handleChange}
+        editing={companyInput.editing} loading={filling} error={errors["company"]} required
+      />
+      <FormInput id={`${modalID}Posting`}
+        label="Posting" type="textarea" value={postingInput.value} handleChange={postingInput.handleChange}
+        editing={postingInput.editing} loading={filling} error={errors["posting"]} required
+      />
+    </AddModal>
   );
-}
+};
+
+export default AddJobModal;

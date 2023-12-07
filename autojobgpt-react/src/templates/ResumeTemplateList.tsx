@@ -109,12 +109,10 @@ export default function ResumeTemplateList(): React.JSX.Element {
         setFillFields={setFillFields}
       />
       <AddTemplateModal
-        show={showAddTemplateModal}
-        setShow={setShowAddTemplateModal}
-        onSubmitAddTemplate={addTemplate}
-        errors={addTemplateErrors}
-        showErrorAlert={showAddTemplateErrorAlert}
-        setShowErrorAlert={setShowAddTemplateErrorAlert}
+        show={showAddTemplateModal} setShow={setShowAddTemplateModal}
+        errors={addTemplateErrors} setErrors={setAddTemplateErrors}
+        showErrorAlert={showAddTemplateErrorAlert} setShowErrorAlert={setShowAddTemplateErrorAlert}
+        addTemplate={addTemplate}
       />
     </section>
   )
