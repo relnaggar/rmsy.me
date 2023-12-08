@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 
 export default function useFormInput(
@@ -13,7 +13,10 @@ export default function useFormInput(
   ) => void,
   edit: (value: string) => void,
   stopEditing: () => void,
+  ref: React.RefObject<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
 } {
+  const ref = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(null);
+  
   const [value, setValue] = useState<string>(initialValue || "");
   const [editing, setEditing] = useState<boolean>(false);
 
@@ -35,5 +38,5 @@ export default function useFormInput(
     setEditing(false);
   };
 
-  return { value, editing, handleChange, edit, stopEditing };
+  return { value, editing, handleChange, edit, stopEditing, ref };
 }

@@ -29,7 +29,7 @@ const AddTemplateModal = ({
       newErrors["name"] = ["Please enter a template name."];
       valid = false;
     }
-    if (uploadInput.value === "") {
+    if ((uploadInput.ref.current as HTMLInputElement).files?.length === 0) {
       newErrors["upload"] = ["Please upload a template file."];
       valid = false;
     }
@@ -43,7 +43,7 @@ const AddTemplateModal = ({
   };
 
   const handleSuccessfulSubmit = (): void => {
-    const docx: File = (document.getElementById(`${modalID}Upload`) as HTMLInputElement).files![0];
+    const docx: File = (uploadInput.ref.current as HTMLInputElement).files![0];
     addTemplate({ name: nameInput.value, docx, description: descriptionInput.value });
   };
 
@@ -58,7 +58,7 @@ const AddTemplateModal = ({
         label="Template Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
         editing={nameInput.editing} error={errors["name"]}
       />
-      <FormInput id={`${modalID}Upload`}
+      <FormInput id={`${modalID}Upload`} ref={uploadInput.ref}
         label="Upload" type="file" value={uploadInput.value} handleChange={uploadInput.handleChange}
         editing={uploadInput.editing} error={errors["upload"]}
         accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"

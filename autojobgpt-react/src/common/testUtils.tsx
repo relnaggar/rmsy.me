@@ -61,12 +61,21 @@ export const testRouteAndAllChildren = (
   }
 };
 
-export const openAndGetModal = async (
+export type OpenAndGetModalProps = {
   modalName: string,
-  timeout: number = 1000,
-  openModalButton?: HTMLElement,
-): Promise<HTMLElement> => {
-  if (!openModalButton) {
+  timeout?: number,
+  openModalButtonText?: string,
+};
+
+export const openAndGetModal = async ({
+  modalName,
+  timeout = 1000,
+  openModalButtonText,
+}: OpenAndGetModalProps): Promise<HTMLElement> => {
+  let openModalButton: HTMLElement;
+  if (openModalButtonText) {
+    openModalButton = screen.getByRole("button", {name: new RegExp(openModalButtonText, "i")});
+  } else {
     openModalButton = screen.getByRole("button", {name: new RegExp(modalName, "i")});
   }
   await act(async () => {

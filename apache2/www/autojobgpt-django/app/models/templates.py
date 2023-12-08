@@ -52,13 +52,8 @@ class FillField(models.Model):
 class Template(models.Model, DocumentMixin):
   docx = models.FileField(upload_to='templates/')
   png = models.FileField(upload_to='templates/')
-  name = models.TextField()
+  name = models.TextField(unique=True)
   description = models.TextField(blank=True)
-
-  class Meta:
-    constraints = [
-      models.UniqueConstraint(fields=['name'], name='template_unique_name'),
-    ]
 
   def __str__(self):
     return self.name

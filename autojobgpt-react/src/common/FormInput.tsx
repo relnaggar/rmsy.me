@@ -14,18 +14,23 @@ interface FormInputProps {
   [key: string]: any,
 };
 
-const FormInput: (props: FormInputProps) => React.JSX.Element = ({
-  id,
-  label,
-  type,  
-  handleChange,
-  editing,  
-  error,
-  value,
-  loading = false,
-  children,
-  ...props
-}) => {
+// use React.forwardRef to pass ref to input element
+
+const FormInput = React.forwardRef((
+  {
+    id,
+    label,
+    type,  
+    handleChange,
+    editing,  
+    error,
+    value,
+    loading = false,
+    children,
+    ...props
+  }: FormInputProps,
+  ref: React.Ref<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+): React.JSX.Element => {
   let errorString: string = "";
   if (error instanceof Array) {
     if (error.length === 0) {
@@ -51,9 +56,9 @@ const FormInput: (props: FormInputProps) => React.JSX.Element = ({
   const inputElement: React.JSX.Element = (
     <>
       {type === "textarea"?
-        <textarea {...textAreaProps} />
+        <textarea {...textAreaProps} ref={ref as React.Ref<HTMLTextAreaElement>} />
       :
-        <input type={type} {...textAreaProps} />
+        <input type={type} {...textAreaProps} ref={ref as React.Ref<HTMLInputElement>} />
       }
       {showError &&
         <div className="invalid-feedback" id={`${id}Feedback`} role={"alert"} aria-labelledby={id}>{error}</div>
@@ -78,6 +83,6 @@ const FormInput: (props: FormInputProps) => React.JSX.Element = ({
       }
     </div>
   );
-};
+});
 
 export default FormInput;

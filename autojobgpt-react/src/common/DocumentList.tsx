@@ -28,9 +28,9 @@ export default function DocumentList({
     <div className="d-flex overflow-x-auto border border-5 p-2" role="list">
       {!loadingDocuments ?
         <>
-          {documents.map((document, _) => 
+          {documents.map((document, index) => 
             document.id !== -1 && <DocumentThumbnail
-              key={document.id}
+              key={`${document.id}-${index}`}
               document={document}              
               onClickEditDocument={onClickEditDocument(document.id)}
               onClickRemoveDocument={onClickRemoveDocument(document.id)}
@@ -39,7 +39,7 @@ export default function DocumentList({
           )}
           {documents.map((document, index) => 
             document.id === -1 && <DocumentThumbnail
-              key={index}
+              key={`${document.id}-${index}`}
               document={document}              
               onClickEditDocument={onClickEditDocument(document.id)}
               onClickRemoveDocument={onClickRemoveDocument(document.id)}

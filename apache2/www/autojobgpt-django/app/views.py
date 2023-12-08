@@ -32,9 +32,7 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
     if isinstance(error, IntegrityError):
       error_message = str(error)
       user_friendly_error = "An integrity error occurred: {}."
-      if "template_unique_name" in error_message:
-        user_friendly_error = user_friendly_error.format("This template name already exists. Please choose a different name")
-      elif "job_unique_title_company" in error_message:
+      if "job_unique_title_company" in error_message:
         user_friendly_error = user_friendly_error.format("A job with this title and company already exists")
       else:
         if "Status" in error_message:
