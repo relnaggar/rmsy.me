@@ -22,10 +22,10 @@ export default function JobBoard(): React.JSX.Element {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
 
-  const [addJobErrors, setAddJobErrors] = useState<Record<string,string>>({});
+  const [addJobErrors, setAddJobErrors] = useState<Record<string,string[]>>({});
   const [showAddJobErrorAlert, setShowAddJobErrorAlert] = useState<boolean>(false);
 
-  const handleErrors = useCallback((errors: Record<string,string>) => {
+  const handleErrors = useCallback((errors: Record<string,string[]>) => {
     setErrorMessage(Object.values(errors).join(" "));
     setShowErrorAlert(true);
   }, []);
@@ -35,7 +35,7 @@ export default function JobBoard(): React.JSX.Element {
     setShowAddJob(false);    
   }, []);
 
-  const handleAddJobFail = useCallback((errors: Record<string,string>) => {
+  const handleAddJobFail = useCallback((errors: Record<string,string[]>) => {
     setAddJobErrors(errors);
     if (errors["error"]) {
       setShowAddJobErrorAlert(true);
@@ -126,10 +126,10 @@ export default function JobBoard(): React.JSX.Element {
   }, []);
 
   const [showAddColumn, setShowAddColumn] = useState<boolean>(false);
-  const [addStatusErrors, setAddStatusErrors] = useState<Record<string,string>>({});
+  const [addStatusErrors, setAddStatusErrors] = useState<Record<string,string[]>>({});
   const [showAddStatusErrorAlert, setShowAddStatusErrorAlert] = useState<boolean>(false);
 
-  const handlePostStatusFail = useCallback((errors: Record<string,string>) => {
+  const handlePostStatusFail = useCallback((errors: Record<string,string[]>) => {
     setAddStatusErrors(errors);
     if (errors["error"]) {
       setShowAddStatusErrorAlert(true);

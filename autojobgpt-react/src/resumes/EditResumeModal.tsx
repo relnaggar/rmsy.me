@@ -35,7 +35,7 @@ export default function EditResumeModal({
 }): React.JSX.Element {
   const resume: Resume | undefined = resumes.find((resume: Resume) => resume.id === resumeID);
 
-  const [errors, setErrors] = useState<Record<string,string>>({});
+  const [errors, setErrors] = useState<Record<string,string[]>>({});
   const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
 
   const handleDuplicateSuccess = useCallback((resume: Resume) => {
@@ -43,7 +43,7 @@ export default function EditResumeModal({
     setShowErrorAlert(false);
   }, [resumes, setResumes]);
 
-  const handleDuplicateFail = useCallback((es: Record<string,string>) => {
+  const handleDuplicateFail = useCallback((es: Record<string,string[]>) => {
     setErrors(es);
     setShowErrorAlert(true);
   }, []);

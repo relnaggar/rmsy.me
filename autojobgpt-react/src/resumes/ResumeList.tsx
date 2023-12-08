@@ -15,15 +15,15 @@ import { Job } from '../jobs/types';
 export default function ResumeList(): React.JSX.Element {
   const openConfirmationModal = useContext(ConfirmationModalContext);
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
 
-  const handleErrors = useCallback((errors: Record<string,string>) => {
+  const handleErrors = useCallback((errors: Record<string,string[]>) => {
     setErrors(errors);
     setShowErrorAlert(true);
   }, []);
 
-  const [addResumeErrors, setAddResumeErrors] = useState<Record<string,string>>({});
+  const [addResumeErrors, setAddResumeErrors] = useState<Record<string,string[]>>({});
   const [showAddResumeErrorsAlert, setShowAddResumeErrorsAlert] = useState<boolean>(false);
 
   const {
@@ -37,7 +37,7 @@ export default function ResumeList(): React.JSX.Element {
     setSubstitutions([...substitutions, ...resume.substitutions]);
   }, [substitutions, setSubstitutions]);
   
-  const handleAddResumeFail = useCallback((errors: Record<string,string>) => {
+  const handleAddResumeFail = useCallback((errors: Record<string,string[]>) => {
     setAddResumeErrors(errors);
     setShowAddResumeErrorsAlert(true);
     setShowAddResume(true);

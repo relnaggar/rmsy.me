@@ -7,7 +7,7 @@ interface FormInputProps {
   type: string,
   handleChange: ((e: React.ChangeEvent<HTMLInputElement>) => void) | ((e: React.ChangeEvent<HTMLTextAreaElement>) => void),
   editing: boolean,
-  error?: string | string[],
+  error?: string[],
   value: string,
   loading?: boolean,
   children?: React.ReactNode,
@@ -26,17 +26,13 @@ const FormInput: (props: FormInputProps) => React.JSX.Element = ({
   children,
   ...props
 }) => {
-  let errorString: string;
-  if (typeof error === "string") {
-    errorString = error;
-  } else if (error instanceof Array) {
+  let errorString: string = "";
+  if (error instanceof Array) {
     if (error.length === 0) {
       errorString = "";
     } else {
       errorString = error.join(" ");
     }
-  } else {
-    errorString = "";
   }
 
   const showError: boolean = !editing && !loading && errorString !== "";

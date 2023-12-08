@@ -3,7 +3,7 @@ import BootstrapAlert from 'react-bootstrap/Alert';
 
 
 interface ErrorAlertProps {
-  errors: Record<string,string>,
+  errors: Record<string,string[]>,
   showErrorAlert: boolean,
   setShowErrorAlert: React.Dispatch<React.SetStateAction<boolean>>,  
 };

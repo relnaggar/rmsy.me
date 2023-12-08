@@ -13,7 +13,7 @@ export default function useDelete<Resource extends WithID>(
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
   options?: {
     onSuccess?: (deletedResource: Resource, resources: Resource[], setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
-    onFail?: (errors: Record<string,string>) => void,
+    onFail?: (errors: Record<string,string[]>) => void,
   },
 ): {
   deleteResource: (id: number) => void,
@@ -29,7 +29,7 @@ export default function useDelete<Resource extends WithID>(
 
   useEffect(() => {
     async function doDelete(): Promise<void> {
-      let errors: Record<string,string> = {};
+      let errors: Record<string,string[]> = {};
       try {
         const response: Response = await fetchData(`${apiRoute}${apiPath}${idBeingDeleted}/`, { 
           method: "DELETE", 

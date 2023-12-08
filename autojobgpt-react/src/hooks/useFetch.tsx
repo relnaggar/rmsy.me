@@ -11,7 +11,7 @@ export default function useFetch<Resource>(
     initialResource?: Resource,
     initialFetch?: boolean,
     onSuccess?: (resource: Resource) => void,
-    onFail?: (errors: Record<string,string>) => void,    
+    onFail?: (errors: Record<string,string[]>) => void,    
   },
 ): {
   resource: Resource,
@@ -38,7 +38,7 @@ export default function useFetch<Resource>(
 
   useEffect(() => {
     async function doFetch(): Promise<void> {
-      let errors: Record<string,string> = {};
+      let errors: Record<string,string[]> = {};
       try {
         const response: Response = await fetchData(`${apiRoute}${apiPath}${paramString}`, {
           method: "GET",

@@ -27,7 +27,7 @@ const AddResumeModal = ({
     setErrors({});
   }, [setShowErrorAlert, setErrors]);
 
-  const handleRefreshFail = useCallback((errors: Record<string, string>) => {
+  const handleRefreshFail = useCallback((errors: Record<string, string[]>) => {
     setShowErrorAlert(true);
     setErrors(errors);
   }, [setShowErrorAlert, setErrors]);
@@ -48,26 +48,17 @@ const AddResumeModal = ({
     }
   );
 
-  const handleSuccessfulSubmit = (): void => {
-    addResume({
-      job: parseInt(jobInput.value),
-      template: parseInt(templateInput.value),
-    });
-    jobInput.stopEditing();
-    templateInput.stopEditing();
-  };
-
-  const customValidation = (): boolean => {
+  const validateSubmit = (): boolean => {
     const jobValue: number = parseInt(jobInput.value);
     const templateValue: number = parseInt(templateInput.value);
 
     if (jobValue === 0 || templateValue === 0) {
-      const newErrors: Record<string, string> = {};
+      const newErrors: Record<string, string[]> = {};
       if (jobValue === 0) {
-        newErrors["job"] = "Please select a job.";
+        newErrors["job"] = ["Please select a job."];
       }
       if (templateValue === 0) {
-        newErrors["template"] = "Please select a template.";
+        newErrors["template"] = ["Please select a template."];
       }
       setErrors(newErrors);
       setShowErrorAlert(true);
@@ -77,6 +68,15 @@ const AddResumeModal = ({
     } else {
       return true;
     }
+  }
+
+  const handleSuccessfulSubmit = (): void => {
+    addResume({
+      job: parseInt(jobInput.value),
+      template: parseInt(templateInput.value),
+    });
+    jobInput.stopEditing();
+    templateInput.stopEditing();
   };
 
   return (
@@ -84,8 +84,7 @@ const AddResumeModal = ({
       show={show} setShow={setShow} errors={errors} setErrors={setErrors}
       showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
       title="Generate Resume" modalID="addResumeModal"
-      onSuccessfulSubmit={handleSuccessfulSubmit}
-      customValidation={customValidation}
+      validateSubmit={validateSubmit} onSuccessfulSubmit={handleSuccessfulSubmit}
     >
       <SelectWithRefresh<Job>
         id={`${modalID}Job`}

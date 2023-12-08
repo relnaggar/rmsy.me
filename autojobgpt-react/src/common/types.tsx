@@ -17,8 +17,8 @@ export interface Document {
 export interface ModalProps {
   show: boolean,
   setShow: React.Dispatch<React.SetStateAction<boolean>>,
-  errors: Record<string,string>,
-  setErrors: React.Dispatch<React.SetStateAction<Record<string,string>>>,
+  errors: Record<string,string[]>,
+  setErrors: React.Dispatch<React.SetStateAction<Record<string,string[]>>>,
   showErrorAlert: boolean,
   setShowErrorAlert: React.Dispatch<React.SetStateAction<boolean>>,
 };

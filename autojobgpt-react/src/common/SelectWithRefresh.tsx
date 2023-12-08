@@ -14,7 +14,7 @@ interface SelectWithRefreshProps<Option extends WithID> {
   options: Option[],
   loading: boolean,
   refetch: () => void,
-  error?: string | string[],
+  error?: string[],
   optionZeroLabel?: string,
 };
 
@@ -31,17 +31,13 @@ const SelectWithRefresh: <Option extends WithID>(props: SelectWithRefreshProps<O
   error,
   optionZeroLabel,
 }) => {
-  let errorString: string;
-  if (typeof error === "string") {
-    errorString = error;
-  } else if (error instanceof Array) {
+  let errorString: string = "";
+  if (error instanceof Array) {
     if (error.length === 0) {
       errorString = "";
     } else {
       errorString = error.join(" ");
     }
-  } else {
-    errorString = "";
   }
   if (optionZeroLabel === undefined) {
     optionZeroLabel = "Select...";

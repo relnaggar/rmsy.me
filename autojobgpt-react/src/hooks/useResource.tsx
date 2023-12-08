@@ -10,13 +10,13 @@ export default function useResource<Resource extends WithID, ResourceUpload>(
   getPlaceholderResource: (resourceUpload: ResourceUpload) => Resource,
   options?: {
     onFetchSuccess?: (resources: Resource[]) => void,
-    onFetchFail?: (errors: Record<string,string>) => void,
+    onFetchFail?: (errors: Record<string,string[]>) => void,
     onPostSuccess?: (resource: Resource) => void,
-    onPostFail?: (errors: Record<string,string>) => void,
+    onPostFail?: (errors: Record<string,string[]>) => void,
     onDeleteSuccess?: (deletedResource: Resource, resources: Resource[], setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
-    onDeleteFail?: (errors: Record<string,string>) => void,
+    onDeleteFail?: (errors: Record<string,string[]>) => void,
     onPatchSuccess?: (resource: Resource, resources: Resource[], setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
-    onPatchFail?: (errors: Record<string,string>) => void,
+    onPatchFail?: (errors: Record<string,string[]>) => void,
   },
 ): {
   resources: Resource[],

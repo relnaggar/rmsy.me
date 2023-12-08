@@ -39,6 +39,13 @@ test("add column modal has a close button", async () => {
   expect(closeButtons.length).toBeGreaterThan(0);
 });
 
+test("clicking close button closes the add column modal", async () => {
+  await renderThisRoute();
+  const addColumnModal: HTMLElement = await openAndGetAddColumnModal();
+  await clickCloseButton(addColumnModal);
+  expect(addColumnModal).not.toBeInTheDocument();
+});
+
 test("add column modal has a name input", async () => {
   await renderThisRoute();
   const nameInput: HTMLElement = getByRole(await openAndGetAddColumnModal(), "textbox", {name: new RegExp("name", "i")});
@@ -55,8 +62,9 @@ test("submitting the add column modal with empty name input shows an error", asy
   await renderThisRoute();
   const addColumnModal: HTMLElement = await openAndGetAddColumnModal();
   await clickSubmitButton(addColumnModal);
-  const nameInput: HTMLElement = getByRole(addColumnModal, "textbox", {name: new RegExp("name", "i")});
-  expect(nameInput).toBeInvalid();
+  const errorAlert: HTMLElement = getByRole(addColumnModal, "alert", {name: new RegExp("name", "i")});
+  expect(errorAlert).toBeInTheDocument();
+  expect(errorAlert).toHaveTextContent(new RegExp("name", "i"));
 });
 
 test("submitting the add column modal with valid input closes the modal", async () => {

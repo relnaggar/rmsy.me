@@ -12,7 +12,7 @@ interface AddModalProps extends ModalProps {
   onClickSubmit?: () => void,
   onSuccessfulSubmit: () => void,
   submitDisabled?: boolean,
-  customValidation?: () => boolean,
+  validateSubmit: () => boolean,
   children: React.ReactNode,
 };
 
@@ -24,7 +24,7 @@ const AddModal = ({
   onClickSubmit = () => {},
   onSuccessfulSubmit,
   submitDisabled = false,
-  customValidation = () => true,
+  validateSubmit,
   children,
 }: AddModalProps): React.JSX.Element => {
   const handleEntered = (): void => {
@@ -44,7 +44,7 @@ const AddModal = ({
     setShowErrorAlert(false);
     onClickSubmit?.();
 
-    if (e.currentTarget.reportValidity() && customValidation()) {
+    if (e.currentTarget.reportValidity() && validateSubmit()) {
       onSuccessfulSubmit();
       setShow(false);
     }

@@ -24,7 +24,7 @@ const AddJobModal = ({
   const companyInput = useFormInput();
   const postingInput = useFormInput();
   
-  const [fillErrors, setFillErrors] = useState<Record<string,string>>({});
+  const [fillErrors, setFillErrors] = useState<Record<string,string[]>>({});
   const [showFillErrorAlert, setShowFillErrorAlert] = useState<boolean>(false);  
   const { url: urlFillErrors, ...nonURLFillErrors } = fillErrors;
 
@@ -34,7 +34,7 @@ const AddJobModal = ({
     postingInput.edit(jobDetails.posting);
   }, [titleInput, companyInput, postingInput]);
 
-  const onFillFail = useCallback((errors: Record<string,string>) => {
+  const onFillFail = useCallback((errors: Record<string,string[]>) => {
     setFillErrors(errors);
     if (Object.keys(errors).filter((key) => key !== "url").length > 0) {
       setShowFillErrorAlert(true);
@@ -49,18 +49,25 @@ const AddJobModal = ({
   });
 
   const handleClickFillDetails = (): void => {
-    setFillErrors({});
     setShowFillErrorAlert(false);
     setShowErrorAlert(false);
 
+    const { url: _, ...newErrors } = errors;
+    setErrors(newErrors);
+
+    let valid = true;
+    const newFillErrors: Record<string,string[]> = {};
+
     if (urlInput.value === "") {
-      setFillErrors({"url": "Please enter a URL."});
-      urlInput.stopEditing();
-    } else {      
-      if ((document.getElementById(`${modalID}URL`) as HTMLInputElement).reportValidity()) {
-        fill(`url=${urlInput.value}`);      
-        urlInput.stopEditing();
-      }
+      newFillErrors["url"] = ["Please enter a URL in order to autofill the job details."];
+      valid = false;
+    }
+
+    setFillErrors(newFillErrors);
+    urlInput.stopEditing();
+
+    if (valid) {
+      fill(`url=${urlInput.value}`);
     }
   };
 
@@ -69,6 +76,33 @@ const AddJobModal = ({
     setFillErrors({});
   };
 
+  const validateSubmit = (): boolean => {
+    let valid = true;
+    const newErrors: Record<string,string[]> = {};
+
+    if (titleInput.value === "") {
+      newErrors["title"] = ["Please enter a job title."];
+      valid = false;
+    }
+
+    if (companyInput.value === "") {
+      newErrors["company"] = ["Please enter a company."];
+      valid = false;
+    }
+
+    if (postingInput.value === "") {
+      newErrors["posting"] = ["Please enter a job posting."];
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    for (const input of [urlInput, titleInput, companyInput, postingInput]) {
+      input.stopEditing();
+    }
+    
+    return valid;
+  }
+
   const handleSuccessfulSubmit = (): void => { 
     addJob({
       url: urlInput.value,
@@ -76,9 +110,6 @@ const AddJobModal = ({
       company: companyInput.value,
       posting: postingInput.value,
     });
-    for (const input of [urlInput, titleInput, companyInput, postingInput]) {
-      input.stopEditing();
-    }
   };
 
   const handleClickCancelFill = (): void => {
@@ -91,7 +122,7 @@ const AddJobModal = ({
       showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
       title="Add Job" modalID={modalID} size="lg"
       onClickSubmit={handleClickSubmit}
-      onSuccessfulSubmit={handleSuccessfulSubmit}
+      validateSubmit={validateSubmit} onSuccessfulSubmit={handleSuccessfulSubmit}
       submitDisabled={filling}      
     >
       <FormInput id={`${modalID}URL`}
@@ -118,15 +149,15 @@ const AddJobModal = ({
       <h5>Details</h5>
       <FormInput id={`${modalID}Title`}
         label="Title" type="text" value={titleInput.value} handleChange={titleInput.handleChange}
-        editing={titleInput.editing} loading={filling} error={errors["title"]} required
+        editing={titleInput.editing} loading={filling} error={errors["title"]}
       />
       <FormInput id={`${modalID}Company`}
         label="Company" type="text" value={companyInput.value} handleChange={companyInput.handleChange}
-        editing={companyInput.editing} loading={filling} error={errors["company"]} required
+        editing={companyInput.editing} loading={filling} error={errors["company"]}
       />
       <FormInput id={`${modalID}Posting`}
         label="Posting" type="textarea" value={postingInput.value} handleChange={postingInput.handleChange}
-        editing={postingInput.editing} loading={filling} error={errors["posting"]} required
+        editing={postingInput.editing} loading={filling} error={errors["posting"]}
       />
     </AddModal>
   );

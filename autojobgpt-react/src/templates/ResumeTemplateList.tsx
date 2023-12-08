@@ -16,7 +16,7 @@ export default function ResumeTemplateList(): React.JSX.Element {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
 
-  const handleErrors = useCallback((errors: Record<string,string>) => {
+  const handleErrors = useCallback((errors: Record<string,string[]>) => {
     setErrorMessage(Object.values(errors).join(" "));
     setShowErrorAlert(true);    
   }, []);
@@ -27,14 +27,14 @@ export default function ResumeTemplateList(): React.JSX.Element {
   } = useFetch<FillField[]>("fillFields/", { initialResource: [], onFail: handleErrors });
 
 
-  const [addTemplateErrors, setAddTemplateErrors] = useState<Record<string,string>>({});  
+  const [addTemplateErrors, setAddTemplateErrors] = useState<Record<string,string[]>>({});  
   const [showAddTemplateErrorAlert, setShowAddTemplateErrorAlert] = useState<boolean>(false);
 
   const handleAddTemplateSuccess = useCallback((template: ResumeTemplate) => {
     setFillFields([...fillFields, ...template.fillFields]);
   }, [fillFields, setFillFields]);
 
-  const handleAddTemplateFail = useCallback((errors: Record<string,string>) => {
+  const handleAddTemplateFail = useCallback((errors: Record<string,string[]>) => {
     setAddTemplateErrors(errors);
     setShowAddTemplateModal(true);
     if (errors["error"]) {

@@ -21,13 +21,30 @@ const AddTemplateModal = ({
 
   const modalID: string = `addTemplateModal`;
 
-  const handleSuccessfulSubmit = (): void => {
-    const docx: File = (document.getElementById(`${modalID}Upload`) as HTMLInputElement).files![0];
-    addTemplate({ name: nameInput.value, docx, description: descriptionInput.value });
+  const validateSubmit = (): boolean => {
+    let valid = true;
+    const newErrors: Record<string,string[]> = {};
 
+    if (nameInput.value === "") {
+      newErrors["name"] = ["Please enter a template name."];
+      valid = false;
+    }
+    if (uploadInput.value === "") {
+      newErrors["upload"] = ["Please upload a template file."];
+      valid = false;
+    }
+
+    setErrors(newErrors);
     for (const input of [nameInput, uploadInput, descriptionInput]) {
       input.stopEditing();
     }
+
+    return valid;
+  };
+
+  const handleSuccessfulSubmit = (): void => {
+    const docx: File = (document.getElementById(`${modalID}Upload`) as HTMLInputElement).files![0];
+    addTemplate({ name: nameInput.value, docx, description: descriptionInput.value });
   };
 
   return (
@@ -35,15 +52,15 @@ const AddTemplateModal = ({
       show={show} setShow={setShow} errors={{error: errors["error"]}} setErrors={setErrors}
       showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
       title="Add Resume Template" modalID={modalID}
-      onSuccessfulSubmit={handleSuccessfulSubmit}
+      validateSubmit={validateSubmit} onSuccessfulSubmit={handleSuccessfulSubmit}
     >
       <FormInput id={`${modalID}Name`}
         label="Template Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
-        editing={nameInput.editing} error={errors["name"]} required
+        editing={nameInput.editing} error={errors["name"]}
       />
       <FormInput id={`${modalID}Upload`}
         label="Upload" type="file" value={uploadInput.value} handleChange={uploadInput.handleChange}
-        editing={uploadInput.editing} error={errors["upload"]} required
+        editing={uploadInput.editing} error={errors["upload"]}
         accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       />
       <FormInput id={`${modalID}Description`}

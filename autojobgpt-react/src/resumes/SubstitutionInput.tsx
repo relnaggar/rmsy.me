@@ -18,7 +18,7 @@ export default function SubstitutionInput({
   setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
   onSubstitutionSaveSuccess: () => void,
 }): React.JSX.Element {
-  const [errors, setErrors] = useState<Record<string,string>>({});
+  const [errors, setErrors] = useState<Record<string,string[]>>({});
   const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
   const [value, setValue] = useState<string>(substitution.value);
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
@@ -29,7 +29,7 @@ export default function SubstitutionInput({
     setShowErrorAlert(false);
   }
 
-  const onFillFail = (errors: Record<string,string>): void => {
+  const onFillFail = (errors: Record<string,string[]>): void => {
     setErrors(errors);
     setShowErrorAlert(true);
   };

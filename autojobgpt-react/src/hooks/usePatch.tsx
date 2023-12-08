@@ -13,7 +13,7 @@ export default function usePatch<Resource extends WithID>(
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
   options?: {
     onSuccess?: (resource: Resource, resources: Resource[], setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
-    onFail?: (errors: Record<string,string>) => void,
+    onFail?: (errors: Record<string,string[]>) => void,
   },
 ): {
   patching: boolean,
@@ -33,7 +33,7 @@ export default function usePatch<Resource extends WithID>(
 
   useEffect(() => {
     async function doPatch(): Promise<void> {
-      let errors: Record<string,string> = {};
+      let errors: Record<string,string[]> = {};
       try {
         const response: Response = await fetchData(`${apiRoute}${apiPath}${idBeingPatched}/`, { 
           method: "PATCH", 

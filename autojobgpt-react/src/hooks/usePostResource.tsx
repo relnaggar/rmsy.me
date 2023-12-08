@@ -14,7 +14,7 @@ export default function usePostResource<Resource extends WithID, ResourceUpload>
   getPlaceholderResource: (resourceUpload: ResourceUpload) => Resource,
   options?: {
     onSuccess?: (resource: Resource) => void,
-    onFail?: (errors: Record<string,string>) => void,
+    onFail?: (errors: Record<string,string[]>) => void,
   },
 ): {
   posting: boolean,
@@ -30,7 +30,7 @@ export default function usePostResource<Resource extends WithID, ResourceUpload>
 
   useEffect(() => {
     async function doPost(body: FormData | string): Promise<void> {      
-      let errors: Record<string,string> = {};
+      let errors: Record<string,string[]> = {};
       const newResources: Resource[] = [...resources.filter(resource => resource.id !== -1)];
       try {
         const csrfHeader: HeadersInit = {

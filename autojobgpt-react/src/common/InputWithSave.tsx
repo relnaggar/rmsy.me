@@ -58,7 +58,7 @@ export default function InputWithSave<Resource extends WithID>({
 
   const [editing, setEditing] = useState<boolean>(true);
   const [saved, setSaved] = useState<boolean>(true);
-  const [errors, setErrors] = useState<Record<string,string>>({});
+  const [errors, setErrors] = useState<Record<string,string[]>>({});
   const [value, setValue] = useControlledState<string>(resourceEditableProperty, valueProp, setValueProp);
   
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function InputWithSave<Resource extends WithID>({
     }
   }, [value, resourceEditableProperty]);
 
-  const handleUpdateFail = useCallback((errors: Record<string,string>) => {
+  const handleUpdateFail = useCallback((errors: Record<string,string[]>) => {
     setErrors(errors);
   }, [setErrors]);
 

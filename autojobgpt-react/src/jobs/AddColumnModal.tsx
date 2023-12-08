@@ -16,11 +16,25 @@ const AddColumnModal = ({
   addColumn,
 }: AddColumnModalProps): React.JSX.Element => {
   const modalID = "addColumnModal";
-  const nameInput = useFormInput();  
+  const nameInput = useFormInput();
+  
+  const validateSubmit = (): boolean => {
+    let valid = true;
+    const newErrors: Record<string,string[]> = {};
+
+    if (nameInput.value === "") {
+      newErrors["name"] = ["Please enter a column name."];
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    nameInput.stopEditing();
+
+    return valid;
+  };
 
   const handleSuccessfulSubmit = (): void => {
     addColumn({ name: nameInput.value });
-    nameInput.stopEditing();
   };
 
   return (
@@ -28,11 +42,11 @@ const AddColumnModal = ({
       show={show} setShow={setShow} errors={{error: errors["error"]}} setErrors={setErrors}
       showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
       title="Add Column" modalID={modalID}
-      onSuccessfulSubmit={handleSuccessfulSubmit}
+      validateSubmit={validateSubmit} onSuccessfulSubmit={handleSuccessfulSubmit}
     >
       <FormInput id={`${modalID}Name`}
         label="Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
-        editing={nameInput.editing} error={errors["name"]} required
+        editing={nameInput.editing} error={errors["name"]}
       />
     </AddModal>
   );

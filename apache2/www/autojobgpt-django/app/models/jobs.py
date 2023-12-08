@@ -66,7 +66,7 @@ class Job(models.Model):
     constraints = [
       models.UniqueConstraint(
         fields=['title', 'company'],
-        name='unique_title_company'),
+        name='job_unique_title_company'),
     ]
 
   def __str__(self):

@@ -10,7 +10,7 @@ export default function usePost<Resource>(
   apiPath: string,
   options?: {
     onSuccess?: (resource: Resource) => void,
-    onFail?: (errors: Record<string,string>) => void,
+    onFail?: (errors: Record<string,string[]>) => void,
   },
 ): {
   posting: boolean,
@@ -30,7 +30,7 @@ export default function usePost<Resource>(
 
   useEffect(() => {
     async function doPost(): Promise<void> {      
-      let errors: Record<string,string> = {};
+      let errors: Record<string,string[]> = {};
       try {
         const response: Response = await fetchData(`${apiRoute}${apiPath}`, {
           method: "POST",

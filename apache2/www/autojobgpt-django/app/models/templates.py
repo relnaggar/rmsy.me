@@ -57,7 +57,7 @@ class Template(models.Model, DocumentMixin):
 
   class Meta:
     constraints = [
-      models.UniqueConstraint(fields=['name'], name='unique_name'),
+      models.UniqueConstraint(fields=['name'], name='template_unique_name'),
     ]
 
   def __str__(self):
