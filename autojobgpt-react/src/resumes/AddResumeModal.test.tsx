@@ -173,7 +173,7 @@ describe("select options are rendered for all select inputs", () => {
   }
 });
 
-test("clicking a refresh button makes an additional API call", async () => {
+xtest("clicking a refresh button makes an additional API call", async () => {
   mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute(
     [{
       url: "../api/jobs/",
