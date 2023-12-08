@@ -141,7 +141,7 @@ xtest("deleting a resume template removes it from the list of resume templates",
   mockFunctions.fetchData.mockImplementationOnce(generateResponse([], 204));
   const matchingResumeTemplate: HTMLElement = getResumeTemplateByName(validResumeTemplate2.name);
   const deleteButton: HTMLElement = getByRole(matchingResumeTemplate, "button", {name: new RegExp("delete", "i")});
-  const deleteConfirmationModal: HTMLElement = await openAndGetModal(deleteButton, "confirm delete", 1000);
+  const deleteConfirmationModal: HTMLElement = await openAndGetModal("confirm delete", 1000, deleteButton);
   const deleteConfirmationButton: HTMLElement = getByRole(deleteConfirmationModal, "button", {name: new RegExp("delete", "i")});
   await act(async () => {
     userEvent.click(deleteConfirmationButton);

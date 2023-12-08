@@ -114,3 +114,14 @@ export const validStatus1: Status = {
 };
 
 export const errorMessage = "Test Error Message";
+
+export const testDataForAPIGeneralErrors = (mockFunctions: {[key: string]: jest.MockedFunction<any>}): {
+  apiErrorType: string,
+  mockAPIError: () => void,
+}[] => [{
+  apiErrorType: "network",
+  mockAPIError: () => mockFunctions.fetchData.mockRejectedValueOnce(new Error(errorMessage)),
+}, {
+  apiErrorType: "general",
+  mockAPIError: () => mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({error: errorMessage})),
+}];

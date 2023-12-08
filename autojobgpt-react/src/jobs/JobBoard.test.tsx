@@ -1,6 +1,7 @@
 // import { screen, queryAllByRole } from "@testing-library/react";
 
 // import { renderThisRoute, getKanbanColumn, getBacklogJobByTitle, queryBacklogJobs, dragJob } from "./jobTestUtils";
+// import { renderThisRoute } from "./jobTestUtils";
 import { injectMocks } from "../common/testUtils";
 // import { injectMocks, mockFunctions } from "../common/testUtils";
 // import { generateConditionalResponseByRoute, validJob1, validJob2, generateResponse } from "../common/mockAPI";
@@ -14,6 +15,11 @@ beforeEach(() => {
 test("true is true", () => {
   expect(true).toBe(true);
 });
+
+// test("job board has an add column button", async () => {
+//   await renderThisRoute();
+//   expect(getAddColumnButton()).toBeInTheDocument();
+// });
 
 // describe("every status (column title) appears in the kanban board", () => {
 //   for (const status of STATUSES) {

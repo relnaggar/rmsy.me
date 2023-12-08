@@ -27,7 +27,7 @@ describe("clicking every edit resume button shows edit resume modal within 1 sec
       await renderThisRoute();
       const resume: HTMLElement = getResumeByName(validResume.name);
       const editButton: HTMLElement = getByRole(resume, "button", {name: new RegExp("edit", "i")});
-      const editResumeModal: HTMLElement = await openAndGetModal(editButton, "edit resume", 1000);
+      const editResumeModal: HTMLElement = await openAndGetModal("edit resume", 1000, editButton);
       expect(editResumeModal).toBeInTheDocument();
     });
   }
@@ -44,7 +44,7 @@ describe("every edit resume modal has a close button", () => {
       await renderThisRoute();
       const resume: HTMLElement = getResumeByName(validResume.name);
       const editButton: HTMLElement = getByRole(resume, "button", {name: new RegExp("edit", "i")});
-      const editResumeModal: HTMLElement = await openAndGetModal(editButton, "edit resume", 1000);
+      const editResumeModal: HTMLElement = await openAndGetModal("edit resume", 1000, editButton);
       const closeButtons: HTMLElement[] = getAllByRole(editResumeModal, "button", {name: new RegExp("close", "i")});
       expect(closeButtons.length).toBeGreaterThan(0);
     });

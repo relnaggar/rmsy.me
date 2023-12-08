@@ -38,5 +38,5 @@ export function getResumeByName(name: string): HTMLElement {
 }
 
 export async function openAndGetAddResumeModal(timeout: number = 1000): Promise<HTMLElement> {
-  return openAndGetModal(getAddResumeButton(), "add resume", timeout);
+  return openAndGetModal("add resume", timeout, getAddResumeButton());
 }

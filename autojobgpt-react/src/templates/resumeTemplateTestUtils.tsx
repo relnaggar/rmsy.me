@@ -39,5 +39,5 @@ export function getResumeTemplateByName(name: string): HTMLElement {
 }
 
 export async function openAndGetAddResumeTemplateModal(timeout: number = 1000): Promise<HTMLElement> {
-  return openAndGetModal(getUploadResumeTemplateButton(), "add resume template", timeout);
+  return openAndGetModal("add resume template", timeout, getUploadResumeTemplateButton());
 }

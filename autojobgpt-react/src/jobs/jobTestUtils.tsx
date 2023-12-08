@@ -31,10 +31,6 @@ export const getFirstColumnJobByTitle = (title: string): HTMLElement => {
   return matchingJob;
 };
 
-export const getAddColumnButton = (): HTMLElement => {
-  return screen.getByRole("button", {name: new RegExp("add column", "i")});
-};
-
 export const getAddJobButton = (): HTMLElement => {
   return getByRole(getFirstColumn(), "button", {name: new RegExp("add job", "i")});
 };
@@ -43,18 +39,10 @@ export const getFirstColumnEditJobButton = (jobTitle: string): HTMLElement => {
   return getByRole(getFirstColumnJobByTitle(jobTitle), "button", {name: new RegExp("edit", "i")});
 };
 
-export const openAndGetAddJobModal = async (timeout: number = 1000): Promise<HTMLElement> => {
-  return openAndGetModal(getAddJobButton(), "add job", timeout);
-};
-
 export const openAndGetFirstColumnEditJobModal = async (
   jobTitle: string, timeout: number = 1000
 ): Promise<HTMLElement> => {
-  return openAndGetModal(getFirstColumnEditJobButton(jobTitle), "edit job", timeout);
-};
-
-export const openAndGetAddColumnModal = async (timeout: number = 1000): Promise<HTMLElement> => {
-  return await openAndGetModal(getAddColumnButton(), "add column", timeout);
+  return openAndGetModal("edit job", timeout, getFirstColumnEditJobButton(jobTitle));
 };
 
 export const dragJob = async (job: HTMLElement, targetStatus: string): Promise<void> => {

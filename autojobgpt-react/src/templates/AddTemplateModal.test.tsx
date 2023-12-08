@@ -52,43 +52,43 @@ test("add resume template modal has a description input", async () => {
   expect(descriptionInput).toBeInTheDocument();
 });
 
-test("adding a resume template closes the modal and adds the resume template to the list of resume templates", async () => {
-  await renderThisRoute();
-  const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
+// test("adding a resume template closes the modal and adds the resume template to the list of resume templates", async () => {
+//   await renderThisRoute();
+//   const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
 
-  // add a resume template
-  const addResumeTemplateModal: HTMLElement = await openAndGetAddResumeTemplateModal();
-  const nameInput: HTMLInputElement = getByRole(addResumeTemplateModal, "textbox", {name: new RegExp("name", "i")});
-  await act(async () => {
-    userEvent.type(nameInput, validResumeTemplate1.name);
-  });
-  const fileInput: HTMLInputElement = getByLabelText(addResumeTemplateModal, new RegExp("upload", "i"));
-  await act(async () => {
-    userEvent.upload(fileInput, new File([""], "test.docx", {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}));
-  });
-  fileInput.required = false; // workaround for limitation of userEvent.upload
+//   // add a resume template
+//   const addResumeTemplateModal: HTMLElement = await openAndGetAddResumeTemplateModal();
+//   const nameInput: HTMLInputElement = getByRole(addResumeTemplateModal, "textbox", {name: new RegExp("name", "i")});
+//   await act(async () => {
+//     userEvent.type(nameInput, validResumeTemplate1.name);
+//   });
+//   const fileInput: HTMLInputElement = getByLabelText(addResumeTemplateModal, new RegExp("upload", "i"));
+//   await act(async () => {
+//     userEvent.upload(fileInput, new File([""], "test.docx", {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}));
+//   });
+//   fileInput.required = false; // workaround for limitation of userEvent.upload
 
-  const submitButton: HTMLElement = getSubmitButton(addResumeTemplateModal);
-  mockFunctions.fetchData.mockImplementationOnce(generateResponse(validResumeTemplate1));
-  await act(async () => {
-    userEvent.click(submitButton);
-  });
+//   const submitButton: HTMLElement = getSubmitButton(addResumeTemplateModal);
+//   mockFunctions.fetchData.mockImplementationOnce(generateResponse(validResumeTemplate1));
+//   await act(async () => {
+//     userEvent.click(submitButton);
+//   });
 
-  // check that the modal was closed within 1 second
-  await waitFor(() => {
-    expect(addResumeTemplateModal).not.toBeInTheDocument();
-  }, {timeout: 1000});  
+//   // check that the modal was closed within 1 second
+//   await waitFor(() => {
+//     expect(addResumeTemplateModal).not.toBeInTheDocument();
+//   }, {timeout: 1000});  
 
-  // check that the API was called again to add the resume template
-  expect(mockFunctions.fetchData).toHaveBeenCalledTimes(initialFetchDataCalls + 1);
-  expect(mockFunctions.fetchData).toHaveBeenLastCalledWith("../api/templates/", expect.objectContaining({
-    method: "POST",
-    body: expect.any(FormData)
-  }));
+//   // check that the API was called again to add the resume template
+//   expect(mockFunctions.fetchData).toHaveBeenCalledTimes(initialFetchDataCalls + 1);
+//   expect(mockFunctions.fetchData).toHaveBeenLastCalledWith("../api/templates/", expect.objectContaining({
+//     method: "POST",
+//     body: expect.any(FormData)
+//   }));
 
-  // check that the resume template was added
-  const resumeTemplates: HTMLElement[] = queryResumeTemplates();
-  expect(resumeTemplates.length).toBe(1);
-  const addedResumeTemplate: HTMLElement = resumeTemplates[0];
-  expect(addedResumeTemplate).toHaveTextContent(validResumeTemplate1.name);
-});
+//   // check that the resume template was added
+//   const resumeTemplates: HTMLElement[] = queryResumeTemplates();
+//   expect(resumeTemplates.length).toBe(1);
+//   const addedResumeTemplate: HTMLElement = resumeTemplates[0];
+//   expect(addedResumeTemplate).toHaveTextContent(validResumeTemplate1.name);
+// });

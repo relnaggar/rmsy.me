@@ -112,7 +112,7 @@ describe("clicking every delete resume button shows delete confirmation modal wi
       await renderThisRoute();
       const resume: HTMLElement = getResumeByName(validResume.name);
       const deleteButton: HTMLElement = getByRole(resume, "button", {name: new RegExp("delete", "i")});
-      const deleteConfirmationModal: HTMLElement = await openAndGetModal(deleteButton, "confirm delete", 1000);
+      const deleteConfirmationModal: HTMLElement = await openAndGetModal("confirm delete", 1000, deleteButton);
       expect(deleteConfirmationModal).toBeInTheDocument();
     });
   }
@@ -129,7 +129,7 @@ describe("every delete resume confirmation modal has a delete button", () => {
       await renderThisRoute();
       const resume: HTMLElement = getResumeByName(validResume.name);
       const deleteButton: HTMLElement = getByRole(resume, "button", {name: new RegExp("delete", "i")});
-      const deleteConfirmationModal: HTMLElement = await openAndGetModal(deleteButton, "confirm delete", 1000);
+      const deleteConfirmationModal: HTMLElement = await openAndGetModal("confirm delete", 1000, deleteButton);
       const deleteConfirmationButton: HTMLElement = getByRole(deleteConfirmationModal, "button", {name: new RegExp("delete", "i")});
       expect(deleteConfirmationButton).toBeInTheDocument();
     });
@@ -147,7 +147,7 @@ describe("every delete resume confirmation modal has a close button", () => {
       await renderThisRoute();
       const resume: HTMLElement = getResumeByName(validResume.name);
       const deleteButton: HTMLElement = getByRole(resume, "button", {name: new RegExp("delete", "i")});
-      const deleteConfirmationModal: HTMLElement = await openAndGetModal(deleteButton, "confirm delete", 1000);
+      const deleteConfirmationModal: HTMLElement = await openAndGetModal("confirm delete", 1000, deleteButton);
       const closeButtons: HTMLElement[] = getAllByRole(deleteConfirmationModal, "button", {name: new RegExp("close", "i")});
       expect(closeButtons.length).toBeGreaterThan(0);
     });
@@ -165,7 +165,7 @@ describe("every delete confirmation modal asks are you sure", () => {
       await renderThisRoute();
       const resume: HTMLElement = getResumeByName(validResume.name);
       const deleteButton: HTMLElement = getByRole(resume, "button", {name: new RegExp("delete", "i")});
-      const deleteConfirmationModal: HTMLElement = await openAndGetModal(deleteButton, "confirm delete", 1000);
+      const deleteConfirmationModal: HTMLElement = await openAndGetModal("confirm delete", 1000, deleteButton);
       expect(deleteConfirmationModal).toHaveTextContent(new RegExp("are you sure", "i"));
     });
   }
@@ -183,7 +183,7 @@ test("deleting a resume closes the confirmation modal and removes it from the li
   mockFunctions.fetchData.mockImplementationOnce(generateResponse([], 204));
   const matchingResume: HTMLElement = getResumeByName(validResume2.name);
   const deleteButton: HTMLElement = getByRole(matchingResume, "button", {name: new RegExp("delete", "i")});
-  const deleteConfirmationModal: HTMLElement = await openAndGetModal(deleteButton, "confirm delete", 1000);
+  const deleteConfirmationModal: HTMLElement = await openAndGetModal("confirm delete", 1000, deleteButton);
   const deleteConfirmationButton: HTMLElement = getByRole(deleteConfirmationModal, "button", {name: new RegExp("delete", "i")});
   await act(async () => {
     userEvent.click(deleteConfirmationButton);

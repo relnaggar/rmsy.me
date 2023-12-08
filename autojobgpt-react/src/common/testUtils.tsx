@@ -9,7 +9,9 @@ import { generateResponse } from "./mockAPI";
 
 const mockRoutesConfig: RouteObject[] = [...routesConfig];
 
-export const mockFunctions = {
+export const mockFunctions: {
+  [key: string]: jest.MockedFunction<any>,
+} = {
   fetchData: jest.fn() as jest.MockedFunction<typeof fetch>
 };
   
@@ -60,12 +62,15 @@ export const testRouteAndAllChildren = (
 };
 
 export const openAndGetModal = async (
-  openModalButton: HTMLElement,
   modalName: string,
-  timeout: number = 1000
+  timeout: number = 1000,
+  openModalButton?: HTMLElement,
 ): Promise<HTMLElement> => {
+  if (!openModalButton) {
+    openModalButton = screen.getByRole("button", {name: new RegExp(modalName, "i")});
+  }
   await act(async () => {
-    userEvent.click(openModalButton);
+    userEvent.click(openModalButton!);
   });
   return await screen.findByRole(
     "dialog",
