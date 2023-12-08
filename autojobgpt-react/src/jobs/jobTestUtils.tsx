@@ -3,63 +3,68 @@ import { screen, getByRole, queryAllByRole, queryByRole, act, fireEvent } from "
 import { renderRoute, openAndGetModal } from "../common/testUtils";
 
 
-export async function renderThisRoute(): Promise<void> {
+export const renderThisRoute = async (): Promise<void> => {
   await renderRoute("/jobs");
-}
+};
 
-export function getKanbanColumn(status: string): HTMLElement {
-  const column: HTMLElement | null = screen.getByText( new RegExp(status, "i")).closest<HTMLElement>(".kanban-column");
-  if (!column) {
-    throw new Error(`Column ${status} not found`);
-  }
-  return column;
-}
+export const getFirstColumn = (): HTMLElement => {
+  const allColumns: HTMLElement[] = queryAllByRole(screen.getByRole("main"), "region");
+  return allColumns[0];
+};
 
-export function getBacklogColumn(): HTMLElement {
-  return getKanbanColumn("backlog");
-}
+export const getColumnByName = (status: string): HTMLElement => {
+  return screen.getByRole("region", {name: new RegExp(status, "i")});
+};
 
-export function getAddJobButton(): HTMLElement {
-  const backlogColumn: HTMLElement = getBacklogColumn();
-  return getByRole(backlogColumn, "button", {name: new RegExp("add job", "i")});
-}
+export const queryFirstColumnJobs = (): HTMLElement[] => {
+  return queryAllByRole(getFirstColumn(), "listitem");
+};
 
-export function getEditJobButton(jobTitle: string): HTMLElement {
-  const job: HTMLElement = getBacklogJobByTitle(jobTitle);
-  return getByRole(job, "button", {name: new RegExp("edit", "i")});
-}
-
-export async function openAndGetAddJobModal(timeout: number = 1000): Promise<HTMLElement> {
-  return openAndGetModal(getAddJobButton(), "add job", timeout);
-}
-
-export async function openAndGetEditJobModal(jobTitle: string, timeout: number = 1000): Promise<HTMLElement> {
-  return openAndGetModal(getEditJobButton(jobTitle), "edit job", timeout);
-}
-
-export function queryBacklogJobs(): HTMLElement[] {
-  const backlogColumn: HTMLElement = getBacklogColumn();
-  const jobs = queryAllByRole(backlogColumn, "listitem");
-  return jobs;
-}
-
-export function getBacklogJobByTitle(title: string): HTMLElement {
-  const backlogJobs: HTMLElement[] = queryBacklogJobs();
-  const matchingJob: HTMLElement = backlogJobs.find((job: HTMLElement) => {
+export const getFirstColumnJobByTitle = (title: string): HTMLElement => {
+  const matchingJob: HTMLElement | undefined = queryFirstColumnJobs().find((job: HTMLElement) => {
     const jobHeading: HTMLElement | null = queryByRole(job, "heading", {name: title});
     return jobHeading && jobHeading.textContent === title;
-  })!;
+  });
+  if (!matchingJob) {
+    throw new Error(`Job ${title} not found`);
+  }
   return matchingJob;
-}
+};
 
-export async function dragJob(job: HTMLElement, targetStatus: string): Promise<void> {
+export const getAddColumnButton = (): HTMLElement => {
+  return screen.getByRole("button", {name: new RegExp("add column", "i")});
+};
+
+export const getAddJobButton = (): HTMLElement => {
+  return getByRole(getFirstColumn(), "button", {name: new RegExp("add job", "i")});
+};
+
+export const getFirstColumnEditJobButton = (jobTitle: string): HTMLElement => {
+  return getByRole(getFirstColumnJobByTitle(jobTitle), "button", {name: new RegExp("edit", "i")});
+};
+
+export const openAndGetAddJobModal = async (timeout: number = 1000): Promise<HTMLElement> => {
+  return openAndGetModal(getAddJobButton(), "add job", timeout);
+};
+
+export const openAndGetFirstColumnEditJobModal = async (
+  jobTitle: string, timeout: number = 1000
+): Promise<HTMLElement> => {
+  return openAndGetModal(getFirstColumnEditJobButton(jobTitle), "edit job", timeout);
+};
+
+export const openAndGetAddColumnModal = async (timeout: number = 1000): Promise<HTMLElement> => {
+  return await openAndGetModal(getAddColumnButton(), "add column", timeout);
+};
+
+export const dragJob = async (job: HTMLElement, targetStatus: string): Promise<void> => {
   await act(async () => {
     fireEvent.dragStart(job);
   });
   await act(async () => {
-    fireEvent.dragOver(getKanbanColumn(targetStatus));
+    fireEvent.dragOver(getColumnByName(targetStatus));
   });
   await act(async () => {
-    fireEvent.drop(getKanbanColumn(targetStatus));
+    fireEvent.drop(getColumnByName(targetStatus));
   });
-}
+};

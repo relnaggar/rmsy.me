@@ -16,7 +16,7 @@ interface AddModalProps extends ModalProps {
   children: React.ReactNode,
 };
 
-const AddModal: (props: AddModalProps) => React.JSX.Element = ({
+const AddModal = ({
   show, setShow, errors, setErrors, showErrorAlert, setShowErrorAlert,
   title,
   modalID,
@@ -26,7 +26,7 @@ const AddModal: (props: AddModalProps) => React.JSX.Element = ({
   submitDisabled = false,
   customValidation = () => true,
   children,
-}) => {
+}: AddModalProps): React.JSX.Element => {
   const handleEntered = (): void => {
     const firstInputElement: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null =
       document.getElementById(modalID)!.querySelector('input, select, textarea');

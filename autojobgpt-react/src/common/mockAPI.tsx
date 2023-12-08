@@ -1,9 +1,20 @@
-import { Job } from "../jobs/types";
+import { Job, Status } from "../jobs/types";
 import { Resume } from "../resumes/types";
 import { ResumeTemplate } from "../templates/types";
 
 
-export function generateResponse(data: any, status: number = 200): () => Promise<Response> {
+export function generateResponse<T = any>(data: T, status: number = 200): () => Promise<Response> {
+  return async () => new Response(
+    JSON.stringify(data), {
+      status: status,
+      headers: {
+        "Content-type": "application/json",
+      },
+    }
+  );
+}
+
+export function generateErrorResponse(data: Record<string,string|string[]>, status: number = 400): () => Promise<Response> {
   return async () => new Response(
     JSON.stringify(data), {
       status: status,
@@ -95,3 +106,11 @@ export const validResume2: Resume = {
   template: validResumeTemplate2,
   name: validJob2.title + ", " + validJob2.company + ", " + 1
 };
+
+export const validStatus1: Status = {
+  id: 1,
+  name: "Test Status 1",
+  order: 1,
+};
+
+export const errorMessage = "Test Error Message";

@@ -1,6 +1,6 @@
 import React from "react";
 import { RouterProvider, createMemoryRouter, RouteObject } from "react-router-dom";
-import { render, act, screen, getByRole } from "@testing-library/react";
+import { render, act, screen, getByRole, getAllByRole } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { routesConfig, routesBasename }  from "../routes/routesConfig";
@@ -9,13 +9,11 @@ import { generateResponse } from "./mockAPI";
 
 const mockRoutesConfig: RouteObject[] = [...routesConfig];
 
-export const mockFunctions: {
-  fetchData: jest.MockedFunction<typeof fetch>
-} = {
+export const mockFunctions = {
   fetchData: jest.fn() as jest.MockedFunction<typeof fetch>
 };
   
-export function injectMocks() {
+export const injectMocks = (): void => {
   function injectMocksIntoRoutes(routes: RouteObject[]) {
     for (const route of routes) {
       if (route.element) {
@@ -36,21 +34,21 @@ export function injectMocks() {
 
   // default mocks
   mockFunctions.fetchData.mockImplementation(generateResponse([]));
-}
+};
 
-export async function renderRoute(path: string) {
+export const renderRoute = async (path: string): Promise<void> => {
   await act(async () => {
     render(<RouterProvider router={createMemoryRouter(mockRoutesConfig, {
       initialEntries: [routesBasename + path],
       basename: routesBasename,
     })} />);
   });
-}
+};
 
-export function testRouteAndAllChildren(
+export const testRouteAndAllChildren = (
   route: RouteObject,
   theTest: (routePath: string) => void,
-): void {
+): void => {
   if (route.path) {
     theTest(route.path);
     if (route.children) {  
@@ -59,23 +57,44 @@ export function testRouteAndAllChildren(
       }
     }
   }
-}
+};
 
-export async function openAndGetModal(openModalButton: HTMLElement, modalName: string, timeout: number = 1000): Promise<HTMLElement> {
-  // click the add resume template button
+export const openAndGetModal = async (
+  openModalButton: HTMLElement,
+  modalName: string,
+  timeout: number = 1000
+): Promise<HTMLElement> => {
   await act(async () => {
     userEvent.click(openModalButton);
   });
-  
-  // wait for the modal to appear
-  const modal: HTMLElement = await screen.findByRole(
+  return await screen.findByRole(
     "dialog",
     {name: new RegExp(modalName, "i")},
     {timeout: timeout}
   );
-  return modal;
-}
+};
 
-export function getSubmitButton(modal: HTMLElement): HTMLElement {
+export const getSubmitButton = (modal: HTMLElement): HTMLElement => {
   return getByRole(modal, "button", {name: new RegExp("submit", "i")});
-}
+};
+
+export const clickSubmitButton = async (modal: HTMLElement): Promise<void> => {
+  const submitButton: HTMLElement = getSubmitButton(modal);
+  await act(async () => {
+    userEvent.click(submitButton);
+  });
+};
+
+export const userTypeInput = async (modal: HTMLElement, inputLabel: string, text: string): Promise<void> => {
+  const input: HTMLElement = getByRole(modal, "textbox", {name: new RegExp(inputLabel, "i")});
+  await act(async () => {
+    userEvent.type(input, text);
+  });
+};
+
+export const clickCloseButton = async (modal: HTMLElement): Promise<void> => {
+  const closeButton: HTMLElement = getAllByRole(modal, "button", {name: new RegExp("close", "i")})[0];
+  await act(async () => {
+    userEvent.click(closeButton);
+  });
+};

@@ -74,7 +74,7 @@ export default function Layout(): React.JSX.Element {
         <ConfirmationModalContext.Provider value={openConfirmationModal}>
           {csrfToken === "" ?
             <div className="position-fixed top-50 start-50 translate-middle">
-              <div className="spinner-border" role="status">
+              <div className="spinner-border" role="status" aria-label="Loading Page">
                 <span className="visually-hidden">Loading...</span>
               </div>
             </div>

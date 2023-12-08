@@ -45,7 +45,10 @@ export default function Column({
   onClickRemoveColumn: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   onClickEditColumn: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
 }): React.JSX.Element {
-  function moveStatus(direction: "left" | "right"): void {
+  const status: Status = sortedStatuses.find((status) => status.id === statusID)!;
+  const columnID = `column${status.order}`;
+
+  const moveStatus = (direction: "left" | "right"): void => {
     let previousStatus: Status | null = null;
     for (const currentStatus of sortedStatuses) {
       if (previousStatus) {
@@ -57,22 +60,27 @@ export default function Column({
       }
       previousStatus = currentStatus;
     }
-  }
+  };
 
-  function onClickMoveLeft(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+  const onClickMoveLeft = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     moveStatus("left");    
-  }
+  };
 
-  function onClickMoveRight(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+  const onClickMoveRight = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     moveStatus("right");
-  }
+  };
 
   return (
-    <div className="kanban-column me-2" onDragOver={onDragOver} onDrop={onDrop}>
+    <div
+      className="kanban-column me-2" onDragOver={onDragOver} onDrop={onDrop}
+      role="region" aria-labelledby={`${columnID}Title`}
+    >
       <div className="card">
         <div className="card-header">
           <span className="d-flex">
-            <h5 className="mt-2 card-title flex-grow-1">{title}</h5>
+            <h5 id={`${columnID}Title`}
+              className="mt-2 card-title flex-grow-1"
+            >{title}</h5>
             <div className="btn-group ms-1" role="group">
               {statusID !== sortedStatuses[0].id && <button
                 type="button"

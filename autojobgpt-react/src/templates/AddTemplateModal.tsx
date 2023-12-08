@@ -11,10 +11,10 @@ interface AddTemplateModalProps extends ModalProps {
   addTemplate: (template: ResumeTemplateUpload) => void,
 };
 
-const AddTemplateModal: (props: AddTemplateModalProps) => React.JSX.Element = ({
+const AddTemplateModal = ({
   show, setShow, errors, setErrors, showErrorAlert, setShowErrorAlert,
   addTemplate,
-}) => {
+}: AddTemplateModalProps): React.JSX.Element => {
   const nameInput = useFormInput();
   const uploadInput = useFormInput();
   const descriptionInput = useFormInput();

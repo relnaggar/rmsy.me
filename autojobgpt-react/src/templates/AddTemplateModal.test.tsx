@@ -1,9 +1,9 @@
 import { screen, getAllByRole, getByRole, act, getByLabelText, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { renderThisRoute,  queryResumeTemplates, openAndGetAddResumeTemplateModal } from "./resumeTemplateTestUtils";
 import { injectMocks, getSubmitButton, mockFunctions } from "../common/testUtils";
 import { validResumeTemplate1, generateResponse } from "../common/mockAPI";
+import { renderThisRoute,  queryResumeTemplates, openAndGetAddResumeTemplateModal } from "./resumeTemplateTestUtils";
 
 
 beforeEach(() => {

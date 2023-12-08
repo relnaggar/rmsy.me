@@ -14,10 +14,10 @@ interface AddResumeModalProps extends ModalProps {
   addResume: (resumeUpload: ResumeUpload) => void,  
 }
 
-export default function AddResumeModal({
+const AddResumeModal = ({
   show, setShow, errors, setErrors, showErrorAlert, setShowErrorAlert,
   addResume,
-}: AddResumeModalProps): React.JSX.Element {
+}: AddResumeModalProps): React.JSX.Element => {
   const modalID = "addResumeModal";
   const jobInput = useFormInput("0");
   const templateInput = useFormInput("0");
@@ -113,4 +113,6 @@ export default function AddResumeModal({
       />
     </AddModal>
   );
-}
+};
+
+export default AddResumeModal;

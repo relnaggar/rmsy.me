@@ -14,6 +14,10 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
   id: number,
   statuses: Status[],
 }): React.JSX.Element {
+  if (id === -1) {
+    return <></>;
+  }
+
   return (
     <Modal aria-labelledby="editJobModalLabel" size="lg" backdrop="static"
       show={show} onHide={() => setShow(false)}

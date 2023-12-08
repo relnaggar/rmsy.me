@@ -228,11 +228,11 @@ export default function JobBoard(): React.JSX.Element {
           )
         ) : (
           <>
-            {sortedStatuses.map((status) => {
+            {sortedStatuses.map((status, index) => {
               return (
                 status.id !== -1 && (
                   <JobColumn
-                    key={status.id}
+                    key={`${status.id}-${index}`}
                     title={status.name}
                     jobs={jobs.filter((job) => (job.status === status.id || (job.status === -1 && status.order === sortedStatuses[0].order)))}
                     statusID={status.id}
@@ -256,7 +256,7 @@ export default function JobBoard(): React.JSX.Element {
             })}
             {sortedStatuses.map((status, index) =>
               status.id === -1 && (
-                <div className="kanban-column me-2" key={index}>
+                <div className="kanban-column me-2" key={`${status.id}-${index}`}>
                   <div className="card">
                     <div className="card-header">
                       <h5 className="mt-2 card-title">

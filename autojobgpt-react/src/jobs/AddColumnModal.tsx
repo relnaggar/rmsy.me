@@ -11,10 +11,10 @@ interface AddColumnModalProps extends ModalProps {
   addColumn: (statusUpload: StatusUpload) => void,
 };
 
-const AddColumnModal: (props: AddColumnModalProps) => React.JSX.Element = ({
+const AddColumnModal = ({
   show, setShow, errors, setErrors, showErrorAlert, setShowErrorAlert,
   addColumn,
-}) => {
+}: AddColumnModalProps): React.JSX.Element => {
   const modalID = "addColumnModal";
   const nameInput = useFormInput();  
 
@@ -31,7 +31,7 @@ const AddColumnModal: (props: AddColumnModalProps) => React.JSX.Element = ({
       onSuccessfulSubmit={handleSuccessfulSubmit}
     >
       <FormInput id={`${modalID}Name`}
-        label="Column Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
+        label="Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
         editing={nameInput.editing} error={errors["name"]} required
       />
     </AddModal>

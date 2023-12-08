@@ -59,7 +59,9 @@ const FormInput: (props: FormInputProps) => React.JSX.Element = ({
       :
         <input type={type} {...textAreaProps} />
       }
-      <div className="invalid-feedback" id={`${id}Feedback`} role={showError? "alert": undefined}>{error}</div>
+      {showError &&
+        <div className="invalid-feedback" id={`${id}Feedback`} role={"alert"} aria-labelledby={id}>{error}</div>
+      }
     </>
   );
 

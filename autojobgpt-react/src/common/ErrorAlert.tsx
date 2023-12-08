@@ -8,11 +8,11 @@ interface ErrorAlertProps {
   setShowErrorAlert: React.Dispatch<React.SetStateAction<boolean>>,  
 };
 
-const ErrorAlert: (props: ErrorAlertProps) => React.JSX.Element = ({
+const ErrorAlert = ({
   errors,
   showErrorAlert,
   setShowErrorAlert,  
-}) => {
+}: ErrorAlertProps): React.JSX.Element => {
   const numErrors: number = Object.keys(errors).length;
 
   const handleDismiss = (): void => {

@@ -14,10 +14,10 @@ interface AddJobModalProps extends ModalProps {
   addJob: (jobUpload: JobUpload) => void,  
 };
 
-const AddJobModal: (props: AddJobModalProps) => React.JSX.Element = ({
+const AddJobModal = ({
   show, setShow, errors, setErrors, showErrorAlert, setShowErrorAlert,
   addJob,
-}) => {
+}: AddJobModalProps): React.JSX.Element => {
   const modalID = "addJobModal";
   const urlInput = useFormInput();
   const titleInput = useFormInput();
@@ -27,9 +27,6 @@ const AddJobModal: (props: AddJobModalProps) => React.JSX.Element = ({
   const [fillErrors, setFillErrors] = useState<Record<string,string>>({});
   const [showFillErrorAlert, setShowFillErrorAlert] = useState<boolean>(false);  
   const { url: urlFillErrors, ...nonURLFillErrors } = fillErrors;
-
-  console.log("fillErrors");
-  console.log(fillErrors);
 
   const onFillSuccess = useCallback((jobDetails: JobDetails) => {
     titleInput.edit(jobDetails.title);
