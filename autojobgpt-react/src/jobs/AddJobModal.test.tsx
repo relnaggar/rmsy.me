@@ -2,8 +2,8 @@ import { screen, getAllByRole, getByRole, waitFor } from "@testing-library/react
 
 import { injectMocks, openAndGetModal, getSubmitButton, clickCloseButton, clickSubmitButton, userTypeInput, mockFunctions, OpenAndGetModalProps } from "../common/testUtils";
 import { validJob1, generateResponse, testDataForAPIGeneralErrors, errorMessage, generateErrorResponse, generateConditionalResponseByRoute } from "../common/mockAPI";
-import { renderThisRoute, getFirstColumn } from "./jobTestUtils";
-import { Job } from "../jobs/types";
+import { renderThisRoute, getFirstColumn, getFillButton, clickFillButton } from "./jobTestUtils";
+import { Job, JobDetails } from "../jobs/types";
 
 
 beforeEach(() => {
@@ -49,6 +49,10 @@ const fillWithValidValues = async (modal: HTMLElement): Promise<void> => {
   for (const testDataForInput of testDataForInputs) {
     await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
   }
+};
+
+const fillValidURL = async (modal: HTMLElement): Promise<void> => {
+  await userTypeInput(modal, "url", validJob1.url);
 };
 
 test(`${modalName} modal isn't visible before clicking ${modalName} button`, async () => {
@@ -263,146 +267,118 @@ describe(`${modalName} retains API general errors on close and reopen`, () => {
   }
 });
 
-// test("add job modal has a fill button", async () => {
-//   await renderThisRoute();
-//   const fillButton: HTMLElement = getByRole(await openAndGetAddJobModal(), "button", {name: new RegExp("fill", "i")});
-//   expect(fillButton).toBeInTheDocument();
-// });
+test(`${modalName} modal has a fill button`, async () => {
+  await renderThisRoute();
+  const fillButton: HTMLElement = getFillButton(await openAndGetModal(openAndGetModalProps));
+  expect(fillButton).toBeInTheDocument();
+});
 
-// test("clicking the fill button calls the API", async () => {
-//   await renderThisRoute();
-//   const addJobModal: HTMLElement = await openAndGetAddJobModal();
-//   const fillButton: HTMLElement = getByRole(addJobModal, "button", {name: new RegExp("fill", "i")});
-//   await act(async () => {
-//     userEvent.type(getByRole(addJobModal, "textbox", {name: new RegExp("url", "i")}), validJob1.url);
-//   });
-//   await act(async () => {
-//     userEvent.click(fillButton);
-//   });
-//   expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(
-//     expect.stringContaining("../api/jobs/extract-details-from-url?url="),
-//     expect.objectContaining({
-//       method: "GET",
-//       headers: expect.objectContaining({
-//         "Content-Type": "application/json",
-//       }),
-//     })
-//   );
-// });
+test(`clicking the ${modalName} modal fill button with empty URL shows an error for that input`, async () => {
+  await renderThisRoute();
+  const modal: HTMLElement = await openAndGetModal(openAndGetModalProps);
+  await clickFillButton(modal);
+  const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp("url", "i")});
+  expect(errorAlert).toBeInTheDocument();
+  expect(errorAlert).toHaveTextContent(new RegExp("url", "i"));
+});
 
-// test("clicking the fill button when the API fails shows an error alert", async () => {
-//   await renderThisRoute();
-//   const addJobModal: HTMLElement = await openAndGetAddJobModal();
-//   mockFunctions.fetchData.mockRejectedValueOnce(new Error("Failed to fetch"));
+test(`clicking the ${modalName} modal fill button with valid URL makes an API call`, async () => {
+  await renderThisRoute();
+  const modal: HTMLElement = await openAndGetModal(openAndGetModalProps);
+  await fillValidURL(modal);
+  const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
+  await clickFillButton(modal);
+  expect(mockFunctions.fetchData.mock.calls.length).toBe(initialFetchDataCalls + 1);
+});
 
-//   const fillButton: HTMLElement = getByRole(addJobModal, "button", {name: new RegExp("fill", "i")});
-//   await act(async () => {
-//     userEvent.type(getByRole(addJobModal, "textbox", {name: new RegExp("url", "i")}), validJob1.url);
-//   });
-//   await act(async () => {
-//     userEvent.click(fillButton);
-//   });
+test(`clicking the ${modalName} modal fill button with valid URL makes an API call to fill the job details`, async () => {
+  await renderThisRoute();
+  const modal: HTMLElement = await openAndGetModal(openAndGetModalProps);
+  await fillValidURL(modal);
+  await clickFillButton(modal);
+  expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(
+    `../api/jobs/extract-details-from-url?url=${validJob1.url}`,
+    expect.objectContaining({
+      method: "GET",
+      headers: expect.objectContaining({
+        "Content-Type": "application/json",
+      }),
+    })
+  );
+});
 
-//   const alert: HTMLElement = getByRole(addJobModal, "alert");
-//   expect(alert).toHaveTextContent("Failed to connect to server. Please check your internet connection and try again.");
-// });
+test(`clicking the ${modalName} modal fill button with valid URL fills the job details`, async () => {
+  await renderThisRoute();
+  const modal: HTMLElement = await openAndGetModal(openAndGetModalProps);
+  await fillValidURL(modal);
+  const {title, company, posting}: JobDetails = validJob1;
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse<JobDetails>({title, company, posting}));
+  await clickFillButton(modal);
+  expect(getByRole(modal, "textbox", {name: new RegExp("title", "i")})).toHaveValue(title);
+  expect(getByRole(modal, "textbox", {name: new RegExp("company", "i")})).toHaveValue(company);
+  expect(getByRole(modal, "textbox", {name: new RegExp("posting", "i")})).toHaveValue(posting);
+});
 
-// type FillButtonTest = {
-//   test_description: string,
-//   url: string,
-//   data: Record<string, string | string[]>,
-//   status: number,
-// };
+describe(`API general errors after clicking the ${modalName} modal fill button show an error alert within the modal`, () => {
+  for (const testDataForAPIGeneralError of testDataForAPIGeneralErrors(mockFunctions)) {
+    test(`API ${testDataForAPIGeneralError.apiErrorType} error after submitting the ${modalName} modal shows an error alert within the modal`, async () => {
+      await renderThisRoute();
+      const modal: HTMLElement = await openAndGetModal(openAndGetModalProps);
+      await fillValidURL(modal);
+      testDataForAPIGeneralError.mockAPIError();
+      await clickFillButton(modal);
+      const errorAlert: HTMLElement = getByRole(modal, "alert");
+      expect(errorAlert).toBeInTheDocument();
+      expect(errorAlert).toHaveTextContent(errorMessage);
+    });
+  }
+});
 
-// describe("clicking the fill button invalid URLs calls the API and shows an error alert", () => {
-//   const allTestData: FillButtonTest[] = [{
-//       "test_description": "an invalid URL",
-//       "url": "ab:cd",
-//       "data": {"url": ["Enter a valid URL."]},
-//       "status": 400,
-//     }, {
-//       "test_description": "a URL with no job details",
-//       "url": "https://www.notajobposting.com",
-//       "data": {"error": "The provided job posting text does not contain a job title or a company name."},
-//       "status": 400,
-//     }, {
-//       "test_description": "an empty URL",
-//       "url": "",
-//       "data": {"error": ["Please enter a URL."]},
-//       "status": 400,
-//     }, {
-//       "test_description": "a server error",
-//       "url": "https://www.validjobposting.com",
-//       "data": {"error": "An error occurred."},
-//       "status": 500,
-//     }
-//   ];
 
-//   for (const currentTestData of allTestData) {
-//     test(`clicking fill button with ${currentTestData["test_description"]} calls the API and shows an error alert`, async () => {
-//       await renderThisRoute();
-//       const addJobModal: HTMLElement = await openAndGetAddJobModal();
-  
-//       // fill with an invalid URL
-//       if (currentTestData["url"] !== "") {
-//         await act(async () => {
-//           userEvent.type(getByRole(addJobModal, "textbox", {name: new RegExp("url", "i")}), currentTestData["url"]);
-//         });
-//       }
-//       mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
-//         url: `../api/jobs/extract-details-from-url?url=${currentTestData["url"]}`,
-//         data: currentTestData["data"],
-//         status: currentTestData["status"],
-//       }]));
-  
-//       // click fill button
-//       const fillButton: HTMLElement = getByRole(addJobModal, "button", {name: new RegExp("fill", "i")});
-//       await act(async () => {
-//         userEvent.click(fillButton);
-//       });
-  
-//       // check that the error alert is shown
-//       const alert: HTMLElement = getByRole(addJobModal, "alert");
-//       if (currentTestData["data"]["error"]) {
-//         expect(alert).toHaveTextContent(currentTestData["data"]["error"] as string)
-//       } else {
-//         expect(alert).toHaveTextContent(Object.values(currentTestData["data"]).flat().join(" "));
-//       }
-//     });
-//   }
-// });
+test(`API input error after clicking the ${modalName} modal fill button shows an error message attached to the URL input`, async () => {
+  await renderThisRoute();
+  const modal: HTMLElement = await openAndGetModal(openAndGetModalProps);
+  await fillValidURL(modal);
+  mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({url: [errorMessage]}));
+  await clickFillButton(modal);
+  const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp("url", "i")});
+  expect(errorAlert).toBeInTheDocument();
+  expect(errorAlert).toHaveTextContent(errorMessage);
+});
 
-// test("clicking the fill button with a valid URL calls the API and fills the job detail inputs", async () => {
-//   await renderThisRoute();
-//   const addJobModal: HTMLElement = await openAndGetAddJobModal();
+test(`API input error after clicking the ${modalName} modal fill button can be cleared by editing the corresponding input`, async () => {
+  await renderThisRoute();
+  const modal: HTMLElement = await openAndGetModal(openAndGetModalProps);
+  await fillValidURL(modal);
+  mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({url: [errorMessage]}));
+  await clickFillButton(modal);
+  const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp("url", "i")});
+  await userTypeInput(modal, "url", "abc");
+  expect(errorAlert).not.toBeInTheDocument();
+  await clickCloseButton(modal); // close the modal to make sure transition is complete by the end of the test
+});
 
-//   // fill with a valid URL
-//   await act(async () => {
-//     userEvent.type(getByRole(addJobModal, "textbox", {name: new RegExp("url", "i")}), validJob1.url);
-//   });
-//   mockFunctions.fetchData.mockImplementation(generateResponse({
-//     "title": validJob1.title,
-//     "company": validJob1.company,
-//     "posting": validJob1.posting,
-//   }));
+test(`empty URL input error after clicking the ${modalName} modal fill button can be cleared by editing the corresponding input`, async () => {
+  await renderThisRoute();
+  const modal: HTMLElement = await openAndGetModal(openAndGetModalProps);
+  await clickFillButton(modal);
+  const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp("url", "i")});
+  await userTypeInput(modal, "url", "abc");
+  expect(errorAlert).not.toBeInTheDocument();
+  await clickCloseButton(modal); // close the modal to make sure transition is complete by the end of the test
+});
 
-//   // click fill button
-//   const fillButton: HTMLElement = getByRole(addJobModal, "button", {name: new RegExp("fill", "i")});
-//   await act(async () => {
-//     userEvent.click(fillButton);
-//   });
-
-//   // check that the job detail inputs were filled
-//   expect(getByRole(addJobModal, "textbox", {name: new RegExp("title", "i")})).toHaveValue(validJob1.title);
-//   expect(getByRole(addJobModal, "textbox", {name: new RegExp("company", "i")})).toHaveValue(validJob1.company);
-//   expect(getByRole(addJobModal, "textbox", {name: new RegExp("posting", "i")})).toHaveValue(validJob1.posting);
-// });
-
-// type SubmitButtonTest = {
-//   url: string,
-//   title: string,
-//   company: string,
-//   posting: string,
-//   data: Record<string, string | string[]>,
-//   status: number,
-// };
+describe(`API general errors after clicking the ${modalName} modal fill button can be cleared by clicking the button again`, () => {
+  for (const testDataForAPIGeneralError of testDataForAPIGeneralErrors(mockFunctions)) {
+    test(`API ${testDataForAPIGeneralError.apiErrorType} error after clicking the ${modalName} modal fill button can be cleared by clicking the button again`, async () => {
+      await renderThisRoute();
+      const modal: HTMLElement = await openAndGetModal(openAndGetModalProps);
+      await fillValidURL(modal);
+      testDataForAPIGeneralError.mockAPIError();
+      await clickFillButton(modal);
+      const errorAlert: HTMLElement = getByRole(modal, "alert");
+      await clickFillButton(modal);
+      expect(errorAlert).not.toBeInTheDocument();
+    });
+  }
+});

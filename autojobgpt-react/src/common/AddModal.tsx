@@ -44,7 +44,7 @@ const AddModal = ({
     setShowErrorAlert(false);
     onClickSubmit?.();
 
-    if (e.currentTarget.reportValidity() && validateSubmit()) {
+    if (validateSubmit()) {
       onSuccessfulSubmit();
       setShow(false);
     }

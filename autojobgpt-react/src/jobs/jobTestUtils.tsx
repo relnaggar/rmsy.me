@@ -1,4 +1,5 @@
-import { screen, getByRole, queryAllByRole, queryByRole, act, fireEvent } from "@testing-library/react";
+import { screen, getByRole, queryAllByRole, act } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { renderRoute, openAndGetModal } from "../common/testUtils";
 
@@ -15,6 +16,17 @@ export const getFirstColumn = (): HTMLElement => {
 export const getColumnByName = (status: string): HTMLElement => {
   return screen.getByRole("region", {name: new RegExp(status, "i")});
 };
+
+export const getFillButton = (modal: HTMLElement): HTMLElement => {
+  return getByRole(modal, "button", {name: new RegExp("fill", "i")});
+}
+
+export const clickFillButton = async (modal: HTMLElement): Promise<void> => {
+  const fillButton: HTMLElement = getFillButton(modal);
+  await act(async () => {
+    userEvent.click(fillButton);
+  });
+}
 
 // export const queryFirstColumnJobs = (): HTMLElement[] => {
 //   return queryAllByRole(getFirstColumn(), "listitem");

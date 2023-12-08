@@ -59,7 +59,7 @@ const AddJobModal = ({
     const newFillErrors: Record<string,string[]> = {};
 
     if (urlInput.value === "") {
-      newFillErrors["url"] = ["Please enter a URL in order to autofill the job details."];
+      newFillErrors["url"] = ["Enter a URL."];
       valid = false;
     }
 
@@ -81,17 +81,17 @@ const AddJobModal = ({
     const newErrors: Record<string,string[]> = {};
 
     if (titleInput.value === "") {
-      newErrors["title"] = ["Please enter a job title."];
+      newErrors["title"] = ["Enter a title."];
       valid = false;
     }
 
     if (companyInput.value === "") {
-      newErrors["company"] = ["Please enter a company."];
+      newErrors["company"] = ["Enter a company."];
       valid = false;
     }
 
     if (postingInput.value === "") {
-      newErrors["posting"] = ["Please enter a job posting."];
+      newErrors["posting"] = ["Enter a posting."];
       valid = false;
     }
 
