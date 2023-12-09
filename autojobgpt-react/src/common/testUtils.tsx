@@ -4,7 +4,7 @@ import { render, act, screen, getByRole, getAllByRole } from "@testing-library/r
 import userEvent from "@testing-library/user-event";
 
 import { routesConfig, routesBasename }  from "../routes/routesConfig";
-import { generateResponse } from "./mockAPI";
+import { generateResponse } from "../api/mockApi";
 
 
 const mockRoutesConfig: RouteObject[] = [...routesConfig];

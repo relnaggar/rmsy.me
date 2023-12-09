@@ -1,9 +1,10 @@
 import { screen, getAllByRole, waitFor, getByRole, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { injectMocks, OpenAndGetModalParams, openAndGetModal, getSubmitButton, clickCloseButton, clickSubmitButton, mockFunctions } from "../common/testUtils";
-import { renderThisRoute, queryResumes, getRefreshButton, clickRefreshButton } from "./resumeTestUtils";
-import { validResume1, generateConditionalResponseByRoute, validJob1, validJob2, validResumeTemplate1, validResumeTemplate2, generateResponse, testDataForAPIGeneralErrors, errorMessage, generateErrorResponse } from "../common/mockAPI";
+import { injectMocks, renderRoute, OpenAndGetModalParams, openAndGetModal, getSubmitButton, clickCloseButton, clickSubmitButton, mockFunctions } from "../common/testUtils";
+import { queryResumes, getRefreshButton, clickRefreshButton } from "./resumeTestUtils";
+import { generateConditionalResponseByRoute, generateResponse, generateErrorResponse } from "../api/mockApi";
+import { validJob1, validJob2, validResumeTemplate1, validResumeTemplate2, validResume1, errorMessage, testDataForAPIGeneralErrors } from "../api/mockData";
 import { Job, ResumeTemplate, Resume } from '../api/types';
 
 
@@ -21,11 +22,12 @@ beforeEach(() => {
   ]));
 });
 
+const thisRoute = "/resumes";
 const modalName = "generate resume";
 const openModalButtonText = "generate new resume";
 const openAndGetModalParams: OpenAndGetModalParams = {modalName, openModalButtonText};
 
-const testDataForInputs: {label: keyof Resume, required: boolean}[] = [{
+const testData: {label: keyof Resume, required: boolean}[] = [{
   label: "job",
   required: true,
 }, {
@@ -34,7 +36,7 @@ const testDataForInputs: {label: keyof Resume, required: boolean}[] = [{
 }];
 
 const fillWithValidValues = async (modal: HTMLElement): Promise<void> => {
-  for (const testDataForInput of testDataForInputs) {
+  for (const testDataForInput of testData) {
     const input: HTMLElement = getByRole(modal, "combobox", {name: new RegExp(testDataForInput.label, "i")});
     await act(async () => {
       userEvent.selectOptions(input, (validResume1[testDataForInput.label] as Job | ResumeTemplate).id.toString());
@@ -43,39 +45,39 @@ const fillWithValidValues = async (modal: HTMLElement): Promise<void> => {
 };
 
 test(`${modalName} modal isn't visible before clicking ${modalName} button`, async () => {
-  await renderThisRoute();
+  await renderRoute(thisRoute);
   expect(screen.queryByRole("dialog", {name: new RegExp(modalName, "i")})).not.toBeInTheDocument();
 });
 
 test(`clicking ${modalName} button shows ${modalName} modal within 1 second`, async () => {
-  await renderThisRoute();
+  await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal({...openAndGetModalParams, timeout: 1000});
   expect(modal).toBeInTheDocument();
 });
 
 test(`${modalName} has a submit button`, async () => {
-  await renderThisRoute();
+  await renderRoute(thisRoute);
   const submitButton: HTMLElement = getSubmitButton(await openAndGetModal(openAndGetModalParams));
   expect(submitButton).toBeInTheDocument();
 });
 
 test(`${modalName} has a close button`, async () => {
-  await renderThisRoute();
+  await renderRoute(thisRoute);
   const closeButtons: HTMLElement[] = getAllByRole(await openAndGetModal(openAndGetModalParams), "button", {name: new RegExp("close", "i")});
   expect(closeButtons.length).toBeGreaterThan(0);
 });
 
 test(`clicking close button closes the ${modalName} modal within 1 second`, async () => {
-  await renderThisRoute();
+  await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await clickCloseButton(modal);
   waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
 });
 
 describe(`${modalName} modal has all select inputs`, () => {
-  for (const testDataForInput of testDataForInputs) {
+  for (const testDataForInput of testData) {
     test(`${modalName} modal has a ${testDataForInput.label} input`, async () => {
-      await renderThisRoute();
+      await renderRoute(thisRoute);
       const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       const input: HTMLElement = getByRole(modal, "combobox", {name: new RegExp(testDataForInput.label, "i")});
       expect(input).toBeInTheDocument();
@@ -84,9 +86,9 @@ describe(`${modalName} modal has all select inputs`, () => {
 });
 
 describe(`each select input in ${modalName} modal has a refresh button`, () => {
-  for (const testDataForInput of testDataForInputs) {
+  for (const testDataForInput of testData) {
     test(`${modalName} modal has a refresh button for ${testDataForInput.label} input`, async () => {
-      await renderThisRoute();
+      await renderRoute(thisRoute);
       const refreshButton: HTMLElement = getRefreshButton(await openAndGetModal(openAndGetModalParams), testDataForInput.label);
       expect(refreshButton).toBeInTheDocument();
     });
@@ -94,15 +96,15 @@ describe(`each select input in ${modalName} modal has a refresh button`, () => {
 });
 
 test(`${modalName} modal automatically focuses on the first select input within 1 second`, async () => {
-  await renderThisRoute();
-  const firstInput: HTMLElement = getByRole(await openAndGetModal(openAndGetModalParams), "combobox", {name: new RegExp(testDataForInputs[0].label, "i")});
+  await renderRoute(thisRoute);
+  const firstInput: HTMLElement = getByRole(await openAndGetModal(openAndGetModalParams), "combobox", {name: new RegExp(testData[0].label, "i")});
   await waitFor(() => expect(firstInput).toHaveFocus(), {timeout: 1000});
 });
 
 describe(`submitting the ${modalName} modal with empty values for required inputs shows an error for that input`, () => {
-  for (const testDataForInput of testDataForInputs.filter((testDataForInput) => testDataForInput.required)) {
+  for (const testDataForInput of testData.filter((testDataForInput) => testDataForInput.required)) {
     test(`submitting the ${modalName} modal with empty ${testDataForInput.label} input shows an error for that input`, async () => {
-      await renderThisRoute();
+      await renderRoute(thisRoute);
       const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
       await clickSubmitButton(modal);
@@ -114,7 +116,7 @@ describe(`submitting the ${modalName} modal with empty values for required input
 });
 
 test(`submitting the ${modalName} modal with valid input closes the modal within 1 second`, async () => {
-  await renderThisRoute();
+  await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
   mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
@@ -123,7 +125,7 @@ test(`submitting the ${modalName} modal with valid input closes the modal within
 });
 
 test(`submitting the ${modalName} modal with valid input makes an API call`, async () => {
-  await renderThisRoute();
+  await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
   const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
@@ -133,7 +135,7 @@ test(`submitting the ${modalName} modal with valid input makes an API call`, asy
 });
 
 test(`submitting the ${modalName} modal with valid input makes an API call to add the column`, async () => {
-  await renderThisRoute();
+  await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
   mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
@@ -148,7 +150,7 @@ test(`submitting the ${modalName} modal with valid input makes an API call to ad
 });
 
 test(`submitting the ${modalName} modal with valid input adds the resume to the list`, async () => {
-  await renderThisRoute();
+  await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
   mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
@@ -162,7 +164,7 @@ test(`submitting the ${modalName} modal with valid input adds the resume to the 
 describe(`API general errors after submitting the ${modalName} modal show an error alert within the modal`, () => {
   for (const testDataForAPIGeneralError of testDataForAPIGeneralErrors(mockFunctions)) {
     test(`API ${testDataForAPIGeneralError.apiErrorType} error after submitting the ${modalName} modal shows an error alert within the modal`, async () => {
-      await renderThisRoute();
+      await renderRoute(thisRoute);
       const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       await fillWithValidValues(modal);
       testDataForAPIGeneralError.mockAPIError();
@@ -177,7 +179,7 @@ describe(`API general errors after submitting the ${modalName} modal show an err
 describe(`API general errors after submitting the ${modalName} modal can be cleared by clicking submit again`, () => {
   for (const testDataForAPIGeneralError of testDataForAPIGeneralErrors(mockFunctions)) {
     test(`API ${testDataForAPIGeneralError.apiErrorType} error after submitting the ${modalName} modal can be cleared by clicking submit again`, async () => {
-      await renderThisRoute();
+      await renderRoute(thisRoute);
       const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       await fillWithValidValues(modal);
       testDataForAPIGeneralError.mockAPIError();
@@ -191,30 +193,30 @@ describe(`API general errors after submitting the ${modalName} modal can be clea
 });
 
 test(`${modalName} modal retains input values on close and reopen`, async () => {
-  await renderThisRoute();
+  await renderRoute(thisRoute);
   let addColumnModal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(addColumnModal);
   await clickCloseButton(addColumnModal);
   addColumnModal = await openAndGetModal(openAndGetModalParams);
-  for (const testDataForInput of testDataForInputs) {
+  for (const testDataForInput of testData) {
     const input: HTMLElement = getByRole(addColumnModal, "combobox", {name: new RegExp(testDataForInput.label, "i")});
     expect(input).toHaveValue((validResume1[testDataForInput.label] as Job | ResumeTemplate).id.toString());  
   }
 });
 
 test(`${modalName} modal retains API input errors on close and reopen`, async () => {
-  await renderThisRoute();
+  await renderRoute(thisRoute);
   let modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
   const errorResponse: {[key: string]: string[]} = {};
-  for (const testDataForInput of testDataForInputs) {
+  for (const testDataForInput of testData) {
     errorResponse[testDataForInput.label] = [errorMessage + testDataForInput.label];
   }
   mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse(errorResponse));
   await clickSubmitButton(modal);
   await clickCloseButton(modal);
   modal = await openAndGetModal(openAndGetModalParams);
-  for (const testDataForInput of testDataForInputs) {
+  for (const testDataForInput of testData) {
     const errorAlert = getByRole(modal, "alert", {name: new RegExp(testDataForInput.label, "i")});
     expect(errorAlert).toBeInTheDocument();
     expect(errorAlert).toHaveTextContent(errorMessage + testDataForInput.label);
@@ -224,7 +226,7 @@ test(`${modalName} modal retains API input errors on close and reopen`, async ()
 describe(`${modalName} modal retains API general errors on close and reopen`, () => {
   for (const testDataForAPIGeneralError of testDataForAPIGeneralErrors(mockFunctions)) {
     test(`${modalName} modal retains API ${testDataForAPIGeneralError.apiErrorType} error on close and reopen`, async () => {
-      await renderThisRoute();
+      await renderRoute(thisRoute);
       let modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       await fillWithValidValues(modal);
       testDataForAPIGeneralError.mockAPIError();
@@ -239,9 +241,9 @@ describe(`${modalName} modal retains API general errors on close and reopen`, ()
 });
 
 describe(`${modalName} modal select options are rendered for all select inputs`, () => {
-  for (const testDataForInput of testDataForInputs) {
+  for (const testDataForInput of testData) {
     test(`${modalName} modal select options are rendered for ${testDataForInput.label} input`, async () => {
-      await renderThisRoute();
+      await renderRoute(thisRoute);
       const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       const selectInput: HTMLElement = getByRole(modal, "combobox", {name: new RegExp(testDataForInput.label, "i")});
       const selectOptions: HTMLElement[] = getAllByRole(selectInput, "option");
@@ -251,9 +253,9 @@ describe(`${modalName} modal select options are rendered for all select inputs`,
 });
 
 describe(`clicking each ${modalName} modal refresh button makes an additional API call`, () => {
-  for (const testDataForInput of testDataForInputs) {
+  for (const testDataForInput of testData) {
     test(`clicking ${modalName} modal refresh button for ${testDataForInput.label} makes an additional API call`, async () => {
-      await renderThisRoute();
+      await renderRoute(thisRoute);
       const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
       await clickRefreshButton(modal, testDataForInput.label);
@@ -263,9 +265,9 @@ describe(`clicking each ${modalName} modal refresh button makes an additional AP
 });
 
 describe(`clicking each ${modalName} modal refresh button makes an API call to get the updated select options`, () => {
-  for (const testDataForInput of testDataForInputs) {
+  for (const testDataForInput of testData) {
     test(`clicking ${modalName} modal refresh button for ${testDataForInput.label} makes an API call to get the updated select options`, async () => {
-      await renderThisRoute();
+      await renderRoute(thisRoute);
       const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       await clickRefreshButton(modal, testDataForInput.label);
       expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`../api/${testDataForInput.label}s/`,
@@ -281,9 +283,9 @@ describe(`clicking each ${modalName} modal refresh button makes an API call to g
 });
 
 describe(`clicking each ${modalName} modal refresh button updates select options if API call returns different data`, () => {
-  for (const testDataForInput of testDataForInputs) {
+  for (const testDataForInput of testData) {
     test(`clicking ${modalName} modal refresh button for ${testDataForInput.label} updates select options if API call returns different data`, async () => {
-      await renderThisRoute();
+      await renderRoute(thisRoute);
       const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       const allOptionsBefore: HTMLElement[] = getAllByRole(modal, "option");
       expect(allOptionsBefore.length).toBe(6);
@@ -302,10 +304,10 @@ describe(`clicking each ${modalName} modal refresh button updates select options
 });
 
 describe(`API general errors after clicking each ${modalName} modal refresh button show an error alert within the modal`, () => {
-  for (const testDataForInput of testDataForInputs) {
+  for (const testDataForInput of testData) {
     for (const testDataForAPIGeneralError of testDataForAPIGeneralErrors(mockFunctions)) {
       test(`API ${testDataForAPIGeneralError.apiErrorType} error after clicking ${modalName} modal refresh button for ${testDataForInput.label} shows an error alert within the modal`, async () => {
-        await renderThisRoute();
+        await renderRoute(thisRoute);
         const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
         testDataForAPIGeneralError.mockAPIError();
         await clickRefreshButton(modal, testDataForInput.label);

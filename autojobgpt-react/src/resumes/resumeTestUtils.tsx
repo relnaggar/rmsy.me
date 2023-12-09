@@ -1,12 +1,6 @@
 import { screen, queryAllByRole, getByRole, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { renderRoute } from "../common/testUtils";
-
-
-export const renderThisRoute = async (): Promise<void> => {
-  await renderRoute("/resumes");
-}
 
 const getResumeSection = (): HTMLElement => {
   const resumeHeading: HTMLElement = screen.getByRole("heading", {name: new RegExp("resumes", "i"), level: 2});

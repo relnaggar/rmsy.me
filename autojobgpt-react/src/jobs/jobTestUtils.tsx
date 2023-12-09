@@ -1,12 +1,6 @@
 import { screen, getByRole, queryAllByRole, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { renderRoute } from "../common/testUtils";
-
-
-export const renderThisRoute = async (): Promise<void> => {
-  await renderRoute("/jobs");
-};
 
 export const getFirstColumn = (): HTMLElement => {
   const allColumns: HTMLElement[] = queryAllByRole(screen.getByRole("main"), "region");
