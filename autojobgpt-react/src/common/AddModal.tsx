@@ -2,15 +2,23 @@ import React from "react";
 import BootstrapModal from 'react-bootstrap/Modal';
 
 import ErrorAlert from "./ErrorAlert";
-import { ModalProps } from "./types";
 
+
+export interface ModalProps {
+  show: boolean,
+  setShow: React.Dispatch<React.SetStateAction<boolean>>,
+  errors: Record<string,string[]>,
+  setErrors: React.Dispatch<React.SetStateAction<Record<string,string[]>>>,
+  showErrorAlert: boolean,
+  setShowErrorAlert: React.Dispatch<React.SetStateAction<boolean>>,
+};
 
 interface AddModalProps extends ModalProps {
   title: string,
   modalID: string,
   size?: "sm" | "lg" | "xl",
-  onClickSubmit?: () => void,
-  onSuccessfulSubmit: () => void,
+  onSubmit?: () => void,
+  onValidatedSubmit: () => void,
   submitDisabled?: boolean,
   validateSubmit: () => boolean,
   children: React.ReactNode,
@@ -21,8 +29,8 @@ const AddModal = ({
   title,
   modalID,
   size = undefined,
-  onClickSubmit = () => {},
-  onSuccessfulSubmit,
+  onSubmit = () => {},
+  onValidatedSubmit,
   submitDisabled = false,
   validateSubmit,
   children,
@@ -42,10 +50,10 @@ const AddModal = ({
 
     setErrors({});
     setShowErrorAlert(false);
-    onClickSubmit?.();
+    onSubmit?.();
 
     if (validateSubmit()) {
-      onSuccessfulSubmit();
+      onValidatedSubmit();
       setShow(false);
     }
   };

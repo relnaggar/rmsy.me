@@ -3,11 +3,11 @@ import { ReactComponent as RobotIcon } from "bootstrap-icons/icons/robot.svg";
 
 import useFetch from "../hooks/useFetch";
 import useInputControl from "../hooks/useInputControl";
-import AddModal from "../common/AddModal";
+import AddModal, { ModalProps } from "../common/AddModal";
 import TextInput from "../common/TextInput";
 import ErrorAlert from "../common/ErrorAlert";
+import InputButton from "../common/InputActionButton";
 import { JobUpload, JobDetails } from "./types";
-import { ModalProps } from "../common/types";
 
 
 interface AddJobModalProps extends ModalProps {
@@ -48,11 +48,11 @@ const AddJobModal = ({
     onFail: onFillFail,
   });
 
-  const handleClickFillDetails = (): void => {
+  const handleClickFillDetails = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setShowFillErrorAlert(false);
     setShowErrorAlert(false);
 
-    const { url: _, ...newErrors } = errors;
+    const { url: urlError, ...newErrors } = errors;
     setErrors(newErrors);
 
     let valid = true;
@@ -71,7 +71,7 @@ const AddJobModal = ({
     }
   };
 
-  const handleClickSubmit = (): void => {
+  const handleSubmit = (): void => {
     setShowFillErrorAlert(false);
     setFillErrors({});
   };
@@ -103,7 +103,7 @@ const AddJobModal = ({
     return valid;
   }
 
-  const handleSuccessfulSubmit = (): void => { 
+  const handleValidatedSubmit = (): void => { 
     addJob({
       url: urlInput.value,
       title: titleInput.value,
@@ -112,7 +112,7 @@ const AddJobModal = ({
     });
   };
 
-  const handleClickCancelFill = (): void => {
+  const handleClickCancelFill = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     cancelFill();
   };
 
@@ -121,25 +121,17 @@ const AddJobModal = ({
       show={show} setShow={setShow} errors={{error: errors["error"]}} setErrors={setErrors}
       showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
       title="Add Job" modalID={modalID} size="lg"
-      onClickSubmit={handleClickSubmit}
-      validateSubmit={validateSubmit} onSuccessfulSubmit={handleSuccessfulSubmit}
+      onSubmit={handleSubmit}
+      validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
       submitDisabled={filling}      
     >
       <TextInput id={`${modalID}URL`}
         label="URL" type="url" value={urlInput.value} handleChange={urlInput.handleChange}
         editing={urlInput.editing} loading={filling} errors={errors["url"] || urlFillErrors}
       >
-        <button className="btn btn-outline-primary" type="button"
-          onClick={filling ? handleClickCancelFill : handleClickFillDetails }
-        >
-          {filling?<>
-            <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-            Cancel
-          </>:<>
-            <RobotIcon className="me-1" />
-            Autofill Details
-          </>}
-        </button>
+        <InputButton controlsId={`${modalID}URL`} label="Autofill Details" loading={filling}
+          onClickAction={handleClickFillDetails} onClickCancel={handleClickCancelFill} icon={<RobotIcon />}
+        />
       </TextInput>
       <ErrorAlert
         errors={nonURLFillErrors}

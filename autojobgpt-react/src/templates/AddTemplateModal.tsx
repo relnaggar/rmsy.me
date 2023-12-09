@@ -1,10 +1,9 @@
 import React from "react";
 
 import useInputControl from "../hooks/useInputControl";
-import AddModal from "../common/AddModal";
+import AddModal, { ModalProps } from "../common/AddModal";
 import TextInput from "../common/TextInput";
 import { ResumeTemplateUpload } from "../templates/types";
-import { ModalProps } from "../common/types";
 
 
 interface AddTemplateModalProps extends ModalProps {
@@ -42,7 +41,7 @@ const AddTemplateModal = ({
     return valid;
   };
 
-  const handleSuccessfulSubmit = (): void => {
+  const handleValidatedSubmit = (): void => {
     const docx: File = (uploadInput.ref.current as HTMLInputElement).files![0];
     addTemplate({ name: nameInput.value, docx, description: descriptionInput.value });
   };
@@ -52,7 +51,7 @@ const AddTemplateModal = ({
       show={show} setShow={setShow} errors={{error: errors["error"]}} setErrors={setErrors}
       showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
       title="Add Resume Template" modalID={modalID}
-      validateSubmit={validateSubmit} onSuccessfulSubmit={handleSuccessfulSubmit}
+      validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
       <TextInput id={`${modalID}Name`}
         label="Template Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}

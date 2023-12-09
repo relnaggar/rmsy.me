@@ -2,12 +2,11 @@ import React, { useCallback } from "react";
 
 import useInputControl from "../hooks/useInputControl";
 import useFetch from "../hooks/useFetch";
-import AddModal from "../common/AddModal";
+import AddModal, { ModalProps } from "../common/AddModal";
 import SelectInputWithRefresh from "../common/SelectInputWithRefresh";
 import { ResumeUpload } from "./types";
 import { Job } from "../jobs/types";
 import { ResumeTemplate } from "../templates/types";
-import { ModalProps } from "../common/types";
 
 
 interface AddResumeModalProps extends ModalProps {
@@ -32,21 +31,21 @@ const AddResumeModal = ({
     setErrors(errors);
   }, [setShowErrorAlert, setErrors]);
 
-  const { resource: jobs, fetching: loadingJobs, refetch: refetchJobs } = useFetch<Job[]>(
-    "jobs/", {
-      initialResource: [],
-      onSuccess: handleRefreshSuccess,
-      onFail: handleRefreshFail,
-    }
-  );
+  const {
+    resource: jobs, fetching: fetchingJobs, refetch: refetchJobs, cancel: cancelJobs
+  } = useFetch<Job[]>("jobs/", {
+    initialResource: [],
+    onSuccess: handleRefreshSuccess,
+    onFail: handleRefreshFail,
+  });
 
-  const { resource: templates, fetching: loadingTemplates, refetch: refetchTemplates} = useFetch<ResumeTemplate[]>(
-    "templates/", {
-      initialResource: [],
-      onSuccess: handleRefreshSuccess,
-      onFail: handleRefreshFail,
-    }
-  );
+  const {
+    resource: templates, fetching: fetchingTemplates, refetch: refetchTemplates, cancel: cancelTemplates
+  } = useFetch<ResumeTemplate[]>("templates/", {
+    initialResource: [],
+    onSuccess: handleRefreshSuccess,
+    onFail: handleRefreshFail,
+  });
 
   const validateSubmit = (): boolean => {
     const jobValue: number = parseInt(jobInput.value);
@@ -69,7 +68,7 @@ const AddResumeModal = ({
     }
   }
 
-  const handleSuccessfulSubmit = (): void => {
+  const handleValidatedSubmit = (): void => {
     addResume({
       job: parseInt(jobInput.value),
       template: parseInt(templateInput.value),
@@ -83,7 +82,7 @@ const AddResumeModal = ({
       show={show} setShow={setShow} errors={errors} setErrors={setErrors}
       showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
       title="Generate Resume" modalID="addResumeModal"
-      validateSubmit={validateSubmit} onSuccessfulSubmit={handleSuccessfulSubmit}
+      validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
       <SelectInputWithRefresh<Job>
         id={`${modalID}Job`}
@@ -93,9 +92,10 @@ const AddResumeModal = ({
         handleChange={jobInput.handleChange as (e: React.ChangeEvent<HTMLSelectElement>) => void}
         editing={jobInput.editing}
         options={jobs}
-        loading={loadingJobs}
-        refetch={refetchJobs}
+        refreshing={fetchingJobs}
+        refresh={refetchJobs}
         errors={errors["job"]}
+        cancel={cancelJobs}
       />
       <SelectInputWithRefresh<ResumeTemplate>
         id={`${modalID}Template`}
@@ -105,9 +105,10 @@ const AddResumeModal = ({
         handleChange={templateInput.handleChange as (e: React.ChangeEvent<HTMLSelectElement>) => void}
         editing={templateInput.editing}
         options={templates}
-        loading={loadingTemplates}
-        refetch={refetchTemplates}
+        refreshing={fetchingTemplates}
+        refresh={refetchTemplates}
         errors={errors["template"]}
+        cancel={cancelTemplates}
       />
     </AddModal>
   );
