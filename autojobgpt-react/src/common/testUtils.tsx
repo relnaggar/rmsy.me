@@ -61,7 +61,7 @@ export const testRouteAndAllChildren = (
   }
 };
 
-export type OpenAndGetModalProps = {
+export type OpenAndGetModalParams = {
   modalName: string,
   timeout?: number,
   openModalButtonText?: string,
@@ -71,7 +71,7 @@ export const openAndGetModal = async ({
   modalName,
   timeout = 1000,
   openModalButtonText,
-}: OpenAndGetModalProps): Promise<HTMLElement> => {
+}: OpenAndGetModalParams): Promise<HTMLElement> => {
   let openModalButton: HTMLElement;
   if (openModalButtonText) {
     openModalButton = screen.getByRole("button", {name: new RegExp(openModalButtonText, "i")});

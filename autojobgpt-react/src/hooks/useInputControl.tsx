@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 
 
-export interface InputControl {
+export interface InputControlMixin {
   value: string,
   editing: boolean,
   handleChange: (
@@ -11,7 +11,7 @@ export interface InputControl {
   ),
 };
 
-interface UseInputControl extends InputControl {
+interface UseInputControl extends InputControlMixin {
   edit: (value: string) => void,
   stopEditing: () => void,
   ref: React.RefObject<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,

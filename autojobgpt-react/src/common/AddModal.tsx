@@ -52,8 +52,7 @@ const AddModal = ({
 
   return (
     <BootstrapModal id={modalID}
-      size={size} aria-labelledby={`${modalID}Label`} 
-      show={show} onEntered={handleEntered} onHide={handleClose}       
+      size={size} aria-labelledby={`${modalID}Label`} show={show} onEntered={handleEntered} onHide={handleClose}       
     >
       <BootstrapModal.Header closeButton>
         <BootstrapModal.Title id={`${modalID}Label`}>{title}</BootstrapModal.Title>

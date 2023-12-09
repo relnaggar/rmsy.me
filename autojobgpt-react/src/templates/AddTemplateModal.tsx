@@ -56,17 +56,17 @@ const AddTemplateModal = ({
     >
       <TextInput id={`${modalID}Name`}
         label="Template Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
-        editing={nameInput.editing} error={errors["name"]}
+        editing={nameInput.editing} errors={errors["name"]}
       />
-      <TextInput id={`${modalID}Upload`} ref={uploadInput.ref}
+      <TextInput id={`${modalID}Upload`} ref={uploadInput.ref as React.RefObject<HTMLInputElement>}
         label="Upload" type="file" value={uploadInput.value} handleChange={uploadInput.handleChange}
-        editing={uploadInput.editing} error={errors["upload"]}
+        editing={uploadInput.editing} errors={errors["upload"]}
         accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       />
       <TextInput id={`${modalID}Description`}
         label="Description (optional)" type="textarea" value={descriptionInput.value}
         handleChange={descriptionInput.handleChange}
-        editing={descriptionInput.editing} error={errors["description"]} rows={3}         
+        editing={descriptionInput.editing} errors={errors["description"]} rows={3}         
       />
     </AddModal>
   )

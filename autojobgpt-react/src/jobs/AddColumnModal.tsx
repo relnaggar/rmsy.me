@@ -46,7 +46,7 @@ const AddColumnModal = ({
     >
       <TextInput id={`${modalID}Name`}
         label="Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
-        editing={nameInput.editing} error={errors["name"]}
+        editing={nameInput.editing} errors={errors["name"]}
       />
     </AddModal>
   );

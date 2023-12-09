@@ -127,7 +127,7 @@ const AddJobModal = ({
     >
       <TextInput id={`${modalID}URL`}
         label="URL" type="url" value={urlInput.value} handleChange={urlInput.handleChange}
-        editing={urlInput.editing} loading={filling} error={errors["url"] || urlFillErrors}
+        editing={urlInput.editing} loading={filling} errors={errors["url"] || urlFillErrors}
       >
         <button className="btn btn-outline-primary" type="button"
           onClick={filling ? handleClickCancelFill : handleClickFillDetails }
@@ -149,15 +149,15 @@ const AddJobModal = ({
       <h5>Details</h5>
       <TextInput id={`${modalID}Title`}
         label="Title" type="text" value={titleInput.value} handleChange={titleInput.handleChange}
-        editing={titleInput.editing} loading={filling} error={errors["title"]}
+        editing={titleInput.editing} loading={filling} errors={errors["title"]}
       />
       <TextInput id={`${modalID}Company`}
         label="Company" type="text" value={companyInput.value} handleChange={companyInput.handleChange}
-        editing={companyInput.editing} loading={filling} error={errors["company"]}
+        editing={companyInput.editing} loading={filling} errors={errors["company"]}
       />
       <TextInput id={`${modalID}Posting`}
         label="Posting" type="textarea" value={postingInput.value} handleChange={postingInput.handleChange}
-        editing={postingInput.editing} loading={filling} error={errors["posting"]}
+        editing={postingInput.editing} loading={filling} errors={errors["posting"]}
       />
     </AddModal>
   );

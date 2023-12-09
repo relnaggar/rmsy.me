@@ -61,7 +61,6 @@ const AddResumeModal = ({
         newErrors["template"] = ["Please select a template."];
       }
       setErrors(newErrors);
-      setShowErrorAlert(true);
       jobInput.stopEditing();
       templateInput.stopEditing();
       return false;
@@ -96,7 +95,7 @@ const AddResumeModal = ({
         options={jobs}
         loading={loadingJobs}
         refetch={refetchJobs}
-        error={errors["job"]}
+        errors={errors["job"]}
       />
       <SelectInputWithRefresh<ResumeTemplate>
         id={`${modalID}Template`}
@@ -108,7 +107,7 @@ const AddResumeModal = ({
         options={templates}
         loading={loadingTemplates}
         refetch={refetchTemplates}
-        error={errors["template"]}
+        errors={errors["template"]}
       />
     </AddModal>
   );

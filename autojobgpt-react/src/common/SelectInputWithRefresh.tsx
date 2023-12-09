@@ -1,72 +1,51 @@
 import React from "react";
 import { ReactComponent as ArrowClockwiseIcon } from "bootstrap-icons/icons/arrow-clockwise.svg";
 
-import { InputControl } from "../hooks/useInputControl";
+import { InputControlMixin } from "../hooks/useInputControl";
+import BaseInput, { BaseInputMixin } from "./BaseInput";
 import { WithID } from "./types";
 
 
-interface SelectInputWithRefreshProps<Option extends WithID> extends InputControl {
-  handleChange: (e: React.ChangeEvent<HTMLSelectElement>) => void,
-  id: string,
-  label: string,
+interface SelectInputWithRefreshProps<Option extends WithID> extends InputControlMixin, BaseInputMixin {
   optionToString: (option: Option) => string,
   options: Option[],
-  loading: boolean,
   refetch: () => void,
-  error?: string[],
   optionZeroLabel?: string,
 };
 
 const SelectInputWithRefresh = <Option extends WithID>({
   value, editing, handleChange,
-  id,
-  label,
-  optionToString,
+  id, label, loading, errors,
   options,
-  loading,
+  optionToString,  
   refetch,
-  error,
-  optionZeroLabel,
+  optionZeroLabel = "Select...",
 }: SelectInputWithRefreshProps<Option>): React.JSX.Element => {
-  let errorString: string = "";
-  if (error instanceof Array) {
-    if (error.length === 0) {
-      errorString = "";
-    } else {
-      errorString = error.join(" ");
-    }
-  }
-  if (optionZeroLabel === undefined) {
-    optionZeroLabel = "Select...";
-  }
+  const input = (
+    <select id={id}
+      name={id} className="form-select" disabled={loading} aria-busy={!loading} value={value}
+      onChange={handleChange as ((e: React.ChangeEvent<HTMLSelectElement>) => void)}
+    >
+      <option value="0">{loading ? "Loading..." : optionZeroLabel }</option>
+      {options.map((opt) => (
+        <option key={opt.id} value={opt.id}>{optionToString(opt)}</option>
+      ))}
+    </select>
+  );
 
-  const showError = !editing && !loading && errorString !== "";
+  const handleClick = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    refetch();
+  };
+
   return (
-    <div className="mb-3">
-      <label htmlFor={id} className="form-label">{label}</label>
-      <div className="input-group">
-        <select id={id}
-          name={id} className={`form-select${showError ? " is-invalid" : ""}`}
-          value={value} onChange={handleChange} disabled={loading} aria-busy={!loading}
-        >
-          <option value="0">{ loading ? "Loading..." : optionZeroLabel }</option>
-          {options.map((opt) => (
-            <option key={opt.id} value={opt.id}>{optionToString(opt)}</option>
-          ))}
-        </select>
-        <button
-          className="btn btn-outline-primary"
-          type="button"
-          onClick={() => refetch()}
-          aria-controls={id}
-          disabled={loading}
-          aria-busy={loading}
-        >
-          <ArrowClockwiseIcon className="me-1" />
-          Refresh
-        </button>
-      </div>
-    </div>
+    <BaseInput id={id} label={label} input={input} editing={editing} loading={loading} errors={errors}>
+      <button aria-controls={id}
+        className="btn btn-outline-primary" type="button" onClick={handleClick} disabled={loading} aria-busy={loading}
+      >
+        <ArrowClockwiseIcon className="me-1" />
+        Refresh
+      </button>
+    </BaseInput>
   );
 };
 
