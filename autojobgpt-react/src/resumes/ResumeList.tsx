@@ -8,9 +8,35 @@ import useFormInput from '../hooks/useInputControl';
 import DocumentList from '../common/DocumentList';
 import EditResumeModal from './EditResumeModal';
 import AddResumeModal from './AddResumeModal';
-import { Resume, ResumeUpload, Substitution, getPlaceholderResume } from './types';
-import { Job } from '../jobs/types';
+import { Job, Substitution, Resume, ResumeUpload } from '../api/types';
 
+
+export const getPlaceholderResume = (resumeUpload: ResumeUpload): Resume => {
+  return {
+    id: -1,
+    substitutions: [],
+    version: -1,
+    docx: "",
+    png: "",
+    chat_messages: [],
+    job: {
+      "id": resumeUpload.job,
+      "url": "",
+      "title": "",
+      "company": "",
+      "posting": "",
+      "status": 1
+    },
+    template: {
+      "id": resumeUpload.template,
+      "name": "",
+      "docx": "",
+      "png": "",
+      "fillFields": [],        
+    },
+    name: "",
+  }
+};
 
 const ResumeList = (): React.JSX.Element => {
   const openConfirmationModal = useContext(ConfirmationModalContext);
@@ -52,7 +78,7 @@ const ResumeList = (): React.JSX.Element => {
     posting: addingResume,
     postResource: addResume,
     deleteResource: removeResume,
-    idBeingDeleted: resumeBeingRemovedID,    
+    idBeingDeleted: resumeBeingRemovedId,    
   } = useResource<Resume,ResumeUpload>(resumeAPIPath, getPlaceholderResume, {
     onFetchFail: handleErrors,
     onPostSuccess: handleAddResumeSuccess,
@@ -61,11 +87,11 @@ const ResumeList = (): React.JSX.Element => {
   });
 
   const [showEditResumeModal, setShowEditResumeModal] = useState<boolean>(false);
-  const [editResumeID, setEditResumeID] = useState<number>(-1);
+  const [editResumeId, setEditResumeId] = useState<number>(-1);
   const [showAddResume, setShowAddResume] = useState<boolean>(false);
 
   const handleClickEditResume = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    setEditResumeID(id);
+    setEditResumeId(id);
     setShowEditResumeModal(true);
   };
 
@@ -83,11 +109,11 @@ const ResumeList = (): React.JSX.Element => {
   };
 
   const jobInput = useFormInput("0");
-  const jobIDsWithAtLeastOneResume: number[] = [];
+  const jobIdsWithAtLeastOneResume: number[] = [];
   const jobsWithAtLeastOneResume: Job[] = [];
   resumes.forEach((resume) => {
-    if (resume.id !== -1 && !jobIDsWithAtLeastOneResume.includes(resume.job.id)) {
-      jobIDsWithAtLeastOneResume.push(resume.job.id);
+    if (resume.id !== -1 && !jobIdsWithAtLeastOneResume.includes(resume.job.id)) {
+      jobIdsWithAtLeastOneResume.push(resume.job.id);
       
       let i: number = 0;
       while (i < jobsWithAtLeastOneResume.length && jobsWithAtLeastOneResume[i].id < resume.job.id) {
@@ -131,7 +157,7 @@ const ResumeList = (): React.JSX.Element => {
         loadingDocuments={loadingResumes}
         onClickEditDocument={handleClickEditResume}
         onClickRemoveDocument={handleClickRemoveResume}
-        documentBeingRemovedID={resumeBeingRemovedID}
+        documentBeingRemovedId={resumeBeingRemovedId}
         onClickAddDocument={handleClickAddResume}
         addButtonText="Generate new resume"
         addDisabled={addingResume}
@@ -140,7 +166,7 @@ const ResumeList = (): React.JSX.Element => {
         apiPath={resumeAPIPath}
         resumes={resumes} setResumes={setResumes}
         show={showEditResumeModal} setShow={setShowEditResumeModal}
-        resumeID={editResumeID}
+        resumeId={editResumeId}
         substitutions={substitutions} setSubstitutions={setSubstitutions}
         onSubstitutionSaveSuccess={handleSubstitutionSaveSuccess}
       />

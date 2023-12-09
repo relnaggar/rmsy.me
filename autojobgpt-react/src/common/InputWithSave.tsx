@@ -3,7 +3,7 @@ import { ReactComponent as FloppyIcon } from "bootstrap-icons/icons/floppy.svg";
 
 import usePatch from "../hooks/usePatch";
 import useControlledState from "../hooks/useControlledState";
-import { WithID } from "./types";
+import { WithId } from '../api/types';
 
 
 export type SelectOption = {
@@ -11,7 +11,7 @@ export type SelectOption = {
   label: string,
 };
 
-interface InputWithSaveProps<Resource extends WithID>{
+interface InputWithSaveProps<Resource extends WithId>{
   type: string,
   apiPath: string,
   resources: Resource[],
@@ -28,7 +28,7 @@ interface InputWithSaveProps<Resource extends WithID>{
   [key: string]: any,
 }
 
-const InputWithSave = <Resource extends WithID>({
+const InputWithSave = <Resource extends WithId>({
   type,
   apiPath,
   resources,
@@ -47,7 +47,7 @@ const InputWithSave = <Resource extends WithID>({
   if (!labelProperty && !labelText) throw new Error("InputWithSave must have either labelProperty or labelText");
 
   const resource: Resource = resources.find((resource) => resource.id === id)!;
-  const elementID: string = `${apiPath.replace("/", "-")}${id}-${editableProperty}`;
+  const elementId: string = `${apiPath.replace("/", "-")}${id}-${editableProperty}`;
   
   let tmp: string;
   if (typeof resource[editableProperty] === "string") {
@@ -90,7 +90,7 @@ const InputWithSave = <Resource extends WithID>({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {  
     e.preventDefault(); // prevent page from reloading
 
-    const value: string = (document.getElementById(elementID) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
+    const value: string = (document.getElementById(elementId) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
     updateResource(id, { [editableProperty]: value } as Partial<Resource>);
     setEditing(false);
   }
@@ -106,12 +106,12 @@ const InputWithSave = <Resource extends WithID>({
       saved ? " is-valid" : ""}${
       showError ? " is-invalid" : ""
     }`,
-    id: elementID,
-    name: elementID,
+    id: elementId,
+    name: elementId,
     value: value ?? "",
     onChange: handleChange,
     disabled: updating,
-    "aria-describedby": showError? `${elementID}-feedback` : undefined,
+    "aria-describedby": showError? `${elementId}-feedback` : undefined,
     ...props,
   };
 
@@ -140,7 +140,7 @@ const InputWithSave = <Resource extends WithID>({
           <input type={type} {...textAreaProps} />
         )
       }
-      <div className="invalid-feedback" id={`${elementID}-feedback`} role={showError? "alert": undefined}>
+      <div className="invalid-feedback" id={`${elementId}-feedback`} role={showError? "alert": undefined}>
         {Object.values(errors).join(" ")}
       </div>
     </>
@@ -180,7 +180,7 @@ const InputWithSave = <Resource extends WithID>({
     <>
       <div className="mb-3">
         <form onSubmit={handleSubmit} aria-label={`Form for updating ${ariaLabel}`}>
-          {!labelProperty && <label className="form-label" htmlFor={elementID}>
+          {!labelProperty && <label className="form-label" htmlFor={elementId}>
             {labelText}
           </label>}
           <div className="d-flex">        
@@ -188,7 +188,7 @@ const InputWithSave = <Resource extends WithID>({
               {labelProperty ?
                 <div className="form-floating">        
                   {input}
-                  <label htmlFor={elementID}>{resource[labelProperty] as string}</label>              
+                  <label htmlFor={elementId}>{resource[labelProperty] as string}</label>              
                 </div>
               :
                 input

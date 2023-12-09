@@ -3,7 +3,7 @@ import { screen, getAllByRole, getByRole, getByLabelText, waitFor } from "@testi
 import { injectMocks, getSubmitButton, openAndGetModal, clickCloseButton, clickSubmitButton, userTypeInput, mockFunctions, OpenAndGetModalParams } from "../common/testUtils";
 import { validResumeTemplate1, generateResponse, testDataForAPIGeneralErrors, errorMessage, generateErrorResponse } from "../common/mockAPI";
 import { renderThisRoute, userUploadDocxFile, queryResumeTemplates } from "./resumeTemplateTestUtils";
-import { ResumeTemplate } from "../templates/types";
+import { ResumeTemplate } from '../api/types';
 
 
 beforeEach(() => {

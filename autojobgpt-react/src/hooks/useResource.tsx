@@ -2,10 +2,10 @@ import useFetch from './useFetch';
 import useDelete from './useDelete';
 import usePostResource from './usePostResource';
 import usePatch from './usePatch';
-import { WithID } from '../common/types';
+import { WithId } from '../api/types';
 
 
-const useResource = <Resource extends WithID, ResourceUpload>(
+const useResource = <Resource extends WithId, ResourceUpload>(
   apiPath: string,
   getPlaceholderResource: (resourceUpload: ResourceUpload) => Resource,
   options?: {

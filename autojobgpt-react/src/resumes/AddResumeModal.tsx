@@ -4,9 +4,7 @@ import useInputControl from "../hooks/useInputControl";
 import useFetch from "../hooks/useFetch";
 import AddModal, { ModalProps } from "../common/AddModal";
 import SelectInputWithRefresh from "../common/SelectInputWithRefresh";
-import { ResumeUpload } from "./types";
-import { Job } from "../jobs/types";
-import { ResumeTemplate } from "../templates/types";
+import { Job, ResumeTemplate, ResumeUpload } from '../api/types';
 
 
 interface AddResumeModalProps extends ModalProps {
@@ -17,7 +15,7 @@ const AddResumeModal = ({
   show, setShow, errors, setErrors, showErrorAlert, setShowErrorAlert,
   addResume,
 }: AddResumeModalProps): React.JSX.Element => {
-  const modalID = "addResumeModal";
+  const modalId = "addResumeModal";
   const jobInput = useInputControl("0");
   const templateInput = useInputControl("0");
 
@@ -81,11 +79,11 @@ const AddResumeModal = ({
     <AddModal
       show={show} setShow={setShow} errors={errors} setErrors={setErrors}
       showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
-      title="Generate Resume" modalID="addResumeModal"
+      title="Generate Resume" modalId="addResumeModal"
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
       <SelectInputWithRefresh<Job>
-        id={`${modalID}Job`}
+        id={`${modalId}Job`}
         label="Job"
         optionToString={(job) => `${job.title}, ${job.company}`}
         value={jobInput.value}
@@ -98,7 +96,7 @@ const AddResumeModal = ({
         cancel={cancelJobs}
       />
       <SelectInputWithRefresh<ResumeTemplate>
-        id={`${modalID}Template`}
+        id={`${modalId}Template`}
         label="Template"
         optionToString={(template) => template.name}
         value={templateInput.value}

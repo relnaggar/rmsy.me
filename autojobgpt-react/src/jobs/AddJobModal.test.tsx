@@ -3,7 +3,7 @@ import { screen, getAllByRole, getByRole, waitFor } from "@testing-library/react
 import { injectMocks, openAndGetModal, getSubmitButton, clickCloseButton, clickSubmitButton, userTypeInput, mockFunctions, OpenAndGetModalParams } from "../common/testUtils";
 import { validJob1, generateResponse, testDataForAPIGeneralErrors, errorMessage, generateErrorResponse, generateConditionalResponseByRoute } from "../common/mockAPI";
 import { renderThisRoute, getFirstColumn, getFillButton, clickFillButton } from "./jobTestUtils";
-import { Job, JobDetails } from "../jobs/types";
+import { Job, JobDetails } from '../api/types';
 
 
 beforeEach(() => {

@@ -3,7 +3,7 @@ import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box
 import { ReactComponent as PencilSquareIcon } from 'bootstrap-icons/icons/pencil-square.svg';
 import { ReactComponent as Trash3Icon } from 'bootstrap-icons/icons/trash3.svg';
 
-import { Job } from './types';
+import { Job } from '../api/types';
 
 
 interface JobCardProps {

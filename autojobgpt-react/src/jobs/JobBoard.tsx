@@ -6,16 +6,35 @@ import useResource from "../hooks/useResource";
 import JobColumn from "./JobColumn";
 import EditJobModal from "./EditJobModal";
 import AddJobModal from "./AddJobModal";
-import { Status, StatusUpload, generatePlaceholderStatus, Job, JobUpload, generatePlaceholderJob } from "./types";
+import { Status, StatusUpload, Job, JobUpload } from '../api/types';
 import AddColumnModal from "./AddColumnModal";
 import EditColumnModal from "./EditColumnModal";
 
+
+const generatePlaceholderStatus = (statusUpload: StatusUpload): Status => {
+  return {
+    "id": -1,
+    "name": statusUpload.name,
+    "order": -1
+  }
+};
+
+const generatePlaceholderJob = (jobUpload: JobUpload): Job => {
+  return {
+    "id": -1,
+    "url": jobUpload.url,
+    "title": jobUpload.title,
+    "company": jobUpload.company,
+    "posting": jobUpload.posting,
+    "status": -1, // status should be the id of the first column
+  }
+};
 
 const JobBoard = (): React.JSX.Element => {
   const openConfirmationModal = useContext(ConfirmationModalContext);
 
   const [draggingJobId, setDraggingJobId] = useState<number>(-1);
-  const [editJobID, setEditJobID] = useState<number>(-1);
+  const [editJobId, setEditJobId] = useState<number>(-1);
   const [showEditJob, setShowEditJob] = useState<boolean>(false);
   const [showAddJob, setShowAddJob] = useState<boolean>(false);
 
@@ -51,7 +70,7 @@ const JobBoard = (): React.JSX.Element => {
     posting: addingJob,
     postResource: addJob,
     deleteResource: removeJob,
-    idBeingDeleted: jobIDBeingRemoved,
+    idBeingDeleted: jobIdBeingRemoved,
     patchResource: updateJob,
   } = useResource<Job,JobUpload>(jobAPIPath, generatePlaceholderJob, {
     onPostSuccess: handleAddJobSuccess,
@@ -71,7 +90,7 @@ const JobBoard = (): React.JSX.Element => {
   };
 
   const handleClickEditJob = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    setEditJobID(id);
+    setEditJobId(id);
     setShowEditJob(true);
   };
 
@@ -145,7 +164,7 @@ const JobBoard = (): React.JSX.Element => {
     setStatuses(newStatuses);
   }, []);
 
-  const [editStatusID, setEditStatusID] = useState<number>(-1);
+  const [editStatusId, setEditStatusId] = useState<number>(-1);
   const [showEditColumn, setShowEditColumn] = useState<boolean>(false);
 
   const statusAPIPath: string = "statuses/";
@@ -155,7 +174,7 @@ const JobBoard = (): React.JSX.Element => {
     fetching: fetchingStatuses,
     postResource: addStatus,
     deleteResource: removeStatus,
-    idBeingDeleted: statusIDBeingRemoved,
+    idBeingDeleted: statusIdBeingRemoved,
     patchResource: updateStatus,
   } = useResource<Status,StatusUpload>(statusAPIPath, generatePlaceholderStatus, {
     onFetchFail: handleErrors,
@@ -168,7 +187,7 @@ const JobBoard = (): React.JSX.Element => {
   });
 
   const handleClickEditStatus = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    setEditStatusID(id);
+    setEditStatusId(id);
     setShowEditColumn(true);
   };
 
@@ -223,7 +242,7 @@ const JobBoard = (): React.JSX.Element => {
                     key={`${status.id}-${index}`}
                     title={status.name}
                     jobs={jobs.filter((job) => (job.status === status.id || (job.status === -1 && status.order === sortedStatuses[0].order)))}
-                    statusID={status.id}
+                    statusId={status.id}
                     sortedStatuses={sortedStatuses}
                     loading={loading}
                     onDrop={handleDrop(status)}
@@ -231,11 +250,11 @@ const JobBoard = (): React.JSX.Element => {
                     onDragStart={handleDragStart}
                     onClickEditJob={handleClickEditJob}
                     onClickRemoveJob={handleClickRemoveJob}
-                    jobIDBeingRemoved={jobIDBeingRemoved}
+                    jobIdBeingRemoved={jobIdBeingRemoved}
                     onClickAddJob={status.order === sortedStatuses[0].order ? handleClickAddJob : undefined}
                     addDisabled={status.order === sortedStatuses[0].order ? addingJob: undefined}
                     updateStatus={updateStatus}
-                    beingRemoved={statusIDBeingRemoved === status.id}
+                    beingRemoved={statusIdBeingRemoved === status.id}
                     onClickRemoveColumn={handleClickRemoveColumn(status.id)}
                     onClickEditColumn={handleClickEditStatus(status.id)}
                   />
@@ -282,7 +301,7 @@ const JobBoard = (): React.JSX.Element => {
         setShow={setShowEditJob}
         jobs={jobs}
         setJobs={setJobs}
-        id={editJobID}
+        id={editJobId}
         statuses={statuses}
       />
       <AddJobModal
@@ -295,7 +314,7 @@ const JobBoard = (): React.JSX.Element => {
         apiPath={statusAPIPath}
         show={showEditColumn}
         setShow={setShowEditColumn}
-        statusID={editStatusID}
+        statusId={editStatusId}
         statuses={statuses}
         setStatuses={setStatuses}
       />

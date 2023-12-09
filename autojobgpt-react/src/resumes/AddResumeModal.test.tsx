@@ -4,9 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { injectMocks, OpenAndGetModalParams, openAndGetModal, getSubmitButton, clickCloseButton, clickSubmitButton, mockFunctions } from "../common/testUtils";
 import { renderThisRoute, queryResumes, getRefreshButton, clickRefreshButton } from "./resumeTestUtils";
 import { validResume1, generateConditionalResponseByRoute, validJob1, validJob2, validResumeTemplate1, validResumeTemplate2, generateResponse, testDataForAPIGeneralErrors, errorMessage, generateErrorResponse } from "../common/mockAPI";
-import { Resume } from "../resumes/types";
-import { Job } from "../jobs/types";
-import { ResumeTemplate } from "../templates/types";
+import { Job, ResumeTemplate, Resume } from '../api/types';
 
 
 beforeEach(() => {

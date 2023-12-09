@@ -4,7 +4,7 @@ import { ReactComponent as Robot } from "bootstrap-icons/icons/robot.svg";
 
 import usePost from "../hooks/usePost";
 import InputWithSave from "../common/InputWithSave";
-import { Substitution } from "./types";
+import { Substitution } from '../api/types';
 
 
 export default function SubstitutionInput({

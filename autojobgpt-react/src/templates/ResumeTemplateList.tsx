@@ -7,8 +7,19 @@ import useFetch from "../hooks/useFetch";
 import DocumentList from "../common/DocumentList";
 import EditTemplateModal from "./EditTemplateModal";
 import AddTemplateModal from "./AddTemplateModal";
-import { ResumeTemplate, ResumeTemplateUpload, FillField, getPlaceholderTemplate } from "./types";
+import { FillField, ResumeTemplate, ResumeTemplateUpload } from "../api/types";
 
+
+export const getPlaceholderTemplate = (templateUpload: ResumeTemplateUpload): ResumeTemplate => {
+  return {
+    id: -1,
+    name: templateUpload.name,
+    docx: "",
+    png: "",
+    description: templateUpload.description,
+    fillFields: [],
+  };
+};
 
 const ResumeTemplateList = (): React.JSX.Element => {
   const openConfirmationModal = useContext(ConfirmationModalContext);
@@ -50,7 +61,7 @@ const ResumeTemplateList = (): React.JSX.Element => {
     posting: addingTemplate,
     postResource: addTemplate,
     deleteResource: removeTemplate,
-    idBeingDeleted: templateBeingRemovedID,    
+    idBeingDeleted: templateBeingRemovedId,    
   } = useResource<ResumeTemplate,ResumeTemplateUpload>(templateAPIPath, getPlaceholderTemplate, {
     onFetchFail: handleErrors,
     onPostSuccess: handleAddTemplateSuccess,
@@ -59,11 +70,11 @@ const ResumeTemplateList = (): React.JSX.Element => {
   });
 
   const [showEditTemplateModal, setShowEditTemplateModal] = useState<boolean>(false);
-  const [editTemplateID, setEditTemplateID] = useState<number>(-1);
+  const [editTemplateId, setEditTemplateId] = useState<number>(-1);
   const [showAddTemplateModal, setShowAddTemplateModal] = useState<boolean>(false);
 
   const handleClickEditTemplate = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    setEditTemplateID(id);
+    setEditTemplateId(id);
     setShowEditTemplateModal(true);
   }  
 
@@ -89,7 +100,7 @@ const ResumeTemplateList = (): React.JSX.Element => {
         loadingDocuments={loadingTemplates}
         onClickEditDocument={handleClickEditTemplate}
         onClickRemoveDocument={handleClickRemoveResume}
-        documentBeingRemovedID={templateBeingRemovedID}
+        documentBeingRemovedId={templateBeingRemovedId}
         onClickAddDocument={handleClickAddTemplate}
         addButtonText="Upload resume template"
         addDisabled={addingTemplate}
@@ -98,7 +109,7 @@ const ResumeTemplateList = (): React.JSX.Element => {
         apiPath={templateAPIPath}
         show={showEditTemplateModal}
         setShow={setShowEditTemplateModal}
-        templateID={editTemplateID}
+        templateId={editTemplateId}
         templates={templates}
         setTemplates={setTemplates}
         fillFields={fillFields}

@@ -4,10 +4,10 @@ import { ReactComponent as ArrowClockwiseIcon } from "bootstrap-icons/icons/arro
 import { InputControlMixin } from "../hooks/useInputControl";
 import BaseInput, { BaseInputMixin } from "./BaseInput";
 import InputActionButton from "./InputActionButton";
-import { WithID } from "./types";
+import { WithId } from '../api/types';
 
 
-interface SelectInputWithRefreshProps<Option extends WithID> extends InputControlMixin, Omit<BaseInputMixin, "loading"> {
+interface SelectInputWithRefreshProps<Option extends WithId> extends InputControlMixin, Omit<BaseInputMixin, "loading"> {
   refreshing: boolean,
   optionToString: (option: Option) => string,
   options: Option[],
@@ -16,7 +16,7 @@ interface SelectInputWithRefreshProps<Option extends WithID> extends InputContro
   optionZeroLabel?: string,
 };
 
-const SelectInputWithRefresh = <Option extends WithID>({
+const SelectInputWithRefresh = <Option extends WithId>({
   value, editing, handleChange,
   id, label, errors,
   refreshing,

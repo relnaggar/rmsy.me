@@ -2,7 +2,7 @@ import React from "react";
 import BootstrapModal from 'react-bootstrap/Modal';
 
 import InputWithSave from "../common/InputWithSave";
-import { Status, Job } from "../jobs/types";
+import { Status, Job } from '../api/types';
 
 
 interface EditJobModalProps {

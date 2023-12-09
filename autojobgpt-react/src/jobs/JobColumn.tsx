@@ -5,13 +5,13 @@ import { ReactComponent as CaretLeftIcon } from 'bootstrap-icons/icons/caret-lef
 import { ReactComponent as CaretRightIcon } from 'bootstrap-icons/icons/caret-right.svg';
 
 import JobCard from "./JobCard";
-import { Status, Job } from "./types";
+import { Status, Job } from '../api/types';
 
 
 interface JobColumnProps {
   title: string,
   jobs: Job[],
-  statusID: number,
+  statusId: number,
   sortedStatuses: Status[],
   loading: boolean,
   onDragStart: (jobId: number) => (e: React.DragEvent<HTMLDivElement>) => void,
@@ -19,7 +19,7 @@ interface JobColumnProps {
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void,
   onClickEditJob: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   onClickRemoveJob: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  jobIDBeingRemoved: number,
+  jobIdBeingRemoved: number,
   onClickAddJob?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   addDisabled?: boolean,
   updateStatus: (id: number, data: Partial<Status>) => void,
@@ -31,7 +31,7 @@ interface JobColumnProps {
 const JobColumn = ({
   title,
   jobs,
-  statusID,
+  statusId,
   sortedStatuses,
   loading,
   onDragStart,
@@ -39,7 +39,7 @@ const JobColumn = ({
   onDrop,
   onClickEditJob,
   onClickRemoveJob,
-  jobIDBeingRemoved,
+  jobIdBeingRemoved,
   onClickAddJob,
   addDisabled,
   updateStatus,
@@ -47,16 +47,16 @@ const JobColumn = ({
   onClickRemoveColumn,
   onClickEditColumn,
 }: JobColumnProps): React.JSX.Element => {
-  const status: Status = sortedStatuses.find((status) => status.id === statusID)!;
-  const columnID = `column${status.order}`;
+  const status: Status = sortedStatuses.find((status) => status.id === statusId)!;
+  const columnId = `column${status.order}`;
 
   const moveStatus = (direction: "left" | "right"): void => {
     let previousStatus: Status | null = null;
     for (const currentStatus of sortedStatuses) {
       if (previousStatus) {
-        if (direction === "left" && currentStatus.id === statusID) {
+        if (direction === "left" && currentStatus.id === statusId) {
           updateStatus(currentStatus.id, {order: previousStatus.order});
-        } else if (direction === "right" && previousStatus.id === statusID) {
+        } else if (direction === "right" && previousStatus.id === statusId) {
           updateStatus(currentStatus.id, {order: previousStatus.order});
         }
       }
@@ -75,16 +75,16 @@ const JobColumn = ({
   return (
     <div
       className="kanban-column me-2" onDragOver={onDragOver} onDrop={onDrop}
-      role="region" aria-labelledby={`${columnID}Title`}
+      role="region" aria-labelledby={`${columnId}Title`}
     >
       <div className="card">
         <div className="card-header">
           <span className="d-flex">
-            <h5 id={`${columnID}Title`}
+            <h5 id={`${columnId}Title`}
               className="mt-2 card-title flex-grow-1"
             >{title}</h5>
             <div className="btn-group ms-1" role="group">
-              {statusID !== sortedStatuses[0].id && <button
+              {statusId !== sortedStatuses[0].id && <button
                 type="button"
                 className="btn btn-secondary"
                 aria-label="Move Left"
@@ -93,7 +93,7 @@ const JobColumn = ({
               >
                 <CaretLeftIcon />
               </button>}
-              {statusID !== sortedStatuses[sortedStatuses.length-1].id && <button
+              {statusId !== sortedStatuses[sortedStatuses.length-1].id && <button
                 type="button"
                 className="btn btn-secondary"
                 aria-label="Move Right"
@@ -150,7 +150,7 @@ const JobColumn = ({
                 onDragStart={onDragStart(job.id)}
                 onClickEditJob={onClickEditJob(job.id)}
                 onClickRemoveJob={onClickRemoveJob(job.id)}
-                beingRemoved={jobIDBeingRemoved === job.id}
+                beingRemoved={jobIdBeingRemoved === job.id}
               />
             )
           )}
@@ -162,7 +162,7 @@ const JobColumn = ({
                 onDragStart={onDragStart(job.id)}
                 onClickEditJob={onClickEditJob(job.id)}
                 onClickRemoveJob={onClickRemoveJob(job.id)}
-                beingRemoved={jobIDBeingRemoved === job.id}
+                beingRemoved={jobIdBeingRemoved === job.id}
               />
             )
           )}

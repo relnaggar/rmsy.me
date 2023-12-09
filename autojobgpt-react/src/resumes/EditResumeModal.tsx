@@ -8,8 +8,7 @@ import { ReactComponent as CopyIcon } from 'bootstrap-icons/icons/copy.svg';
 import usePost from "../hooks/usePost";
 import InputWithSave from "../common/InputWithSave";
 import SubstitutionInput from "./SubstitutionInput";
-import { Resume, Substitution } from "./types";
-import { Job } from "../jobs/types";
+import { Job, Substitution, Resume } from '../api/types';
 
 
 interface EditResumeModalProps {
@@ -18,7 +17,7 @@ interface EditResumeModalProps {
   setResumes: React.Dispatch<React.SetStateAction<Resume[]>>,
   show: boolean,
   setShow: React.Dispatch<React.SetStateAction<boolean>>,
-  resumeID: number,
+  resumeId: number,
   substitutions: Substitution[],
   setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
   onSubstitutionSaveSuccess: () => void,
@@ -30,12 +29,12 @@ const EditResumeModal = ({
   setResumes,
   show,
   setShow,
-  resumeID,
+  resumeId,
   substitutions,
   setSubstitutions,
   onSubstitutionSaveSuccess,
 }: EditResumeModalProps): React.JSX.Element => {
-  const resume: Resume | undefined = resumes.find((resume: Resume) => resume.id === resumeID);
+  const resume: Resume | undefined = resumes.find((resume: Resume) => resume.id === resumeId);
 
   const [errors, setErrors] = useState<Record<string,string[]>>({});
   const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
@@ -51,7 +50,7 @@ const EditResumeModal = ({
   }, []);
 
   const { posting: duplicating, post: duplicate, cancel: cancelDuplicate } = usePost<Resume>(
-    `${apiPath}${resumeID}/duplicate/`, {
+    `${apiPath}${resumeId}/duplicate/`, {
       onSuccess: handleDuplicateSuccess,
       onFail: handleDuplicateFail,
     }
@@ -81,7 +80,7 @@ const EditResumeModal = ({
           apiPath={apiPath}
           resources={resumes}
           setResources={setResumes}
-          id={resumeID}
+          id={resumeId}
           editableProperty="name"
           labelText="Resume Name"
           required
@@ -119,7 +118,7 @@ const EditResumeModal = ({
         <hr />
         <h5 className="mb-3">Fill Field Substitutions</h5>
         {substitutions
-          .filter((substitution: Substitution) => substitution.resume === resumeID)
+          .filter((substitution: Substitution) => substitution.resume === resumeId)
           .map((substitution: Substitution) => {
             return (
               <SubstitutionInput

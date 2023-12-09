@@ -3,11 +3,11 @@ import React, { useContext, useEffect, useState } from "react";
 import useAPI from "./useAPI";
 import { FetchDataContext } from "../routes/routesConfig";
 import { CSRFTokenContext } from "../routes/Layout";
-import { WithID } from "../common/types";
+import { WithId } from '../api/types';
 import { makeErrorMessage } from "./hooksUtils";
 
 
-const useDelete = <Resource extends WithID>(
+const useDelete = <Resource extends WithId>(
   apiPath: string,
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
@@ -25,7 +25,7 @@ const useDelete = <Resource extends WithID>(
   const fetchData = useContext(FetchDataContext);
   const csrfToken = useContext(CSRFTokenContext);
 
-  const [idBeingDeleted, setIDBeingDeleted] = useState<number>(-1);
+  const [idBeingDeleted, setIdBeingDeleted] = useState<number>(-1);
 
   useEffect(() => {
     const doDelete = async (): Promise<void> => {
@@ -50,7 +50,7 @@ const useDelete = <Resource extends WithID>(
       } catch (error) {
         errors["error"] = makeErrorMessage(error);
       } finally {
-        setIDBeingDeleted(-1);
+        setIdBeingDeleted(-1);
         if (Object.keys(errors).length > 0) {
           onFail?.(errors);
         }
@@ -65,7 +65,7 @@ const useDelete = <Resource extends WithID>(
     if (idBeingDeleted !== -1) {
       return;
     }    
-    setIDBeingDeleted(id);
+    setIdBeingDeleted(id);
   };
   
   return { deleteResource, idBeingDeleted };

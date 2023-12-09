@@ -3,11 +3,11 @@ import React, { useContext, useEffect, useState } from "react";
 import useAPI from "./useAPI";
 import { FetchDataContext } from "../routes/routesConfig";
 import { CSRFTokenContext } from "../routes/Layout";
-import { WithID } from "../common/types";
+import { WithId } from '../api/types';
 import { makeErrorMessage } from "./hooksUtils";
 
 
-const usePatch = <Resource extends WithID>(
+const usePatch = <Resource extends WithId>(
   apiPath: string,
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
@@ -28,7 +28,7 @@ const usePatch = <Resource extends WithID>(
   const fetchData = useContext(FetchDataContext);
   const csrfToken = useContext(CSRFTokenContext);
 
-  const [idBeingPatched, setIDBeingPatched] = useState<number>(-1);
+  const [idBeingPatched, setIdBeingPatched] = useState<number>(-1);
   const [patch, setPatch] = useState<Partial<Resource>>({});
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const usePatch = <Resource extends WithID>(
       } catch (error) {
         errors["error"] = makeErrorMessage(error);
       } finally {    
-        setIDBeingPatched(-1);
+        setIdBeingPatched(-1);
         if (Object.keys(errors).length > 0) {
           onFail?.(errors);
         }
@@ -67,7 +67,7 @@ const usePatch = <Resource extends WithID>(
 
   const patchResource = (id: number, patch: Partial<Resource>): void => {
     setPatch(patch);
-    setIDBeingPatched(id);
+    setIdBeingPatched(id);
   };
 
   return { patching: idBeingPatched !== -1, patchResource };

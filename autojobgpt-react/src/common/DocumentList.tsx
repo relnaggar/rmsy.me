@@ -2,7 +2,7 @@ import React from 'react';
 
 import DocumentThumbnail from './DocumentThumbnail';
 import AddDocumentButton from './AddDocumentButton';
-import { Document } from './types';
+import { Document } from '../api/types';
 
 
 interface DocumentListProps {
@@ -10,7 +10,7 @@ interface DocumentListProps {
   loadingDocuments: boolean,
   onClickEditDocument: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   onClickRemoveDocument: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  documentBeingRemovedID: number,
+  documentBeingRemovedId: number,
   onClickAddDocument: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   addButtonText: string,
   addDisabled: boolean,
@@ -21,7 +21,7 @@ const DocumentList = ({
   loadingDocuments,
   onClickEditDocument,
   onClickRemoveDocument,
-  documentBeingRemovedID,
+  documentBeingRemovedId,
   onClickAddDocument,
   addButtonText,
   addDisabled,
@@ -36,7 +36,7 @@ const DocumentList = ({
               document={document}              
               onClickEditDocument={onClickEditDocument(document.id)}
               onClickRemoveDocument={onClickRemoveDocument(document.id)}
-              beingRemoved={documentBeingRemovedID === document.id}
+              beingRemoved={documentBeingRemovedId === document.id}
             />
           )}
           {documents.map((document, index) => 
@@ -45,7 +45,7 @@ const DocumentList = ({
               document={document}              
               onClickEditDocument={onClickEditDocument(document.id)}
               onClickRemoveDocument={onClickRemoveDocument(document.id)}
-              beingRemoved={documentBeingRemovedID === document.id}
+              beingRemoved={documentBeingRemovedId === document.id}
             />
           )}
           <AddDocumentButton onClick={onClickAddDocument} buttonText={addButtonText} disabled={addDisabled} />

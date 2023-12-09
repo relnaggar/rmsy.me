@@ -2,14 +2,14 @@ import React from "react";
 import BootstrapModal from 'react-bootstrap/Modal';
 
 import InputWithSave from "../common/InputWithSave";
-import { Status } from "./types";
+import { Status } from '../api/types';
 
 
 interface EditColumnModalProps {
   apiPath: string,
   show: boolean,
   setShow: React.Dispatch<React.SetStateAction<boolean>>,
-  statusID: number,
+  statusId: number,
   statuses: Status[]
   setStatuses: React.Dispatch<React.SetStateAction<Status[]>>,
 };
@@ -17,7 +17,7 @@ interface EditColumnModalProps {
 const EditColumnModal = ({
   apiPath,
   show, setShow,
-  statusID,
+  statusId,
   statuses, setStatuses,
 }: EditColumnModalProps): React.JSX.Element => {
   return (
@@ -34,7 +34,7 @@ const EditColumnModal = ({
           apiPath={apiPath}
           resources={statuses}
           setResources={setStatuses}
-          id={statusID}
+          id={statusId}
           editableProperty="name"
           labelText="Column Name"
         />

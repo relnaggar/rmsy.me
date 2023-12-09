@@ -15,7 +15,7 @@ export interface ModalProps {
 
 interface AddModalProps extends ModalProps {
   title: string,
-  modalID: string,
+  modalId: string,
   size?: "sm" | "lg" | "xl",
   onSubmit?: () => void,
   onValidatedSubmit: () => void,
@@ -27,7 +27,7 @@ interface AddModalProps extends ModalProps {
 const AddModal = ({
   show, setShow, errors, setErrors, showErrorAlert, setShowErrorAlert,
   title,
-  modalID,
+  modalId,
   size = undefined,
   onSubmit = () => {},
   onValidatedSubmit,
@@ -37,7 +37,7 @@ const AddModal = ({
 }: AddModalProps): React.JSX.Element => {
   const handleEntered = (): void => {
     const firstInputElement: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null =
-      document.getElementById(modalID)!.querySelector('input, select, textarea');
+      document.getElementById(modalId)!.querySelector('input, select, textarea');
     firstInputElement?.focus();
   };
 
@@ -59,11 +59,11 @@ const AddModal = ({
   };
 
   return (
-    <BootstrapModal id={modalID}
-      size={size} aria-labelledby={`${modalID}Label`} show={show} onEntered={handleEntered} onHide={handleClose}       
+    <BootstrapModal id={modalId}
+      size={size} aria-labelledby={`${modalId}Label`} show={show} onEntered={handleEntered} onHide={handleClose}       
     >
       <BootstrapModal.Header closeButton>
-        <BootstrapModal.Title id={`${modalID}Label`}>{title}</BootstrapModal.Title>
+        <BootstrapModal.Title id={`${modalId}Label`}>{title}</BootstrapModal.Title>
       </BootstrapModal.Header>
       <form onSubmit={handleSubmit}>
         <BootstrapModal.Body>

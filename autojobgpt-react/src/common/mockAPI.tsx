@@ -1,6 +1,4 @@
-import { Job, Status } from "../jobs/types";
-import { Resume } from "../resumes/types";
-import { ResumeTemplate } from "../templates/types";
+import { Status, Job, Resume, ResumeTemplate } from '../api/types';
 
 
 export function generateResponse<T = any>(data: T, status: number = 200): () => Promise<Response> {

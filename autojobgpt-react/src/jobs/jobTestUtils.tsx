@@ -1,7 +1,7 @@
 import { screen, getByRole, queryAllByRole, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { renderRoute, openAndGetModal } from "../common/testUtils";
+import { renderRoute } from "../common/testUtils";
 
 
 export const renderThisRoute = async (): Promise<void> => {

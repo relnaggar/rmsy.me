@@ -3,7 +3,7 @@ import React from "react";
 import useInputControl from "../hooks/useInputControl";
 import AddModal, { ModalProps } from "../common/AddModal";
 import TextInput from "../common/TextInput";
-import { ResumeTemplateUpload } from "../templates/types";
+import { ResumeTemplateUpload } from '../api/types';
 
 
 interface AddTemplateModalProps extends ModalProps {
@@ -18,7 +18,7 @@ const AddTemplateModal = ({
   const uploadInput = useInputControl();
   const descriptionInput = useInputControl();
 
-  const modalID: string = `addTemplateModal`;
+  const modalId: string = `addTemplateModal`;
 
   const validateSubmit = (): boolean => {
     let valid = true;
@@ -50,19 +50,19 @@ const AddTemplateModal = ({
     <AddModal
       show={show} setShow={setShow} errors={{error: errors["error"]}} setErrors={setErrors}
       showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
-      title="Add Resume Template" modalID={modalID}
+      title="Add Resume Template" modalId={modalId}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
-      <TextInput id={`${modalID}Name`}
+      <TextInput id={`${modalId}Name`}
         label="Template Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
         editing={nameInput.editing} errors={errors["name"]}
       />
-      <TextInput id={`${modalID}Upload`} ref={uploadInput.ref as React.RefObject<HTMLInputElement>}
+      <TextInput id={`${modalId}Upload`} ref={uploadInput.ref as React.RefObject<HTMLInputElement>}
         label="Upload" type="file" value={uploadInput.value} handleChange={uploadInput.handleChange}
         editing={uploadInput.editing} errors={errors["upload"]}
         accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       />
-      <TextInput id={`${modalID}Description`}
+      <TextInput id={`${modalId}Description`}
         label="Description (optional)" type="textarea" value={descriptionInput.value}
         handleChange={descriptionInput.handleChange}
         editing={descriptionInput.editing} errors={errors["description"]} rows={3}         

@@ -3,11 +3,11 @@ import React, { useContext, useState, useEffect } from "react";
 import useAPI from "./useAPI";
 import { FetchDataContext } from "../routes/routesConfig";
 import { CSRFTokenContext } from "../routes/Layout";
-import { WithID } from "../common/types";
+import { WithId } from '../api/types';
 import { makeErrorMessage } from "./hooksUtils";
 
 
-const usePostResource = <Resource extends WithID, ResourceUpload>(
+const usePostResource = <Resource extends WithId, ResourceUpload>(
   apiPath: string,
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
