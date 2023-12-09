@@ -12,7 +12,7 @@ export const ConfirmationModalContext = createContext<
 
 export const CSRFTokenContext = createContext<string>("");
 
-export default function Layout(): React.JSX.Element {
+const Layout = (): React.JSX.Element => {
   const apiRoute: string = useAPI();
   const fetchData = useContext(FetchDataContext);    
   const [csrfToken, setCsrfToken] = useState<string>("");  
@@ -93,4 +93,6 @@ export default function Layout(): React.JSX.Element {
       />
     </div>
   )
-}
+};
+
+export default Layout;

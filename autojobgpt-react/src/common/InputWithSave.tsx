@@ -1,31 +1,17 @@
 import React, { useCallback, useState, useRef, useEffect } from "react";
-import { ReactComponent as Floppy } from "bootstrap-icons/icons/floppy.svg";
+import { ReactComponent as FloppyIcon } from "bootstrap-icons/icons/floppy.svg";
 
 import usePatch from "../hooks/usePatch";
 import useControlledState from "../hooks/useControlledState";
 import { WithID } from "./types";
+
 
 export type SelectOption = {
   value: string,
   label: string,
 };
 
-export default function InputWithSave<Resource extends WithID>({
-  type,
-  apiPath,
-  resources,
-  setResources,
-  id,
-  editableProperty,
-  labelProperty,
-  labelText,
-  onSaveSuccess,
-  value: valueProp,
-  setValue: setValueProp,
-  selectOptions,
-  children,
-  ...props
-}: {
+interface InputWithSaveProps<Resource extends WithID>{
   type: string,
   apiPath: string,
   resources: Resource[],
@@ -40,7 +26,24 @@ export default function InputWithSave<Resource extends WithID>({
   selectOptions?: SelectOption[],
   children?: React.ReactNode,
   [key: string]: any,
-}): React.JSX.Element {
+}
+
+const InputWithSave = <Resource extends WithID>({
+  type,
+  apiPath,
+  resources,
+  setResources,
+  id,
+  editableProperty,
+  labelProperty,
+  labelText,
+  onSaveSuccess,
+  value: valueProp,
+  setValue: setValueProp,
+  selectOptions,
+  children,
+  ...props
+}: InputWithSaveProps<Resource>): React.JSX.Element => {
   if (!labelProperty && !labelText) throw new Error("InputWithSave must have either labelProperty or labelText");
 
   const resource: Resource = resources.find((resource) => resource.id === id)!;
@@ -84,7 +87,7 @@ export default function InputWithSave<Resource extends WithID>({
     onSuccess: handleUpdateSuccess,
   });
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {    
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {  
     e.preventDefault(); // prevent page from reloading
 
     const value: string = (document.getElementById(elementID) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
@@ -92,7 +95,7 @@ export default function InputWithSave<Resource extends WithID>({
     setEditing(false);
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
     setValue(e.target.value);
   }
 
@@ -161,12 +164,12 @@ export default function InputWithSave<Resource extends WithID>({
         </>
       : (saved?
         <>
-          <Floppy className="me-1" />
+          <FloppyIcon className="me-1" />
           Saved
         </>
       :
         <>
-          <Floppy className="me-1" />
+          <FloppyIcon className="me-1" />
           Save
         </>
       )}
@@ -204,4 +207,6 @@ export default function InputWithSave<Resource extends WithID>({
       </div>
     </>
   )
-}
+};
+
+export default InputWithSave;

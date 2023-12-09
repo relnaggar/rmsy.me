@@ -7,7 +7,7 @@ import { WithID } from "../common/types";
 import { makeErrorMessage } from "./hooksUtils";
 
 
-export default function usePostResource<Resource extends WithID, ResourceUpload>(
+const usePostResource = <Resource extends WithID, ResourceUpload>(
   apiPath: string,
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
@@ -19,7 +19,7 @@ export default function usePostResource<Resource extends WithID, ResourceUpload>
 ): {
   posting: boolean,
   postResource: (resource: ResourceUpload) => void,
-} {
+} => {
   const { onSuccess, onFail } = options || {};
 
   const apiRoute: string = useAPI();
@@ -29,7 +29,7 @@ export default function usePostResource<Resource extends WithID, ResourceUpload>
   const [resourceBeingPosted, setResourceBeingPosted] = useState<ResourceUpload | null>(null);
 
   useEffect(() => {
-    async function doPost(body: FormData | string): Promise<void> {      
+    const doPost = async (body: FormData | string): Promise<void> => {      
       let errors: Record<string,string[]> = {};
       const newResources: Resource[] = [...resources.filter(resource => resource.id !== -1)];
       try {
@@ -62,7 +62,7 @@ export default function usePostResource<Resource extends WithID, ResourceUpload>
           onFail?.(errors);
         }
       }
-    }
+    };
     if (resourceBeingPosted !== null) {
       const formData = new FormData();
       let containsFile = false;
@@ -82,14 +82,16 @@ export default function usePostResource<Resource extends WithID, ResourceUpload>
     }
   }, [fetchData, apiRoute, apiPath, csrfToken, resourceBeingPosted, resources, onSuccess, onFail, setResources]);
 
-  function postResource(resourceUpload: ResourceUpload): void {
+  const postResource = (resourceUpload: ResourceUpload): void => {
     const placeHolderResource: Resource = getPlaceholderResource(resourceUpload);
     if (placeHolderResource.id !== -1) {
       throw new Error("Placeholder resource must have an id of -1");
     }
     setResources([...resources, placeHolderResource]);
     setResourceBeingPosted(resourceUpload);
-  }
+  };
 
   return { posting: resourceBeingPosted !== null, postResource };
-}
+};
+
+export default usePostResource;

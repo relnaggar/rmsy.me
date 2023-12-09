@@ -1,10 +1,17 @@
 import React from "react";
 
-export default function AddDocument({ onClickAddDocument, buttonText, disabled }: {
-  onClickAddDocument: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  buttonText: string,
-  disabled: boolean,
-}): React.JSX.Element {
+
+interface AddDocumentButtonProps {
+  onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  buttonText: string;
+  disabled: boolean;
+}
+
+const AddDocumentButton = ({
+  onClick,
+  buttonText,
+  disabled
+}: AddDocumentButtonProps): React.JSX.Element => {
   return (
     <div className="document">
       <div className="document-image img-thumbnail"></div>
@@ -12,10 +19,12 @@ export default function AddDocument({ onClickAddDocument, buttonText, disabled }
         <button
           type="button"
           className="btn btn-primary"
-          onClick={onClickAddDocument}
+          onClick={onClick}
           disabled={disabled}
         >{`+ ${buttonText}`}</button>
       </div>
     </div>
   );
-}
+};
+
+export default AddDocumentButton;

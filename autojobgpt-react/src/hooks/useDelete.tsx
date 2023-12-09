@@ -7,7 +7,7 @@ import { WithID } from "../common/types";
 import { makeErrorMessage } from "./hooksUtils";
 
 
-export default function useDelete<Resource extends WithID>(
+const useDelete = <Resource extends WithID>(
   apiPath: string,
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
@@ -18,7 +18,7 @@ export default function useDelete<Resource extends WithID>(
 ): {
   deleteResource: (id: number) => void,
   idBeingDeleted: number,
-} {
+} => {
   const { onSuccess, onFail } = options || {};
 
   const apiRoute: string = useAPI();
@@ -28,7 +28,7 @@ export default function useDelete<Resource extends WithID>(
   const [idBeingDeleted, setIDBeingDeleted] = useState<number>(-1);
 
   useEffect(() => {
-    async function doDelete(): Promise<void> {
+    const doDelete = async (): Promise<void> => {
       let errors: Record<string,string[]> = {};
       try {
         const response: Response = await fetchData(`${apiRoute}${apiPath}${idBeingDeleted}/`, { 
@@ -55,19 +55,20 @@ export default function useDelete<Resource extends WithID>(
           onFail?.(errors);
         }
       }
-    }
+    };
     if (idBeingDeleted !== -1) {
       doDelete();
     }
   }, [fetchData, apiRoute, apiPath, csrfToken, idBeingDeleted, resources, onSuccess, onFail, setResources]);
 
-  function deleteResource(id: number): void {
+  const deleteResource = (id: number): void => {
     if (idBeingDeleted !== -1) {
       return;
-    }
-    
+    }    
     setIDBeingDeleted(id);
-  }
+  };
   
   return { deleteResource, idBeingDeleted };
-}
+};
+
+export default useDelete;

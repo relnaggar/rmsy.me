@@ -1,17 +1,11 @@
 import React from "react";
-import Modal from 'react-bootstrap/Modal';
+import BootstrapModal from 'react-bootstrap/Modal';
 
 import InputWithSave from "../common/InputWithSave";
 import { ResumeTemplate, FillField } from "../templates/types";
 
 
-export default function EditTemplateModal({
-  apiPath,
-  show, setShow,
-  templateID,
-  templates, setTemplates,
-  fillFields, setFillFields,
-}: {
+interface EditTemplateModalProps {
   apiPath: string,
   show: boolean,
   setShow: React.Dispatch<React.SetStateAction<boolean>>,
@@ -20,16 +14,24 @@ export default function EditTemplateModal({
   setTemplates: React.Dispatch<React.SetStateAction<ResumeTemplate[]>>,
   fillFields: FillField[],
   setFillFields: React.Dispatch<React.SetStateAction<FillField[]>>,
-}): React.JSX.Element {
+}
+
+const EditTemplateModal = ({
+  apiPath,
+  show, setShow,
+  templateID,
+  templates, setTemplates,
+  fillFields, setFillFields,
+}: EditTemplateModalProps): React.JSX.Element => {
   return (
-    <Modal aria-labelledby="editTemplateModalLabel" size="xl" backdrop="static"
+    <BootstrapModal aria-labelledby="editTemplateModalLabel" size="xl" backdrop="static"
       show={show} onHide={() => setShow(false)}
       onEntered={() => document.getElementsByTagName("input")[0].focus()}      
     >
-      <Modal.Header closeButton>
-        <Modal.Title id="editTemplateModalLabel">Edit Resume Template</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+      <BootstrapModal.Header closeButton>
+        <BootstrapModal.Title id="editTemplateModalLabel">Edit Resume Template</BootstrapModal.Title>
+      </BootstrapModal.Header>
+      <BootstrapModal.Body>
         <InputWithSave<ResumeTemplate>
           type="text"
           apiPath={apiPath}
@@ -81,10 +83,12 @@ export default function EditTemplateModal({
             return null;
           }
         })}
-      </Modal.Body>
-      <Modal.Footer>
+      </BootstrapModal.Body>
+      <BootstrapModal.Footer>
         <button type="button" className="btn btn-secondary" onClick={() => setShow(false)}>Close</button>
-      </Modal.Footer>
-    </Modal>
+      </BootstrapModal.Footer>
+    </BootstrapModal>
   )
-}
+};
+
+export default EditTemplateModal;

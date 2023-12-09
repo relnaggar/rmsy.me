@@ -1,16 +1,15 @@
 import React from "react";
 import { ReactComponent as ArrowClockwiseIcon } from "bootstrap-icons/icons/arrow-clockwise.svg";
 
+import { InputControl } from "../hooks/useInputControl";
 import { WithID } from "./types";
 
 
-interface SelectWithRefreshProps<Option extends WithID> {
+interface SelectInputWithRefreshProps<Option extends WithID> extends InputControl {
+  handleChange: (e: React.ChangeEvent<HTMLSelectElement>) => void,
   id: string,
   label: string,
   optionToString: (option: Option) => string,
-  value: string,
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void,
-  editing: boolean,
   options: Option[],
   loading: boolean,
   refetch: () => void,
@@ -18,19 +17,17 @@ interface SelectWithRefreshProps<Option extends WithID> {
   optionZeroLabel?: string,
 };
 
-const SelectWithRefresh: <Option extends WithID>(props: SelectWithRefreshProps<Option>) => React.JSX.Element = ({
+const SelectInputWithRefresh = <Option extends WithID>({
+  value, editing, handleChange,
   id,
   label,
   optionToString,
-  value,
-  onChange,
-  editing,
   options,
   loading,
   refetch,
   error,
   optionZeroLabel,
-}) => {
+}: SelectInputWithRefreshProps<Option>): React.JSX.Element => {
   let errorString: string = "";
   if (error instanceof Array) {
     if (error.length === 0) {
@@ -50,7 +47,7 @@ const SelectWithRefresh: <Option extends WithID>(props: SelectWithRefreshProps<O
       <div className="input-group">
         <select id={id}
           name={id} className={`form-select${showError ? " is-invalid" : ""}`}
-          value={value} onChange={onChange} disabled={loading} aria-busy={!loading}
+          value={value} onChange={handleChange} disabled={loading} aria-busy={!loading}
         >
           <option value="0">{ loading ? "Loading..." : optionZeroLabel }</option>
           {options.map((opt) => (
@@ -73,4 +70,4 @@ const SelectWithRefresh: <Option extends WithID>(props: SelectWithRefreshProps<O
   );
 };
 
-export default SelectWithRefresh;
+export default SelectInputWithRefresh;

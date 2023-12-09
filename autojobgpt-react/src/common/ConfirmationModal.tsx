@@ -1,39 +1,52 @@
 import React from 'react';
-import Modal from 'react-bootstrap/Modal';
+import BoostrapModal from 'react-bootstrap/Modal';
 
-export default function ConfirmationModal({ show, setShow, action, actionDescription, actionVerb }: {
+
+interface ConfirmationModalProps {
   show: boolean,
   setShow: (show: boolean) => void,
   action: () => void,
   actionDescription: string
   actionVerb: string
-}): React.JSX.Element {
-  function handleClickAction(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    action();
+};
+
+const ConfirmationModal = ({
+  show,
+  setShow,
+  action,
+  actionDescription,
+  actionVerb
+}: ConfirmationModalProps): React.JSX.Element => {
+
+  const handleClose = (): void => {
     setShow(false);
   }
 
+  const handleEntered = (): void => {
+    document.getElementById("confirmationCloseButton")?.focus();
+  };
+
+  const handleClickAction = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    action();
+    setShow(false);
+  };
+
   return (
-    <Modal
-      show={show} onHide={() => setShow(false)}
-      onEntered={() => document.getElementById("confirmationCloseButton")?.focus()}
-      aria-labelledby="confirmationModalLabel"
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="confirmationModalLabel">Confirm {actionVerb}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+    <BoostrapModal show={show} onHide={handleClose} onEntered={handleEntered} aria-labelledby="confirmationModalLabel">
+      <BoostrapModal.Header closeButton>
+        <BoostrapModal.Title id="confirmationModalLabel">Confirm {actionVerb}</BoostrapModal.Title>
+      </BoostrapModal.Header>
+      <BoostrapModal.Body>
         <p>Are you sure you want to {actionDescription}?</p>
-      </Modal.Body>
-      <Modal.Footer>
+      </BoostrapModal.Body>
+      <BoostrapModal.Footer>
         <button type="button" className="btn btn-danger" onClick={handleClickAction}>{actionVerb}</button>
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={() => setShow(false)}
-          id="confirmationCloseButton"
-        >Close</button>
-      </Modal.Footer>
-    </Modal>
+        <button id="confirmationCloseButton" type="button" className="btn btn-secondary" onClick={handleClose}>
+          Close
+        </button>
+      </BoostrapModal.Footer>
+    </BoostrapModal>
   )
-}
+};
+
+export default ConfirmationModal;

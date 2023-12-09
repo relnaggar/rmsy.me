@@ -1,17 +1,25 @@
 import React, { useRef } from "react";
-import { ReactComponent as PencilSquare } from "bootstrap-icons/icons/pencil-square.svg";
-import { ReactComponent as Trash3 } from "bootstrap-icons/icons/trash3.svg";
-import { ReactComponent as FileArrowDown } from "bootstrap-icons/icons/file-arrow-down.svg";
+import { ReactComponent as PencilSquareIcon } from "bootstrap-icons/icons/pencil-square.svg";
+import { ReactComponent as Trash3Icon } from "bootstrap-icons/icons/trash3.svg";
+import { ReactComponent as FileArrowDownIcon } from "bootstrap-icons/icons/file-arrow-down.svg";
 
 import { generatePlaceholderWidths } from "./utils";
 import { Document } from "./types";
 
-export default function DocumentThumbnail({ document, beingRemoved, onClickEditDocument, onClickRemoveDocument }: {
+
+interface DocumentThumbnailProps {
   document: Document,
   beingRemoved?: boolean,
   onClickEditDocument?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  onClickRemoveDocument?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
-}): React.JSX.Element {
+  onClickRemoveDocument?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+};
+
+const DocumentThumbnail = ({
+  document,
+  beingRemoved = false,
+  onClickEditDocument,
+  onClickRemoveDocument
+}: DocumentThumbnailProps): React.JSX.Element => {
   const placeholderWidths = useRef<number[]>([]);
 
   if (placeholderWidths.current.length === 0) {
@@ -64,7 +72,7 @@ export default function DocumentThumbnail({ document, beingRemoved, onClickEditD
                   onClick={onClickEditDocument!}
                   disabled={beingRemoved}
                 >
-                  <PencilSquare />
+                  <PencilSquareIcon />
                 </button>
                 <button
                   type="button"
@@ -78,7 +86,7 @@ export default function DocumentThumbnail({ document, beingRemoved, onClickEditD
                       <span className="visually-hidden">Loading...</span>
                     </div>
                   :
-                    <Trash3 />
+                    <Trash3Icon />
                   }
                 </button>
               </div>
@@ -100,11 +108,13 @@ export default function DocumentThumbnail({ document, beingRemoved, onClickEditD
       {document.docx !== "" && 
         <div className="document-footer pb-4">
           <a download href={document.docx} className="btn btn-primary" role="button">
-            <FileArrowDown className="me-1" />
+            <FileArrowDownIcon className="me-1" />
             Download
           </a>
         </div>
       }
     </div>
   );
-}
+};
+
+export default DocumentThumbnail;

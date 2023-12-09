@@ -20,7 +20,7 @@ export type FillField = {
   template: number,
 }
 
-export function getPlaceholderTemplate(templateUpload: ResumeTemplateUpload): ResumeTemplate {
+export const getPlaceholderTemplate = (templateUpload: ResumeTemplateUpload): ResumeTemplate => {
   return {
     id: -1,
     name: templateUpload.name,

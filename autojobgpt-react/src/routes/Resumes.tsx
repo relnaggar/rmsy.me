@@ -4,11 +4,13 @@ import ResumeTemplateList from "../templates/ResumeTemplateList";
 import ResumeList from "../resumes/ResumeList";
 
 
-export default function ResumesPage(): React.JSX.Element {
+const ResumesPage = (): React.JSX.Element => {
   return (
     <main>        
       <ResumeTemplateList />      
       <ResumeList />
     </main>
   );
-}
+};
+
+export default ResumesPage;

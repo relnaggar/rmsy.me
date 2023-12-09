@@ -1,10 +1,10 @@
 import React, { useContext, useState, useCallback } from 'react';
-import Alert from 'react-bootstrap/Alert';
+import BootstrapAlert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useResource from '../hooks/useResource';
 import useFetch from '../hooks/useFetch';
-import useFormInput from '../hooks/useFormInput';
+import useFormInput from '../hooks/useInputControl';
 import DocumentList from '../common/DocumentList';
 import EditResumeModal from './EditResumeModal';
 import AddResumeModal from './AddResumeModal';
@@ -12,7 +12,7 @@ import { Resume, ResumeUpload, Substitution, getPlaceholderResume } from './type
 import { Job } from '../jobs/types';
 
 
-export default function ResumeList(): React.JSX.Element {
+const ResumeList = (): React.JSX.Element => {
   const openConfirmationModal = useContext(ConfirmationModalContext);
 
   const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -64,27 +64,23 @@ export default function ResumeList(): React.JSX.Element {
   const [editResumeID, setEditResumeID] = useState<number>(-1);
   const [showAddResume, setShowAddResume] = useState<boolean>(false);
 
-  function handleClickEditResume(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
-    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      setEditResumeID(id);
-      setShowEditResumeModal(true);
-    }
-  }
+  const handleClickEditResume = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    setEditResumeID(id);
+    setShowEditResumeModal(true);
+  };
 
-  function handleClickRemoveResume(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
-    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      const resume: Resume = resumes.find((resume) => resume.id === id)!;
-      openConfirmationModal(() => removeResume(id), `delete resume "${resume.name}"`, "Delete");
-    }
-  }
+  const handleClickRemoveResume = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    const resume: Resume = resumes.find((resume) => resume.id === id)!;
+    openConfirmationModal(() => removeResume(id), `delete resume "${resume.name}"`, "Delete");
+  };
   
-  function handleClickAddResume(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+  const handleClickAddResume = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     setShowAddResume(true);
-  }
+  };
 
-  function handleSubstitutionSaveSuccess(): void {
+  const handleSubstitutionSaveSuccess = (): void => {
     refetchResumes();
-  }
+  };
 
   const jobInput = useFormInput("0");
   const jobIDsWithAtLeastOneResume: number[] = [];
@@ -112,7 +108,7 @@ export default function ResumeList(): React.JSX.Element {
           <div className="col-auto">
             <select
               id="resume-job-select" className="form-select"
-              value={jobInput.value} onChange={jobInput.handleChange}
+              value={jobInput.value} onChange={jobInput.handleChange as (e: React.ChangeEvent<HTMLSelectElement>) => void}
             >
               <option value="0">All Jobs</option>
               {jobsWithAtLeastOneResume.map((job) => (
@@ -122,9 +118,9 @@ export default function ResumeList(): React.JSX.Element {
           </div>
         </div>
       }
-      <Alert variant="danger" show={showErrorAlert} onClose={() => setShowErrorAlert(false)} dismissible>
+      <BootstrapAlert variant="danger" show={showErrorAlert} onClose={() => setShowErrorAlert(false)} dismissible>
         {Object.values(errors).join(" ")}
-      </Alert>
+      </BootstrapAlert>
       <DocumentList
         documents={
           jobInput.value === "0" ?
@@ -156,4 +152,6 @@ export default function ResumeList(): React.JSX.Element {
       />
     </section>
   )
-}
+};
+
+export default ResumeList;

@@ -1,18 +1,26 @@
 import React from 'react';
-import { ReactComponent as BoxArrowUpRight } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
-import { ReactComponent as PencilSquare } from 'bootstrap-icons/icons/pencil-square.svg';
-import { ReactComponent as Trash3 } from 'bootstrap-icons/icons/trash3.svg';
+import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
+import { ReactComponent as PencilSquareIcon } from 'bootstrap-icons/icons/pencil-square.svg';
+import { ReactComponent as Trash3Icon } from 'bootstrap-icons/icons/trash3.svg';
 
 import { Job } from './types';
 
 
-export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemoveJob, beingRemoved }: {
+interface JobCardProps {
   job: Job,
   onDragStart: (e: React.DragEvent<HTMLDivElement>) => void
   onClickEditJob: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   onClickRemoveJob: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   beingRemoved: boolean
-}): React.JSX.Element {
+}
+
+const JobCard = ({
+  job,
+  onDragStart,
+  onClickEditJob,
+  onClickRemoveJob,
+  beingRemoved
+}: JobCardProps): React.JSX.Element => {
   return (
     <div
       className="card mb-2 p-2 text-bg-primary"
@@ -32,7 +40,7 @@ export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemov
                 onClick={onClickEditJob}
                 disabled={beingRemoved}
               >
-                <PencilSquare />
+                <PencilSquareIcon />
               </button>
               <button
                 type="button"
@@ -46,7 +54,7 @@ export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemov
                     <span className="visually-hidden">Loading...</span>
                   </div>
                 :
-                  <Trash3 />
+                  <Trash3Icon />
                 }
               </button>
             </div>
@@ -61,7 +69,7 @@ export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemov
           {job.url ?
             <a href={job.url} target="_blank" rel="noreferrer" className="link-light">
               {job.company}
-              <BoxArrowUpRight className="ms-1" />
+              <BoxArrowUpRightIcon className="ms-1" />
             </a>
           :
             job.company
@@ -74,4 +82,6 @@ export default function JobCard({ job, onDragStart, onClickEditJob, onClickRemov
       }
     </div>
   );
-}
+};
+
+export default JobCard;

@@ -5,7 +5,7 @@ import { FetchDataContext } from "../routes/routesConfig";
 import { makeErrorMessage } from "./hooksUtils";
 
 
-export default function useFetch<Resource>(
+const useFetch = <Resource extends unknown>(
   apiPath: string,  
   options?: {
     initialResource?: Resource,
@@ -19,7 +19,7 @@ export default function useFetch<Resource>(
   fetching: boolean,
   refetch: (paramString?: string) => void,
   cancel: () => void,
-} {
+} => {
   const {
     initialResource = {} as Resource,
     initialFetch = true,
@@ -37,7 +37,7 @@ export default function useFetch<Resource>(
   const abortControllerRef = useRef<AbortController>(new AbortController());
 
   useEffect(() => {
-    async function doFetch(): Promise<void> {
+    const doFetch = async (): Promise<void> => {
       let errors: Record<string,string[]> = {};
       try {
         const response: Response = await fetchData(`${apiRoute}${apiPath}${paramString}`, {
@@ -70,7 +70,7 @@ export default function useFetch<Resource>(
           }
         }
       }
-    }
+    };
 
     if (fetching) {
       abortControllerRef.current = new AbortController();
@@ -78,7 +78,7 @@ export default function useFetch<Resource>(
     }    
   }, [fetchData, apiRoute, apiPath, paramString, fetching, onSuccess, onFail]);
 
-  function refetch(paramString?: string): void {
+  const refetch = (paramString?: string): void => {
     if (fetching) {
       abortControllerRef.current.abort();
     }
@@ -86,12 +86,14 @@ export default function useFetch<Resource>(
       setParamString(`?${paramString}`);
     }
     setFetching(true);
-  }
+  };
 
-  function cancel(): void {
+  const cancel = (): void => {
     abortControllerRef.current.abort();
     setFetching(false);
-  }
+  };
 
   return { resource, setResource, fetching, refetch, cancel };
-}
+};
+
+export default useFetch;

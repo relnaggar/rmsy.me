@@ -7,7 +7,7 @@ import { WithID } from "../common/types";
 import { makeErrorMessage } from "./hooksUtils";
 
 
-export default function usePatch<Resource extends WithID>(
+const usePatch = <Resource extends WithID>(
   apiPath: string,
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
@@ -18,7 +18,7 @@ export default function usePatch<Resource extends WithID>(
 ): {
   patching: boolean,
   patchResource: (id: number, patch: Partial<Resource>) => void,
-} {
+} => {
   const {
     onSuccess,
     onFail,
@@ -32,7 +32,7 @@ export default function usePatch<Resource extends WithID>(
   const [patch, setPatch] = useState<Partial<Resource>>({});
 
   useEffect(() => {
-    async function doPatch(): Promise<void> {
+    const doPatch = async (): Promise<void> => {
       let errors: Record<string,string[]> = {};
       try {
         const response: Response = await fetchData(`${apiRoute}${apiPath}${idBeingPatched}/`, { 
@@ -59,16 +59,18 @@ export default function usePatch<Resource extends WithID>(
           onFail?.(errors);
         }
       }
-    }
+    };
     if (idBeingPatched !== -1) {
       doPatch();
     }
   }, [fetchData, apiRoute, apiPath, csrfToken, idBeingPatched, patch, resources, setResources, onSuccess, onFail]);
 
-  function patchResource(id: number, patch: Partial<Resource>): void {
+  const patchResource = (id: number, patch: Partial<Resource>): void => {
     setPatch(patch);
     setIDBeingPatched(id);
-  }
+  };
 
   return { patching: idBeingPatched !== -1, patchResource };
-}
+};
+
+export default usePatch;

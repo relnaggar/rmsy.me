@@ -1,32 +1,14 @@
 import React from "react";
-import { ReactComponent as PencilSquare } from 'bootstrap-icons/icons/pencil-square.svg';
-import { ReactComponent as Trash3 } from 'bootstrap-icons/icons/trash3.svg';
-import { ReactComponent as CaretLeft } from 'bootstrap-icons/icons/caret-left.svg';
-import { ReactComponent as CaretRight } from 'bootstrap-icons/icons/caret-right.svg';
+import { ReactComponent as PencilSquareIcon } from 'bootstrap-icons/icons/pencil-square.svg';
+import { ReactComponent as Trash3Icon } from 'bootstrap-icons/icons/trash3.svg';
+import { ReactComponent as CaretLeftIcon } from 'bootstrap-icons/icons/caret-left.svg';
+import { ReactComponent as CaretRightIcon } from 'bootstrap-icons/icons/caret-right.svg';
 
 import JobCard from "./JobCard";
 import { Status, Job } from "./types";
 
 
-export default function Column({
-  title,
-  jobs,
-  statusID,
-  sortedStatuses,
-  loading,
-  onDragStart,
-  onDragOver,
-  onDrop,
-  onClickEditJob,
-  onClickRemoveJob,
-  jobIDBeingRemoved,
-  onClickAddJob,
-  addDisabled,
-  updateStatus,
-  beingRemoved,
-  onClickRemoveColumn,
-  onClickEditColumn,
-}: {
+interface JobColumnProps {
   title: string,
   jobs: Job[],
   statusID: number,
@@ -44,7 +26,27 @@ export default function Column({
   beingRemoved: boolean,
   onClickRemoveColumn: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   onClickEditColumn: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-}): React.JSX.Element {
+};
+
+const JobColumn = ({
+  title,
+  jobs,
+  statusID,
+  sortedStatuses,
+  loading,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onClickEditJob,
+  onClickRemoveJob,
+  jobIDBeingRemoved,
+  onClickAddJob,
+  addDisabled,
+  updateStatus,
+  beingRemoved,
+  onClickRemoveColumn,
+  onClickEditColumn,
+}: JobColumnProps): React.JSX.Element => {
   const status: Status = sortedStatuses.find((status) => status.id === statusID)!;
   const columnID = `column${status.order}`;
 
@@ -89,7 +91,7 @@ export default function Column({
                 onClick={onClickMoveLeft}
                 disabled={beingRemoved}
               >
-                <CaretLeft />
+                <CaretLeftIcon />
               </button>}
               {statusID !== sortedStatuses[sortedStatuses.length-1].id && <button
                 type="button"
@@ -98,7 +100,7 @@ export default function Column({
                 onClick={onClickMoveRight}
                 disabled={beingRemoved}
               >
-                <CaretRight />
+                <CaretRightIcon />
               </button>}
             </div>
             <div className="btn-group ms-1" role="group">
@@ -109,7 +111,7 @@ export default function Column({
                 onClick={onClickEditColumn}
                 disabled={beingRemoved}
               >
-                <PencilSquare />
+                <PencilSquareIcon />
               </button>
               <button
                 type="button"
@@ -123,7 +125,7 @@ export default function Column({
                     <span className="visually-hidden">Loading...</span>
                   </div>
                 :
-                  <Trash3 />
+                  <Trash3Icon />
                 }
               </button>
             </div>
@@ -178,4 +180,6 @@ export default function Column({
       </div>
     </div>
   );
-}
+};
+
+export default JobColumn;

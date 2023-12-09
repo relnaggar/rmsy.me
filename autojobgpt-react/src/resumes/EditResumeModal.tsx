@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from "react";
-import Modal from 'react-bootstrap/Modal';
-import Alert from 'react-bootstrap/Alert';
-import { ReactComponent as BoxArrowUpRight } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
-import { ReactComponent as FileArrowDown } from 'bootstrap-icons/icons/file-arrow-down.svg';
-import { ReactComponent as Copy } from 'bootstrap-icons/icons/copy.svg';
+import BootstrapModal from 'react-bootstrap/Modal';
+import BootstrapAlert from 'react-bootstrap/Alert';
+import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
+import { ReactComponent as FileArrowDownIcon } from 'bootstrap-icons/icons/file-arrow-down.svg';
+import { ReactComponent as CopyIcon } from 'bootstrap-icons/icons/copy.svg';
 
 import usePost from "../hooks/usePost";
 import InputWithSave from "../common/InputWithSave";
@@ -12,17 +12,7 @@ import { Resume, Substitution } from "./types";
 import { Job } from "../jobs/types";
 
 
-export default function EditResumeModal({
-  apiPath,
-  resumes,
-  setResumes,
-  show,
-  setShow,
-  resumeID,
-  substitutions,
-  setSubstitutions,
-  onSubstitutionSaveSuccess,
-}: {
+interface EditResumeModalProps {
   apiPath: string,
   resumes: Resume[],
   setResumes: React.Dispatch<React.SetStateAction<Resume[]>>,
@@ -32,7 +22,19 @@ export default function EditResumeModal({
   substitutions: Substitution[],
   setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
   onSubstitutionSaveSuccess: () => void,
-}): React.JSX.Element {
+}
+
+const EditResumeModal = ({
+  apiPath,
+  resumes,
+  setResumes,
+  show,
+  setShow,
+  resumeID,
+  substitutions,
+  setSubstitutions,
+  onSubstitutionSaveSuccess,
+}: EditResumeModalProps): React.JSX.Element => {
   const resume: Resume | undefined = resumes.find((resume: Resume) => resume.id === resumeID);
 
   const [errors, setErrors] = useState<Record<string,string[]>>({});
@@ -55,25 +57,25 @@ export default function EditResumeModal({
     }
   );
 
-  function handleClickDuplicate(): void {
+  const handleClickDuplicate = (): void => {
     setShowErrorAlert(false);
     duplicate();
   }
 
-  function handleClose(): void {
+  const handleClose = (): void => {
     setShowErrorAlert(false);
     setShow(false);    
   }  
 
   return (
-    <Modal
+    <BootstrapModal
       show={show} onHide={handleClose} aria-labelledby="editResumeModalLabel"
       onEntered={() => document.getElementsByTagName("input")[0].focus()} size="xl" backdrop="static"
     >
-      <Modal.Header closeButton>
-        <Modal.Title id="editResumeModalLabel">Edit Resume</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+      <BootstrapModal.Header closeButton>
+        <BootstrapModal.Title id="editResumeModalLabel">Edit Resume</BootstrapModal.Title>
+      </BootstrapModal.Header>
+      <BootstrapModal.Body>
         <InputWithSave<Resume>
           type="text"
           apiPath={apiPath}
@@ -94,21 +96,21 @@ export default function EditResumeModal({
                 className="link-primary form-control border border-0"
               >
                 {resume.job!.title + ", " + (resume.job as Job).company}
-                <BoxArrowUpRight className="ms-1" />
+                <BoxArrowUpRightIcon className="ms-1" />
               </a>
             </div>
             <div className="mb-3 flex-fill">
               <span className="form-label">Template</span>
               <a href={resume.template!.docx} className="form-control link-primary border border-0">
                 {resume!.template.name}
-                <FileArrowDown className="ms-1" />
+                <FileArrowDownIcon className="ms-1" />
               </a>
             </div>
             <div className="mb-3 flex-fill">
               <span className="form-label">Resume</span>
               <a href={resume!.docx} className="form-control link-primary border border-0">
                 Version {resume.version}
-                <FileArrowDown className="ms-1" />
+                <FileArrowDownIcon className="ms-1" />
               </a>
             </div>
           </div>
@@ -129,14 +131,14 @@ export default function EditResumeModal({
             );
           })
         }
-      </Modal.Body>
-      <Modal.Footer>
-        <Alert
+      </BootstrapModal.Body>
+      <BootstrapModal.Footer>
+        <BootstrapAlert
             variant="danger" dismissible className="w-100"
             show={showErrorAlert} onClose={() => setShowErrorAlert(false)}
           >
             {Object.values(errors).join(" ")}
-        </Alert>
+        </BootstrapAlert>
         <button className="btn btn-outline-primary" type="button"
           onClick={duplicating ? () => cancelDuplicate() : handleClickDuplicate }
         >
@@ -144,12 +146,14 @@ export default function EditResumeModal({
             <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
             Cancel
           </>:<>
-            <Copy className="me-1" />
+            <CopyIcon className="me-1" />
             Duplicate
           </>}
         </button>
         <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
-      </Modal.Footer>
-    </Modal>
+      </BootstrapModal.Footer>
+    </BootstrapModal>
   )
-}
+};
+
+export default EditResumeModal;

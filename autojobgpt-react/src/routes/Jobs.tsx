@@ -3,10 +3,12 @@ import React from "react";
 import JobBoard from "../jobs/JobBoard";
 
 
-export default function Jobs(): React.JSX.Element {
+const Jobs = (): React.JSX.Element => {
   return (
     <main>
       <JobBoard />
     </main>
   );
-}
+};
+
+export default Jobs;

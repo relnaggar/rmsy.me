@@ -1,8 +1,8 @@
 import React from "react";
 
-import useFormInput from "../hooks/useFormInput";
+import useInputControl from "../hooks/useInputControl";
 import AddModal from "../common/AddModal";
-import FormInput from "../common/FormInput";
+import TextInput from "../common/TextInput";
 import { StatusUpload } from "./types";
 import { ModalProps } from "../common/types";
 
@@ -16,7 +16,7 @@ const AddColumnModal = ({
   addColumn,
 }: AddColumnModalProps): React.JSX.Element => {
   const modalID = "addColumnModal";
-  const nameInput = useFormInput();
+  const nameInput = useInputControl();
   
   const validateSubmit = (): boolean => {
     let valid = true;
@@ -44,7 +44,7 @@ const AddColumnModal = ({
       title="Add Column" modalID={modalID}
       validateSubmit={validateSubmit} onSuccessfulSubmit={handleSuccessfulSubmit}
     >
-      <FormInput id={`${modalID}Name`}
+      <TextInput id={`${modalID}Name`}
         label="Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
         editing={nameInput.editing} error={errors["name"]}
       />

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
 
-export default function useControlledState<T>(
+const useControlledState = <T extends unknown>(
   initialValue: T,
   valueProp?: T,
   setValueProp?: React.Dispatch<React.SetStateAction<T>>,
-): readonly [T, (newValue: T) => void] {
+): readonly [T, (newValue: T) => void] => {
   const [value, setInternalValue] = useState<T>(valueProp || initialValue);
 
   useEffect(() => {
@@ -24,4 +24,6 @@ export default function useControlledState<T>(
   };
 
   return [value, setValue] as const;
-}
+};
+
+export default useControlledState;

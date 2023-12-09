@@ -1,34 +1,28 @@
 import React from 'react';
 
+import { InputControl } from "../hooks/useInputControl";
 
-interface FormInputProps {
+
+interface TextInputProps extends InputControl {
   id: string,
   label: string,
-  type: string,
-  handleChange: ((e: React.ChangeEvent<HTMLInputElement>) => void) | ((e: React.ChangeEvent<HTMLTextAreaElement>) => void),
-  editing: boolean,
-  error?: string[],
-  value: string,
+  type: string,    
+  error?: string[],  
   loading?: boolean,
   children?: React.ReactNode,
   [key: string]: any,
 };
 
-// use React.forwardRef to pass ref to input element
-
-const FormInput = React.forwardRef((
-  {
-    id,
-    label,
-    type,  
-    handleChange,
-    editing,  
-    error,
-    value,
-    loading = false,
-    children,
-    ...props
-  }: FormInputProps,
+const TextInput = React.forwardRef(({
+  value, editing, handleChange,
+  id,
+  label,
+  type,
+  error,
+  loading = false,
+  children,
+  ...props
+}: TextInputProps,
   ref: React.Ref<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
 ): React.JSX.Element => {
   let errorString: string = "";
@@ -47,7 +41,10 @@ const FormInput = React.forwardRef((
     id,
     name: id,
     value: type === "file" ? undefined : (value ?? ""),
-    onChange: handleChange,
+    onChange: handleChange as (
+      ((e: React.ChangeEvent<HTMLInputElement>) => void) |
+      ((e: React.ChangeEvent<HTMLTextAreaElement>) => void)
+    ),
     disabled: loading,
     "aria-describedby": showError? `${id}Feedback`: undefined,
     ...props,
@@ -85,4 +82,4 @@ const FormInput = React.forwardRef((
   );
 });
 
-export default FormInput;
+export default TextInput;

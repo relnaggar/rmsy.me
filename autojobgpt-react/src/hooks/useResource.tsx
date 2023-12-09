@@ -5,7 +5,7 @@ import usePatch from './usePatch';
 import { WithID } from '../common/types';
 
 
-export default function useResource<Resource extends WithID, ResourceUpload>(
+const useResource = <Resource extends WithID, ResourceUpload>(
   apiPath: string,
   getPlaceholderResource: (resourceUpload: ResourceUpload) => Resource,
   options?: {
@@ -29,7 +29,7 @@ export default function useResource<Resource extends WithID, ResourceUpload>(
   idBeingDeleted: number,
   patching: boolean,
   patchResource: (id: number, patch: Partial<Resource>) => void,
-} {
+} => {
   let {
     onPostSuccess,
     onPostFail,
@@ -69,4 +69,6 @@ export default function useResource<Resource extends WithID, ResourceUpload>(
     deleteResource, idBeingDeleted,    
     patching, patchResource,
   };
-}
+};
+
+export default useResource;

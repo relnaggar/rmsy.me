@@ -1,8 +1,8 @@
 import React from "react";
 
-import useFormInput from "../hooks/useFormInput";
+import useInputControl from "../hooks/useInputControl";
 import AddModal from "../common/AddModal";
-import FormInput from "../common/FormInput";
+import TextInput from "../common/TextInput";
 import { ResumeTemplateUpload } from "../templates/types";
 import { ModalProps } from "../common/types";
 
@@ -15,9 +15,9 @@ const AddTemplateModal = ({
   show, setShow, errors, setErrors, showErrorAlert, setShowErrorAlert,
   addTemplate,
 }: AddTemplateModalProps): React.JSX.Element => {
-  const nameInput = useFormInput();
-  const uploadInput = useFormInput();
-  const descriptionInput = useFormInput();
+  const nameInput = useInputControl();
+  const uploadInput = useInputControl();
+  const descriptionInput = useInputControl();
 
   const modalID: string = `addTemplateModal`;
 
@@ -54,16 +54,16 @@ const AddTemplateModal = ({
       title="Add Resume Template" modalID={modalID}
       validateSubmit={validateSubmit} onSuccessfulSubmit={handleSuccessfulSubmit}
     >
-      <FormInput id={`${modalID}Name`}
+      <TextInput id={`${modalID}Name`}
         label="Template Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
         editing={nameInput.editing} error={errors["name"]}
       />
-      <FormInput id={`${modalID}Upload`} ref={uploadInput.ref}
+      <TextInput id={`${modalID}Upload`} ref={uploadInput.ref}
         label="Upload" type="file" value={uploadInput.value} handleChange={uploadInput.handleChange}
         editing={uploadInput.editing} error={errors["upload"]}
         accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       />
-      <FormInput id={`${modalID}Description`}
+      <TextInput id={`${modalID}Description`}
         label="Description (optional)" type="textarea" value={descriptionInput.value}
         handleChange={descriptionInput.handleChange}
         editing={descriptionInput.editing} error={errors["description"]} rows={3}         

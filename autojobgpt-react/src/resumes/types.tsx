@@ -27,7 +27,7 @@ export type ResumeUpload = {
   template: number,
 }
 
-export function getPlaceholderResume(resumeUpload: ResumeUpload): Resume {
+export const getPlaceholderResume = (resumeUpload: ResumeUpload): Resume => {
   return {
     id: -1,
     substitutions: [],

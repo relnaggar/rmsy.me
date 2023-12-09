@@ -41,7 +41,7 @@ export type JobDetails = Pick<
   "posting"
 >;
 
-export function generatePlaceholderJob(): Job {
+export const generatePlaceholderJob = (): Job => {
   return {
     "id": -1,
     "url": "",
@@ -50,4 +50,4 @@ export function generatePlaceholderJob(): Job {
     "posting": "",
     "status": -1,
   }
-}
+};

@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useState } from "react";
-import Alert from 'react-bootstrap/Alert';
+import BootstrapAlert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useResource from "../hooks/useResource";
@@ -11,7 +11,7 @@ import AddColumnModal from "./AddColumnModal";
 import EditColumnModal from "./EditColumnModal";
 
 
-export default function JobBoard(): React.JSX.Element {
+const JobBoard = (): React.JSX.Element => {
   const openConfirmationModal = useContext(ConfirmationModalContext);
 
   const [draggingJobId, setDraggingJobId] = useState<number>(-1);
@@ -61,49 +61,41 @@ export default function JobBoard(): React.JSX.Element {
     onPatchFail: handleErrors,
   });
 
-  function handleClickAddJob(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+  const handleClickAddJob = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     setShowAddJob(true);
   }
 
-  function handleClickRemoveJob(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
-    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-      const job: Job = jobs.find((job) => job.id === id)!;
-      openConfirmationModal(() => removeJob(id), `delete job "${job.title}, ${job.company}"`, "Delete");
-    };
-  }
+  const handleClickRemoveJob = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    const job: Job = jobs.find((job) => job.id === id)!;
+    openConfirmationModal(() => removeJob(id), `delete job "${job.title}, ${job.company}"`, "Delete");
+  };
 
-  function handleClickEditJob(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
-    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-      setEditJobID(id);
-      setShowEditJob(true);
-    };
-  }
+  const handleClickEditJob = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    setEditJobID(id);
+    setShowEditJob(true);
+  };
 
-  function handleDragStart(id: number): (e: React.DragEvent<HTMLDivElement>) => void {
-    return (e: React.DragEvent<HTMLDivElement>): void => {
-      setDraggingJobId(id);
-      try { // e.currentTarget not supported in jsdom
-        e.currentTarget.scrollIntoView({behavior: "smooth", block: "center"});
-      } catch (error) {}
-    };
-  }
+  const handleDragStart = (id: number) => (e: React.DragEvent<HTMLDivElement>): void => {
+    setDraggingJobId(id);
+    try { // e.currentTarget not supported in jsdom
+      e.currentTarget.scrollIntoView({behavior: "smooth", block: "center"});
+    } catch (error) {}
+  };
 
-  function handleDragOver(e: React.DragEvent<HTMLDivElement>): void {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
     e.preventDefault();
   }
 
-  function handleDrop(endStatus: Status): (e: React.DragEvent<HTMLDivElement>) => void {
-    return (e: React.DragEvent<HTMLDivElement>): void => {
-      e.preventDefault(); // prevent page from reloading
-      
-      const job: Job = jobs.find((job) => job.id === draggingJobId)!;
-      const jobStatus: Status = sortedStatuses.find((status) => status.id === job.status)!;
-      if (jobStatus.order !== endStatus.order) {      
-        updateJob(draggingJobId, {status: endStatus.id});
-        setDraggingJobId(-1);
-      }
+  const handleDrop = (endStatus: Status) => (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault(); // prevent page from reloading
+    
+    const job: Job = jobs.find((job) => job.id === draggingJobId)!;
+    const jobStatus: Status = sortedStatuses.find((status) => status.id === job.status)!;
+    if (jobStatus.order !== endStatus.order) {      
+      updateJob(draggingJobId, {status: endStatus.id});
+      setDraggingJobId(-1);
     }
-  }
+  };
 
   const handlePatchStatusSuccess = useCallback((newStatus: Status, statuses: Status[], setStatuses: React.Dispatch<React.SetStateAction<Status[]>>) => {
     const newStatuses: Status[] = [...statuses];
@@ -175,28 +167,24 @@ export default function JobBoard(): React.JSX.Element {
     onPatchFail: handleErrors,
   });
 
-  function handleClickEditStatus(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
-    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-      setEditStatusID(id);
-      setShowEditColumn(true);
-    };
-  }
+  const handleClickEditStatus = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    setEditStatusID(id);
+    setShowEditColumn(true);
+  };
 
-  function handleClickRemoveColumn(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
-    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-      const status: Status = statuses.find((status) => status.id === id)!;
-      openConfirmationModal(() => removeStatus(id), `delete column "${status.name}"`, "Delete");
-    };
-  }
+  const handleClickRemoveColumn = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    const status: Status = statuses.find((status) => status.id === id)!;
+    openConfirmationModal(() => removeStatus(id), `delete column "${status.name}"`, "Delete");
+  };
 
   const sortedStatuses: Status[] = statuses.sort((a,b) => a.order - b.order);
   const loading: boolean = fetchingJobs || fetchingStatuses;
   return (
     <>
       { showErrorAlert &&
-        <Alert variant="danger" onClose={() => setShowErrorAlert(false)} dismissible>
+        <BootstrapAlert variant="danger" onClose={() => setShowErrorAlert(false)} dismissible>
           {errorMessage}
-        </Alert>
+        </BootstrapAlert>
       }
       <div className="kanban-board border">
         { loading ? (
@@ -320,4 +308,6 @@ export default function JobBoard(): React.JSX.Element {
       />
     </>
   );
-}
+};
+
+export default JobBoard;

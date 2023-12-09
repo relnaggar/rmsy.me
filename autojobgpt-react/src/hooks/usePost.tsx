@@ -6,7 +6,7 @@ import { CSRFTokenContext } from "../routes/Layout";
 import { makeErrorMessage } from "./hooksUtils";
 
 
-export default function usePost<Resource>(
+const usePost = <Resource extends unknown>(
   apiPath: string,
   options?: {
     onSuccess?: (resource: Resource) => void,
@@ -16,7 +16,7 @@ export default function usePost<Resource>(
   posting: boolean,
   post: (postData?: any) => void,
   cancel: () => void,
-} {
+} => {
   const { onSuccess, onFail } = options || {};
 
   const apiRoute: string = useAPI();
@@ -29,7 +29,7 @@ export default function usePost<Resource>(
   const abortControllerRef = useRef<AbortController>(new AbortController());
 
   useEffect(() => {
-    async function doPost(): Promise<void> {      
+    const doPost = async (): Promise<void> => {      
       let errors: Record<string,string[]> = {};
       try {
         const response: Response = await fetchData(`${apiRoute}${apiPath}`, {
@@ -58,25 +58,27 @@ export default function usePost<Resource>(
           }
         }
       }
-    }
+    };
     if (posting) {
       abortControllerRef.current = new AbortController();
       doPost();
     }
   }, [fetchData, apiRoute, apiPath, csrfToken, posting, postData, onSuccess, onFail]);
 
-  function post(postData?: any): void {
+  const post = (postData?: any): void => {
     if (posting) {
       abortControllerRef.current.abort();
     }
     setPosting(true);
     setPostData(postData);
-  }
+  };
 
-  function cancel(): void {
+  const cancel = (): void => {
     abortControllerRef.current.abort();
     setPosting(false);
-  }
+  };
 
   return { posting, post, cancel };
-}
+};
+
+export default usePost;

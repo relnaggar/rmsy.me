@@ -1,9 +1,9 @@
 import React, { useCallback } from "react";
 
-import useFormInput from "../hooks/useFormInput";
+import useInputControl from "../hooks/useInputControl";
 import useFetch from "../hooks/useFetch";
 import AddModal from "../common/AddModal";
-import SelectWithRefresh from "../common/SelectWithRefresh";
+import SelectInputWithRefresh from "../common/SelectInputWithRefresh";
 import { ResumeUpload } from "./types";
 import { Job } from "../jobs/types";
 import { ResumeTemplate } from "../templates/types";
@@ -19,8 +19,8 @@ const AddResumeModal = ({
   addResume,
 }: AddResumeModalProps): React.JSX.Element => {
   const modalID = "addResumeModal";
-  const jobInput = useFormInput("0");
-  const templateInput = useFormInput("0");
+  const jobInput = useInputControl("0");
+  const templateInput = useInputControl("0");
 
   const handleRefreshSuccess = useCallback(() => {
     setShowErrorAlert(false);
@@ -86,24 +86,24 @@ const AddResumeModal = ({
       title="Generate Resume" modalID="addResumeModal"
       validateSubmit={validateSubmit} onSuccessfulSubmit={handleSuccessfulSubmit}
     >
-      <SelectWithRefresh<Job>
+      <SelectInputWithRefresh<Job>
         id={`${modalID}Job`}
         label="Job"
         optionToString={(job) => `${job.title}, ${job.company}`}
         value={jobInput.value}
-        onChange={jobInput.handleChange}
+        handleChange={jobInput.handleChange as (e: React.ChangeEvent<HTMLSelectElement>) => void}
         editing={jobInput.editing}
         options={jobs}
         loading={loadingJobs}
         refetch={refetchJobs}
         error={errors["job"]}
       />
-      <SelectWithRefresh<ResumeTemplate>
+      <SelectInputWithRefresh<ResumeTemplate>
         id={`${modalID}Template`}
         label="Template"
         optionToString={(template) => template.name}
         value={templateInput.value}
-        onChange={templateInput.handleChange}
+        handleChange={templateInput.handleChange as (e: React.ChangeEvent<HTMLSelectElement>) => void}
         editing={templateInput.editing}
         options={templates}
         loading={loadingTemplates}

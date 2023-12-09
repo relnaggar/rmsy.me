@@ -4,7 +4,6 @@ import { injectMocks, getSubmitButton, openAndGetModal, clickCloseButton, clickS
 import { validResumeTemplate1, generateResponse, testDataForAPIGeneralErrors, errorMessage, generateErrorResponse } from "../common/mockAPI";
 import { renderThisRoute, userUploadDocxFile, queryResumeTemplates } from "./resumeTemplateTestUtils";
 import { ResumeTemplate } from "../templates/types";
-import exp from "constants";
 
 
 beforeEach(() => {
@@ -14,10 +13,7 @@ beforeEach(() => {
 
 const modalName = "add resume template";
 const openModalButtonText = "upload resume template";
-const openAndGetModalProps: OpenAndGetModalProps = {
-  modalName,
-  openModalButtonText,
-};
+const openAndGetModalProps: OpenAndGetModalProps = {modalName, openModalButtonText};
 
 const testDataForInputs: {
   label: string,

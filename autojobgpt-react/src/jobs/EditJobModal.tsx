@@ -1,11 +1,11 @@
 import React from "react";
-import Modal from 'react-bootstrap/Modal';
+import BootstrapModal from 'react-bootstrap/Modal';
 
 import InputWithSave from "../common/InputWithSave";
 import { Status, Job } from "../jobs/types";
 
 
-export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id, statuses }: {
+interface EditJobModalProps {
   apiPath: string,
   show: boolean,
   setShow: React.Dispatch<React.SetStateAction<boolean>>,
@@ -13,20 +13,30 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
   setJobs: React.Dispatch<React.SetStateAction<Job[]>>,
   id: number,
   statuses: Status[],
-}): React.JSX.Element {
+}
+
+const EditJobModal = ({
+  apiPath,
+  show,
+  setShow,
+  jobs,
+  setJobs,
+  id,
+  statuses
+}: EditJobModalProps): React.JSX.Element => {
   if (id === -1) {
     return <></>;
   }
 
   return (
-    <Modal aria-labelledby="editJobModalLabel" size="lg" backdrop="static"
+    <BootstrapModal aria-labelledby="editJobModalLabel" size="lg" backdrop="static"
       show={show} onHide={() => setShow(false)}
       onEntered={() => document.getElementsByTagName("input")[0].focus()}      
     >
-      <Modal.Header closeButton>
-        <Modal.Title id="editJobModalLabel">Edit Job</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+      <BootstrapModal.Header closeButton>
+        <BootstrapModal.Title id="editJobModalLabel">Edit Job</BootstrapModal.Title>
+      </BootstrapModal.Header>
+      <BootstrapModal.Body>
         <InputWithSave<Job>
           type="select"
           apiPath={apiPath}
@@ -79,10 +89,12 @@ export default function EditJobModal({ apiPath, show, setShow, jobs, setJobs, id
           labelText="Posting"
           required
         />
-      </Modal.Body>
-      <Modal.Footer>
+      </BootstrapModal.Body>
+      <BootstrapModal.Footer>
         <button type="button" className="btn btn-secondary" onClick={() => setShow(false)}>Close</button>
-      </Modal.Footer>
-    </Modal>
+      </BootstrapModal.Footer>
+    </BootstrapModal>
   )
-}
+};
+
+export default EditJobModal;

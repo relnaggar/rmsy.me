@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom';
 
-export default function useAPI(): string {
+const useAPI = (): string => {
   try {
     const location = useLocation();
 
@@ -20,4 +20,6 @@ export default function useAPI(): string {
   } catch (error) { // if we're not in a route, then we're in a test
     return "";
   }
-}
+};
+
+export default useAPI;

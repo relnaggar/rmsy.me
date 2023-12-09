@@ -1,42 +1,49 @@
 import React, { useRef, useState } from "react";
 
 
-export default function useFormInput(
-  initialValue?: string
-): {
+export interface InputControl {
   value: string,
   editing: boolean,
-  handleChange: (e:
-    React.ChangeEvent<HTMLInputElement> |
-    React.ChangeEvent<HTMLTextAreaElement> |
-    React.ChangeEvent<HTMLSelectElement>
-  ) => void,
+  handleChange: (
+    ((e: React.ChangeEvent<HTMLInputElement>) => void) |
+    ((e: React.ChangeEvent<HTMLTextAreaElement>) => void) |
+    ((e: React.ChangeEvent<HTMLSelectElement>) => void)
+  ),
+};
+
+interface UseInputControl extends InputControl {
   edit: (value: string) => void,
   stopEditing: () => void,
   ref: React.RefObject<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-} {
+};
+
+const useInputControl = (
+  initialValue?: string
+): UseInputControl => {
   const ref = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(null);
   
   const [value, setValue] = useState<string>(initialValue || "");
   const [editing, setEditing] = useState<boolean>(false);
 
-  function handleChange(e:
+  const handleChange = (e:
     React.ChangeEvent<HTMLInputElement> |
     React.ChangeEvent<HTMLTextAreaElement> |
     React.ChangeEvent<HTMLSelectElement>
-  ) {
+  ) => {
     setValue(e.target.value);
     setEditing(true);
-  }
+  };
 
-  function edit(value: string) {
+  const edit = (value: string) => {
     setValue(value);
     setEditing(true);
-  }
+  };
 
-  function stopEditing() {
+  const stopEditing = () => {
     setEditing(false);
   };
 
   return { value, editing, handleChange, edit, stopEditing, ref };
-}
+};
+
+export default useInputControl;

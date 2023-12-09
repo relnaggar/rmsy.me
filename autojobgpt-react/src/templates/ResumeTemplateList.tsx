@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useState } from "react";
-import Alert from 'react-bootstrap/Alert';
+import BoostrapAlert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useResource from "../hooks/useResource";
@@ -10,7 +10,7 @@ import AddTemplateModal from "./AddTemplateModal";
 import { ResumeTemplate, ResumeTemplateUpload, FillField, getPlaceholderTemplate } from "./types";
 
 
-export default function ResumeTemplateList(): React.JSX.Element {
+const ResumeTemplateList = (): React.JSX.Element => {
   const openConfirmationModal = useContext(ConfirmationModalContext);
 
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -62,31 +62,27 @@ export default function ResumeTemplateList(): React.JSX.Element {
   const [editTemplateID, setEditTemplateID] = useState<number>(-1);
   const [showAddTemplateModal, setShowAddTemplateModal] = useState<boolean>(false);
 
-  function handleClickEditTemplate(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {
-    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      setEditTemplateID(id);
-      setShowEditTemplateModal(true);
-    };
+  const handleClickEditTemplate = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    setEditTemplateID(id);
+    setShowEditTemplateModal(true);
   }  
 
-  function handleClickRemoveResume(id: number): (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void {    
-    return (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      const template: ResumeTemplate = templates.find((template) => template.id === id)!;
-      openConfirmationModal(() => removeTemplate(id), `delete resume template "${template.name}"`, "Delete");
-    };
-  }
+  const handleClickRemoveResume = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    const template: ResumeTemplate = templates.find((template) => template.id === id)!;
+    openConfirmationModal(() => removeTemplate(id), `delete resume template "${template.name}"`, "Delete");
+  };
   
-  function handleClickAddTemplate(_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+  const handleClickAddTemplate = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     setShowAddTemplateModal(true);
-  }
+  };
 
   return(
     <section>
       <h2>Templates</h2>
       { showErrorAlert &&
-        <Alert variant="danger" onClose={() => setShowErrorAlert(false)} dismissible>
+        <BoostrapAlert variant="danger" onClose={() => setShowErrorAlert(false)} dismissible>
           {errorMessage}
-        </Alert>
+        </BoostrapAlert>
       }
       <DocumentList
         documents={templates}
@@ -116,4 +112,6 @@ export default function ResumeTemplateList(): React.JSX.Element {
       />
     </section>
   )
-}
+};
+
+export default ResumeTemplateList;

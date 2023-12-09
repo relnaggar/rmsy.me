@@ -2,9 +2,9 @@ import React, { useState, useCallback } from "react";
 import { ReactComponent as RobotIcon } from "bootstrap-icons/icons/robot.svg";
 
 import useFetch from "../hooks/useFetch";
-import useFormInput from "../hooks/useFormInput";
+import useInputControl from "../hooks/useInputControl";
 import AddModal from "../common/AddModal";
-import FormInput from "../common/FormInput";
+import TextInput from "../common/TextInput";
 import ErrorAlert from "../common/ErrorAlert";
 import { JobUpload, JobDetails } from "./types";
 import { ModalProps } from "../common/types";
@@ -19,10 +19,10 @@ const AddJobModal = ({
   addJob,
 }: AddJobModalProps): React.JSX.Element => {
   const modalID = "addJobModal";
-  const urlInput = useFormInput();
-  const titleInput = useFormInput();
-  const companyInput = useFormInput();
-  const postingInput = useFormInput();
+  const urlInput = useInputControl();
+  const titleInput = useInputControl();
+  const companyInput = useInputControl();
+  const postingInput = useInputControl();
   
   const [fillErrors, setFillErrors] = useState<Record<string,string[]>>({});
   const [showFillErrorAlert, setShowFillErrorAlert] = useState<boolean>(false);  
@@ -125,7 +125,7 @@ const AddJobModal = ({
       validateSubmit={validateSubmit} onSuccessfulSubmit={handleSuccessfulSubmit}
       submitDisabled={filling}      
     >
-      <FormInput id={`${modalID}URL`}
+      <TextInput id={`${modalID}URL`}
         label="URL" type="url" value={urlInput.value} handleChange={urlInput.handleChange}
         editing={urlInput.editing} loading={filling} error={errors["url"] || urlFillErrors}
       >
@@ -140,22 +140,22 @@ const AddJobModal = ({
             Autofill Details
           </>}
         </button>
-      </FormInput>
+      </TextInput>
       <ErrorAlert
         errors={nonURLFillErrors}
         showErrorAlert={showFillErrorAlert} setShowErrorAlert={setShowFillErrorAlert}
       />
       <hr />
       <h5>Details</h5>
-      <FormInput id={`${modalID}Title`}
+      <TextInput id={`${modalID}Title`}
         label="Title" type="text" value={titleInput.value} handleChange={titleInput.handleChange}
         editing={titleInput.editing} loading={filling} error={errors["title"]}
       />
-      <FormInput id={`${modalID}Company`}
+      <TextInput id={`${modalID}Company`}
         label="Company" type="text" value={companyInput.value} handleChange={companyInput.handleChange}
         editing={companyInput.editing} loading={filling} error={errors["company"]}
       />
-      <FormInput id={`${modalID}Posting`}
+      <TextInput id={`${modalID}Posting`}
         label="Posting" type="textarea" value={postingInput.value} handleChange={postingInput.handleChange}
         editing={postingInput.editing} loading={filling} error={errors["posting"]}
       />
