@@ -28,6 +28,12 @@ export const validStatus2: Status = {
   order: 2,
 };
 
+export const validStatus3: Status = {
+  id: 3,
+  name: "Test Status 3",
+  order: 3,
+};
+
 
 export const validJob1: Job = {
   id: 1,

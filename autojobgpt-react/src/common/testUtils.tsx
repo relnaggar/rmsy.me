@@ -212,14 +212,36 @@ export const getJobByTitleCompany = (title: string, company: string): HTMLElemen
   return matchingJob;
 };
 
-export const dragJob = async (job: HTMLElement, targetStatus: string): Promise<void> => {
+export const dragJob = async (jobElement: HTMLElement, targetStatus: string): Promise<void> => {
   await act(async () => {
-    fireEvent.dragStart(job);
+    fireEvent.dragStart(jobElement);
   });
   await act(async () => {
     fireEvent.dragOver(getColumnByName(targetStatus));
   });
   await act(async () => {
     fireEvent.drop(getColumnByName(targetStatus));
+  });
+};
+
+export const getMoveRightButton = (columnElement: HTMLElement): HTMLElement => {
+  return getByRole(columnElement, "button", {name: new RegExp("move right", "i")});
+};
+
+export const getMoveLeftButton = (columnElement: HTMLElement): HTMLElement => {
+  return getByRole(columnElement, "button", {name: new RegExp("move left", "i")});
+};
+
+export const clickMoveRightButton = async (columnElement: HTMLElement): Promise<void> => {
+  const moveRightButton: HTMLElement = getMoveRightButton(columnElement);
+  await act(async () => {
+    userEvent.click(moveRightButton);
+  });
+};
+
+export const clickMoveLeftButton = async (columnElement: HTMLElement): Promise<void> => {
+  const moveLeftButton: HTMLElement = getMoveLeftButton(columnElement);
+  await act(async () => {
+    userEvent.click(moveLeftButton);
   });
 };

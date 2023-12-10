@@ -51,16 +51,12 @@ const JobColumn = ({
   const columnId = `column${status.order}`;
 
   const moveStatus = (direction: "left" | "right"): void => {
-    let previousStatus: Status | null = null;
-    for (const currentStatus of sortedStatuses) {
-      if (previousStatus) {
-        if (direction === "left" && currentStatus.id === statusId) {
-          updateStatus(currentStatus.id, {order: previousStatus.order});
-        } else if (direction === "right" && previousStatus.id === statusId) {
-          updateStatus(currentStatus.id, {order: previousStatus.order});
-        }
+    for (let i = 0; i < sortedStatuses.length; i++) {
+      if (direction === "left" && statusId === sortedStatuses[i].id) {
+        updateStatus(statusId, {order: sortedStatuses[i-1].order});
+      } else if (direction === "right" && statusId === sortedStatuses[i].id) {
+        updateStatus(statusId, {order: sortedStatuses[i+1].order});
       }
-      previousStatus = currentStatus;
     }
   };
 
