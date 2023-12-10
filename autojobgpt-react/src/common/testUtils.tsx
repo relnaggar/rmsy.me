@@ -1,7 +1,8 @@
 import React from "react";
 import { RouterProvider, createMemoryRouter, RouteObject } from "react-router-dom";
-import { render, act, screen, getByRole, getAllByRole, queryAllByRole, getByLabelText } from "@testing-library/react";
+import { render, act, screen, getByRole, getAllByRole, queryAllByRole, getByLabelText, queryByRole, queryByText } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { fireEvent } from "@testing-library/dom";
 
 import { routesConfig, routesBasename }  from "../routes/routesConfig";
 import { generateResponse } from "../api/mockApi";
@@ -125,9 +126,9 @@ export const getSection = (headingLabel: string): HTMLElement => {
   return heading.parentElement as HTMLElement;
 };
 
-export const queryResources = (headingLabel: string): HTMLElement[] => {
+export const queryResources = (headingLabel: string, role = "listitem"): HTMLElement[] => {
   const resourceSection: HTMLElement = getSection(headingLabel);
-  const listItems: HTMLElement[] = queryAllByRole(resourceSection, "listitem");
+  const listItems: HTMLElement[] = queryAllByRole(resourceSection, role);
   const resources: HTMLElement[] = listItems.filter((listItem: HTMLElement) => 
     !listItem.hasAttribute("aria-busy") || listItem.getAttribute("aria-busy") === "false"
   );
@@ -168,4 +169,57 @@ export const clickRefreshButton = async (modal: HTMLElement, label: string): Pro
 
 export const getFilterByJobSelect = (): HTMLElement => {
   return screen.getByRole('combobox', {name: new RegExp("filter by job", "i")});
+};
+
+export const getFillButton = (modal: HTMLElement): HTMLElement => {
+  return getByRole(modal, "button", {name: new RegExp("fill", "i")});
+}
+
+export const clickFillButton = async (modal: HTMLElement): Promise<void> => {
+  const fillButton: HTMLElement = getFillButton(modal);
+  await act(async () => {
+    userEvent.click(fillButton);
+  });
+}
+
+export const getFirstColumn = (): HTMLElement => {
+  const allColumns: HTMLElement[] = queryResources("job board", "region");
+  return allColumns[0];
+};
+
+export const getColumnByName = (name: string): HTMLElement => {
+  const allColumns: HTMLElement[] = queryResources("job board", "region");
+  const matchingColumn: HTMLElement | undefined = allColumns.find((column: HTMLElement) => {
+    const columnHeading: HTMLElement | null = queryByRole(column, "heading", {name: name});
+    return columnHeading && columnHeading.textContent === name;
+  });
+  if (!matchingColumn) {
+    throw new Error(`Column ${name} not found`);
+  }
+  return matchingColumn;
+};
+
+export const getJobByTitleCompany = (title: string, company: string): HTMLElement => {
+  const allJobs: HTMLElement[] = queryResources("job board", "listitem");
+  const matchingJob: HTMLElement | undefined = allJobs.find((job: HTMLElement) => {
+    const jobTitle: HTMLElement | null = queryByText(job, title);
+    const jobCompany: HTMLElement | null = queryByText(job, company);
+    return jobTitle && jobCompany;
+  });
+  if (!matchingJob) {
+    throw new Error(`Job ${title} at ${company} not found`);
+  }
+  return matchingJob;
+};
+
+export const dragJob = async (job: HTMLElement, targetStatus: string): Promise<void> => {
+  await act(async () => {
+    fireEvent.dragStart(job);
+  });
+  await act(async () => {
+    fireEvent.dragOver(getColumnByName(targetStatus));
+  });
+  await act(async () => {
+    fireEvent.drop(getColumnByName(targetStatus));
+  });
 };

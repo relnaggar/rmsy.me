@@ -1,7 +1,6 @@
 import { screen, getAllByRole, getByRole, waitFor, queryByRole } from "@testing-library/react";
 
-import { injectMocks, renderRoute, getSubmitButton, clickSubmitButton, userTypeInput, mockFunctions, clickCloseButton, openAndGetModal, OpenAndGetModalParams } from "../common/testUtils";
-import { getColumnByName } from "./jobTestUtils";
+import { injectMocks, renderRoute, getSubmitButton, clickSubmitButton, userTypeInput, mockFunctions, clickCloseButton, openAndGetModal, OpenAndGetModalParams, getColumnByName } from "../common/testUtils";
 import { generateResponse, generateErrorResponse } from "../api/mockApi";
 import { errorMessage, testDataForApiGeneralErrors, validStatus1 } from "../api/mockData";
 import { Status } from '../api/types';

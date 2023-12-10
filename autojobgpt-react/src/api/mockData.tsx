@@ -44,7 +44,7 @@ export const validJob2: Job = {
   title: "Test Job 2",
   company: "Test Company 2",
   posting: "Test Text 2",
-  status: 1,
+  status: 2,
 }
 
 

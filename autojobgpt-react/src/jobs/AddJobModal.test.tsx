@@ -1,9 +1,8 @@
 import { screen, getAllByRole, getByRole, waitFor, queryByRole } from "@testing-library/react";
 
-import { injectMocks, renderRoute, openAndGetModal, getSubmitButton, clickCloseButton, clickSubmitButton, userTypeInput, mockFunctions, OpenAndGetModalParams } from "../common/testUtils";
+import { injectMocks, renderRoute, openAndGetModal, getSubmitButton, clickCloseButton, clickSubmitButton, userTypeInput, mockFunctions, OpenAndGetModalParams, getFillButton, clickFillButton, getFirstColumn } from "../common/testUtils";
 import { generateResponse, generateErrorResponse, generateConditionalResponseByRoute } from "../api/mockApi";
-import { errorMessage, testDataForApiGeneralErrors, validJob1 } from "../api/mockData";
-import { getFirstColumn, getFillButton, clickFillButton } from "./jobTestUtils";
+import { errorMessage, testDataForApiGeneralErrors, validJob1, validStatus1, validStatus2 } from "../api/mockData";
 import { Job, JobDetails } from '../api/types';
 
 
@@ -12,9 +11,7 @@ beforeEach(() => {
   injectMocks();
   mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
     url: "../api/statuses/",
-    data: [
-      {"id": 1, "name": "Backlog", "order": 1},
-    ],
+    data: [validStatus1, validStatus2],
   }]));
 });
 
@@ -54,7 +51,7 @@ const fillValidURL = async (modal: HTMLElement): Promise<void> => {
   await userTypeInput(modal, "url", validJob1.url);
 };
 
-test(`${modalName} button appears`, async () => {
+test(`${modalName} button appears once on the page`, async () => {
   await renderRoute(thisRoute);
   expect(screen.getByRole("button", {name: new RegExp(modalName, "i")})).toBeInTheDocument();
 });

@@ -199,7 +199,8 @@ const JobBoard = (): React.JSX.Element => {
   const sortedStatuses: Status[] = statuses.sort((a,b) => a.order - b.order);
   const loading: boolean = fetchingJobs || fetchingStatuses;
   return (
-    <>
+    <section>
+      <h2>Job Board</h2>
       { showErrorAlert &&
         <BootstrapAlert variant="danger" onClose={() => setShowErrorAlert(false)} dismissible>
           {errorMessage}
@@ -325,7 +326,7 @@ const JobBoard = (): React.JSX.Element => {
         setShowErrorAlert={setShowAddStatusErrorAlert}
         addColumn={addStatus}
       />
-    </>
+    </section>
   );
 };
 

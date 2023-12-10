@@ -34,8 +34,8 @@ test(`api call is initially made to fetch the ${thisResource}s`, async () => {
 test(`empty api call means no ${thisResource} list items are displayed`, async () => {
   mockFunctions.fetchData.mockImplementation(generateResponse([]));
   await renderRoute(thisRoute);
-  const resumeTemplates: HTMLElement[] = queryResources(thisResource);
-  expect(resumeTemplates.length).toBe(0);
+  const resources: HTMLElement[] = queryResources(thisResource);
+  expect(resources.length).toBe(0);
 });
 
 
