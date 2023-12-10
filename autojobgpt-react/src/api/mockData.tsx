@@ -4,15 +4,15 @@ import { Job, Resume, ResumeTemplate, Status } from "./types";
 
 export const errorMessage = "Test Error Message";
 
-export const testDataForAPIGeneralErrors = (mockFunctions: {[key: string]: jest.MockedFunction<any>}): {
+export const testDataForApiGeneralErrors = (mockFunctions: {[key: string]: jest.MockedFunction<any>}): {
   apiErrorType: string,
-  mockAPIError: () => void,
+  mockApiError: () => void,
 }[] => [{
   apiErrorType: "network",
-  mockAPIError: () => mockFunctions.fetchData.mockRejectedValueOnce(new Error(errorMessage)),
+  mockApiError: () => mockFunctions.fetchData.mockRejectedValueOnce(new Error(errorMessage)),
 }, {
   apiErrorType: "general",
-  mockAPIError: () => mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({error: errorMessage})),
+  mockApiError: () => mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({error: [errorMessage]})),
 }];
 
 

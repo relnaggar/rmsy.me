@@ -52,6 +52,9 @@ const usePostResource = <Resource extends WithId, ResourceUpload>(
           onSuccess?.(resource);
         } else {
           errors = await response.json();
+          if (!String(errors)) {
+            errors = {error: makeErrorMessage(response.statusText)};
+          }
         }
       } catch (error) {
         errors["error"] = makeErrorMessage(error);

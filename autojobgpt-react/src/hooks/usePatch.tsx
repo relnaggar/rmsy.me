@@ -50,6 +50,9 @@ const usePatch = <Resource extends WithId>(
           onSuccess?.(patchedResource, resources, setResources);
         } else {          
           errors = await response.json();
+          if (!String(errors)) {
+            errors = {error: makeErrorMessage(response.statusText)};
+          }
         }
       } catch (error) {
         errors["error"] = makeErrorMessage(error);

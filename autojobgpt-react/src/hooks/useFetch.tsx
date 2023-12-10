@@ -55,6 +55,9 @@ const useFetch = <Resource extends unknown>(
           onSuccess?.(resource);
         } else {
           errors = await response.json();
+          if (!String(errors)) {
+            errors = {error: makeErrorMessage(response.statusText)};
+          }
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {

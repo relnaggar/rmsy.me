@@ -1,9 +1,8 @@
 import { screen, getAllByRole, getByRole, getByLabelText, waitFor } from "@testing-library/react";
 
-import { injectMocks, renderRoute, getSubmitButton, openAndGetModal, clickCloseButton, clickSubmitButton, userTypeInput, mockFunctions, OpenAndGetModalParams } from "../common/testUtils";
+import { injectMocks, renderRoute, getSubmitButton, openAndGetModal, clickCloseButton, clickSubmitButton, userTypeInput, mockFunctions, OpenAndGetModalParams, queryResources, userUploadDocxFile } from "../common/testUtils";
 import { generateResponse, generateErrorResponse } from "../api/mockApi";
-import { validResumeTemplate1, errorMessage, testDataForAPIGeneralErrors } from "../api/mockData";
-import { userUploadDocxFile, queryResumeTemplates } from "./templateTestUtils";
+import { validResumeTemplate1, errorMessage, testDataForApiGeneralErrors } from "../api/mockData";
 import { ResumeTemplate } from '../api/types';
 
 
@@ -13,6 +12,7 @@ beforeEach(() => {
 });
 
 const thisRoute = "/resumes";
+const thisResource = "template";
 const modalName = "add resume template";
 const openModalButtonText = "upload resume template";
 const openAndGetModalParams: OpenAndGetModalParams = {modalName, openModalButtonText};
@@ -52,6 +52,11 @@ const fillWithValidValues = async (modal: HTMLElement): Promise<void> => {
     }
   }
 };
+
+test(`${modalName} button appears`, async () => {
+  await renderRoute(thisRoute);
+  expect(screen.getByRole("button", {name: new RegExp(openModalButtonText, "i")})).toBeInTheDocument();
+});
 
 test(`${modalName} modal isn't visible before clicking ${modalName} button`, async () => {
   await renderRoute(thisRoute);
@@ -125,7 +130,7 @@ test(`submitting the ${modalName} modal with valid input closes the modal within
   waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
 });
 
-test(`submitting the ${modalName} modal with valid input makes an API call`, async () => {
+test(`submitting the ${modalName} modal with valid input makes an api call`, async () => {
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
@@ -134,7 +139,7 @@ test(`submitting the ${modalName} modal with valid input makes an API call`, asy
   expect(mockFunctions.fetchData.mock.calls.length).toBe(initialFetchDataCalls + 1);
 });
 
-test(`submitting the ${modalName} modal with valid input makes an API call to add the resume template`, async () => {
+test(`submitting the ${modalName} modal with valid input makes an api call to add the resume template`, async () => {
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
@@ -155,25 +160,25 @@ test(`submitting the ${modalName} modal with valid input makes an API call to ad
   }
 });
 
-test(`submitting the ${modalName} modal with valid input adds the resume template to the list`, async () => {
+test(`submitting the ${modalName} modal with valid input adds the ${thisResource} to the list`, async () => {
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
   mockFunctions.fetchData.mockImplementationOnce(generateResponse<ResumeTemplate>(validResumeTemplate1));
   await clickSubmitButton(modal);
-  const resumeTemplates: HTMLElement[] = queryResumeTemplates();
-  expect(resumeTemplates.length).toBe(1);
-  const addedResumeTemplate: HTMLElement = resumeTemplates[0];
-  expect(addedResumeTemplate).toHaveTextContent(validResumeTemplate1.name);
+  const resourceElements: HTMLElement[] = queryResources(thisResource);
+  expect(resourceElements.length).toBe(1);
+  const addedResourceElement: HTMLElement = resourceElements[0];
+  expect(addedResourceElement).toHaveTextContent(validResumeTemplate1.name);
 });
 
-describe(`API general errors after submitting the ${modalName} modal show an error alert within the modal`, () => {
-  for (const testDataForAPIGeneralError of testDataForAPIGeneralErrors(mockFunctions)) {
-    test(`API ${testDataForAPIGeneralError.apiErrorType} error after submitting the ${modalName} modal shows an error alert within the modal`, async () => {
+describe(`api general errors after submitting the ${modalName} modal show an error alert within the modal`, () => {
+  for (const testDataForApiGeneralError of testDataForApiGeneralErrors(mockFunctions)) {
+    test(`api ${testDataForApiGeneralError.apiErrorType} error after submitting the ${modalName} modal shows an error alert within the modal`, async () => {
       await renderRoute(thisRoute);
       const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       await fillWithValidValues(modal);
-      testDataForAPIGeneralError.mockAPIError();
+      testDataForApiGeneralError.mockApiError();
       await clickSubmitButton(modal);
       const errorAlert: HTMLElement = getByRole(modal, "alert");
       expect(errorAlert).toBeInTheDocument();
@@ -182,9 +187,9 @@ describe(`API general errors after submitting the ${modalName} modal show an err
   }
 });
 
-describe(`API input error after submitting the ${modalName} modal can be cleared by editing the corresponding input`, () => {
+describe(`api input error after submitting the ${modalName} modal can be cleared by editing the corresponding input`, () => {
   for (const testDataForInput of testData) {
-    test(`API input error for ${testDataForInput.label} after submitting the ${modalName} modal can be cleared by editing the corresponding input`, async () => {
+    test(`api input error for ${testDataForInput.label} after submitting the ${modalName} modal can be cleared by editing the corresponding input`, async () => {
       await renderRoute(thisRoute);
       const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       await fillWithValidValues(modal);
@@ -202,13 +207,13 @@ describe(`API input error after submitting the ${modalName} modal can be cleared
   }
 });
 
-describe(`API general errors after submitting the ${modalName} modal can be cleared by clicking submit again`, () => {
-  for (const testDataForAPIGeneralError of testDataForAPIGeneralErrors(mockFunctions)) {
-    test(`API ${testDataForAPIGeneralError.apiErrorType} error after submitting the ${modalName} modal can be cleared by clicking submit again`, async () => {
+describe(`api general errors after submitting the ${modalName} modal can be cleared by clicking submit again`, () => {
+  for (const testDataForApiGeneralError of testDataForApiGeneralErrors(mockFunctions)) {
+    test(`api ${testDataForApiGeneralError.apiErrorType} error after submitting the ${modalName} modal can be cleared by clicking submit again`, async () => {
       await renderRoute(thisRoute);
       const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       await fillWithValidValues(modal);
-      testDataForAPIGeneralError.mockAPIError();
+      testDataForApiGeneralError.mockApiError();
       await clickSubmitButton(modal);
       const errorAlert: HTMLElement = getByRole(modal, "alert");
       await clickSubmitButton(modal);
@@ -230,7 +235,7 @@ test(`${modalName} modal retains input values (except for files) on close and re
   }
 });
 
-test(`${modalName} modal retains API input errors on close and reopen`, async () => {
+test(`${modalName} modal retains api input errors on close and reopen`, async () => {
   await renderRoute(thisRoute);
   let modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
@@ -249,13 +254,13 @@ test(`${modalName} modal retains API input errors on close and reopen`, async ()
   }
 });
 
-describe(`${modalName} retains API general errors on close and reopen`, () => {
-  for (const testDataForAPIGeneralError of testDataForAPIGeneralErrors(mockFunctions)) {
-    test(`${modalName} modal retains API ${testDataForAPIGeneralError.apiErrorType} error on close and reopen`, async () => {
+describe(`${modalName} retains api general errors on close and reopen`, () => {
+  for (const testDataForApiGeneralError of testDataForApiGeneralErrors(mockFunctions)) {
+    test(`${modalName} modal retains api ${testDataForApiGeneralError.apiErrorType} error on close and reopen`, async () => {
       await renderRoute(thisRoute);
       let modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       await fillWithValidValues(modal);
-      testDataForAPIGeneralError.mockAPIError();
+      testDataForApiGeneralError.mockApiError();
       await clickSubmitButton(modal);
       await clickCloseButton(modal);
       modal = await openAndGetModal(openAndGetModalParams);
