@@ -5,23 +5,27 @@ import { FetchDataContext } from "../routes/routesConfig";
 import { makeErrorMessage } from "./hooksUtils";
 
 
-const useFetch = <Resource extends unknown>(
-  apiPath: string,  
-  options?: {
-    initialResource?: Resource,
-    initialFetch?: boolean,
-    onSuccess?: (resource: Resource) => void,
-    onFail?: (errors: Record<string,string[]>) => void,    
-  },
-): {
-  resource: Resource,
-  setResource: React.Dispatch<React.SetStateAction<Resource>>,
+export interface UseFetch<ResponseData> {
+  responseData: ResponseData,
+  setResponseData: React.Dispatch<React.SetStateAction<ResponseData>>,
   fetching: boolean,
   refetch: (paramString?: string) => void,
   cancel: () => void,
-} => {
+};
+
+interface UseFetchOptions<ResponseData> {
+  onSuccess?: (responseData: ResponseData, setResponseData: React.Dispatch<React.SetStateAction<ResponseData>>) => void,
+  onFail?: (errors: Record<string,string[]>) => void,  
+  initialFetch?: boolean,
+  initialData?: ResponseData,
+};
+
+const useFetch = <Data extends unknown>(
+  apiPath: string,  
+  options?: UseFetchOptions<Data>,
+): UseFetch<Data> => {
   const {
-    initialResource = {} as Resource,
+    initialData = {} as Data,
     initialFetch = true,
     onSuccess,
     onFail,
@@ -30,7 +34,7 @@ const useFetch = <Resource extends unknown>(
   const apiRoute: string = useAPI();
   const fetchData = useContext(FetchDataContext);
 
-  const [resource, setResource] = useState<Resource>(initialResource);
+  const [responseData, setResponseData] = useState<Data>(initialData);
   const [fetching, setFetching] = useState<boolean>(initialFetch);
   const [paramString, setParamString] = useState<string>("");
 
@@ -50,9 +54,9 @@ const useFetch = <Resource extends unknown>(
         // await new Promise(resolve => setTimeout(resolve, 3000));
 
         if (response.ok) {
-          const resource: Resource = await response.json();
-          setResource(resource);
-          onSuccess?.(resource);
+          const responseData: Data = await response.json();
+          setResponseData(responseData);
+          onSuccess?.(responseData, setResponseData);
         } else {
           errors = await response.json();
           if (!String(errors)) {
@@ -96,7 +100,7 @@ const useFetch = <Resource extends unknown>(
     setFetching(false);
   };
 
-  return { resource, setResource, fetching, refetch, cancel };
+  return { responseData, setResponseData, fetching, refetch, cancel };
 };
 
 export default useFetch;

@@ -1,14 +1,16 @@
 import React, { useContext, useState, useCallback } from 'react';
-import BootstrapAlert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useResource from '../hooks/useResource';
-import useFetch from '../hooks/useFetch';
+import useFetchResource from '../hooks/useFetchResource';
 import useFormInput from '../hooks/useInputControl';
+import useAddModal from '../hooks/useAddModal';
+import ErrorAlert from '../common/ErrorAlert';
 import DocumentList from '../common/DocumentList';
 import EditResumeModal from './EditResumeModal';
 import AddResumeModal from './AddResumeModal';
 import { Job, Substitution, Resume, ResumeUpload } from '../api/types';
+import useErrorAlert from '../hooks/useErrorAlert';
 
 
 export const getPlaceholderResume = (resumeUpload: ResumeUpload): Resume => {
@@ -40,78 +42,46 @@ export const getPlaceholderResume = (resumeUpload: ResumeUpload): Resume => {
 
 const ResumeList = (): React.JSX.Element => {
   const openConfirmationModal = useContext(ConfirmationModalContext);
+  const addResumeModal = useAddModal();
+  const errorAlert = useErrorAlert();
 
-  const [errors, setErrors] = useState<Record<string, string[]>>({});
-  const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
-
-  const handleErrors = useCallback((errors: Record<string,string[]>) => {
-    setErrors(errors);
-    setShowErrorAlert(true);
-  }, []);
-
-  const [addResumeErrors, setAddResumeErrors] = useState<Record<string,string[]>>({});
-  const [showAddResumeErrorsAlert, setShowAddResumeErrorsAlert] = useState<boolean>(false);
-
-  const {
-    resource: substitutions,
-    setResource: setSubstitutions,
-  } = useFetch<Substitution[]>("substitutions/", { initialResource: [], onFail: handleErrors });
+  const substitutions = useFetchResource<Substitution>("substitutions/", {
+    onFail: errorAlert.showErrors
+  });
 
   const handleAddResumeSuccess = useCallback((resume: Resume) => {
-    setShowAddResumeErrorsAlert(false);
-    setAddResumeErrors({});
-    setSubstitutions([...substitutions, ...resume.substitutions]);
-  }, [substitutions, setSubstitutions]);
-  
-  const handleAddResumeFail = useCallback((errors: Record<string,string[]>) => {
-    setAddResumeErrors(errors);
-    setShowAddResumeErrorsAlert(true);
-    setShowAddResume(true);
-  }, []);
+    addResumeModal.handleAddSuccess();
+    substitutions.setResources([...substitutions.resources, ...resume.substitutions]);
+  }, [addResumeModal, substitutions]);
 
-  const resumeAPIPath: string = "resumes/";
-  const {    
-    resources: resumes,
-    setResources: setResumes,
-    fetching: loadingResumes,
-    refetch: refetchResumes,
-    posting: addingResume,
-    postResource: addResume,
-    deleteResource: removeResume,
-    idBeingDeleted: resumeBeingRemovedId,    
-  } = useResource<Resume,ResumeUpload>(resumeAPIPath, getPlaceholderResume, {
-    onFetchFail: handleErrors,
+  const resumes = useResource<Resume,ResumeUpload>("resumes/", getPlaceholderResume, {
+    onFetchFail: errorAlert.showErrors,
     onPostSuccess: handleAddResumeSuccess,
-    onPostFail: handleAddResumeFail,
-    onDeleteFail: handleErrors,    
+    onPostFail: addResumeModal.handleAddFail,
+    onDeleteFail: errorAlert.showErrors,
   });
 
   const [showEditResumeModal, setShowEditResumeModal] = useState<boolean>(false);
   const [editResumeId, setEditResumeId] = useState<number>(-1);
-  const [showAddResume, setShowAddResume] = useState<boolean>(false);
-
+  
   const handleClickEditResume = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     setEditResumeId(id);
     setShowEditResumeModal(true);
   };
 
   const handleClickRemoveResume = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    const resume: Resume = resumes.find((resume) => resume.id === id)!;
-    openConfirmationModal(() => removeResume(id), `delete resume "${resume.name}"`, "Delete");
-  };
-  
-  const handleClickAddResume = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    setShowAddResume(true);
+    const resume: Resume = resumes.resources.find((resume) => resume.id === id)!;
+    openConfirmationModal(() => resumes.deleteResource(id), `delete resume "${resume.name}"`, "Delete");
   };
 
   const handleSubstitutionSaveSuccess = (): void => {
-    refetchResumes();
+    resumes.refetch();
   };
 
   const jobInput = useFormInput("0");
   const jobIdsWithAtLeastOneResume: number[] = [];
   const jobsWithAtLeastOneResume: Job[] = [];
-  resumes.forEach((resume) => {
+  resumes.resources.forEach((resume) => {
     if (resume.id !== -1 && !jobIdsWithAtLeastOneResume.includes(resume.job.id)) {
       jobIdsWithAtLeastOneResume.push(resume.job.id);
       
@@ -123,7 +93,7 @@ const ResumeList = (): React.JSX.Element => {
     }
   });
 
-  const sortedResumes: Resume[] = resumes.sort((a, b) => a.id - b.id);
+  const sortedResumes: Resume[] = resumes.resources.sort((a, b) => a.id - b.id);
 
   return(
     <section className="mt-3">
@@ -144,9 +114,7 @@ const ResumeList = (): React.JSX.Element => {
           </div>
         </div>
       }
-      <BootstrapAlert variant="danger" show={showErrorAlert} onClose={() => setShowErrorAlert(false)} dismissible>
-        {Object.values(errors).join(" ")}
-      </BootstrapAlert>
+      <ErrorAlert {...errorAlert} />
       <DocumentList
         documents={
           jobInput.value === "0" ?
@@ -154,28 +122,23 @@ const ResumeList = (): React.JSX.Element => {
           :
             sortedResumes.filter((resume) => resume.job.id === parseInt(jobInput.value))
         }
-        loadingDocuments={loadingResumes}
+        loadingDocuments={resumes.fetching}
         onClickEditDocument={handleClickEditResume}
         onClickRemoveDocument={handleClickRemoveResume}
-        documentBeingRemovedId={resumeBeingRemovedId}
-        onClickAddDocument={handleClickAddResume}
+        documentBeingRemovedId={resumes.idBeingDeleted}
+        onClickAddDocument={addResumeModal.open}
         addButtonText="Generate new resume"
-        addDisabled={addingResume}
+        addDisabled={resumes.posting}
       />
       <EditResumeModal
-        apiPath={resumeAPIPath}
-        resumes={resumes} setResumes={setResumes}
+        apiPath={resumes.apiPath}
+        resumes={resumes.resources} setResumes={resumes.setResources}
         show={showEditResumeModal} setShow={setShowEditResumeModal}
         resumeId={editResumeId}
-        substitutions={substitutions} setSubstitutions={setSubstitutions}
+        substitutions={substitutions.resources} setSubstitutions={substitutions.setResources}
         onSubstitutionSaveSuccess={handleSubstitutionSaveSuccess}
       />
-      <AddResumeModal
-        show={showAddResume} setShow={setShowAddResume}
-        errors={addResumeErrors} setErrors={setAddResumeErrors}
-        showErrorAlert={showAddResumeErrorsAlert} setShowErrorAlert={setShowAddResumeErrorsAlert}
-        addResume={addResume}
-      />
+      <AddResumeModal {...addResumeModal} addResume={resumes.postResource} />
     </section>
   )
 };

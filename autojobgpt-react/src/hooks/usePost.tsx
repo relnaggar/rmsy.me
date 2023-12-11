@@ -6,17 +6,19 @@ import { CSRFTokenContext } from "../routes/Layout";
 import { makeErrorMessage } from "./hooksUtils";
 
 
-const usePost = <Resource extends unknown>(
-  apiPath: string,
-  options?: {
-    onSuccess?: (resource: Resource) => void,
-    onFail?: (errors: Record<string,string[]>) => void,
-  },
-): {
+export interface UsePost {
   posting: boolean,
   post: (postData?: any) => void,
   cancel: () => void,
-} => {
+};
+
+const usePost = <ResponseData extends unknown>(
+  apiPath: string,
+  options?: {
+    onSuccess?: (responseData: ResponseData) => void,
+    onFail?: (errors: Record<string,string[]>) => void,
+  },
+): UsePost => {
   const { onSuccess, onFail } = options || {};
 
   const apiRoute: string = useAPI();
@@ -43,8 +45,8 @@ const usePost = <Resource extends unknown>(
         // await new Promise(resolve => setTimeout(resolve, 3000));
 
         if (response.ok) {
-          const resource: Resource = await response.json();
-          onSuccess?.(resource);
+          const responseData: ResponseData = await response.json();
+          onSuccess?.(responseData);
         } else {
           errors = await response.json();
           if (!String(errors)) {

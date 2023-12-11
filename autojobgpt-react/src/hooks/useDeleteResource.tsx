@@ -7,7 +7,12 @@ import { WithId } from '../api/types';
 import { makeErrorMessage } from "./hooksUtils";
 
 
-const useDelete = <Resource extends WithId>(
+export interface UseDeleteResource {
+  deleteResource: (id: number) => void,
+  idBeingDeleted: number,
+};
+
+const useDeleteResource = <Resource extends WithId>(
   apiPath: string,
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
@@ -15,10 +20,7 @@ const useDelete = <Resource extends WithId>(
     onSuccess?: (deletedResource: Resource, resources: Resource[], setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
     onFail?: (errors: Record<string,string[]>) => void,
   },
-): {
-  deleteResource: (id: number) => void,
-  idBeingDeleted: number,
-} => {
+): UseDeleteResource => {
   const { onSuccess, onFail } = options || {};
 
   const apiRoute: string = useAPI();
@@ -74,4 +76,4 @@ const useDelete = <Resource extends WithId>(
   return { deleteResource, idBeingDeleted };
 };
 
-export default useDelete;
+export default useDeleteResource;

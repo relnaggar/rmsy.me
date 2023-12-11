@@ -7,18 +7,20 @@ import { WithId } from '../api/types';
 import { makeErrorMessage } from "./hooksUtils";
 
 
-const usePatch = <Resource extends WithId>(
+export interface UsePatchResource<Resource> {
+  patching: boolean,
+  patchResource: (id: number, patch: Partial<Resource>) => void,
+};
+
+const usePatchResource = <Resource extends WithId>(
   apiPath: string,
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
   options?: {
-    onSuccess?: (resource: Resource, resources: Resource[], setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
+    onSuccess?: (patchedResource: Resource, resources: Resource[], setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
     onFail?: (errors: Record<string,string[]>) => void,
   },
-): {
-  patching: boolean,
-  patchResource: (id: number, patch: Partial<Resource>) => void,
-} => {
+): UsePatchResource<Resource> => {
   const {
     onSuccess,
     onFail,
@@ -76,4 +78,4 @@ const usePatch = <Resource extends WithId>(
   return { patching: idBeingPatched !== -1, patchResource };
 };
 
-export default usePatch;
+export default usePatchResource;

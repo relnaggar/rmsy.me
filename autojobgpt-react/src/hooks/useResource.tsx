@@ -1,9 +1,18 @@
-import useFetch from './useFetch';
-import useDelete from './useDelete';
-import usePostResource from './usePostResource';
-import usePatch from './usePatch';
+import useFetchResource, { UseFetchResource } from './useFetchResource';
+import useDeleteResource, { UseDeleteResource } from './useDeleteResource';
+import usePostResource, { UsePostResource} from './usePostResource';
+import usePatchResource, { UsePatchResource } from './usePatchResource';
 import { WithId } from '../api/types';
 
+
+interface UseResource<Resource extends WithId, ResourceUpload> extends
+    UseFetchResource<Resource>,
+    UsePostResource<ResourceUpload>,
+    UseDeleteResource,
+    UsePatchResource<Resource>
+{
+  apiPath: string,
+};
 
 const useResource = <Resource extends WithId, ResourceUpload>(
   apiPath: string,
@@ -18,19 +27,8 @@ const useResource = <Resource extends WithId, ResourceUpload>(
     onPatchSuccess?: (resource: Resource, resources: Resource[], setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
     onPatchFail?: (errors: Record<string,string[]>) => void,
   },
-): {
-  resources: Resource[],
-  setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
-  fetching: boolean,
-  refetch: () => void,
-  posting: boolean,
-  postResource: (resourceUpload: ResourceUpload) => void,
-  deleteResource: (id: number) => void,
-  idBeingDeleted: number,
-  patching: boolean,
-  patchResource: (id: number, patch: Partial<Resource>) => void,
-} => {
-  let {
+): UseResource<Resource,ResourceUpload> => {
+  const {
     onPostSuccess,
     onPostFail,
     onFetchSuccess,
@@ -41,34 +39,29 @@ const useResource = <Resource extends WithId, ResourceUpload>(
     onPatchFail,
   } = options || {};
 
-  const { resource: resources, setResource: setResources, fetching, refetch } = useFetch<Resource[]>(apiPath, {
-    initialResource: [],
+  const fetchResource = useFetchResource<Resource>(apiPath, {
     onSuccess: onFetchSuccess,
     onFail: onFetchFail
   });
 
-  const { posting, postResource } = usePostResource<Resource,ResourceUpload>(apiPath, resources, setResources,
-    getPlaceholderResource, {
+  const { resources, setResources } = fetchResource;
+
+  const postResource = usePostResource<Resource,ResourceUpload>(apiPath, resources, setResources, getPlaceholderResource, {
     onSuccess: onPostSuccess,
     onFail: onPostFail,
   });
 
-  const { deleteResource, idBeingDeleted } = useDelete<Resource>(apiPath, resources, setResources, {
+  const deleteResource = useDeleteResource<Resource>(apiPath, resources, setResources, {
     onSuccess: onDeleteSuccess,
     onFail: onDeleteFail
   });
 
-  const { patchResource, patching } = usePatch<Resource>(apiPath, resources, setResources, {
+  const patchResource = usePatchResource<Resource>(apiPath, resources, setResources, {
     onSuccess: onPatchSuccess,
     onFail: onPatchFail
   });
 
-  return {
-    resources, setResources, fetching, refetch,
-    posting, postResource,
-    deleteResource, idBeingDeleted,    
-    patching, patchResource,
-  };
+  return { apiPath, ...fetchResource, ...postResource, ...deleteResource, ...patchResource };
 };
 
 export default useResource;

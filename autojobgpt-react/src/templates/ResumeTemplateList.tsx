@@ -1,13 +1,15 @@
 import React, { useCallback, useContext, useState } from "react";
-import BoostrapAlert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useResource from "../hooks/useResource";
-import useFetch from "../hooks/useFetch";
+import useFetchResource from "../hooks/useFetchResource";
+import useAddModal from "../hooks/useAddModal";
 import DocumentList from "../common/DocumentList";
 import EditTemplateModal from "./EditTemplateModal";
 import AddTemplateModal from "./AddTemplateModal";
 import { FillField, ResumeTemplate, ResumeTemplateUpload } from "../api/types";
+import useErrorAlert from "../hooks/useErrorAlert";
+import ErrorAlert from "../common/ErrorAlert";
 
 
 export const getPlaceholderTemplate = (templateUpload: ResumeTemplateUpload): ResumeTemplate => {
@@ -23,55 +25,25 @@ export const getPlaceholderTemplate = (templateUpload: ResumeTemplateUpload): Re
 
 const ResumeTemplateList = (): React.JSX.Element => {
   const openConfirmationModal = useContext(ConfirmationModalContext);
+  const addTemplateModal = useAddModal();
+  const errorAlert = useErrorAlert();
 
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
-
-  const handleErrors = useCallback((errors: Record<string,string[]>) => {
-    setErrorMessage(Object.values(errors).join(" "));
-    setShowErrorAlert(true);    
-  }, []);
-
-  const {
-    resource: fillFields,
-    setResource: setFillFields
-  } = useFetch<FillField[]>("fillFields/", { initialResource: [], onFail: handleErrors });
-
-
-  const [addTemplateErrors, setAddTemplateErrors] = useState<Record<string,string[]>>({});  
-  const [showAddTemplateErrorAlert, setShowAddTemplateErrorAlert] = useState<boolean>(false);
+  const fillFields = useFetchResource<FillField>("fillFields/", { onFail: errorAlert.showErrors });
 
   const handleAddTemplateSuccess = useCallback((template: ResumeTemplate) => {
-    setFillFields([...fillFields, ...template.fillFields]);
-  }, [fillFields, setFillFields]);
+    addTemplateModal.handleAddSuccess();
+    fillFields.setResources([...fillFields.resources, ...template.fillFields]);
+  }, [addTemplateModal, fillFields]);
 
-  const handleAddTemplateFail = useCallback((errors: Record<string,string[]>) => {
-    setAddTemplateErrors(errors);
-    setShowAddTemplateModal(true);
-    if (errors["error"]) {
-      setShowAddTemplateErrorAlert(true);
-    }
-  }, []);
-
-  const templateAPIPath: string = "templates/";
-  const {
-    resources: templates,
-    setResources: setTemplates,
-    fetching: loadingTemplates,
-    posting: addingTemplate,
-    postResource: addTemplate,
-    deleteResource: removeTemplate,
-    idBeingDeleted: templateBeingRemovedId,    
-  } = useResource<ResumeTemplate,ResumeTemplateUpload>(templateAPIPath, getPlaceholderTemplate, {
-    onFetchFail: handleErrors,
+  const templates = useResource<ResumeTemplate,ResumeTemplateUpload>("templates/", getPlaceholderTemplate, {
+    onFetchFail: errorAlert.showErrors,
     onPostSuccess: handleAddTemplateSuccess,
-    onPostFail: handleAddTemplateFail,
-    onDeleteFail: handleErrors,
+    onPostFail: addTemplateModal.handleAddFail,
+    onDeleteFail: errorAlert.showErrors,
   });
 
   const [showEditTemplateModal, setShowEditTemplateModal] = useState<boolean>(false);
   const [editTemplateId, setEditTemplateId] = useState<number>(-1);
-  const [showAddTemplateModal, setShowAddTemplateModal] = useState<boolean>(false);
 
   const handleClickEditTemplate = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     setEditTemplateId(id);
@@ -79,48 +51,35 @@ const ResumeTemplateList = (): React.JSX.Element => {
   }  
 
   const handleClickRemoveResume = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    const template: ResumeTemplate = templates.find((template) => template.id === id)!;
-    openConfirmationModal(() => removeTemplate(id), `delete resume template "${template.name}"`, "Delete");
-  };
-  
-  const handleClickAddTemplate = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    setShowAddTemplateModal(true);
+    const template: ResumeTemplate = templates.resources.find((template) => template.id === id)!;
+    openConfirmationModal(() => templates.deleteResource(id), `delete resume template "${template.name}"`, "Delete");
   };
 
   return(
     <section>
       <h2>Templates</h2>
-      { showErrorAlert &&
-        <BoostrapAlert variant="danger" onClose={() => setShowErrorAlert(false)} dismissible>
-          {errorMessage}
-        </BoostrapAlert>
-      }
+      <ErrorAlert {...errorAlert} />
       <DocumentList
-        documents={templates}
-        loadingDocuments={loadingTemplates}
+        documents={templates.resources}
+        loadingDocuments={templates.fetching}
         onClickEditDocument={handleClickEditTemplate}
         onClickRemoveDocument={handleClickRemoveResume}
-        documentBeingRemovedId={templateBeingRemovedId}
-        onClickAddDocument={handleClickAddTemplate}
+        documentBeingRemovedId={templates.idBeingDeleted}
+        onClickAddDocument={addTemplateModal.open}
         addButtonText="Upload resume template"
-        addDisabled={addingTemplate}
+        addDisabled={templates.posting}
       />
       <EditTemplateModal
-        apiPath={templateAPIPath}
+        apiPath={templates.apiPath}
         show={showEditTemplateModal}
         setShow={setShowEditTemplateModal}
         templateId={editTemplateId}
-        templates={templates}
-        setTemplates={setTemplates}
-        fillFields={fillFields}
-        setFillFields={setFillFields}
+        templates={templates.resources}
+        setTemplates={templates.setResources}
+        fillFields={fillFields.resources}
+        setFillFields={fillFields.setResources}
       />
-      <AddTemplateModal
-        show={showAddTemplateModal} setShow={setShowAddTemplateModal}
-        errors={addTemplateErrors} setErrors={setAddTemplateErrors}
-        showErrorAlert={showAddTemplateErrorAlert} setShowErrorAlert={setShowAddTemplateErrorAlert}
-        addTemplate={addTemplate}
-      />
+      <AddTemplateModal {...addTemplateModal} addTemplate={templates.postResource} />
     </section>
   )
 };

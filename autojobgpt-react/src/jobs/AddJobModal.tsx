@@ -3,20 +3,20 @@ import { ReactComponent as RobotIcon } from "bootstrap-icons/icons/robot.svg";
 
 import useFetch from "../hooks/useFetch";
 import useInputControl from "../hooks/useInputControl";
-import AddModal, { ModalProps } from "../common/AddModal";
+import AddModal, { AddModalMixin } from "../common/AddModal";
 import TextInput from "../common/TextInput";
 import ErrorAlert from "../common/ErrorAlert";
 import InputButton from "../common/InputActionButton";
 import { JobUpload, JobDetails } from '../api/types';
 
 
-interface AddJobModalProps extends ModalProps {
+interface AddJobModalProps extends AddModalMixin {
   addJob: (jobUpload: JobUpload) => void,  
 };
 
 const AddJobModal = ({
-  show, setShow, errors, setErrors, showErrorAlert, setShowErrorAlert,
   addJob,
+  ...addModal
 }: AddJobModalProps): React.JSX.Element => {
   const modalId = "addJobModal";
   const urlInput = useInputControl();
@@ -50,10 +50,10 @@ const AddJobModal = ({
 
   const handleClickFillDetails = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setShowFillErrorAlert(false);
-    setShowErrorAlert(false);
+    addModal.setShowErrorAlert(false);
 
-    const { url: urlError, ...newErrors } = errors;
-    setErrors(newErrors);
+    const { url: urlError, ...newErrors } = addModal.errors;
+    addModal.setErrors(newErrors);
 
     let valid = true;
     const newFillErrors: Record<string,string[]> = {};
@@ -95,7 +95,7 @@ const AddJobModal = ({
       valid = false;
     }
 
-    setErrors(newErrors);
+    addModal.setErrors(newErrors);
     for (const input of [urlInput, titleInput, companyInput, postingInput]) {
       input.stopEditing();
     }
@@ -118,8 +118,7 @@ const AddJobModal = ({
 
   return (
     <AddModal
-      show={show} setShow={setShow} errors={{error: errors["error"]}} setErrors={setErrors}
-      showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
+      {...addModal} errors={{error: addModal.errors["error"]}}
       title="Add Job" modalId={modalId} size="lg"
       onSubmit={handleSubmit}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
@@ -127,7 +126,7 @@ const AddJobModal = ({
     >
       <TextInput id={`${modalId}URL`}
         label="URL" type="url" value={urlInput.value} handleChange={urlInput.handleChange}
-        editing={urlInput.editing} loading={filling} errors={errors["url"] || urlFillErrors}
+        editing={urlInput.editing} loading={filling} errors={addModal.errors["url"] || urlFillErrors}
       >
         <InputButton controlsId={`${modalId}URL`} label="Autofill Details" loading={filling}
           onClickAction={handleClickFillDetails} onClickCancel={handleClickCancelFill} icon={<RobotIcon />}
@@ -141,15 +140,15 @@ const AddJobModal = ({
       <h5>Details</h5>
       <TextInput id={`${modalId}Title`}
         label="Title" type="text" value={titleInput.value} handleChange={titleInput.handleChange}
-        editing={titleInput.editing} loading={filling} errors={errors["title"]}
+        editing={titleInput.editing} loading={filling} errors={addModal.errors["title"]}
       />
       <TextInput id={`${modalId}Company`}
         label="Company" type="text" value={companyInput.value} handleChange={companyInput.handleChange}
-        editing={companyInput.editing} loading={filling} errors={errors["company"]}
+        editing={companyInput.editing} loading={filling} errors={addModal.errors["company"]}
       />
       <TextInput id={`${modalId}Posting`}
         label="Posting" type="textarea" value={postingInput.value} handleChange={postingInput.handleChange}
-        editing={postingInput.editing} loading={filling} errors={errors["posting"]}
+        editing={postingInput.editing} loading={filling} errors={addModal.errors["posting"]}
       />
     </AddModal>
   );

@@ -1,14 +1,16 @@
 import React, { useCallback, useContext, useState } from "react";
-import BootstrapAlert from 'react-bootstrap/Alert';
 
 import { ConfirmationModalContext } from "../routes/Layout";
+import useAddModal from "../hooks/useAddModal";
 import useResource from "../hooks/useResource";
+import useErrorAlert from "../hooks/useErrorAlert";
 import JobColumn from "./JobColumn";
 import EditJobModal from "./EditJobModal";
 import AddJobModal from "./AddJobModal";
 import { Status, StatusUpload, Job, JobUpload } from '../api/types';
 import AddColumnModal from "./AddColumnModal";
 import EditColumnModal from "./EditColumnModal";
+import ErrorAlert from "../common/ErrorAlert";
 
 
 const generatePlaceholderStatus = (statusUpload: StatusUpload): Status => {
@@ -30,63 +32,27 @@ const generatePlaceholderJob = (jobUpload: JobUpload): Job => {
   }
 };
 
-const JobBoard = (): React.JSX.Element => {
+const JobBoard = (): React.JSX.Element => {  
   const openConfirmationModal = useContext(ConfirmationModalContext);
+  const errorAlert = useErrorAlert();
+  const addColumnModal = useAddModal();
+  const addJobModal = useAddModal();  
 
   const [draggingJobId, setDraggingJobId] = useState<number>(-1);
   const [editJobId, setEditJobId] = useState<number>(-1);
   const [showEditJob, setShowEditJob] = useState<boolean>(false);
-  const [showAddJob, setShowAddJob] = useState<boolean>(false);
 
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
-
-  const [addJobErrors, setAddJobErrors] = useState<Record<string,string[]>>({});
-  const [showAddJobErrorAlert, setShowAddJobErrorAlert] = useState<boolean>(false);
-
-  const handleErrors = useCallback((errors: Record<string,string[]>) => {
-    setErrorMessage(Object.values(errors).join(" "));
-    setShowErrorAlert(true);
-  }, []);
-
-  const handleAddJobSuccess = useCallback(() => {
-    setAddJobErrors({});
-    setShowAddJob(false);    
-  }, []);
-
-  const handleAddJobFail = useCallback((errors: Record<string,string[]>) => {
-    setAddJobErrors(errors);
-    if (errors["error"]) {
-      setShowAddJobErrorAlert(true);
-    }
-    setShowAddJob(true);
-  }, []);
-
-  const jobAPIPath: string = "jobs/";
-  const {
-    resources: jobs,
-    setResources: setJobs,
-    fetching: fetchingJobs,
-    posting: addingJob,
-    postResource: addJob,
-    deleteResource: removeJob,
-    idBeingDeleted: jobIdBeingRemoved,
-    patchResource: updateJob,
-  } = useResource<Job,JobUpload>(jobAPIPath, generatePlaceholderJob, {
-    onPostSuccess: handleAddJobSuccess,
-    onPostFail: handleAddJobFail,
-    onFetchFail: handleErrors,
-    onDeleteFail: handleErrors,
-    onPatchFail: handleErrors,
+  const jobs = useResource<Job,JobUpload>("jobs/", generatePlaceholderJob, {
+    onPostSuccess: addJobModal.handleAddSuccess,
+    onPostFail: addJobModal.handleAddFail,
+    onFetchFail: errorAlert.showErrors,
+    onDeleteFail: errorAlert.showErrors,
+    onPatchFail: errorAlert.showErrors,
   });
 
-  const handleClickAddJob = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    setShowAddJob(true);
-  }
-
   const handleClickRemoveJob = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    const job: Job = jobs.find((job) => job.id === id)!;
-    openConfirmationModal(() => removeJob(id), `delete job "${job.title}, ${job.company}"`, "Delete");
+    const job: Job = jobs.resources.find((job) => job.id === id)!;
+    openConfirmationModal(() => jobs.deleteResource(id), `delete job "${job.title}, ${job.company}"`, "Delete");
   };
 
   const handleClickEditJob = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
@@ -108,10 +74,10 @@ const JobBoard = (): React.JSX.Element => {
   const handleDrop = (endStatus: Status) => (e: React.DragEvent<HTMLDivElement>): void => {
     e.preventDefault(); // prevent page from reloading
     
-    const job: Job = jobs.find((job) => job.id === draggingJobId)!;
+    const job: Job = jobs.resources.find((job) => job.id === draggingJobId)!;
     const jobStatus: Status = sortedStatuses.find((status) => status.id === job.status)!;
     if (jobStatus.order !== endStatus.order) {      
-      updateJob(draggingJobId, {status: endStatus.id});
+      jobs.patchResource(draggingJobId, {status: endStatus.id});
       setDraggingJobId(-1);
     }
   };
@@ -136,23 +102,6 @@ const JobBoard = (): React.JSX.Element => {
     setStatuses(newStatuses);
   }, []);
 
-  const [showAddColumn, setShowAddColumn] = useState<boolean>(false);
-  const [addStatusErrors, setAddStatusErrors] = useState<Record<string,string[]>>({});
-  const [showAddStatusErrorAlert, setShowAddStatusErrorAlert] = useState<boolean>(false);
-
-  const handlePostStatusFail = useCallback((errors: Record<string,string[]>) => {
-    setAddStatusErrors(errors);
-    if (errors["error"]) {
-      setShowAddStatusErrorAlert(true);
-    }
-    setShowAddColumn(true);
-  }, []);
-
-  const handlePostStatusSuccess = useCallback(() => {
-    setAddStatusErrors({});
-    setShowAddColumn(false);
-  }, []);
-
   const handleDeleteStatusSuccess = useCallback((deletedStatus: Status, statuses: Status[], setStatuses: React.Dispatch<React.SetStateAction<Status[]>>) => {
     // decrease order of all statuses with order greater than the deleted status
     const newStatuses: Status[] = [...statuses];
@@ -167,23 +116,14 @@ const JobBoard = (): React.JSX.Element => {
   const [editStatusId, setEditStatusId] = useState<number>(-1);
   const [showEditColumn, setShowEditColumn] = useState<boolean>(false);
 
-  const statusAPIPath: string = "statuses/";
-  const {
-    resources: statuses,
-    setResources: setStatuses,
-    fetching: fetchingStatuses,
-    postResource: addStatus,
-    deleteResource: removeStatus,
-    idBeingDeleted: statusIdBeingRemoved,
-    patchResource: updateStatus,
-  } = useResource<Status,StatusUpload>(statusAPIPath, generatePlaceholderStatus, {
-    onFetchFail: handleErrors,
-    onPostFail: handlePostStatusFail,
-    onPostSuccess: handlePostStatusSuccess,
+  const statuses = useResource<Status,StatusUpload>("statuses/", generatePlaceholderStatus, {
+    onFetchFail: errorAlert.showErrors,
+    onPostFail: addColumnModal.handleAddFail,
+    onPostSuccess: addColumnModal.handleAddSuccess,
     onDeleteSuccess: handleDeleteStatusSuccess,
-    onDeleteFail: handleErrors,
+    onDeleteFail:  errorAlert.showErrors,
     onPatchSuccess: handlePatchStatusSuccess,
-    onPatchFail: handleErrors,
+    onPatchFail:  errorAlert.showErrors,
   });
 
   const handleClickEditStatus = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
@@ -192,20 +132,16 @@ const JobBoard = (): React.JSX.Element => {
   };
 
   const handleClickRemoveColumn = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    const status: Status = statuses.find((status) => status.id === id)!;
-    openConfirmationModal(() => removeStatus(id), `delete column "${status.name}"`, "Delete");
+    const status: Status = statuses.resources.find((status) => status.id === id)!;
+    openConfirmationModal(() => statuses.deleteResource(id), `delete column "${status.name}"`, "Delete");
   };
 
-  const sortedStatuses: Status[] = statuses.sort((a,b) => a.order - b.order);
-  const loading: boolean = fetchingJobs || fetchingStatuses;
+  const sortedStatuses: Status[] = statuses.resources.sort((a,b) => a.order - b.order);
+  const loading: boolean = jobs.fetching || statuses.fetching;
   return (
     <section>
       <h2>Job Board</h2>
-      { showErrorAlert &&
-        <BootstrapAlert variant="danger" onClose={() => setShowErrorAlert(false)} dismissible>
-          {errorMessage}
-        </BootstrapAlert>
-      }
+      <ErrorAlert {...errorAlert} />
       <div className="kanban-board border">
         { loading ? (
           [...Array(3)].map((_, index) =>
@@ -242,7 +178,7 @@ const JobBoard = (): React.JSX.Element => {
                   <JobColumn
                     key={`${status.id}-${index}`}
                     title={status.name}
-                    jobs={jobs.filter((job) => (job.status === status.id || (job.status === -1 && status.order === sortedStatuses[0].order)))}
+                    jobs={jobs.resources.filter((job) => (job.status === status.id || (job.status === -1 && status.order === sortedStatuses[0].order)))}
                     statusId={status.id}
                     sortedStatuses={sortedStatuses}
                     loading={loading}
@@ -251,11 +187,11 @@ const JobBoard = (): React.JSX.Element => {
                     onDragStart={handleDragStart}
                     onClickEditJob={handleClickEditJob}
                     onClickRemoveJob={handleClickRemoveJob}
-                    jobIdBeingRemoved={jobIdBeingRemoved}
-                    onClickAddJob={status.order === sortedStatuses[0].order ? handleClickAddJob : undefined}
-                    addDisabled={status.order === sortedStatuses[0].order ? addingJob: undefined}
-                    updateStatus={updateStatus}
-                    beingRemoved={statusIdBeingRemoved === status.id}
+                    jobIdBeingRemoved={jobs.idBeingDeleted}
+                    onClickAddJob={status.order === sortedStatuses[0].order ? addJobModal.open : undefined}
+                    addDisabled={status.order === sortedStatuses[0].order ? jobs.posting: undefined}
+                    updateStatus={statuses.patchResource}
+                    beingRemoved={statuses.idBeingDeleted === status.id}
                     onClickRemoveColumn={handleClickRemoveColumn(status.id)}
                     onClickEditColumn={handleClickEditStatus(status.id)}
                   />
@@ -287,7 +223,7 @@ const JobBoard = (): React.JSX.Element => {
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={() => setShowAddColumn(true)}
+                onClick={addColumnModal.open}
                 disabled={false}
               >
                 + Add column
@@ -297,35 +233,24 @@ const JobBoard = (): React.JSX.Element => {
         </div>
       </div>
       <EditJobModal
-        apiPath={jobAPIPath}
+        apiPath={jobs.apiPath}
         show={showEditJob}
         setShow={setShowEditJob}
-        jobs={jobs}
-        setJobs={setJobs}
+        jobs={jobs.resources}
+        setJobs={jobs.setResources}
         id={editJobId}
-        statuses={statuses}
+        statuses={statuses.resources}
       />
-      <AddJobModal
-        show={showAddJob} setShow={setShowAddJob}        
-        errors={addJobErrors} setErrors={setAddJobErrors}
-        showErrorAlert={showAddJobErrorAlert} setShowErrorAlert={setShowAddJobErrorAlert}
-        addJob={addJob}
-      />
+      <AddJobModal {...addJobModal} addJob={jobs.postResource} />
       <EditColumnModal
-        apiPath={statusAPIPath}
+        apiPath={statuses.apiPath}
         show={showEditColumn}
         setShow={setShowEditColumn}
         statusId={editStatusId}
-        statuses={statuses}
-        setStatuses={setStatuses}
+        statuses={statuses.resources}
+        setStatuses={statuses.setResources}
       />
-      <AddColumnModal
-        show={showAddColumn} setShow={setShowAddColumn}        
-        errors={addStatusErrors} setErrors={setAddStatusErrors}
-        showErrorAlert={showAddStatusErrorAlert}
-        setShowErrorAlert={setShowAddStatusErrorAlert}
-        addColumn={addStatus}
-      />
+      <AddColumnModal {...addColumnModal} addColumn={statuses.postResource} />
     </section>
   );
 };

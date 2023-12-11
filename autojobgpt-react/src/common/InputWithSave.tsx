@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useRef, useEffect } from "react";
 import { ReactComponent as FloppyIcon } from "bootstrap-icons/icons/floppy.svg";
 
-import usePatch from "../hooks/usePatch";
+import usePatch from "../hooks/usePatchResource";
 import useControlledState from "../hooks/useControlledState";
 import { WithId } from '../api/types';
 

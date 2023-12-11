@@ -1,19 +1,17 @@
 import React from "react";
 import BootstrapModal from 'react-bootstrap/Modal';
 
+import { ErrorAlertMixin } from "../hooks/useErrorAlert";
 import ErrorAlert from "./ErrorAlert";
 
 
-export interface ModalProps {
+export interface AddModalMixin extends ErrorAlertMixin {
   show: boolean,
   setShow: React.Dispatch<React.SetStateAction<boolean>>,
-  errors: Record<string,string[]>,
   setErrors: React.Dispatch<React.SetStateAction<Record<string,string[]>>>,
-  showErrorAlert: boolean,
-  setShowErrorAlert: React.Dispatch<React.SetStateAction<boolean>>,
 };
 
-interface AddModalProps extends ModalProps {
+interface AddModalProps extends AddModalMixin {
   title: string,
   modalId: string,
   size?: "sm" | "lg" | "xl",

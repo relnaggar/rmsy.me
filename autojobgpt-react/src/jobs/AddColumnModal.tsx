@@ -1,18 +1,18 @@
 import React from "react";
 
 import useInputControl from "../hooks/useInputControl";
-import AddModal, { ModalProps } from "../common/AddModal";
+import AddModal, { AddModalMixin } from "../common/AddModal";
 import TextInput from "../common/TextInput";
 import { StatusUpload } from '../api/types';
 
 
-interface AddColumnModalProps extends ModalProps {
+interface AddColumnModalProps extends AddModalMixin {
   addColumn: (statusUpload: StatusUpload) => void,
 };
 
-const AddColumnModal = ({
-  show, setShow, errors, setErrors, showErrorAlert, setShowErrorAlert,
+const AddColumnModal = ({  
   addColumn,
+  ...addColumnModal
 }: AddColumnModalProps): React.JSX.Element => {
   const modalId = "addColumnModal";
   const nameInput = useInputControl();
@@ -26,7 +26,7 @@ const AddColumnModal = ({
       valid = false;
     }
 
-    setErrors(newErrors);
+    addColumnModal.setErrors(newErrors);
     nameInput.stopEditing();
 
     return valid;
@@ -38,14 +38,13 @@ const AddColumnModal = ({
 
   return (
     <AddModal
-      show={show} setShow={setShow} errors={{error: errors["error"]}} setErrors={setErrors}
-      showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
+      {...addColumnModal} errors={{error: addColumnModal.errors["error"]}} 
       title="Add Column" modalId={modalId}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
       <TextInput id={`${modalId}Name`}
         label="Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
-        editing={nameInput.editing} errors={errors["name"]}
+        editing={nameInput.editing} errors={addColumnModal.errors["name"]}
       />
     </AddModal>
   );

@@ -7,19 +7,21 @@ import { WithId } from '../api/types';
 import { makeErrorMessage } from "./hooksUtils";
 
 
+export interface UsePostResource<ResourceUpload> {
+  posting: boolean,
+  postResource: (resource: ResourceUpload) => void,
+};
+
 const usePostResource = <Resource extends WithId, ResourceUpload>(
   apiPath: string,
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
   getPlaceholderResource: (resourceUpload: ResourceUpload) => Resource,
   options?: {
-    onSuccess?: (resource: Resource) => void,
+    onSuccess?: (newResource: Resource, resources: Resource[], setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
     onFail?: (errors: Record<string,string[]>) => void,
   },
-): {
-  posting: boolean,
-  postResource: (resource: ResourceUpload) => void,
-} => {
+): UsePostResource<ResourceUpload> => {
   const { onSuccess, onFail } = options || {};
 
   const apiRoute: string = useAPI();
@@ -49,7 +51,7 @@ const usePostResource = <Resource extends WithId, ResourceUpload>(
         if (response.ok) {
           const resource: Resource = await response.json();
           newResources.push(resource);
-          onSuccess?.(resource);
+          onSuccess?.(resource, newResources, setResources);
         } else {
           errors = await response.json();
           if (!String(errors)) {
