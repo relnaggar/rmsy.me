@@ -54,7 +54,11 @@ const usePost = <ResponseData extends unknown>(
           }
         }
       } catch (error) {
-        errors["error"] = makeErrorMessage(error);
+        if (error instanceof DOMException && error.name === "AbortError") {
+          // do nothing
+        } else {
+          errors["error"] = makeErrorMessage(error);
+        }
       } finally {
         if (!abortControllerRef.current.signal.aborted) {
           setPosting(false);
