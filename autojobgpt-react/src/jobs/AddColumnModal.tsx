@@ -1,6 +1,6 @@
 import React from "react";
 
-import useInputControl from "../hooks/useInputControl";
+import useInputControl, { InputControlMixin } from "../hooks/useInputControl";
 import AddModal, { AddModalMixin } from "../common/AddModal";
 import TextInput from "../common/TextInput";
 import { StatusUpload } from '../api/types';
@@ -42,9 +42,8 @@ const AddColumnModal = ({
       title="Add Column" modalId={modalId}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
-      <TextInput id={`${modalId}Name`}
-        label="Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
-        editing={nameInput.editing} errors={addColumnModal.errors["name"]}
+      <TextInput id={`${modalId}Name`} {...nameInput as InputControlMixin}
+        label="Name" type="text" errors={addColumnModal.errors["name"]}
       />
     </AddModal>
   );

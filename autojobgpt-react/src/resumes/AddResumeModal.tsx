@@ -28,16 +28,12 @@ const AddResumeModal = ({
     addModal.setErrors(errors);
   }, [addModal]);
 
-  const {
-    resources: jobs, fetching: fetchingJobs, refetch: refetchJobs, cancel: cancelJobs
-  } = useFetchResource<Job>("jobs/", {
+  const jobManager = useFetchResource<Job>("jobs/", {
     onSuccess: handleRefreshSuccess,
     onFail: handleRefreshFail,
   });
 
-  const {
-    resources: templates, fetching: fetchingTemplates, refetch: refetchTemplates, cancel: cancelTemplates
-  } = useFetchResource<ResumeTemplate>("templates/", {
+  const templateManager = useFetchResource<ResumeTemplate>("templates/", {
     onSuccess: handleRefreshSuccess,
     onFail: handleRefreshFail,
   });
@@ -73,32 +69,14 @@ const AddResumeModal = ({
   };
 
   return (
-    <AddModal {...addModal} title="Generate Resume" modalId="addResumeModal" validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}>
-      <SelectInputWithRefresh<Job>
-        id={`${modalId}Job`}
-        label="Job"
-        optionToString={(job) => `${job.title}, ${job.company}`}
-        value={jobInput.value}
-        handleChange={jobInput.handleChange as (e: React.ChangeEvent<HTMLSelectElement>) => void}
-        editing={jobInput.editing}
-        options={jobs}
-        refreshing={fetchingJobs}
-        refresh={refetchJobs}
-        errors={addModal.errors["job"]}
-        cancel={cancelJobs}
+    <AddModal modalId="addResumeModal" {...addModal}
+      title="Generate Resume" validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
+    >
+      <SelectInputWithRefresh<Job> id={`${modalId}Job`} {...jobInput} {...jobManager}
+        label="Job" optionToString={(job) => `${job.title}, ${job.company}`} errors={addModal.errors["job"]}
       />
-      <SelectInputWithRefresh<ResumeTemplate>
-        id={`${modalId}Template`}
-        label="Template"
-        optionToString={(template) => template.name}
-        value={templateInput.value}
-        handleChange={templateInput.handleChange as (e: React.ChangeEvent<HTMLSelectElement>) => void}
-        editing={templateInput.editing}
-        options={templates}
-        refreshing={fetchingTemplates}
-        refresh={refetchTemplates}
-        errors={addModal.errors["template"]}
-        cancel={cancelTemplates}
+      <SelectInputWithRefresh<ResumeTemplate> id={`${modalId}Template`} {...templateInput} {...templateManager}
+        label="Template" optionToString={(template) => template.name} errors={addModal.errors["template"]}
       />
     </AddModal>
   );

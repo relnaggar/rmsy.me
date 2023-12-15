@@ -63,12 +63,11 @@ const ResumeTemplateList = (): React.JSX.Element => {
     <section>
       <h2>Templates</h2>
       <ErrorAlert {...errorAlert} />
-      <DocumentList
+      <DocumentList {...templateManager}
         onClickEditDocument={handleClickEditTemplate}
         onClickRemoveDocument={handleClickRemoveTemplate}
         onClickAddDocument={handleClickAddTemplate}
-        addButtonText="Upload resume template"
-        {...templateManager}
+        addButtonText="Upload resume template"        
       />
       <EditTemplateModal
         apiPath={templateManager.apiPath}
@@ -80,7 +79,7 @@ const ResumeTemplateList = (): React.JSX.Element => {
         fillFields={fillFieldManager.resources}
         setFillFields={fillFieldManager.setResources}
       />
-      <AddTemplateModal postResource={templateManager.postResource} {...addTemplateModal} />
+      <AddTemplateModal {...addTemplateModal} postResource={templateManager.postResource}  />
     </section>
   )
 };

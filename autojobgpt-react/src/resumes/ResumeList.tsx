@@ -6,8 +6,9 @@ import useEditModal from "../hooks/useEditModal";
 import useErrorAlert from "../hooks/useErrorAlert";
 import useFetchResource from "../hooks/useFetchResource";
 import useResource from "../hooks/useResource";
-import useFormInput from '../hooks/useInputControl';
+import useFilterResource from "../hooks/useFilterResource";
 import ErrorAlert from '../common/ErrorAlert';
+import FilterResourceSelect from '../common/FilterResourceSelect';
 import DocumentList from '../common/DocumentList';
 import EditResumeModal from './EditResumeModal';
 import AddResumeModal from './AddResumeModal';
@@ -82,54 +83,21 @@ const ResumeList = (): React.JSX.Element => {
     refetchResumes();
   };
 
-  const jobInput = useFormInput("0");
-  const jobIdsWithAtLeastOneResume: number[] = [];
-  const jobsWithAtLeastOneResume: Job[] = [];
-  resumes.forEach((resume) => {
-    if (resume.id !== -1 && !jobIdsWithAtLeastOneResume.includes(resume.job.id)) {
-      jobIdsWithAtLeastOneResume.push(resume.job.id);
-      
-      let i: number = 0;
-      while (i < jobsWithAtLeastOneResume.length && jobsWithAtLeastOneResume[i].id < resume.job.id) {
-        i++;
-      }
-      jobsWithAtLeastOneResume.splice(i, 0, resume.job);      
-    }
-  });
-
-  let filteredResumes: Resume[]
-  if (jobInput.value === "0") {
-    filteredResumes = resumes;
-  } else {
-    filteredResumes = resumes.filter((resume) => resume.job.id === parseInt(jobInput.value))
-  }
+  const { filteredResources: filteredResumes, ...filterResumeManager} = useFilterResource<Resume, Job>(resumes, "job");
 
   return(
     <section className="mt-3">
       <h2>Resumes</h2>
-      { jobsWithAtLeastOneResume.length > 1 &&
-        <div className="mb-3 row">
-          <label htmlFor="resume-job-select" className="col-auto col-form-label me-3">Filter by job:</label>
-          <div className="col-auto">
-            <select
-              id="resume-job-select" className="form-select"
-              value={jobInput.value} onChange={jobInput.handleChange as (e: React.ChangeEvent<HTMLSelectElement>) => void}
-            >
-              <option value="0">All Jobs</option>
-              {jobsWithAtLeastOneResume.map((job) => (
-                <option key={job.id} value={job.id}>{`${job.title}, ${job.company}`}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      }
       <ErrorAlert {...errorAlert} />
-      <DocumentList
+      <FilterResourceSelect {...filterResumeManager}
+        filterByOptionToString={(job: Job) => `${job.title}, ${job.company}`}
+        filterLabel="Filter by job:" defaultOptionLabel="All Jobs"
+      />
+      <DocumentList {...{...resumeManager, resources: filteredResumes }}
         onClickEditDocument={handleClickEditResume}
         onClickRemoveDocument={handleClickRemoveResume}
         onClickAddDocument={handleClickAddResume}
-        addButtonText="Generate new resume"
-        {...{...resumeManager, resources: filteredResumes}}
+        addButtonText="Generate new resume"        
       />
       <EditResumeModal
         apiPath={resumeManager.apiPath}
@@ -139,7 +107,7 @@ const ResumeList = (): React.JSX.Element => {
         substitutions={substitutionManager.resources} setSubstitutions={substitutionManager.setResources}
         onSubstitutionSaveSuccess={handleSubstitutionSaveSuccess}
       />
-      <AddResumeModal postResource={resumeManager.postResource} {...addResumeModal} />
+      <AddResumeModal {...addResumeModal} postResource={resumeManager.postResource} />
     </section>
   )
 };

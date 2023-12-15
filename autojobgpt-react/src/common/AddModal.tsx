@@ -19,7 +19,6 @@ interface AddModalProps extends AddModalMixin {
   onValidatedSubmit: () => void,
   submitDisabled?: boolean,
   validateSubmit: () => boolean,
-  children: React.ReactNode,
 };
 
 const AddModal = ({
@@ -32,7 +31,7 @@ const AddModal = ({
   submitDisabled = false,
   validateSubmit,
   children,
-}: AddModalProps): React.JSX.Element => {
+}: React.PropsWithChildren<AddModalProps>): React.JSX.Element => {
   const handleEntered = (): void => {
     const firstInputElement: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null =
       document.getElementById(modalId)!.querySelector('input, select, textarea');

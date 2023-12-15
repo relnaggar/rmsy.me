@@ -7,7 +7,6 @@ interface TextInputProps extends InputControlMixin, BaseInputMixin,
   Omit<React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'id' | 'value'>
 {
   type: string,
-  children?: React.ReactNode,
 };
 
 const TextInput = React.forwardRef(({
@@ -17,9 +16,10 @@ const TextInput = React.forwardRef(({
   type,
   children,
   ...extraInputProps
-}: TextInputProps,
+}: React.PropsWithChildren<TextInputProps>,
   ref: React.Ref<HTMLInputElement | HTMLTextAreaElement>,
 ): React.JSX.Element => {
+
   const inputProps: React.TextareaHTMLAttributes<HTMLTextAreaElement> | React.InputHTMLAttributes<HTMLInputElement> = {
     id,
     name: id,

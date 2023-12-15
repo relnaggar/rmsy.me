@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { ReactComponent as RobotIcon } from "bootstrap-icons/icons/robot.svg";
 
 import useFetch from "../hooks/useFetch";
-import useInputControl from "../hooks/useInputControl";
+import useInputControl, { InputControlMixin } from "../hooks/useInputControl";
 import AddModal, { AddModalMixin } from "../common/AddModal";
 import TextInput from "../common/TextInput";
 import ErrorAlert from "../common/ErrorAlert";
@@ -117,38 +117,33 @@ const AddJobModal = ({
   };
 
   return (
-    <AddModal
-      {...addModal} errors={{error: addModal.errors["error"]}}
-      title="Add Job" modalId={modalId} size="lg"
+    <AddModal modalId={modalId} {...addModal} 
+      errors={{error: addModal.errors["error"]}}
+      title="Add Job" size="lg"
       onSubmit={handleSubmit}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
       submitDisabled={filling}      
     >
-      <TextInput id={`${modalId}URL`}
-        label="URL" type="url" value={urlInput.value} handleChange={urlInput.handleChange}
-        editing={urlInput.editing} loading={filling} errors={addModal.errors["url"] || urlFillErrors}
+      <TextInput id={`${modalId}URL`} {...urlInput as InputControlMixin}
+        label="URL" type="url" loading={filling} errors={addModal.errors["url"] || urlFillErrors}
       >
         <InputButton controlsId={`${modalId}URL`} label="Autofill Details" loading={filling}
           onClickAction={handleClickFillDetails} onClickCancel={handleClickCancelFill} icon={<RobotIcon />}
         />
       </TextInput>
       <ErrorAlert
-        errors={nonURLFillErrors}
-        showErrorAlert={showFillErrorAlert} setShowErrorAlert={setShowFillErrorAlert}
+        errors={nonURLFillErrors} showErrorAlert={showFillErrorAlert} setShowErrorAlert={setShowFillErrorAlert}
       />
       <hr />
       <h5>Details</h5>
-      <TextInput id={`${modalId}Title`}
-        label="Title" type="text" value={titleInput.value} handleChange={titleInput.handleChange}
-        editing={titleInput.editing} loading={filling} errors={addModal.errors["title"]}
+      <TextInput id={`${modalId}Title`} {...titleInput as InputControlMixin}
+        label="Title" type="text" loading={filling} errors={addModal.errors["title"]}
       />
-      <TextInput id={`${modalId}Company`}
-        label="Company" type="text" value={companyInput.value} handleChange={companyInput.handleChange}
-        editing={companyInput.editing} loading={filling} errors={addModal.errors["company"]}
+      <TextInput id={`${modalId}Company`} {...companyInput as InputControlMixin}
+        label="Company" type="text" loading={filling} errors={addModal.errors["company"]}
       />
-      <TextInput id={`${modalId}Posting`}
-        label="Posting" type="textarea" value={postingInput.value} handleChange={postingInput.handleChange}
-        editing={postingInput.editing} loading={filling} errors={addModal.errors["posting"]}
+      <TextInput id={`${modalId}Posting`} {...postingInput as InputControlMixin}
+        label="Posting" type="textarea" loading={filling} errors={addModal.errors["posting"]}
       />
     </AddModal>
   );

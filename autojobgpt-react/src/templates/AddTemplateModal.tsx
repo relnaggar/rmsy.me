@@ -1,10 +1,11 @@
 import React from "react";
 
-import useInputControl from "../hooks/useInputControl";
+import useInputControl, { InputControlMixin } from "../hooks/useInputControl";
 import AddModal, { AddModalMixin } from "../common/AddModal";
 import TextInput from "../common/TextInput";
 import { UsePostResource } from "../hooks/usePostResource";
 import { ResumeTemplateUpload } from '../api/types';
+
 
 
 interface AddTemplateModalProps extends Pick<UsePostResource<ResumeTemplateUpload>, "postResource">, AddModalMixin {};
@@ -51,19 +52,16 @@ const AddTemplateModal = ({
       title="Add Resume Template" modalId={modalId}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
-      <TextInput id={`${modalId}Name`}
-        label="Template Name" type="text" value={nameInput.value} handleChange={nameInput.handleChange}
-        editing={nameInput.editing} errors={addModal.errors["name"]}
+      <TextInput id={`${modalId}Name`} {...nameInput as InputControlMixin}
+        label="Template Name" type="text" errors={addModal.errors["name"]}
       />
       <TextInput id={`${modalId}Upload`} ref={uploadInput.ref as React.RefObject<HTMLInputElement>}
-        label="Upload" type="file" value={uploadInput.value} handleChange={uploadInput.handleChange}
-        editing={uploadInput.editing} errors={addModal.errors["upload"]}
+        {...uploadInput as InputControlMixin}
+        label="Upload" type="file" errors={addModal.errors["upload"]}
         accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       />
-      <TextInput id={`${modalId}Description`}
-        label="Description (optional)" type="textarea" value={descriptionInput.value}
-        handleChange={descriptionInput.handleChange}
-        editing={descriptionInput.editing} errors={addModal.errors["description"]} rows={3}         
+      <TextInput id={`${modalId}Description`} {...descriptionInput as InputControlMixin}
+        label="Description (optional)" type="textarea" errors={addModal.errors["description"]} rows={3}         
       />
     </AddModal>
   )
