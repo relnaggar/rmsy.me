@@ -1,9 +1,8 @@
 import React, { useRef } from "react";
-import { ReactComponent as PencilSquareIcon } from "bootstrap-icons/icons/pencil-square.svg";
-import { ReactComponent as Trash3Icon } from "bootstrap-icons/icons/trash3.svg";
 import { ReactComponent as FileArrowDownIcon } from "bootstrap-icons/icons/file-arrow-down.svg";
 
 import { Document } from '../api/types';
+import EditDeleteButtonGroup, { EditDeleteButtonGroupProps } from "./EditDeleteButtonGroup";
 
 
 const generatePlaceholderWidths = (numberOfRows: number): number[] => {
@@ -32,21 +31,15 @@ const generatePlaceholderWidths = (numberOfRows: number): number[] => {
   return placeHolderWidths;
 };
 
-interface DocumentThumbnailProps {
+interface DocumentThumbnailProps extends Partial<EditDeleteButtonGroupProps> {
   document: Document,
-  beingRemoved?: boolean,
-  onClickEditDocument?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  onClickRemoveDocument?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
 };
 
 const DocumentThumbnail = ({
   document,
-  beingRemoved = false,
-  onClickEditDocument,
-  onClickRemoveDocument
+  ...editDeleteButtonGroupProps
 }: DocumentThumbnailProps): React.JSX.Element => {
   const placeholderWidths = useRef<number[]>([]);
-
   if (placeholderWidths.current.length === 0) {
     placeholderWidths.current = generatePlaceholderWidths(15);
   }
@@ -67,8 +60,8 @@ const DocumentThumbnail = ({
                 width === 0 ?
                   <br key={index} />
                 :
-                  <span className={`placeholder me-1 col-${width}`} key={index}></span>
-              );                  
+                  <span key={index} className={`placeholder me-1 col-${width}`}></span>
+              );
             })}
           </p>
         </div>
@@ -89,32 +82,11 @@ const DocumentThumbnail = ({
           <>
             <h6 className="p-2 m-0 bg-body border rounded">{document.name}</h6>
             {document.png !== "" && (
-              <div className="btn-group ms-1" role="group">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  aria-label="Edit"
-                  onClick={onClickEditDocument!}
-                  disabled={beingRemoved}
-                >
-                  <PencilSquareIcon />
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  aria-label="Delete"
-                  onClick={onClickRemoveDocument!}
-                  disabled={beingRemoved}
-                >
-                  {beingRemoved ?
-                    <div className="spinner-border spinner-border-sm" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
-                  :
-                    <Trash3Icon />
-                  }
-                </button>
-              </div>
+              <EditDeleteButtonGroup
+                onClickEdit={editDeleteButtonGroupProps.onClickEdit!}
+                onClickRemove={editDeleteButtonGroupProps.onClickRemove!}
+                beingRemoved={editDeleteButtonGroupProps.beingRemoved!}
+              />
             )}
           </>
         }

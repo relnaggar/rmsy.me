@@ -3,62 +3,61 @@ import React from 'react';
 import DocumentThumbnail from './DocumentThumbnail';
 import AddDocumentButton from './AddDocumentButton';
 import { Document } from '../api/types';
+import { UseResource } from '../hooks/useResource';
 
 
-interface DocumentListProps {
-  documents: Document[],
-  loadingDocuments: boolean,
+interface DocumentListProps extends Pick<UseResource<Document,Document>,
+  "resources" | "fetching" | "idBeingDeleted" | "posting"
+> {
   onClickEditDocument: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   onClickRemoveDocument: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  documentBeingRemovedId: number,
   onClickAddDocument: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   addButtonText: string,
-  addDisabled: boolean,
 }
 
 const DocumentList = ({
-  documents,
-  loadingDocuments,
   onClickEditDocument,
   onClickRemoveDocument,
-  documentBeingRemovedId,
   onClickAddDocument,
   addButtonText,
-  addDisabled,
+  ...resourceManager
 }: DocumentListProps): React.JSX.Element => {
+  const { resources: documents, fetching, idBeingDeleted, posting } = resourceManager;
+
+  // sort documents by id, putting placeholders with id -1 at the end
+  documents.sort((a, b) => {
+    if (a.id === -1) {
+      return 1;
+    } else if (b.id === -1) {
+      return -1;
+    } else {
+      return a.id - b.id;
+    }
+  });
+
   return (
     <div className="d-flex overflow-x-auto border border-5 p-2" role="list">
-      {!loadingDocuments ?
-        <>
-          {documents.map((document, index) => 
-            document.id !== -1 && <DocumentThumbnail
-              key={`${document.id}-${index}`}
-              document={document}              
-              onClickEditDocument={onClickEditDocument(document.id)}
-              onClickRemoveDocument={onClickRemoveDocument(document.id)}
-              beingRemoved={documentBeingRemovedId === document.id}
-            />
-          )}
-          {documents.map((document, index) => 
-            document.id === -1 && <DocumentThumbnail
-              key={`${document.id}-${index}`}
-              document={document}              
-              onClickEditDocument={onClickEditDocument(document.id)}
-              onClickRemoveDocument={onClickRemoveDocument(document.id)}
-              beingRemoved={documentBeingRemovedId === document.id}
-            />
-          )}
-          <AddDocumentButton onClick={onClickAddDocument} buttonText={addButtonText} disabled={addDisabled} />
-        </>
-      :
+      {fetching ?
         [...Array(3)].map((_, index) => 
-          <DocumentThumbnail document={{
-            "id": -1,
-            "name": "",
-            "png": "",
-            "docx": "",
-          }} key={index} />
+          <DocumentThumbnail key={index}
+            document={{"id": -1, "name": "", "png": "", "docx": ""}}            
+            onClickEdit={() => {}}
+            onClickRemove={() => {}}
+            beingRemoved={false}
+          />
         )
+      :
+        <>
+          {documents.map((document, index) =>
+            <DocumentThumbnail key={`${document.id}-${index}`}
+              document={document}              
+              onClickEdit={onClickEditDocument(document.id)}
+              onClickRemove={onClickRemoveDocument(document.id)}
+              beingRemoved={idBeingDeleted === document.id}
+            />
+          )}
+          <AddDocumentButton onClick={onClickAddDocument} buttonText={addButtonText} disabled={posting} />
+        </>        
       }
     </div>
   );

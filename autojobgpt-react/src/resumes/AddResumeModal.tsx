@@ -2,17 +2,16 @@ import React, { useCallback } from "react";
 
 import useInputControl from "../hooks/useInputControl";
 import useFetchResource from "../hooks/useFetchResource";
+import { UsePostResource } from "../hooks/usePostResource";
 import AddModal, { AddModalMixin } from "../common/AddModal";
 import SelectInputWithRefresh from "../common/SelectInputWithRefresh";
 import { Job, ResumeTemplate, ResumeUpload } from '../api/types';
 
 
-interface AddResumeModalProps extends AddModalMixin {
-  addResume: (resumeUpload: ResumeUpload) => void,  
-}
+interface AddResumeModalProps extends Pick<UsePostResource<ResumeUpload>, "postResource">, AddModalMixin {};
 
 const AddResumeModal = ({  
-  addResume,
+  postResource: postResume,
   ...addModal
 }: AddResumeModalProps): React.JSX.Element => {
   const modalId = "addResumeModal";
@@ -65,7 +64,7 @@ const AddResumeModal = ({
   }
 
   const handleValidatedSubmit = (): void => {
-    addResume({
+    postResume({
       job: parseInt(jobInput.value),
       template: parseInt(templateInput.value),
     });

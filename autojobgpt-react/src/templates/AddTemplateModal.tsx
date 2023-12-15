@@ -3,15 +3,14 @@ import React from "react";
 import useInputControl from "../hooks/useInputControl";
 import AddModal, { AddModalMixin } from "../common/AddModal";
 import TextInput from "../common/TextInput";
+import { UsePostResource } from "../hooks/usePostResource";
 import { ResumeTemplateUpload } from '../api/types';
 
 
-interface AddTemplateModalProps extends AddModalMixin {
-  addTemplate: (template: ResumeTemplateUpload) => void,
-};
+interface AddTemplateModalProps extends Pick<UsePostResource<ResumeTemplateUpload>, "postResource">, AddModalMixin {};
 
-const AddTemplateModal = ({  
-  addTemplate,
+const AddTemplateModal = ({
+  postResource: postTemplate,
   ...addModal
 }: AddTemplateModalProps): React.JSX.Element => {
   const nameInput = useInputControl();
@@ -43,7 +42,7 @@ const AddTemplateModal = ({
 
   const handleValidatedSubmit = (): void => {
     const docx: File = (uploadInput.ref.current as HTMLInputElement).files![0];
-    addTemplate({ name: nameInput.value, docx, description: descriptionInput.value });
+    postTemplate({ name: nameInput.value, docx, description: descriptionInput.value });
   };
 
   return (

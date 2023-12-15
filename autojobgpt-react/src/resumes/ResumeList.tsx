@@ -1,19 +1,20 @@
-import React, { useContext, useState, useCallback } from 'react';
+import React, { useContext, useCallback } from 'react';
 
 import { ConfirmationModalContext } from "../routes/Layout";
-import useResource from '../hooks/useResource';
-import useFetchResource from '../hooks/useFetchResource';
+import useAddModal from "../hooks/useAddModal";
+import useEditModal from "../hooks/useEditModal";
+import useErrorAlert from "../hooks/useErrorAlert";
+import useFetchResource from "../hooks/useFetchResource";
+import useResource from "../hooks/useResource";
 import useFormInput from '../hooks/useInputControl';
-import useAddModal from '../hooks/useAddModal';
 import ErrorAlert from '../common/ErrorAlert';
 import DocumentList from '../common/DocumentList';
 import EditResumeModal from './EditResumeModal';
 import AddResumeModal from './AddResumeModal';
 import { Job, Substitution, Resume, ResumeUpload } from '../api/types';
-import useErrorAlert from '../hooks/useErrorAlert';
 
 
-export const getPlaceholderResume = (resumeUpload: ResumeUpload): Resume => {
+const getPlaceholderResume = (resumeUpload: ResumeUpload): Resume => {
   return {
     id: -1,
     substitutions: [],
@@ -43,45 +44,48 @@ export const getPlaceholderResume = (resumeUpload: ResumeUpload): Resume => {
 const ResumeList = (): React.JSX.Element => {
   const openConfirmationModal = useContext(ConfirmationModalContext);
   const addResumeModal = useAddModal();
+  const editResumeModal = useEditModal();
   const errorAlert = useErrorAlert();
 
-  const substitutions = useFetchResource<Substitution>("substitutions/", {
+  const substitutionManager = useFetchResource<Substitution>("substitutions/", {
     onFail: errorAlert.showErrors
   });
+  const { resources: substitutions, setResources: setSubstitutions } = substitutionManager;
 
   const handleAddResumeSuccess = useCallback((resume: Resume) => {
     addResumeModal.handleAddSuccess();
-    substitutions.setResources([...substitutions.resources, ...resume.substitutions]);
-  }, [addResumeModal, substitutions]);
+    setSubstitutions([...substitutions, ...resume.substitutions]);
+  }, [addResumeModal, substitutions, setSubstitutions]);
 
-  const resumes = useResource<Resume,ResumeUpload>("resumes/", getPlaceholderResume, {
+  const resumeManager = useResource<Resume,ResumeUpload>("resumes/", getPlaceholderResume, {
     onFetchFail: errorAlert.showErrors,
     onPostSuccess: handleAddResumeSuccess,
     onPostFail: addResumeModal.handleAddFail,
     onDeleteFail: errorAlert.showErrors,
   });
-
-  const [showEditResumeModal, setShowEditResumeModal] = useState<boolean>(false);
-  const [editResumeId, setEditResumeId] = useState<number>(-1);
+  const { resources: resumes, deleteResource: deleteResume, refetch: refetchResumes } = resumeManager;
   
   const handleClickEditResume = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    setEditResumeId(id);
-    setShowEditResumeModal(true);
+    editResumeModal.open(id);
   };
 
   const handleClickRemoveResume = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    const resume: Resume = resumes.resources.find((resume) => resume.id === id)!;
-    openConfirmationModal(() => resumes.deleteResource(id), `delete resume "${resume.name}"`, "Delete");
+    const resume: Resume = resumes.find((resume) => resume.id === id)!;
+    openConfirmationModal(() => deleteResume(id), `delete resume "${resume.name}"`, "Delete");
   };
 
+  const handleClickAddResume = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    addResumeModal.open();
+  }
+
   const handleSubstitutionSaveSuccess = (): void => {
-    resumes.refetch();
+    refetchResumes();
   };
 
   const jobInput = useFormInput("0");
   const jobIdsWithAtLeastOneResume: number[] = [];
   const jobsWithAtLeastOneResume: Job[] = [];
-  resumes.resources.forEach((resume) => {
+  resumes.forEach((resume) => {
     if (resume.id !== -1 && !jobIdsWithAtLeastOneResume.includes(resume.job.id)) {
       jobIdsWithAtLeastOneResume.push(resume.job.id);
       
@@ -93,7 +97,12 @@ const ResumeList = (): React.JSX.Element => {
     }
   });
 
-  const sortedResumes: Resume[] = resumes.resources.sort((a, b) => a.id - b.id);
+  let filteredResumes: Resume[]
+  if (jobInput.value === "0") {
+    filteredResumes = resumes;
+  } else {
+    filteredResumes = resumes.filter((resume) => resume.job.id === parseInt(jobInput.value))
+  }
 
   return(
     <section className="mt-3">
@@ -116,29 +125,21 @@ const ResumeList = (): React.JSX.Element => {
       }
       <ErrorAlert {...errorAlert} />
       <DocumentList
-        documents={
-          jobInput.value === "0" ?
-            sortedResumes
-          :
-            sortedResumes.filter((resume) => resume.job.id === parseInt(jobInput.value))
-        }
-        loadingDocuments={resumes.fetching}
         onClickEditDocument={handleClickEditResume}
         onClickRemoveDocument={handleClickRemoveResume}
-        documentBeingRemovedId={resumes.idBeingDeleted}
-        onClickAddDocument={addResumeModal.open}
+        onClickAddDocument={handleClickAddResume}
         addButtonText="Generate new resume"
-        addDisabled={resumes.posting}
+        {...{...resumeManager, resources: filteredResumes}}
       />
       <EditResumeModal
-        apiPath={resumes.apiPath}
-        resumes={resumes.resources} setResumes={resumes.setResources}
-        show={showEditResumeModal} setShow={setShowEditResumeModal}
-        resumeId={editResumeId}
-        substitutions={substitutions.resources} setSubstitutions={substitutions.setResources}
+        apiPath={resumeManager.apiPath}
+        resumes={resumeManager.resources} setResumes={resumeManager.setResources}
+        show={editResumeModal.show} setShow={editResumeModal.setShow}
+        resumeId={editResumeModal.editId}
+        substitutions={substitutionManager.resources} setSubstitutions={substitutionManager.setResources}
         onSubstitutionSaveSuccess={handleSubstitutionSaveSuccess}
       />
-      <AddResumeModal {...addResumeModal} addResume={resumes.postResource} />
+      <AddResumeModal postResource={resumeManager.postResource} {...addResumeModal} />
     </section>
   )
 };

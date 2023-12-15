@@ -5,7 +5,7 @@ import usePatchResource, { UsePatchResource } from './usePatchResource';
 import { WithId } from '../api/types';
 
 
-interface UseResource<Resource extends WithId, ResourceUpload> extends
+export interface UseResource<Resource extends WithId, ResourceUpload> extends
     UseFetchResource<Resource>,
     UsePostResource<ResourceUpload>,
     UseDeleteResource,

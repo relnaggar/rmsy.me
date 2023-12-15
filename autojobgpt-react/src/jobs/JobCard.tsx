@@ -1,24 +1,23 @@
 import React from 'react';
 import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
-import { ReactComponent as PencilSquareIcon } from 'bootstrap-icons/icons/pencil-square.svg';
-import { ReactComponent as Trash3Icon } from 'bootstrap-icons/icons/trash3.svg';
 
 import { Job } from '../api/types';
+import EditDeleteButtonGroup from '../common/EditDeleteButtonGroup';
 
 
 interface JobCardProps {
   job: Job,
   onDragStart: (e: React.DragEvent<HTMLDivElement>) => void
-  onClickEditJob: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
-  onClickRemoveJob: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  onClickEdit: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  onClickRemove: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   beingRemoved: boolean
 }
 
 const JobCard = ({
   job,
   onDragStart,
-  onClickEditJob,
-  onClickRemoveJob,
+  onClickEdit,
+  onClickRemove,
   beingRemoved
 }: JobCardProps): React.JSX.Element => {
   return (
@@ -32,32 +31,12 @@ const JobCard = ({
       {job.title ?
         <span className="d-flex">
           <h6 className="mt-2 card-title flex-grow-1">{job.title}</h6>
-          <div className="btn-group ms-1" role="group">
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                aria-label="Edit"
-                onClick={onClickEditJob}
-                disabled={beingRemoved}
-              >
-                <PencilSquareIcon />
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                aria-label="Delete"
-                onClick={onClickRemoveJob}
-                disabled={beingRemoved}
-              >
-                { beingRemoved ?
-                  <div className="spinner-border spinner-border-sm" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                :
-                  <Trash3Icon />
-                }
-              </button>
-            </div>
+          <EditDeleteButtonGroup
+            onClickEdit={onClickEdit}
+            onClickRemove={onClickRemove}
+            beingRemoved={beingRemoved}
+            small
+          />
         </span>
       :
         <span className="placeholder-glow">

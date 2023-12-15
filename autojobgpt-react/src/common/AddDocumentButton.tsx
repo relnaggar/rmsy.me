@@ -1,7 +1,7 @@
 import React from "react";
 
 
-interface AddDocumentButtonProps {
+export interface AddDocumentButtonProps {
   onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   buttonText: string;
   disabled: boolean;
@@ -16,12 +16,9 @@ const AddDocumentButton = ({
     <div className="document">
       <div className="document-image img-thumbnail"></div>
       <div className="document-body">
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={onClick}
-          disabled={disabled}
-        >{`+ ${buttonText}`}</button>
+        <button type="button" className="btn btn-primary" onClick={onClick} disabled={disabled} >
+          {`+ ${buttonText}`}
+        </button>
       </div>
     </div>
   );

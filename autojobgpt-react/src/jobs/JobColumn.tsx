@@ -144,8 +144,8 @@ const JobColumn = ({
                 key={job.id}
                 job={job}
                 onDragStart={onDragStart(job.id)}
-                onClickEditJob={onClickEditJob(job.id)}
-                onClickRemoveJob={onClickRemoveJob(job.id)}
+                onClickEdit={onClickEditJob(job.id)}
+                onClickRemove={onClickRemoveJob(job.id)}
                 beingRemoved={jobIdBeingRemoved === job.id}
               />
             )
@@ -156,8 +156,8 @@ const JobColumn = ({
                 key={job.id}
                 job={job}
                 onDragStart={onDragStart(job.id)}
-                onClickEditJob={onClickEditJob(job.id)}
-                onClickRemoveJob={onClickRemoveJob(job.id)}
+                onClickEdit={onClickEditJob(job.id)}
+                onClickRemove={onClickRemoveJob(job.id)}
                 beingRemoved={jobIdBeingRemoved === job.id}
               />
             )
