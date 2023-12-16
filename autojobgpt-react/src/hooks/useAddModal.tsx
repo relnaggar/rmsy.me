@@ -1,11 +1,10 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 import useErrorAlert, { ErrorAlertMixin } from "./useErrorAlert";
+import { AddModalMixin } from "../common/AddModal";
 
 
-interface UseAddModal extends ErrorAlertMixin {
-  show: boolean,
-  setShow: React.Dispatch<React.SetStateAction<boolean>>,
+export interface UseAddModal extends AddModalMixin, ErrorAlertMixin {
   handleAddSuccess: () => void,
   handleAddFail: (errors: Record<string,string[]>) => void,
   open: () => void,

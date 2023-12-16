@@ -1,19 +1,15 @@
 import React from "react";
 
-import useInputControl, { InputControlMixin } from "../hooks/useInputControl";
-import AddModal, { AddModalMixin } from "../common/AddModal";
+import useInputControl from "../hooks/useInputControl";
+import AddModal, { AddResourceModalProps } from "../common/AddModal";
 import TextInput from "../common/TextInput";
 import { StatusUpload } from '../api/types';
 
 
-interface AddColumnModalProps extends AddModalMixin {
-  addColumn: (statusUpload: StatusUpload) => void,
-};
-
 const AddColumnModal = ({  
-  addColumn,
+  postResource: postColumn,
   ...addColumnModal
-}: AddColumnModalProps): React.JSX.Element => {
+}: AddResourceModalProps<StatusUpload>): React.JSX.Element => {
   const modalId = "addColumnModal";
   const nameInput = useInputControl();
   
@@ -33,7 +29,7 @@ const AddColumnModal = ({
   };
 
   const handleValidatedSubmit = (): void => {
-    addColumn({ name: nameInput.value });
+    postColumn({ name: nameInput.value });
   };
 
   return (
@@ -42,7 +38,8 @@ const AddColumnModal = ({
       title="Add Column" modalId={modalId}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
-      <TextInput id={`${modalId}Name`} {...nameInput as InputControlMixin}
+      <TextInput id={`${modalId}Name`}
+        value={nameInput.value} editing={nameInput.editing} handleChange={nameInput.handleChange}
         label="Name" type="text" errors={addColumnModal.errors["name"]}
       />
     </AddModal>

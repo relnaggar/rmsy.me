@@ -2,8 +2,12 @@ import React from "react";
 import BootstrapModal from 'react-bootstrap/Modal';
 
 import { ErrorAlertMixin } from "../hooks/useErrorAlert";
+import { UsePostResource } from "../hooks/usePostResource";
 import ErrorAlert from "./ErrorAlert";
 
+
+export interface AddResourceModalProps<ResourceUpload> extends AddModalMixin,
+  Pick<UsePostResource<ResourceUpload>, "postResource"> {};
 
 export interface AddModalMixin extends ErrorAlertMixin {
   show: boolean,

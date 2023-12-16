@@ -2,18 +2,15 @@ import React, { useCallback } from "react";
 
 import useInputControl from "../hooks/useInputControl";
 import useFetchResource from "../hooks/useFetchResource";
-import { UsePostResource } from "../hooks/usePostResource";
-import AddModal, { AddModalMixin } from "../common/AddModal";
+import AddModal, { AddResourceModalProps } from "../common/AddModal";
 import SelectInputWithRefresh from "../common/SelectInputWithRefresh";
 import { Job, ResumeTemplate, ResumeUpload } from '../api/types';
 
 
-interface AddResumeModalProps extends Pick<UsePostResource<ResumeUpload>, "postResource">, AddModalMixin {};
-
 const AddResumeModal = ({  
   postResource: postResume,
   ...addModal
-}: AddResumeModalProps): React.JSX.Element => {
+}: AddResourceModalProps<ResumeUpload>): React.JSX.Element => {
   const modalId = "addResumeModal";
   const jobInput = useInputControl("0");
   const templateInput = useInputControl("0");
@@ -72,10 +69,12 @@ const AddResumeModal = ({
     <AddModal modalId="addResumeModal" {...addModal}
       title="Generate Resume" validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
-      <SelectInputWithRefresh<Job> id={`${modalId}Job`} {...jobInput} {...jobManager}
+      <SelectInputWithRefresh id={`${modalId}Job`} {...jobManager}
+        value={jobInput.value} editing={jobInput.editing} handleChange={jobInput.handleChange}
         label="Job" optionToString={(job) => `${job.title}, ${job.company}`} errors={addModal.errors["job"]}
       />
-      <SelectInputWithRefresh<ResumeTemplate> id={`${modalId}Template`} {...templateInput} {...templateManager}
+      <SelectInputWithRefresh id={`${modalId}Template`} {...templateManager}
+        value={templateInput.value} editing={templateInput.editing} handleChange={templateInput.handleChange}
         label="Template" optionToString={(template) => template.name} errors={addModal.errors["template"]}
       />
     </AddModal>

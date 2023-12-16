@@ -1,9 +1,9 @@
 import React from 'react';
 
+import { UseResource } from '../hooks/useResource';
 import DocumentThumbnail from './DocumentThumbnail';
 import AddDocumentButton from './AddDocumentButton';
 import { Document } from '../api/types';
-import { UseResource } from '../hooks/useResource';
 
 
 interface DocumentListProps extends Pick<UseResource<Document,Document>,

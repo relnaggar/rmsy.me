@@ -1,19 +1,15 @@
 import React from "react";
 
-import useInputControl, { InputControlMixin } from "../hooks/useInputControl";
-import AddModal, { AddModalMixin } from "../common/AddModal";
+import useInputControl from "../hooks/useInputControl";
+import AddModal, { AddResourceModalProps } from "../common/AddModal";
 import TextInput from "../common/TextInput";
-import { UsePostResource } from "../hooks/usePostResource";
 import { ResumeTemplateUpload } from '../api/types';
 
-
-
-interface AddTemplateModalProps extends Pick<UsePostResource<ResumeTemplateUpload>, "postResource">, AddModalMixin {};
 
 const AddTemplateModal = ({
   postResource: postTemplate,
   ...addModal
-}: AddTemplateModalProps): React.JSX.Element => {
+}: AddResourceModalProps<ResumeTemplateUpload>): React.JSX.Element => {
   const nameInput = useInputControl();
   const uploadInput = useInputControl();
   const descriptionInput = useInputControl();
@@ -52,15 +48,17 @@ const AddTemplateModal = ({
       title="Add Resume Template" modalId={modalId}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
-      <TextInput id={`${modalId}Name`} {...nameInput as InputControlMixin}
+      <TextInput id={`${modalId}Name`}
+        value={nameInput.value} editing={nameInput.editing} handleChange={nameInput.handleChange}
         label="Template Name" type="text" errors={addModal.errors["name"]}
       />
       <TextInput id={`${modalId}Upload`} ref={uploadInput.ref as React.RefObject<HTMLInputElement>}
-        {...uploadInput as InputControlMixin}
+        value={uploadInput.value} editing={uploadInput.editing} handleChange={uploadInput.handleChange}
         label="Upload" type="file" errors={addModal.errors["upload"]}
         accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       />
-      <TextInput id={`${modalId}Description`} {...descriptionInput as InputControlMixin}
+      <TextInput id={`${modalId}Description`} 
+        value={descriptionInput.value} editing={descriptionInput.editing} handleChange={descriptionInput.handleChange}
         label="Description (optional)" type="textarea" errors={addModal.errors["description"]} rows={3}         
       />
     </AddModal>

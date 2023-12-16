@@ -2,22 +2,18 @@ import React, { useState, useCallback } from "react";
 import { ReactComponent as RobotIcon } from "bootstrap-icons/icons/robot.svg";
 
 import useFetch from "../hooks/useFetch";
-import useInputControl, { InputControlMixin } from "../hooks/useInputControl";
-import AddModal, { AddModalMixin } from "../common/AddModal";
+import useInputControl from "../hooks/useInputControl";
+import AddModal, { AddResourceModalProps } from "../common/AddModal";
 import TextInput from "../common/TextInput";
 import ErrorAlert from "../common/ErrorAlert";
 import InputButton from "../common/InputActionButton";
 import { JobUpload, JobDetails } from '../api/types';
 
 
-interface AddJobModalProps extends AddModalMixin {
-  addJob: (jobUpload: JobUpload) => void,  
-};
-
 const AddJobModal = ({
-  addJob,
+  postResource: postJob,
   ...addModal
-}: AddJobModalProps): React.JSX.Element => {
+}: AddResourceModalProps<JobUpload>): React.JSX.Element => {
   const modalId = "addJobModal";
   const urlInput = useInputControl();
   const titleInput = useInputControl();
@@ -104,7 +100,7 @@ const AddJobModal = ({
   }
 
   const handleValidatedSubmit = (): void => { 
-    addJob({
+    postJob({
       url: urlInput.value,
       title: titleInput.value,
       company: companyInput.value,
@@ -124,7 +120,8 @@ const AddJobModal = ({
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
       submitDisabled={filling}      
     >
-      <TextInput id={`${modalId}URL`} {...urlInput as InputControlMixin}
+      <TextInput id={`${modalId}URL`}
+        value={urlInput.value} editing={urlInput.editing} handleChange={urlInput.handleChange}
         label="URL" type="url" loading={filling} errors={addModal.errors["url"] || urlFillErrors}
       >
         <InputButton controlsId={`${modalId}URL`} label="Autofill Details" loading={filling}
@@ -136,13 +133,16 @@ const AddJobModal = ({
       />
       <hr />
       <h5>Details</h5>
-      <TextInput id={`${modalId}Title`} {...titleInput as InputControlMixin}
+      <TextInput id={`${modalId}Title`}
+        value={titleInput.value} editing={titleInput.editing} handleChange={titleInput.handleChange}
         label="Title" type="text" loading={filling} errors={addModal.errors["title"]}
       />
-      <TextInput id={`${modalId}Company`} {...companyInput as InputControlMixin}
+      <TextInput id={`${modalId}Company`}
+        value={companyInput.value} editing={companyInput.editing} handleChange={companyInput.handleChange}
         label="Company" type="text" loading={filling} errors={addModal.errors["company"]}
       />
-      <TextInput id={`${modalId}Posting`} {...postingInput as InputControlMixin}
+      <TextInput id={`${modalId}Posting`}
+        value={postingInput.value} editing={postingInput.editing} handleChange={postingInput.handleChange}
         label="Posting" type="textarea" loading={filling} errors={addModal.errors["posting"]}
       />
     </AddModal>

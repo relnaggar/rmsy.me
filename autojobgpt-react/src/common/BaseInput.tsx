@@ -10,7 +10,6 @@ export interface BaseInputMixin {
 
 interface BaseInputProps extends BaseInputMixin {
   input: React.JSX.Element,
-  children?: React.ReactNode,
 };
 
 const BaseInput = ({
@@ -18,7 +17,7 @@ const BaseInput = ({
   loading = false,
   errors = [],
   input,
-}: BaseInputProps): React.JSX.Element => {
+}: React.PropsWithChildren<BaseInputProps>): React.JSX.Element => {
   const error: string = errors.join(" ");
   const showError: boolean = !editing && !loading && error !== "";
   const feedbackId = `${id}Feedback`;

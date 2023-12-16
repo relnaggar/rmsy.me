@@ -1,16 +1,20 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useContext } from "react";
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useAddModal from "../hooks/useAddModal";
+import useEditModal from "../hooks/useEditModal";
 import useResource from "../hooks/useResource";
 import useErrorAlert from "../hooks/useErrorAlert";
+import useDrag from "../hooks/useDrag";
+import ErrorAlert from "../common/ErrorAlert";
 import JobColumn from "./JobColumn";
 import EditJobModal from "./EditJobModal";
 import AddJobModal from "./AddJobModal";
-import { Status, StatusUpload, Job, JobUpload } from '../api/types';
-import AddColumnModal from "./AddColumnModal";
 import EditColumnModal from "./EditColumnModal";
-import ErrorAlert from "../common/ErrorAlert";
+import AddColumnModal from "./AddColumnModal";
+import PlaceholderColumn from "./PlaceholderColumn";
+import { Status, StatusUpload, Job, JobUpload } from '../api/types';
+import AddColumnButton from "./AddColumnButton";
 
 
 const generatePlaceholderStatus = (statusUpload: StatusUpload): Status => {
@@ -35,54 +39,34 @@ const generatePlaceholderJob = (jobUpload: JobUpload): Job => {
 const JobBoard = (): React.JSX.Element => {  
   const openConfirmationModal = useContext(ConfirmationModalContext);
   const errorAlert = useErrorAlert();
-  const addColumnModal = useAddModal();
   const addJobModal = useAddModal();  
+  const editJobModal = useEditModal();
+  const addColumnModal = useAddModal();
+  const editColumnModal = useEditModal();
 
-  const [draggingJobId, setDraggingJobId] = useState<number>(-1);
-  const [editJobId, setEditJobId] = useState<number>(-1);
-  const [showEditJob, setShowEditJob] = useState<boolean>(false);
-
-  const jobs = useResource<Job,JobUpload>("jobs/", generatePlaceholderJob, {
+  const jobManager = useResource<Job,JobUpload>("jobs/", generatePlaceholderJob, {
     onPostSuccess: addJobModal.handleAddSuccess,
     onPostFail: addJobModal.handleAddFail,
     onFetchFail: errorAlert.showErrors,
     onDeleteFail: errorAlert.showErrors,
     onPatchFail: errorAlert.showErrors,
   });
-
-  const handleClickRemoveJob = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    const job: Job = jobs.resources.find((job) => job.id === id)!;
-    openConfirmationModal(() => jobs.deleteResource(id), `delete job "${job.title}, ${job.company}"`, "Delete");
-  };
+  const {resources: jobs, deleteResource: deleteJob, patchResource: patchJob} = jobManager;
 
   const handleClickEditJob = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    setEditJobId(id);
-    setShowEditJob(true);
+    editJobModal.open(id);
   };
 
-  const handleDragStart = (id: number) => (e: React.DragEvent<HTMLDivElement>): void => {
-    setDraggingJobId(id);
-    try { // e.currentTarget not supported in jsdom
-      e.currentTarget.scrollIntoView({behavior: "smooth", block: "center"});
-    } catch (error) {}
-  };
+  const handleClickRemoveJob = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    const job: Job = jobs.find((job) => job.id === id)!;
+    openConfirmationModal(() => deleteJob(id), `delete job "${job.title}, ${job.company}"`, "Delete");
+  };  
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
-    e.preventDefault();
-  }
-
-  const handleDrop = (endStatus: Status) => (e: React.DragEvent<HTMLDivElement>): void => {
-    e.preventDefault(); // prevent page from reloading
-    
-    const job: Job = jobs.resources.find((job) => job.id === draggingJobId)!;
-    const jobStatus: Status = sortedStatuses.find((status) => status.id === job.status)!;
-    if (jobStatus.order !== endStatus.order) {      
-      jobs.patchResource(draggingJobId, {status: endStatus.id});
-      setDraggingJobId(-1);
-    }
-  };
-
-  const handlePatchStatusSuccess = useCallback((newStatus: Status, statuses: Status[], setStatuses: React.Dispatch<React.SetStateAction<Status[]>>) => {
+  const handlePatchStatusSuccess = useCallback((
+    newStatus: Status, statuses: Status[],
+    setStatuses: React.Dispatch<React.SetStateAction<Status[]>>
+  ) => {
+    // swap order of status with the same order as the new status
     const newStatuses: Status[] = [...statuses];
     let swappedOrder: number | undefined = undefined;
     for (const currentStatus of newStatuses) {
@@ -92,6 +76,7 @@ const JobBoard = (): React.JSX.Element => {
         break;
       }
     }
+    // decrease order of all statuses with order greater than the new status
     if (swappedOrder !== undefined) {
       for (const currentStatus of newStatuses) {
         if (currentStatus.order === newStatus.order && currentStatus.id !== newStatus.id) {
@@ -102,7 +87,10 @@ const JobBoard = (): React.JSX.Element => {
     setStatuses(newStatuses);
   }, []);
 
-  const handleDeleteStatusSuccess = useCallback((deletedStatus: Status, statuses: Status[], setStatuses: React.Dispatch<React.SetStateAction<Status[]>>) => {
+  const handleDeleteStatusSuccess = useCallback((
+    deletedStatus: Status, statuses: Status[],
+    setStatuses: React.Dispatch<React.SetStateAction<Status[]>>
+  ) => {
     // decrease order of all statuses with order greater than the deleted status
     const newStatuses: Status[] = [...statuses];
     for (let i = 0; i < newStatuses.length; i++) {
@@ -113,10 +101,7 @@ const JobBoard = (): React.JSX.Element => {
     setStatuses(newStatuses);
   }, []);
 
-  const [editStatusId, setEditStatusId] = useState<number>(-1);
-  const [showEditColumn, setShowEditColumn] = useState<boolean>(false);
-
-  const statuses = useResource<Status,StatusUpload>("statuses/", generatePlaceholderStatus, {
+  const statusManager = useResource<Status,StatusUpload>("statuses/", generatePlaceholderStatus, {
     onFetchFail: errorAlert.showErrors,
     onPostFail: addColumnModal.handleAddFail,
     onPostSuccess: addColumnModal.handleAddSuccess,
@@ -125,132 +110,77 @@ const JobBoard = (): React.JSX.Element => {
     onPatchSuccess: handlePatchStatusSuccess,
     onPatchFail:  errorAlert.showErrors,
   });
+  const {resources: statuses, deleteResource: deleteStatus } = statusManager;
 
   const handleClickEditStatus = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    setEditStatusId(id);
-    setShowEditColumn(true);
+    editColumnModal.open(id);
   };
 
   const handleClickRemoveColumn = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    const status: Status = statuses.resources.find((status) => status.id === id)!;
-    openConfirmationModal(() => statuses.deleteResource(id), `delete column "${status.name}"`, "Delete");
+    const status: Status = statuses.find((status) => status.id === id)!;
+    openConfirmationModal(() => deleteStatus(id), `delete column "${status.name}"`, "Delete");
   };
 
-  const sortedStatuses: Status[] = statuses.resources.sort((a,b) => a.order - b.order);
-  const loading: boolean = jobs.fetching || statuses.fetching;
+  const {handleDragStart, handleDragOver, handleDrop} = useDrag(jobs, statuses, patchJob);
+  const loading: boolean = jobManager.fetching || statusManager.fetching;
+
+  // sort statuses by order, putting placeholders with id -1 at the end
+  statuses.sort((a, b) => {
+    if (a.id === -1) {
+      return 1;
+    } else if (b.id === -1) {
+      return -1;
+    } else {
+      return a.order - b.order;
+    }
+  });
   return (
     <section>
       <h2>Job Board</h2>
       <ErrorAlert {...errorAlert} />
       <div className="kanban-board border">
-        { loading ? (
-          [...Array(3)].map((_, index) =>
-            <div className="kanban-column me-2" key={index}>
-              <div className="card">
-                <div className="card-header">
-                  <h5 className="mt-2 card-title">
-                    <span className="placeholder-glow">
-                      <span className="placeholder col-6"></span>
-                    </span>
-                  </h5>
-                </div>  
-                <div className="card-body">
-                  {[...Array(3)].map((_, index) => 
-                    <div className="card mb-2 p-2" aria-hidden="true" key={index}>
-                      <h6 className="card-title placeholder-glow">
-                        <span className="placeholder col-6"></span>
-                      </h6>
-                      <p className="card-subtitle placeholder-glow">
-                        <span className="placeholder col-7"></span>
-                      </p>
-                    </div>
-                  )}
-                </div>
-                <div className="card-footer"></div>
-              </div>
-            </div>
-          )
-        ) : (
-          <>
-            {sortedStatuses.map((status, index) => {
-              return (
-                status.id !== -1 && (
-                  <JobColumn
-                    key={`${status.id}-${index}`}
-                    title={status.name}
-                    jobs={jobs.resources.filter((job) => (job.status === status.id || (job.status === -1 && status.order === sortedStatuses[0].order)))}
-                    statusId={status.id}
-                    sortedStatuses={sortedStatuses}
-                    loading={loading}
-                    onDrop={handleDrop(status)}
-                    onDragOver={handleDragOver}
-                    onDragStart={handleDragStart}
-                    onClickEditJob={handleClickEditJob}
-                    onClickRemoveJob={handleClickRemoveJob}
-                    jobIdBeingRemoved={jobs.idBeingDeleted}
-                    onClickAddJob={status.order === sortedStatuses[0].order ? addJobModal.open : undefined}
-                    addDisabled={status.order === sortedStatuses[0].order ? jobs.posting: undefined}
-                    updateStatus={statuses.patchResource}
-                    beingRemoved={statuses.idBeingDeleted === status.id}
-                    onClickRemoveColumn={handleClickRemoveColumn(status.id)}
-                    onClickEditColumn={handleClickEditStatus(status.id)}
-                  />
-                )
-              );
-            })}
-            {sortedStatuses.map((status, index) =>
-              status.id === -1 && (
-                <div className="kanban-column me-2" key={`${status.id}-${index}`}>
-                  <div className="card">
-                    <div className="card-header">
-                      <h5 className="mt-2 card-title">
-                        <span className="placeholder-glow">
-                          <span className="placeholder col-6"></span>
-                        </span>
-                      </h5>
-                    </div>
-                    <div className="card-body"></div>
-                    <div className="card-footer"></div>
-                  </div>
-                </div>
-              )
-            )}
-          </>
-        )}
-        <div className="kanban-column me-2">
-          <div className="card">
-            <div className="card-body text-center">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={addColumnModal.open}
-                disabled={false}
-              >
-                + Add column
-              </button>
-            </div>
-          </div>
-        </div>
+        <>
+          {loading ?
+            [...Array(3)].map((_, index) => <PlaceholderColumn jobs={3} key={index} />)
+          :
+            statuses.map((status, index) =>
+              status.id === -1 ?
+                <PlaceholderColumn jobs={0} key={`${status.id}-${index}`} />
+              :
+                <JobColumn key={`${status.id}-${index}`}
+                  status={status} allStatuses={statuses}
+                  jobs={jobs.filter((job) => (job.status === status.id || (job.status === -1 && status.order === statuses[0].order)))}
+                  jobIdBeingDeleted={jobManager.idBeingDeleted} postingJob={jobManager.posting}
+                  beingRemoved={statusManager.idBeingDeleted === status.id}
+                  patchStatus={statusManager.patchResource}                  
+                  onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleDrop(status)}
+                  onClickAddJob={addJobModal.open} onClickEditJob={handleClickEditJob} onClickRemoveJob={handleClickRemoveJob}
+                  onClickEditColumn={handleClickEditStatus(status.id)} onClickRemoveColumn={handleClickRemoveColumn(status.id)}                  
+                />
+            )
+          }
+        </>
+        <AddColumnButton onClick={addColumnModal.open} disabled={statusManager.posting} />
       </div>
       <EditJobModal
-        apiPath={jobs.apiPath}
-        show={showEditJob}
-        setShow={setShowEditJob}
-        jobs={jobs.resources}
-        setJobs={jobs.setResources}
-        id={editJobId}
-        statuses={statuses.resources}
+        apiPath={jobManager.apiPath}
+        show={editJobModal.show}
+        setShow={editJobModal.setShow}
+        jobs={jobManager.resources}
+        setJobs={jobManager.setResources}
+        id={editJobModal.editId}
+        statuses={statusManager.resources}
       />
-      <AddJobModal {...addJobModal} addJob={jobs.postResource} />
+      <AddJobModal {...addJobModal} postResource={jobManager.postResource} />
       <EditColumnModal
-        apiPath={statuses.apiPath}
-        show={showEditColumn}
-        setShow={setShowEditColumn}
-        statusId={editStatusId}
-        statuses={statuses.resources}
-        setStatuses={statuses.setResources}
+        apiPath={statusManager.apiPath}
+        show={editColumnModal.show}
+        setShow={editColumnModal.setShow}
+        statusId={editColumnModal.editId}
+        statuses={statusManager.resources}
+        setStatuses={statusManager.setResources}
       />
-      <AddColumnModal {...addColumnModal} addColumn={statuses.postResource} />
+      <AddColumnModal {...addColumnModal} postResource={statusManager.postResource} />
     </section>
   );
 };

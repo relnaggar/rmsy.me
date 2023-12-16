@@ -1,8 +1,8 @@
 import React from 'react';
 import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
 
-import { Job } from '../api/types';
 import EditDeleteButtonGroup from '../common/EditDeleteButtonGroup';
+import { Job } from '../api/types';
 
 
 interface JobCardProps {
