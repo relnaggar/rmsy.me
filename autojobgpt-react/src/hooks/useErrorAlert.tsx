@@ -1,12 +1,7 @@
 import { useState, useCallback } from 'react';
 
+import { ErrorAlertMixin } from "../common/ErrorAlert";
 
-export interface ErrorAlertMixin {
-  errors: Record<string,string[]>,
-  setErrors: React.Dispatch<React.SetStateAction<Record<string,string[]>>>,
-  showErrorAlert: boolean,
-  setShowErrorAlert: React.Dispatch<React.SetStateAction<boolean>>,
-};
 
 interface UseErrorAlert extends ErrorAlertMixin {  
   clearErrors: () => void,

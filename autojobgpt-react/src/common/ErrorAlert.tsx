@@ -1,8 +1,13 @@
 import React from 'react';
 import BootstrapAlert from 'react-bootstrap/Alert';
 
-import { ErrorAlertMixin } from '../hooks/useErrorAlert';
 
+export interface ErrorAlertMixin {
+  errors: Record<string,string[]>,
+  setErrors: React.Dispatch<React.SetStateAction<Record<string,string[]>>>,
+  showErrorAlert: boolean,
+  setShowErrorAlert: React.Dispatch<React.SetStateAction<boolean>>,
+};
 
 interface ErrorAlertProps extends Omit<ErrorAlertMixin, "setErrors"> {};
 

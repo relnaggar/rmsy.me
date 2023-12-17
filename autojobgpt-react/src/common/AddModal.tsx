@@ -1,24 +1,16 @@
 import React from "react";
-import BootstrapModal from 'react-bootstrap/Modal';
 
-import { ErrorAlertMixin } from "../hooks/useErrorAlert";
 import { UsePostResource } from "../hooks/usePostResource";
-import ErrorAlert from "./ErrorAlert";
+import { ErrorAlertMixin } from "./ErrorAlert";
+import InputModal, { ModalMixin, InputModalMixin } from "./InputModal";
 
 
 export interface AddResourceModalProps<ResourceUpload> extends AddModalMixin,
   Pick<UsePostResource<ResourceUpload>, "postResource"> {};
 
-export interface AddModalMixin extends ErrorAlertMixin {
-  show: boolean,
-  setShow: React.Dispatch<React.SetStateAction<boolean>>,
-  setErrors: React.Dispatch<React.SetStateAction<Record<string,string[]>>>,
-};
+export interface AddModalMixin extends ModalMixin, ErrorAlertMixin {};
 
-interface AddModalProps extends AddModalMixin {
-  title: string,
-  modalId: string,
-  size?: "sm" | "lg" | "xl",
+interface AddModalProps extends InputModalMixin, ErrorAlertMixin {
   onSubmit?: () => void,
   onValidatedSubmit: () => void,
   submitDisabled?: boolean,
@@ -26,26 +18,15 @@ interface AddModalProps extends AddModalMixin {
 };
 
 const AddModal = ({
-  show, setShow, errors, setErrors, showErrorAlert, setShowErrorAlert,
-  title,
-  modalId,
+  modalId, title, show, setShow,
   size = undefined,
+  errors, setErrors, showErrorAlert, setShowErrorAlert,  
   onSubmit = () => {},
   onValidatedSubmit,
   submitDisabled = false,
   validateSubmit,
   children,
 }: React.PropsWithChildren<AddModalProps>): React.JSX.Element => {
-  const handleEntered = (): void => {
-    const firstInputElement: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null =
-      document.getElementById(modalId)!.querySelector('input, select, textarea');
-    firstInputElement?.focus();
-  };
-
-  const handleClose = (): void => {
-    setShow(false);
-  };
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault(); // prevent page from reloading
 
@@ -60,25 +41,13 @@ const AddModal = ({
   };
 
   return (
-    <BootstrapModal id={modalId}
-      size={size} aria-labelledby={`${modalId}Label`} show={show} onEntered={handleEntered} onHide={handleClose}       
+    <InputModal
+      title={title} modalId={modalId} show={show} setShow={setShow} size={size}
+      handleSubmit={handleSubmit} submitDisabled={submitDisabled}
+      errors={errors} showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
     >
-      <BootstrapModal.Header closeButton>
-        <BootstrapModal.Title id={`${modalId}Label`}>{title}</BootstrapModal.Title>
-      </BootstrapModal.Header>
-      <form onSubmit={handleSubmit}>
-        <BootstrapModal.Body>
-          {children}
-        </BootstrapModal.Body>
-        <BootstrapModal.Footer>
-          <ErrorAlert errors={errors} showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert} />
-          <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
-          <button type="submit" className="btn btn-primary" disabled={submitDisabled} formNoValidate>
-            Submit
-          </button>
-        </BootstrapModal.Footer>
-      </form>
-    </BootstrapModal>
+      {children}
+    </InputModal>
   );
 };
 

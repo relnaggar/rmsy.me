@@ -176,9 +176,9 @@ const JobBoard = (): React.JSX.Element => {
         apiPath={statusManager.apiPath}
         show={editColumnModal.show}
         setShow={editColumnModal.setShow}
-        statusId={editColumnModal.editId}
-        statuses={statusManager.resources}
-        setStatuses={statusManager.setResources}
+        resourceId={editColumnModal.editId}
+        resources={statusManager.resources}
+        setResources={statusManager.setResources}
       />
       <AddColumnModal {...addColumnModal} postResource={statusManager.postResource} />
     </section>

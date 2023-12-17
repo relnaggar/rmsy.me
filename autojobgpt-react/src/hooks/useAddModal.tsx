@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 
-import useErrorAlert, { ErrorAlertMixin } from "./useErrorAlert";
+import useErrorAlert from "./useErrorAlert";
+import { ErrorAlertMixin } from "../common/ErrorAlert";
 import { AddModalMixin } from "../common/AddModal";
 
 

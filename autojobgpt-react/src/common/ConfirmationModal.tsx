@@ -1,18 +1,17 @@
 import React from 'react';
 import BoostrapModal from 'react-bootstrap/Modal';
 
+import { ModalMixin } from './InputModal';
 
-interface ConfirmationModalProps {
-  show: boolean,
-  setShow: (show: boolean) => void,
+
+interface ConfirmationModalProps extends ModalMixin {
   action: () => void,
   actionDescription: string
   actionVerb: string
 };
 
 const ConfirmationModal = ({
-  show,
-  setShow,
+  show, setShow,
   action,
   actionDescription,
   actionVerb
