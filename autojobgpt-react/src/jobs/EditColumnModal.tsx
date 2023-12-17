@@ -20,27 +20,45 @@ const EditColumnModal = ({
   statusId,
   statuses, setStatuses,
 }: EditColumnModalProps): React.JSX.Element => {
+  const modalId = `editColumnModal${statusId}`;
+  const title = "Edit Column";
+
+  const handleEntered = (): void => {
+    const firstInputElement: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null =
+      document.getElementById(modalId)!.querySelector('input, select, textarea');
+    firstInputElement?.focus();
+  };
+
+  const handleClose = () => {
+    setShow(false);
+  };
+
   return (
-    <BootstrapModal aria-labelledby="editColumnModalLabel" backdrop="static"
-      show={show} onHide={() => setShow(false)}
-      onEntered={() => document.getElementsByTagName("input")[0].focus()}      
+    <BootstrapModal id={modalId}
+      backdrop="static" aria-labelledby={`${modalId}Label`} show={show} onEntered={handleEntered} onHide={handleClose}
     >
       <BootstrapModal.Header closeButton>
-        <BootstrapModal.Title id="editColumnModalLabel">Edit Column</BootstrapModal.Title>
+        <BootstrapModal.Title id={`${modalId}Label`}>{title}</BootstrapModal.Title>
       </BootstrapModal.Header>
       <BootstrapModal.Body>
-        <InputWithSave<Status>
+        <InputWithSave id={statusId}
           type="text"
           apiPath={apiPath}
           resources={statuses}
-          setResources={setStatuses}
-          id={statusId}
+          setResources={setStatuses}          
           editableProperty="name"
           labelText="Column Name"
+          validateSubmit={(value: string) => {
+            const errors: Record<string,string[]> = {};
+            if (value === "") {
+              errors["name"] = ["Please enter a column name."];
+            }
+            return errors;
+          }}
         />
       </BootstrapModal.Body>
       <BootstrapModal.Footer>
-        <button type="button" className="btn btn-secondary" onClick={() => setShow(false)}>Close</button>
+        <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
       </BootstrapModal.Footer>
     </BootstrapModal>
   )

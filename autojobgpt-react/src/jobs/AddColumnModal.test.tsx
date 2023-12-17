@@ -3,17 +3,11 @@ import { screen, getAllByRole, getByRole, waitFor, queryByRole } from "@testing-
 import { injectMocks, renderRoute, getSubmitButton, clickSubmitButton, userTypeInput, mockFunctions, clickCloseButton, openAndGetModal, OpenAndGetModalParams, getColumnByName } from "../common/testUtils";
 import { generateResponse, generateErrorResponse } from "../api/mockApi";
 import { errorMessage, testDataForApiGeneralErrors, validStatus1 } from "../api/mockData";
-import { Status } from '../api/types';
 
-
-beforeEach(() => {
-  jest.clearAllMocks();
-  injectMocks();
-});
 
 const thisRoute = "/jobs";
 const modalName = "add column";
-const openAndGetModalParams: OpenAndGetModalParams = {modalName};
+const openAndGetModalParams: OpenAndGetModalParams = { modalName };
 
 const testData: {
   label: string,
@@ -32,6 +26,11 @@ const fillWithValidValues = async (modal: HTMLElement): Promise<void> => {
     await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
   }
 };
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  injectMocks();
+});
 
 test(`${modalName} button appears`, async () => {
   await renderRoute(thisRoute);
@@ -65,7 +64,7 @@ test(`clicking close button closes the ${modalName} modal within 1 second`, asyn
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await clickCloseButton(modal);
-  waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
+  await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
 });
 
 describe(`${modalName} modal has all inputs`, () => {
@@ -102,7 +101,7 @@ test(`submitting the ${modalName} modal with valid input closes the modal within
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
   await clickSubmitButton(modal);
-  waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
+  await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
 });
 
 test(`submitting the ${modalName} modal with valid input makes an api call`, async () => {
@@ -131,7 +130,7 @@ test(`submitting the ${modalName} modal with valid input adds the column to the 
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
-  mockFunctions.fetchData.mockImplementationOnce(generateResponse<Status>(validStatus1));
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse(validStatus1));
   await clickSubmitButton(modal);
   expect(getColumnByName(validStatus1.name)).toBeInTheDocument();
 });
@@ -191,7 +190,7 @@ describe(`api general errors after submitting the ${modalName} modal can be clea
       testDataForApiGeneralError.mockApiError();
       await clickSubmitButton(modal);
       await clickSubmitButton(modal);
-      waitFor(() => expect(queryByRole(modal, "alert")).not.toBeInTheDocument(), {timeout: 1000});
+      await waitFor(() => expect(queryByRole(modal, "alert")).not.toBeInTheDocument(), {timeout: 1000});
     });
   }
 });

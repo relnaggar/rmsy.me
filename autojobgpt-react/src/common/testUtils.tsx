@@ -1,11 +1,12 @@
 import React from "react";
 import { RouterProvider, createMemoryRouter, RouteObject } from "react-router-dom";
-import { render, act, screen, getByRole, getAllByRole, queryAllByRole, getByLabelText, queryByRole, queryByText } from "@testing-library/react";
+import { render, act, screen, getByRole, getAllByRole, queryAllByRole, getByLabelText, queryByRole, queryByText, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { fireEvent } from "@testing-library/dom";
 
 import { routesConfig, routesBasename }  from "../routes/routesConfig";
 import { generateResponse } from "../api/mockApi";
+import { get } from "http";
 
 
 const mockRoutesConfig: RouteObject[] = [...routesConfig];
@@ -107,11 +108,19 @@ export const userTypeInput = async (modal: HTMLElement, inputLabel: string, text
   });
 };
 
+export const userClearInput = async (modal: HTMLElement, inputLabel: string): Promise<void> => {
+  const input: HTMLElement = getByRole(modal, "textbox", {name: new RegExp(inputLabel, "i")});
+  await act(async () => {
+    userEvent.clear(input);
+  });
+}
+
 export const clickCloseButton = async (modal: HTMLElement): Promise<void> => {
   const closeButton: HTMLElement = getAllByRole(modal, "button", {name: new RegExp("close", "i")})[0];
   await act(async () => {
     userEvent.click(closeButton);
   });
+  await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
 };
 
 export const userUploadDocxFile = async (modal: HTMLElement, labelText: string, fileName: string): Promise<void> => {
@@ -143,6 +152,14 @@ export const openAndGetDeleteModal = async (resourceElement: HTMLElement, timeou
   return await screen.findByRole("dialog", {name: new RegExp("confirm delete", "i")}, {timeout: timeout});
 };
 
+export const openAndGetEditModal = async (resourceElement: HTMLElement, timeout: number = 1000): Promise<HTMLElement> => {
+  const editButton: HTMLElement = getByRole(resourceElement, "button", {name: new RegExp("edit", "i")});
+  await act(async () => {
+    userEvent.click(editButton);
+  });
+  return await screen.findByRole("dialog", {name: new RegExp("edit", "i")}, {timeout: timeout});
+}
+
 export const getDeleteButton = (modal: HTMLElement): HTMLElement => {
   return getByRole(modal, "button", {name: new RegExp("delete", "i")});
 };
@@ -154,17 +171,47 @@ export const clickDeleteButton = async (modal: HTMLElement): Promise<void> => {
   });
 }
 
+export const getActionButton = (modal: HTMLElement, inputLabel: string, buttonLabel: string): HTMLElement => {
+  const matchingInputs: HTMLElement[] = [
+    ...queryAllByRole(modal, "combobox", {name: new RegExp(inputLabel, "i")}),
+    ...queryAllByRole(modal, "textbox", {name: new RegExp(inputLabel, "i")})
+  ];
+  if (matchingInputs.length !== 1) {
+    throw new Error(`Input ${inputLabel} not found`);
+  }
+  const inputId: string = matchingInputs[0].getAttribute("id")!;
+  const buttons: HTMLElement[] = getAllByRole(modal, "button", {name: new RegExp(buttonLabel, "i")});
+  const matchingButton: HTMLElement | undefined = buttons.find((button: HTMLElement) => {
+    return button.getAttribute("aria-controls") === inputId;
+  });
+  if (!matchingButton) {
+    throw new Error(`Button ${buttonLabel} controlling input ${inputLabel} not found`);
+  } else {
+    return matchingButton;  
+  }
+};
+
+export const clickActionButton = async (modal: HTMLElement, inputLabel: string, buttonLabel: string): Promise<void> => {
+  const actionButton: HTMLElement = getActionButton(modal, inputLabel, buttonLabel);
+  await act(async () => {
+    userEvent.click(actionButton);
+  });
+};
+
 export const getRefreshButton = (modal: HTMLElement, label: string): HTMLElement => {
-  const input: HTMLElement = getByRole(modal, "combobox", {name: new RegExp(label, "i")});
-  const inputId: string = input.getAttribute("id")!;
-  return document.querySelector(`[aria-controls="${inputId}"]`)!;
+  return getActionButton(modal, label, "refresh");
 };
 
 export const clickRefreshButton = async (modal: HTMLElement, label: string): Promise<void> => {
-  const refreshButton: HTMLElement = getRefreshButton(modal, label);
-  await act(async () => {
-    userEvent.click(refreshButton);
-  });
+  await clickActionButton(modal, label, "refresh");
+};
+
+export const getSaveButton = (modal: HTMLElement, label: string): HTMLElement => {
+  return getActionButton(modal, label, "save");
+};
+
+export const clickSaveButton = async (modal: HTMLElement, label: string): Promise<void> => {
+  await clickActionButton(modal, label, "save");
 };
 
 export const getFilterByJobSelect = (): HTMLElement => {

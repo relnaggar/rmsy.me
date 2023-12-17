@@ -18,6 +18,7 @@ interface InputWithSaveProps<Resource extends WithId>{
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
   id: number,
   editableProperty: keyof Resource & string,
+  validateSubmit?: (value: string) => Record<string,string[]>,
   labelProperty?: keyof Resource,
   labelText?: string,
   onSaveSuccess?: () => void,
@@ -35,6 +36,7 @@ const InputWithSave = <Resource extends WithId>({
   setResources,
   id,
   editableProperty,
+  validateSubmit = () => ({}),
   labelProperty,
   labelText,
   onSaveSuccess,
@@ -91,12 +93,18 @@ const InputWithSave = <Resource extends WithId>({
     e.preventDefault(); // prevent page from reloading
 
     const value: string = (document.getElementById(elementId) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
-    updateResource(id, { [editableProperty]: value } as Partial<Resource>);
-    setEditing(false);
+    const errorMessage = validateSubmit(value);
+    if (Object.keys(errorMessage).length === 0) {
+      updateResource(id, { [editableProperty]: value } as Partial<Resource>);
+    } else {
+      setErrors(errorMessage);
+    }
+    setEditing(false);    
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
     setValue(e.target.value);
+    setEditing(true);
   }
 
   const thereAreErrors: boolean = Object.keys(errors).length > 0;
@@ -140,7 +148,11 @@ const InputWithSave = <Resource extends WithId>({
           <input type={type} {...textAreaProps} />
         )
       }
-      <div className="invalid-feedback" id={`${elementId}-feedback`} role={showError? "alert": undefined}>
+      <div id={`${elementId}-feedback`}
+        aria-labelledby={elementId}
+        className="invalid-feedback"
+        role={showError? "alert": undefined}
+      >
         {Object.values(errors).join(" ")}
       </div>
     </>
@@ -154,7 +166,7 @@ const InputWithSave = <Resource extends WithId>({
   }
 
   const saveButton: React.JSX.Element = (
-    <button
+    <button aria-controls={elementId}
       type="submit" className="btn btn-outline-primary" disabled={updating || saved} aria-busy={updating}
     >
       {updating?
