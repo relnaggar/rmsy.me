@@ -6,43 +6,34 @@ import { ReactComponent as FileArrowDownIcon } from 'bootstrap-icons/icons/file-
 import { ReactComponent as CopyIcon } from 'bootstrap-icons/icons/copy.svg';
 
 import usePost from "../hooks/usePost";
+import { EditResourceModalProps } from "../common/EditModal";
 import InputWithSave from "../common/InputWithSave";
 import SubstitutionInput from "./SubstitutionInput";
 import { Job, Substitution, Resume } from '../api/types';
 
 
-interface EditResumeModalProps {
-  apiPath: string,
-  resumes: Resume[],
-  setResumes: React.Dispatch<React.SetStateAction<Resume[]>>,
-  show: boolean,
-  setShow: React.Dispatch<React.SetStateAction<boolean>>,
-  resumeId: number,
+interface EditResumeModalProps extends EditResourceModalProps<Resume> {
   substitutions: Substitution[],
   setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
   onSubstitutionSaveSuccess: () => void,
 }
 
 const EditResumeModal = ({
-  apiPath,
-  resumes,
-  setResumes,
-  show,
-  setShow,
-  resumeId,
+  show, setShow, editId,
   substitutions,
   setSubstitutions,
   onSubstitutionSaveSuccess,
+  apiPath, resources, setResources,
 }: EditResumeModalProps): React.JSX.Element => {
-  const resume: Resume | undefined = resumes.find((resume: Resume) => resume.id === resumeId);
+  const resume: Resume | undefined = resources.find((resume: Resume) => resume.id === editId);
 
   const [errors, setErrors] = useState<Record<string,string[]>>({});
   const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
 
   const handleDuplicateSuccess = useCallback((resume: Resume) => {
-    setResumes([...resumes, resume]);
+    setResources([...resources, resume]);
     setShowErrorAlert(false);
-  }, [resumes, setResumes]);
+  }, [resources, setResources]);
 
   const handleDuplicateFail = useCallback((es: Record<string,string[]>) => {
     setErrors(es);
@@ -50,7 +41,7 @@ const EditResumeModal = ({
   }, []);
 
   const { posting: duplicating, post: duplicate, cancel: cancelDuplicate } = usePost<Resume>(
-    `${apiPath}${resumeId}/duplicate/`, {
+    `${apiPath}${editId}/duplicate/`, {
       onSuccess: handleDuplicateSuccess,
       onFail: handleDuplicateFail,
     }
@@ -75,14 +66,9 @@ const EditResumeModal = ({
         <BootstrapModal.Title id="editResumeModalLabel">Edit Resume</BootstrapModal.Title>
       </BootstrapModal.Header>
       <BootstrapModal.Body>
-        <InputWithSave<Resume>
-          type="text"
-          apiPath={apiPath}
-          resources={resumes}
-          setResources={setResumes}
-          id={resumeId}
-          editableProperty="name"
-          labelText="Resume Name"
+        <InputWithSave editId={editId}          
+          apiPath={apiPath} resources={resources} setResources={setResources}   
+          type="text" editableProperty="name" labelText="Resume Name"
           required
         />
 
@@ -118,7 +104,7 @@ const EditResumeModal = ({
         <hr />
         <h5 className="mb-3">Fill Field Substitutions</h5>
         {substitutions
-          .filter((substitution: Substitution) => substitution.resume === resumeId)
+          .filter((substitution: Substitution) => substitution.resume === editId)
           .map((substitution: Substitution) => {
             return (
               <SubstitutionInput

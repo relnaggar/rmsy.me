@@ -8,20 +8,16 @@ import { Status } from '../api/types';
 interface EditColumnModalProps extends EditResourceModalProps<Status> {};
 
 const EditColumnModal = ({
-  apiPath, show, setShow, resourceId, resources, setResources,
+  show, setShow, editId,
+  ...resourceManager
 }: EditColumnModalProps): React.JSX.Element => {
-  const modalId = `editColumnModal${resourceId}`;
+  const modalId = `editColumnModal${editId}`;
   const title = "Edit Column";
 
   return (
     <EditModal title={title} modalId={modalId} show={show} setShow={setShow}>
-      <InputWithSave id={resourceId}
-        type="text"
-        apiPath={apiPath}
-        resources={resources}
-        setResources={setResources}          
-        editableProperty="name"
-        labelText="Column Name"
+      <InputWithSave editId={editId} {...resourceManager}
+        type="text" editableProperty="name" labelText="Column Name"
         validateSubmit={(value: string) => {
           const errors: Record<string,string[]> = {};
           if (value === "") {

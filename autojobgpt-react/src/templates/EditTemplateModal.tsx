@@ -1,27 +1,20 @@
 import React from "react";
 import BootstrapModal from 'react-bootstrap/Modal';
 
+import { EditResourceModalProps } from "../common/EditModal";
 import InputWithSave from "../common/InputWithSave";
 import { FillField, ResumeTemplate } from '../api/types';
 
 
-interface EditTemplateModalProps {
-  apiPath: string,
-  show: boolean,
-  setShow: React.Dispatch<React.SetStateAction<boolean>>,
-  templateId: number,
-  templates: ResumeTemplate[],
-  setTemplates: React.Dispatch<React.SetStateAction<ResumeTemplate[]>>,
+interface EditTemplateModalProps extends EditResourceModalProps<ResumeTemplate> {
   fillFields: FillField[],
   setFillFields: React.Dispatch<React.SetStateAction<FillField[]>>,
 }
 
 const EditTemplateModal = ({
-  apiPath,
-  show, setShow,
-  templateId,
-  templates, setTemplates,
+  show, setShow, editId,
   fillFields, setFillFields,
+  ...resourceManager
 }: EditTemplateModalProps): React.JSX.Element => {
   return (
     <BootstrapModal aria-labelledby="editTemplateModalLabel" size="xl" backdrop="static"
@@ -32,31 +25,21 @@ const EditTemplateModal = ({
         <BootstrapModal.Title id="editTemplateModalLabel">Edit Resume Template</BootstrapModal.Title>
       </BootstrapModal.Header>
       <BootstrapModal.Body>
-        <InputWithSave<ResumeTemplate>
-          type="text"
-          apiPath={apiPath}
-          resources={templates}
-          setResources={setTemplates}
-          id={templateId}
-          editableProperty="name"
-          labelText="Template Name"
+        <InputWithSave editId={editId}
+          {...resourceManager}
+          type="text" editableProperty="name" labelText="Template Name"
           required
         />
-        <InputWithSave<ResumeTemplate>
-          type="textarea"
-          apiPath={apiPath}
-          resources={templates}
-          setResources={setTemplates}
-          id={templateId}
-          editableProperty="description"
-          labelText="Description (optional)"
+        <InputWithSave editId={editId}
+          {...resourceManager}
+          type="textarea" editableProperty="description" labelText="Description (optional)"
         />
         <hr />
         <h5 className="mb-3">Fill Field Descriptions</h5>
         {fillFields.map((fillField: FillField) => {
-          if (fillField.template === templateId) {
+          if (fillField.template === editId) {
             if (fillField.key === "JOB_TITLE" || fillField.key === "COMPANY") {
-              const elementId: string = `${apiPath.replace("/", "-")}${fillField.id}-description`;
+              const elementId: string = `${resourceManager.apiPath.replace("/", "-")}${fillField.id}-description`;
               return (
                 <div className="mb-3 form-floating">
                   <textarea
@@ -69,14 +52,9 @@ const EditTemplateModal = ({
                 </div>
               )
             } else {
-              return <InputWithSave<FillField>
-                type="textarea"
-                apiPath="fillFields/"
-                resources={fillFields}
-                setResources={setFillFields}
-                id={fillField.id}
-                editableProperty="description"
-                labelProperty="key"
+              return <InputWithSave editId={fillField.id}
+                apiPath="fillFields/" resources={fillFields} setResources={setFillFields}
+                type="textarea" editableProperty="description" labelProperty="key"
               />
             }
           } else {

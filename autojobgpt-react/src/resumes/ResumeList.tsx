@@ -99,11 +99,12 @@ const ResumeList = (): React.JSX.Element => {
         onClickAddDocument={handleClickAddResume}
         addButtonText="Generate new resume"        
       />
-      <EditResumeModal
+      <EditResumeModal editId={editResumeModal.editId}
+        show={editResumeModal.show}
+        setShow={editResumeModal.setShow} 
         apiPath={resumeManager.apiPath}
-        resumes={resumeManager.resources} setResumes={resumeManager.setResources}
-        show={editResumeModal.show} setShow={editResumeModal.setShow}
-        resumeId={editResumeModal.editId}
+        resources={resumeManager.resources}
+        setResources={resumeManager.setResources}        
         substitutions={substitutionManager.resources} setSubstitutions={substitutionManager.setResources}
         onSubstitutionSaveSuccess={handleSubstitutionSaveSuccess}
       />

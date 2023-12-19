@@ -51,12 +51,12 @@ export default function SubstitutionInput({
 
   return (
     <>
-      <InputWithSave<Substitution>
+      <InputWithSave
         type="textarea"
         apiPath="substitutions/"
         resources={substitutions}
         setResources={setSubstitutions}
-        id={substitution.id}
+        editId={substitution.id}
         editableProperty="value"
         labelProperty="key"
         onSaveSuccess={onSubstitutionSaveSuccess}

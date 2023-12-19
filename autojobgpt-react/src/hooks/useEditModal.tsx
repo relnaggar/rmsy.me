@@ -1,10 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
+
+import { ModalMixin } from "../common/InputModal";
+import { EditResourceMixin } from '../common/EditModal';
 
 
-interface EditModalMixin {
-  show: boolean,
-  setShow: React.Dispatch<React.SetStateAction<boolean>>,
-  editId: number,
+interface EditModalMixin extends ModalMixin, Pick<EditResourceMixin<never>, "editId"> {
   open: (id: number) => void,
 };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 
 const useControlledState = <T extends unknown>(
@@ -14,14 +14,14 @@ const useControlledState = <T extends unknown>(
     }
   }, [valueProp]);
 
-  const setValue = (newValue: T): void => {
+  const setValue = useCallback((newValue: T): void => {
     if (valueProp === undefined) {
       setInternalValue(newValue);
     }
     if (setValueProp !== undefined) {
       setValueProp(newValue);
     }
-  };
+  }, [valueProp, setValueProp]);
 
   return [value, setValue] as const;
 };

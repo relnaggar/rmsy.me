@@ -1,30 +1,21 @@
 import React from "react";
 import BootstrapModal from 'react-bootstrap/Modal';
 
+import { EditResourceModalProps } from "../common/EditModal";
 import InputWithSave from "../common/InputWithSave";
 import { Status, Job } from '../api/types';
 
 
-interface EditJobModalProps {
-  apiPath: string,
-  show: boolean,
-  setShow: React.Dispatch<React.SetStateAction<boolean>>,
-  jobs: Job[],
-  setJobs: React.Dispatch<React.SetStateAction<Job[]>>,
-  id: number,
+interface EditJobModalProps extends EditResourceModalProps<Job> {
   statuses: Status[],
-}
+};
 
 const EditJobModal = ({
-  apiPath,
-  show,
-  setShow,
-  jobs,
-  setJobs,
-  id,
-  statuses
+  show, setShow, editId,
+  statuses,
+  ...resourceManager
 }: EditJobModalProps): React.JSX.Element => {
-  if (id === -1) {
+  if (editId === -1) {
     return <></>;
   }
 
@@ -37,56 +28,26 @@ const EditJobModal = ({
         <BootstrapModal.Title id="editJobModalLabel">Edit Job</BootstrapModal.Title>
       </BootstrapModal.Header>
       <BootstrapModal.Body>
-        <InputWithSave<Job>
-          type="select"
-          apiPath={apiPath}
-          resources={jobs}
-          setResources={setJobs}
-          id={id}
-          editableProperty="status"
-          labelText="Status"
+        <InputWithSave editId={editId} {...resourceManager}
+          type="select" editableProperty="status" labelText="Status"
           selectOptions={statuses.map((status: Status) => {
             return {value: status.id.toString(), label: status.name}
           })}
           required              
         />
-        <InputWithSave<Job>
-          type="url"
-          apiPath={apiPath}
-          resources={jobs}
-          setResources={setJobs}
-          id={id}
-          editableProperty="url"
-          labelText="URL"
+        <InputWithSave editId={editId} {...resourceManager}
+          type="url" editableProperty="url" labelText="URL"
         />
-        <InputWithSave<Job>
-          type="text"
-          apiPath={apiPath}
-          resources={jobs}
-          setResources={setJobs}
-          id={id}
-          editableProperty="title"
-          labelText="Title"
+        <InputWithSave editId={editId} {...resourceManager}
+          type="text" editableProperty="title" labelText="Title"
           required
         />
-        <InputWithSave<Job>
-          type="text"
-          apiPath={apiPath}
-          resources={jobs}
-          setResources={setJobs}
-          id={id}
-          editableProperty="company"
-          labelText="Company"
+        <InputWithSave editId={editId} {...resourceManager}
+          type="text" editableProperty="company" labelText="Company"
           required
         />
-        <InputWithSave<Job>
-          type="textarea"
-          apiPath={apiPath}
-          resources={jobs}
-          setResources={setJobs}
-          id={id}
-          editableProperty="posting"
-          labelText="Posting"
+        <InputWithSave editId={editId} {...resourceManager}
+          type="textarea" editableProperty="posting" labelText="Posting"
           required
         />
       </BootstrapModal.Body>

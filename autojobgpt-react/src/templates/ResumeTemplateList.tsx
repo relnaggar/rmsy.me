@@ -69,13 +69,12 @@ const ResumeTemplateList = (): React.JSX.Element => {
         onClickAddDocument={handleClickAddTemplate}
         addButtonText="Upload resume template"        
       />
-      <EditTemplateModal
-        apiPath={templateManager.apiPath}
-        templates={templateManager.resources}
-        setTemplates={templateManager.setResources}
+      <EditTemplateModal editId={editTemplateModal.editId}
         show={editTemplateModal.show}
         setShow={editTemplateModal.setShow}
-        templateId={editTemplateModal.editId}        
+        apiPath={templateManager.apiPath}
+        resources={templateManager.resources}
+        setResources={templateManager.setResources}
         fillFields={fillFieldManager.resources}
         setFillFields={fillFieldManager.setResources}
       />

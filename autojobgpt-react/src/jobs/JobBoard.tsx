@@ -162,21 +162,19 @@ const JobBoard = (): React.JSX.Element => {
         </>
         <AddColumnButton onClick={addColumnModal.open} disabled={statusManager.posting} />
       </div>
-      <EditJobModal
-        apiPath={jobManager.apiPath}
+      <EditJobModal editId={editJobModal.editId}
         show={editJobModal.show}
         setShow={editJobModal.setShow}
-        jobs={jobManager.resources}
-        setJobs={jobManager.setResources}
-        id={editJobModal.editId}
+        apiPath={jobManager.apiPath}        
+        resources={jobManager.resources}
+        setResources={jobManager.setResources}        
         statuses={statusManager.resources}
       />
       <AddJobModal {...addJobModal} postResource={jobManager.postResource} />
-      <EditColumnModal
-        apiPath={statusManager.apiPath}
+      <EditColumnModal editId={editColumnModal.editId}
         show={editColumnModal.show}
         setShow={editColumnModal.setShow}
-        resourceId={editColumnModal.editId}
+        apiPath={statusManager.apiPath}              
         resources={statusManager.resources}
         setResources={statusManager.setResources}
       />

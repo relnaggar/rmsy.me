@@ -1,15 +1,17 @@
 import React from "react";
 
 import InputModal, { InputModalMixin, ModalMixin } from "./InputModal";
+import { UseResource } from "../hooks/useResource";
 import { WithId } from "../api/types";
 
 
-export interface EditResourceModalProps<Resource extends WithId> extends ModalMixin {
-  apiPath: string,
-  resourceId: number,
-  resources: Resource[],
-  setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
-};
+export interface EditResourceMixin<Resource extends WithId> extends
+  Pick<UseResource<Resource, never>, "apiPath" | "resources" | "setResources">
+{
+  editId: number,
+}
+
+export interface EditResourceModalProps<Resource extends WithId> extends ModalMixin, EditResourceMixin<Resource> {};
 
 interface EditModalProps extends InputModalMixin {};
 

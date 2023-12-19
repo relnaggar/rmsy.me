@@ -255,13 +255,13 @@ describe(`${modalName} retains api general errors on close and reopen`, () => {
   for (const testDataForApiGeneralError of testDataForApiGeneralErrors(mockFunctions)) {
     test(`${modalName} modal retains api ${testDataForApiGeneralError.apiErrorType} error on close and reopen`, async () => {
       await renderRoute(thisRoute);
-      let modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
+      const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       await fillWithValidValues(modal);
       testDataForApiGeneralError.mockApiError();
       await clickSubmitButton(modal);
       await clickCloseButton(modal);
-      modal = await openAndGetModal(openAndGetModalParams);
-      const errorAlert = getByRole(modal, "alert");
+      const newModal = await openAndGetModal(openAndGetModalParams);
+      const errorAlert = getByRole(newModal, "alert");
       expect(errorAlert).toBeInTheDocument();
       expect(errorAlert).toHaveTextContent(errorMessage);
     });

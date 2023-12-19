@@ -4,7 +4,7 @@ import { ReactComponent as RobotIcon } from "bootstrap-icons/icons/robot.svg";
 import useFetch from "../hooks/useFetch";
 import useInputControl from "../hooks/useInputControl";
 import AddModal, { AddResourceModalProps } from "../common/AddModal";
-import TextInput from "../common/TextInput";
+import BaseInput from "../common/BaseInput";
 import ErrorAlert from "../common/ErrorAlert";
 import InputButton from "../common/InputActionButton";
 import { JobUpload, JobDetails } from '../api/types';
@@ -120,28 +120,28 @@ const AddJobModal = ({
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
       submitDisabled={filling}      
     >
-      <TextInput id={`${modalId}URL`}
+      <BaseInput id={`${modalId}URL`}
         value={urlInput.value} editing={urlInput.editing} handleChange={urlInput.handleChange}
         label="URL" type="url" loading={filling} errors={addModal.errors["url"] || urlFillErrors}
       >
         <InputButton controlsId={`${modalId}URL`} label="Autofill Details" loading={filling}
           onClickAction={handleClickFillDetails} onClickCancel={handleClickCancelFill} icon={<RobotIcon />}
         />
-      </TextInput>
+      </BaseInput>
       <ErrorAlert
         errors={nonURLFillErrors} showErrorAlert={showFillErrorAlert} setShowErrorAlert={setShowFillErrorAlert}
       />
       <hr />
       <h5>Details</h5>
-      <TextInput id={`${modalId}Title`}
+      <BaseInput id={`${modalId}Title`} ref={titleInput.ref}
         value={titleInput.value} editing={titleInput.editing} handleChange={titleInput.handleChange}
         label="Title" type="text" loading={filling} errors={addModal.errors["title"]}
       />
-      <TextInput id={`${modalId}Company`}
+      <BaseInput id={`${modalId}Company`} ref={companyInput.ref}
         value={companyInput.value} editing={companyInput.editing} handleChange={companyInput.handleChange}
         label="Company" type="text" loading={filling} errors={addModal.errors["company"]}
       />
-      <TextInput id={`${modalId}Posting`}
+      <BaseInput id={`${modalId}Posting`} ref={postingInput.ref}
         value={postingInput.value} editing={postingInput.editing} handleChange={postingInput.handleChange}
         label="Posting" type="textarea" loading={filling} errors={addModal.errors["posting"]}
       />

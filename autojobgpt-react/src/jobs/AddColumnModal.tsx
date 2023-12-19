@@ -2,11 +2,11 @@ import React from "react";
 
 import useInputControl from "../hooks/useInputControl";
 import AddModal, { AddResourceModalProps } from "../common/AddModal";
-import TextInput from "../common/TextInput";
+import BaseInput from "../common/BaseInput";
 import { StatusUpload } from '../api/types';
 
 
-const AddColumnModal = ({  
+const AddColumnModal = ({
   postResource: postColumn,
   ...addColumnModal
 }: AddResourceModalProps<StatusUpload>): React.JSX.Element => {
@@ -38,7 +38,7 @@ const AddColumnModal = ({
       title="Add Column" modalId={modalId}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
-      <TextInput id={`${modalId}Name`}
+      <BaseInput id={`${modalId}Name`} ref={nameInput.ref}
         value={nameInput.value} editing={nameInput.editing} handleChange={nameInput.handleChange}
         label="Name" type="text" errors={addColumnModal.errors["name"]}
       />

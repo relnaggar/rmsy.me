@@ -2,7 +2,7 @@ import React from "react";
 
 import useInputControl from "../hooks/useInputControl";
 import AddModal, { AddResourceModalProps } from "../common/AddModal";
-import TextInput from "../common/TextInput";
+import BaseInput from "../common/BaseInput";
 import { ResumeTemplateUpload } from '../api/types';
 
 
@@ -48,16 +48,16 @@ const AddTemplateModal = ({
       title="Add Resume Template" modalId={modalId}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
-      <TextInput id={`${modalId}Name`}
+      <BaseInput id={`${modalId}Name`} ref={nameInput.ref}
         value={nameInput.value} editing={nameInput.editing} handleChange={nameInput.handleChange}
         label="Template Name" type="text" errors={addModal.errors["name"]}
       />
-      <TextInput id={`${modalId}Upload`} ref={uploadInput.ref as React.RefObject<HTMLInputElement>}
+      <BaseInput id={`${modalId}Upload`} ref={uploadInput.ref}
         value={uploadInput.value} editing={uploadInput.editing} handleChange={uploadInput.handleChange}
         label="Upload" type="file" errors={addModal.errors["upload"]}
         accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       />
-      <TextInput id={`${modalId}Description`} 
+      <BaseInput id={`${modalId}Description`} ref={descriptionInput.ref}
         value={descriptionInput.value} editing={descriptionInput.editing} handleChange={descriptionInput.handleChange}
         label="Description (optional)" type="textarea" errors={addModal.errors["description"]} rows={3}         
       />

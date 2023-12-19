@@ -1,4 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
+
+import useControlledState from "./useControlledState";
 
 
 export interface InputControlMixin {
@@ -11,19 +13,29 @@ export interface InputControlMixin {
   ),
 };
 
-interface UseInputControl extends InputControlMixin {
+export interface UseInputControl extends InputControlMixin {
   edit: (value: string) => void,
   stopEditing: () => void,
   ref: React.RefObject<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
 };
 
 const useInputControl = (
-  initialValue?: string
+  initialValue?: string,
+  valueProp?: string,
+  setValueProp?: React.Dispatch<React.SetStateAction<string>>,
 ): UseInputControl => {
   const ref = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(null);
   
-  const [value, setValue] = useState<string>(initialValue || "");
-  const [editing, setEditing] = useState<boolean>(false);
+  const [value, setValue] = useControlledState<string>(initialValue || "", valueProp, setValueProp);
+  const [editing, setEditing] = useState(false);
+
+  useEffect(() => {
+    if (ref.current && ref.current.nodeName === "TEXTAREA") {
+      const textarea = ref.current as HTMLTextAreaElement;
+      textarea.style.height = 'auto'; // Reset height
+      textarea.style.height = `${textarea.scrollHeight}px`; // Set to scrollHeight
+    }
+  }, [value]);
 
   const handleChange = (e:
     React.ChangeEvent<HTMLInputElement> |
@@ -34,14 +46,14 @@ const useInputControl = (
     setEditing(true);
   };
 
-  const edit = (value: string) => {
+  const edit = useCallback((value: string) => {
     setValue(value);
     setEditing(true);
-  };
+  }, [setValue]);
 
-  const stopEditing = () => {
+  const stopEditing = useCallback(() => {
     setEditing(false);
-  };
+  }, []);
 
   return { value, editing, handleChange, edit, stopEditing, ref };
 };

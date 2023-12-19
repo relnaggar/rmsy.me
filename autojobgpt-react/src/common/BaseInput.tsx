@@ -1,63 +1,160 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
-export interface BaseInputMixin {
+import { InputControlMixin } from "../hooks/useInputControl";
+
+
+export type SelectOption = {
+  value: string,
+  label: string,
+};
+
+export interface BaseInputProps extends InputControlMixin,
+  Omit<React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'id' | 'value'>
+{
+  type: string,
   id: string,
   label: string,
-  editing: boolean,
   loading?: boolean,
-  errors?: string[],  
+  errors?: string[],
+  handleSubmit?: (e: React.FormEvent<HTMLFormElement>) => void,
+  floatingLabel?: boolean,
+  isValid?: boolean,
+  selectOptions?: SelectOption[],
+  loadingOptionLabel?: string,
+  defaultOptionValue?: string,
+  defaultOptionLabel?: string,
 };
 
-interface BaseInputProps extends BaseInputMixin {
-  input: React.JSX.Element,
-};
-
-const BaseInput = ({
-  id, label, editing, children,
+const BaseInput = React.forwardRef(({  
+  value, editing, handleChange,
+  type,
+  id,
+  label,
   loading = false,
   errors = [],
-  input,
-}: React.PropsWithChildren<BaseInputProps>): React.JSX.Element => {
+  handleSubmit,
+  floatingLabel = false,
+  isValid = false,
+  selectOptions,
+  loadingOptionLabel = "Loading...",
+  defaultOptionValue = "0",
+  defaultOptionLabel = "Select...",
+  children,
+  ...extraInputProps
+}: React.PropsWithChildren<BaseInputProps>,
+  ref: React.Ref<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+): React.JSX.Element => {
   const error: string = errors.join(" ");
   const showError: boolean = !editing && !loading && error !== "";
   const feedbackId = `${id}Feedback`;
+  const childrenRef = useRef<HTMLDivElement>(null);
 
-  let updatedInput: React.JSX.Element;
-  if (showError) {
-    updatedInput = React.cloneElement(input, {
-      className: `${input.props.className} is-invalid`,
-      "aria-describedby": feedbackId
-    })
+  const inputProps: React.TextareaHTMLAttributes<HTMLTextAreaElement> | React.InputHTMLAttributes<HTMLInputElement> = {
+    id,
+    name: id,
+    className: `${
+      type === "select" ? "form-select" : "form-control"}${
+      isValid ? " is-valid" : ""}${
+      showError ? " is-invalid" : ""
+    }`,
+    value: type === "file" ? undefined : (value ?? ""),
+    disabled: loading,
+    "aria-busy": loading,
+    "aria-describedby": showError ? feedbackId: undefined,
+    ...extraInputProps,
+  };
+
+  let input: React.JSX.Element;
+  if (type === "textarea") {
+    input = (
+      <textarea ref={ref as React.Ref<HTMLTextAreaElement>}
+        onChange={handleChange as ((e: React.ChangeEvent<HTMLTextAreaElement>) => void)}
+        {...inputProps as React.TextareaHTMLAttributes<HTMLTextAreaElement>}
+      />
+    );
+  } else if (type === "select") {
+    input = (
+      <select ref={ref as React.Ref<HTMLSelectElement>}
+        onChange={handleChange as ((e: React.ChangeEvent<HTMLSelectElement>) => void)}
+        {...inputProps as React.SelectHTMLAttributes<HTMLSelectElement>}
+      >
+        { !inputProps.required &&
+          <option value={defaultOptionValue}>{loading ? loadingOptionLabel : defaultOptionLabel}</option>
+        }
+        {selectOptions!.map((selectOption) => (
+          <option key={selectOption.value} value={selectOption.value}>{selectOption.label}</option>
+        ))}
+      </select>
+    );
   } else {
-    updatedInput = input;
-  }  
+    input = (
+      <input ref={ref as React.Ref<HTMLInputElement>}
+        type={type} onChange={handleChange as ((e: React.ChangeEvent<HTMLInputElement>) => void)}
+        {...inputProps as React.InputHTMLAttributes<HTMLInputElement>}
+      />
+    );
+  }
 
   const inputWithFeedback = (
     <>
-      {updatedInput}
+      {input}
       {showError &&
-        <div className="invalid-feedback" id={feedbackId} role={"alert"} aria-labelledby={id}>{error}</div>
+        <div id={feedbackId}
+          className="invalid-feedback"  role={showError ? "alert": undefined} aria-labelledby={id}
+        >
+          {error}
+        </div>
       }
     </>
   );
 
-  return (
-    <div className="mb-3">
-      <label className="form-label" htmlFor={id}>{label}</label>
+  const inputContent = (
+    <>
+      { !floatingLabel &&
+        <label className="form-label" htmlFor={id}>
+          {label}
+        </label>
+      }
       { children ?
         <div className="d-flex">
           <div className="flex-grow-1">
-            {inputWithFeedback}
+            { floatingLabel ?
+              <div className="form-floating">        
+                {inputWithFeedback}
+                <label htmlFor={id}>{label}</label>              
+              </div>
+            :
+              inputWithFeedback
+            }
           </div>
-          <div className="ps-2">
+          <div className="d-none ps-2 d-md-flex flex-column gap-2" ref={childrenRef}>
             {children}
           </div>
         </div>
       :
         inputWithFeedback
       }
-    </div>
+    </>
   );
-};
+
+  return (
+    <>
+      <div className="mb-3">
+        { handleSubmit ?
+          <form onSubmit={handleSubmit} aria-label={`Form for updating ${label}`}>
+            {inputContent}
+          </form>
+        :
+          inputContent
+        }
+      </div>
+      { children && childrenRef.current?.children.length === 0 &&
+        <div className="d-md-none d-flex justify-content-end mb-3 gap-2">
+          {children}
+        </div>
+      }
+    </>    
+  );
+});
 
 export default BaseInput;
