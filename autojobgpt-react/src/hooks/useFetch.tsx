@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 
-import useAPI from "./useAPI";
+import useAPI from "./useApiRoot";
 import { FetchDataContext } from "../routes/routesConfig";
 import { makeErrorMessage } from "./hooksUtils";
 

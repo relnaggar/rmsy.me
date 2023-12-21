@@ -1,15 +1,13 @@
-import React, { useContext, useState, useEffect } from "react";
+import React from "react";
 
-import useAPI from "./useAPI";
-import { FetchDataContext } from "../routes/routesConfig";
-import { CSRFTokenContext } from "../routes/Layout";
-import { WithId } from '../api/types';
-import { makeErrorMessage } from "./hooksUtils";
+import useApiCall from "./useApiCall";
+import { WithId } from "../api/types";
 
 
 export interface UsePostResource<ResourceUpload> {
   posting: boolean,
-  postResource: (resource: ResourceUpload) => void,
+  postResource: (resource: ResourceUpload) => Promise<void>,
+  cancel: () => void,
 };
 
 const usePostResource = <Resource extends WithId, ResourceUpload>(
@@ -24,79 +22,39 @@ const usePostResource = <Resource extends WithId, ResourceUpload>(
 ): UsePostResource<ResourceUpload> => {
   const { onSuccess, onFail } = options || {};
 
-  const apiRoute: string = useAPI();
-  const fetchData = useContext(FetchDataContext);
-  const csrfToken = useContext(CSRFTokenContext);
-
-  const [resourceBeingPosted, setResourceBeingPosted] = useState<ResourceUpload | null>(null);
-
-  useEffect(() => {
-    const doPost = async (body: FormData | string): Promise<void> => {      
-      let errors: Record<string,string[]> = {};
-      const newResources: Resource[] = [...resources.filter(resource => resource.id !== -1)];
-      try {
-        const csrfHeader: HeadersInit = {
-          "X-CSRFToken": csrfToken,
-        };
-        const response: Response = await fetchData(`${apiRoute}${apiPath}`, {
-          method: "POST",
-          // if the body is a FormData then we shouldn't set the Content-Type header
-          headers: body instanceof FormData ? csrfHeader : { ...csrfHeader, "Content-Type": "application/json" },
-          body: body
-        });
-        
-        // wait for 3 seconds before continuing
-        // await new Promise(resolve => setTimeout(resolve, 3000));
-
-        if (response.ok) {
-          const resource: Resource = await response.json();
-          newResources.push(resource);
-          onSuccess?.(resource, newResources, setResources);
-        } else {
-          errors = await response.json();
-          if (!String(errors)) {
-            errors = {error: makeErrorMessage(response.statusText)};
-          }
-        }
-      } catch (error) {
-        errors["error"] = makeErrorMessage(error);
-      } finally {
-        setResources(newResources);
-        setResourceBeingPosted(null);
-        if (Object.keys(errors).length > 0) {
-          onFail?.(errors);
-        }
-      }
-    };
-    if (resourceBeingPosted !== null) {
-      const formData = new FormData();
-      let containsFile = false;
-      for (const [key, value] of Object.entries(resourceBeingPosted!)) {
-        if (value instanceof File) {
-          containsFile = true;          
-        }
-        formData.append(key, value);
-      }
-      if (containsFile) {
-        // if the addedResource contains a file, then we need to use FormData
-        doPost(formData);
-      } else {
-        // otherwise we should use JSON
-        doPost(JSON.stringify(resourceBeingPosted));
-      }
-    }
-  }, [fetchData, apiRoute, apiPath, csrfToken, resourceBeingPosted, resources, onSuccess, onFail, setResources]);
-
-  const postResource = (resourceUpload: ResourceUpload): void => {
+  const beforeCall = (resourceUpload: ResourceUpload): Resource[] => {
     const placeHolderResource: Resource = getPlaceholderResource(resourceUpload);
     if (placeHolderResource.id !== -1) {
       throw new Error("Placeholder resource must have an id of -1");
     }
-    setResources([...resources, placeHolderResource]);
-    setResourceBeingPosted(resourceUpload);
+    setResources([...resources, placeHolderResource]);    
+
+    const newResources = [...resources];
+    return newResources;
   };
 
-  return { posting: resourceBeingPosted !== null, postResource };
+  const handleSuccess = async (response: Response, newResources: Resource[]): Promise<void> => {
+    const resource: Resource = await response.json();
+    newResources.push(resource);
+    onSuccess?.(resource, newResources, setResources);
+  };
+
+  const afterCall = (newResources: Resource[]): void => {
+    setResources(newResources);
+  };
+
+  const { calling: posting, call, cancel } = useApiCall<Resource>(apiPath, "POST", {
+    beforeCall,
+    onSuccess: handleSuccess,
+    afterCall,
+    onFail
+  });
+
+  const postResource = async (resourceUpload: ResourceUpload): Promise<void> => {
+    await call(resourceUpload);
+  }
+
+  return { posting, postResource, cancel };
 };
 
 export default usePostResource;

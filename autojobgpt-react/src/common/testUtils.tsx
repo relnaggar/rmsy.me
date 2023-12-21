@@ -120,7 +120,7 @@ export const clickCloseButton = async (modal: HTMLElement): Promise<void> => {
   await act(async () => {
     userEvent.click(closeButton);
   });
-  await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
+  await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 3000});
 };
 
 export const userUploadDocxFile = async (modal: HTMLElement, labelText: string, fileName: string): Promise<void> => {

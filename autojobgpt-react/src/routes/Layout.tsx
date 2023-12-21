@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 
-import useAPI from "../hooks/useAPI";
+import useAPI from "../hooks/useApiRoot";
 import { FetchDataContext } from "../routes/routesConfig";
 import ConfirmationModal from "../common/ConfirmationModal";
 
