@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from "react";
+import React, { useContext } from "react";
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useAddModal from "../hooks/useAddModal";
@@ -33,10 +33,10 @@ const ResumeTemplateList = (): React.JSX.Element => {
   const fillFieldManager = useFetchResource<FillField>("fillFields/", { onFail: errorAlert.showErrors });
   const { resources: fillFields, setResources: setFillFields } = fillFieldManager;
 
-  const handleAddTemplateSuccess = useCallback((template: ResumeTemplate) => {
+  const handleAddTemplateSuccess = (template: ResumeTemplate) => {
     addTemplateModal.handleAddSuccess();
     setFillFields([...fillFields, ...template.fillFields]);
-  }, [addTemplateModal, fillFields, setFillFields]);
+  };
 
   const templateManager = useResource<ResumeTemplate,ResumeTemplateUpload>("templates/", generatePlaceholderTemplate, {
     onFetchFail: errorAlert.showErrors,

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useId } from "react";
 
 import useInputControl from "../hooks/useInputControl";
 import useFetchResource from "../hooks/useFetchResource";
@@ -11,7 +11,7 @@ const AddResumeModal = ({
   postResource: postResume,
   ...addModal
 }: AddResourceModalProps<ResumeUpload>): React.JSX.Element => {
-  const modalId = "addResumeModal";
+  const modalId = useId();
   const jobInput = useInputControl("0");
   const templateInput = useInputControl("0");
 
@@ -66,14 +66,14 @@ const AddResumeModal = ({
   };
 
   return (
-    <AddModal modalId="addResumeModal" {...addModal}
+    <AddModal modalId={modalId} {...addModal}
       title="Generate Resume" validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
-      <SelectInputWithRefresh id={`${modalId}Job`} {...jobManager}
+      <SelectInputWithRefresh {...jobManager}
         value={jobInput.value} editing={jobInput.editing} handleChange={jobInput.handleChange}
         label="Job" optionToString={(job) => `${job.title}, ${job.company}`} errors={addModal.errors["job"]}
       />
-      <SelectInputWithRefresh id={`${modalId}Template`} {...templateManager}
+      <SelectInputWithRefresh {...templateManager}
         value={templateInput.value} editing={templateInput.editing} handleChange={templateInput.handleChange}
         label="Template" optionToString={(template) => template.name} errors={addModal.errors["template"]}
       />

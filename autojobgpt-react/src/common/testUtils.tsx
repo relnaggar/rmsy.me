@@ -6,7 +6,6 @@ import { fireEvent } from "@testing-library/dom";
 
 import { routesConfig, routesBasename }  from "../routes/routesConfig";
 import { generateResponse } from "../api/mockApi";
-import { get } from "http";
 
 
 const mockRoutesConfig: RouteObject[] = [...routesConfig];
@@ -120,7 +119,7 @@ export const clickCloseButton = async (modal: HTMLElement): Promise<void> => {
   await act(async () => {
     userEvent.click(closeButton);
   });
-  await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 3000});
+  await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
 };
 
 export const userUploadDocxFile = async (modal: HTMLElement, labelText: string, fileName: string): Promise<void> => {

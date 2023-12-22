@@ -176,7 +176,7 @@ describe(`api input error after submitting the ${modalName} modal can be cleared
       const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp(testDataForInput.label, "i")});
       await userTypeInput(modal, testDataForInput.label, "abc");
       expect(errorAlert).not.toBeInTheDocument();
-      await clickSubmitButton(modal); // close the modal to make sure transition is complete by the end of the test
+      await clickCloseButton(modal); // close the modal to make sure transition is complete by the end of the test
     });
   }
 });
@@ -216,6 +216,7 @@ test(`${modalName} modal retains api input errors on close and reopen`, async ()
   }
   mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse(errorResponse));
   await clickSubmitButton(modal);
+  modal = await openAndGetModal(openAndGetModalParams);
   await clickCloseButton(modal);
   modal = await openAndGetModal(openAndGetModalParams);
   for (const testDataForInput of testData) {
@@ -233,6 +234,7 @@ describe(`${modalName} retains api general errors on close and reopen`, () => {
       await fillWithValidValues(modal);
       testDataForApiGeneralError.mockApiError();
       await clickSubmitButton(modal);
+      modal = await openAndGetModal(openAndGetModalParams);
       await clickCloseButton(modal);
       modal = await openAndGetModal(openAndGetModalParams);
       const errorAlert = getByRole(modal, "alert");

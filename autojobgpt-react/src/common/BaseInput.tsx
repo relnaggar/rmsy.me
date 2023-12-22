@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useId, useRef } from 'react';
 
 import { CommonInputControlProps } from "../hooks/useInputControl";
 
@@ -12,7 +12,7 @@ export interface BaseInputProps extends CommonInputControlProps,
   Omit<React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'id' | 'value'>
 {
   type: string,
-  id: string,
+  id?: string,
   label: string,
   loading?: boolean,
   errors?: string[],
@@ -46,12 +46,14 @@ const BaseInput = React.forwardRef(({
 ): React.JSX.Element => {
   const error: string = errors.join(" ");
   const showError: boolean = !editing && !loading && error !== "";
-  const feedbackId = `${id}Feedback`;
+  const autoId = useId();
+  const currentId = id ?? autoId;
+  const feedbackId = useId();
   const childrenRef = useRef<HTMLDivElement>(null);
 
   const inputProps: React.TextareaHTMLAttributes<HTMLTextAreaElement> | React.InputHTMLAttributes<HTMLInputElement> = {
-    id,
-    name: id,
+    id: currentId,
+    name: currentId,
     className: `${
       type === "select" ? "form-select" : "form-control"}${
       isValid ? " is-valid" : ""}${
@@ -100,7 +102,7 @@ const BaseInput = React.forwardRef(({
       {input}
       {showError &&
         <div id={feedbackId}
-          className="invalid-feedback"  role={showError ? "alert": undefined} aria-labelledby={id}
+          className="invalid-feedback"  role={showError ? "alert": undefined} aria-labelledby={currentId}
         >
           {error}
         </div>
@@ -111,7 +113,7 @@ const BaseInput = React.forwardRef(({
   const inputContent = (
     <>
       { !floatingLabel &&
-        <label className="form-label" htmlFor={id}>
+        <label className="form-label" htmlFor={currentId}>
           {label}
         </label>
       }
@@ -121,7 +123,7 @@ const BaseInput = React.forwardRef(({
             { floatingLabel ?
               <div className="form-floating">        
                 {inputWithFeedback}
-                <label htmlFor={id}>{label}</label>              
+                <label htmlFor={currentId}>{label}</label>              
               </div>
             :
               inputWithFeedback

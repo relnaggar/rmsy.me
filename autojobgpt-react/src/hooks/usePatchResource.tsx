@@ -1,10 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState, useCallback } from "react";
 
-import useAPI from "./useApiRoot";
-import { FetchDataContext } from "../routes/routesConfig";
-import { CSRFTokenContext } from "../routes/Layout";
+import useApiCall, { OnSuccessParams, AfterCallParams } from "./useApiCall"
 import { WithId } from '../api/types';
-import { makeErrorMessage } from "./hooksUtils";
 
 
 export interface UsePatchResource<Resource> {
@@ -21,64 +18,31 @@ const usePatchResource = <Resource extends WithId>(
     onFail?: (errors: Record<string,string[]>) => void,
   },
 ): UsePatchResource<Resource> => {
-  const {
-    onSuccess,
-    onFail,
-  } = options || {};
+  const { onSuccess, onFail } = options || {};
 
-  const apiRoute: string = useAPI();
-  const fetchData = useContext(FetchDataContext);
-  const csrfToken = useContext(CSRFTokenContext);
+  const [idsBeingPatched, setIdsBeingPatched] = useState<number[]>([]);
 
-  const [idBeingPatched, setIdBeingPatched] = useState<number>(-1);
-  const [patch, setPatch] = useState<Partial<Resource>>({});
+  const handleSuccess = useCallback(async ({ response, resourceId }: OnSuccessParams): Promise<void> => {
+    const patchedResource: Resource = await response.json();
+    const oldResource: Resource = resources.find((resource) => resource.id === resourceId)!;
+    setResources((resources) => resources.map(
+      (resource) => resource.id === resourceId ? patchedResource : resource
+    ));
+    onSuccess?.(oldResource, setResources);
+  }, [resources, setResources, onSuccess]);
 
-  useEffect(() => {
-    const doPatch = async (): Promise<void> => {
-      let errors: Record<string,string[]> = {};
-      try {
-        const response: Response = await fetchData(`${apiRoute}${apiPath}${idBeingPatched}/`, { 
-          method: "PATCH", 
-          headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
-          body: JSON.stringify(patch)
-        });
+  const afterCall = useCallback(({ resourceId }: AfterCallParams): void => {
+    setIdsBeingPatched((idsBeingPatched) => idsBeingPatched.filter((idBeingPatched) => idBeingPatched !== resourceId));
+  }, []);
+  
+  const { call } = useApiCall(apiPath, "PATCH", { onSuccess: handleSuccess, afterCall, onFail });
 
-        // wait for 3 seconds before continuing
-        // await new Promise(resolve => setTimeout(resolve, 3000));
+  const patchResource = useCallback((id: number, patchData: Partial<Resource>): void => {
+    setIdsBeingPatched((idsBeingPatched) => [...idsBeingPatched, id]);
+    call({data: patchData, resourceId: id});    
+  }, [call]);
 
-        if (response.ok) {
-          const patchedResource: Resource = await response.json();
-          const oldResource: Resource = resources.find((resource) => resource.id === idBeingPatched)!;
-          setResources((resources) => resources.map(
-            (resource) => resource.id === idBeingPatched ? patchedResource : resource
-          ));
-          onSuccess?.(oldResource, setResources);
-        } else {          
-          errors = await response.json();
-          if (!String(errors)) {
-            errors = {error: makeErrorMessage(response.statusText)};
-          }
-        }
-      } catch (error) {
-        errors["error"] = makeErrorMessage(error);
-      } finally {    
-        setIdBeingPatched(-1);
-        if (Object.keys(errors).length > 0) {
-          onFail?.(errors);
-        }
-      }
-    };
-    if (idBeingPatched !== -1) {
-      doPatch();
-    }
-  }, [fetchData, apiRoute, apiPath, csrfToken, idBeingPatched, patch, resources, setResources, onSuccess, onFail]);
-
-  const patchResource = (id: number, patch: Partial<Resource>): void => {
-    setPatch(patch);
-    setIdBeingPatched(id);
-  };
-
-  return { patching: idBeingPatched !== -1, patchResource };
+  return { patching: idsBeingPatched.length !== 0, patchResource };
 };
 
 export default usePatchResource;

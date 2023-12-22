@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import { ReactComponent as ArrowClockwiseIcon } from "bootstrap-icons/icons/arrow-clockwise.svg";
 
 import { CommonInputControlProps } from "../hooks/useInputControl";
@@ -11,17 +11,19 @@ import { WithId } from '../api/types';
 interface SelectInputWithRefreshProps<Option extends WithId> extends
   CommonInputControlProps,
   UseFetchResource<Option>,
-  Pick<BaseInputProps, "id" | "label" | "errors">
+  Pick<BaseInputProps, "label" | "errors">
 {
   optionToString: (option: Option) => string,
 };
 
 const SelectInputWithRefresh = <Option extends WithId>({
   value, editing, handleChange,
-  id, label, errors,
+  label, errors,
   fetching, resources, refetch, cancel,
   optionToString,
 }: SelectInputWithRefreshProps<Option>): React.JSX.Element => {
+  const id = useId();
+  
   const selectOptions = resources.map((opt) => ({
     value: opt.id.toString(),
     label: optionToString(opt),

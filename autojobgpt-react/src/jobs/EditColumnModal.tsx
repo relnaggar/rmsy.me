@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 
 import InputWithSave from "../common/InputWithSave";
 import EditModal, { EditResourceModalProps } from "../common/EditModal";
@@ -11,7 +11,7 @@ const EditColumnModal = ({
   show, setShow, editId,
   ...resourceManager
 }: EditColumnModalProps): React.JSX.Element => {
-  const modalId = `editColumnModal${editId}`;
+  const modalId = useId();
   const title = "Edit Column";
 
   return (

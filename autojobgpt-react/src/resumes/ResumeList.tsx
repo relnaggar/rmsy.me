@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from 'react';
+import React, { useContext } from 'react';
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useAddModal from "../hooks/useAddModal";
@@ -53,10 +53,10 @@ const ResumeList = (): React.JSX.Element => {
   });
   const { setResources: setSubstitutions } = substitutionManager;
 
-  const handleAddResumeSuccess = useCallback((resume: Resume) => {
+  const handleAddResumeSuccess = (resume: Resume) => {
     addResumeModal.handleAddSuccess();
     setSubstitutions((substitutions) => [...substitutions, ...resume.substitutions]);
-  }, [addResumeModal, setSubstitutions]);
+  };
 
   const resumeManager = useResource<Resume,ResumeUpload>("resumes/", getPlaceholderResume, {
     onFetchFail: errorAlert.showErrors,

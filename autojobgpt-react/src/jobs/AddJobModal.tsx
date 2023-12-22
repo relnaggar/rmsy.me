@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useId } from "react";
 import { ReactComponent as RobotIcon } from "bootstrap-icons/icons/robot.svg";
 
 import useFetch from "../hooks/useFetch";
@@ -14,7 +14,7 @@ const AddJobModal = ({
   postResource: postJob,
   ...addModal
 }: AddResourceModalProps<JobUpload>): React.JSX.Element => {
-  const modalId = "addJobModal";
+  const modalId = useId();
   const urlInput = useInputControl();
   const titleInput = useInputControl();
   const companyInput = useInputControl();
@@ -24,18 +24,18 @@ const AddJobModal = ({
   const [showFillErrorAlert, setShowFillErrorAlert] = useState<boolean>(false);  
   const { url: urlFillErrors, ...nonURLFillErrors } = fillErrors;
 
-  const onFillSuccess = useCallback((jobDetails: JobDetails) => {
+  const onFillSuccess = (jobDetails: JobDetails) => {
     titleInput.edit(jobDetails.title);
     companyInput.edit(jobDetails.company);
     postingInput.edit(jobDetails.posting);
-  }, [titleInput, companyInput, postingInput]);
+  };
 
-  const onFillFail = useCallback((errors: Record<string,string[]>) => {
+  const onFillFail = (errors: Record<string,string[]>) => {
     setFillErrors(errors);
     if (Object.keys(errors).filter((key) => key !== "url").length > 0) {
       setShowFillErrorAlert(true);
     }
-  }, []);
+  };
 
   const { fetching: filling, refetch: fill, cancel: cancelFill } = useFetch<JobDetails>(
     `jobs/extract-details-from-url`, {
@@ -120,7 +120,7 @@ const AddJobModal = ({
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
       submitDisabled={filling}      
     >
-      <BaseInput id={`${modalId}URL`}
+      <BaseInput
         value={urlInput.value} editing={urlInput.editing} handleChange={urlInput.handleChange}
         label="URL" type="url" loading={filling} errors={addModal.errors["url"] || urlFillErrors}
       >
@@ -133,15 +133,15 @@ const AddJobModal = ({
       />
       <hr />
       <h5>Details</h5>
-      <BaseInput id={`${modalId}Title`} ref={titleInput.ref}
+      <BaseInput ref={titleInput.ref}
         value={titleInput.value} editing={titleInput.editing} handleChange={titleInput.handleChange}
         label="Title" type="text" loading={filling} errors={addModal.errors["title"]}
       />
-      <BaseInput id={`${modalId}Company`} ref={companyInput.ref}
+      <BaseInput ref={companyInput.ref}
         value={companyInput.value} editing={companyInput.editing} handleChange={companyInput.handleChange}
         label="Company" type="text" loading={filling} errors={addModal.errors["company"]}
       />
-      <BaseInput id={`${modalId}Posting`} ref={postingInput.ref}
+      <BaseInput ref={postingInput.ref}
         value={postingInput.value} editing={postingInput.editing} handleChange={postingInput.handleChange}
         label="Posting" type="textarea" loading={filling} errors={addModal.errors["posting"]}
       />

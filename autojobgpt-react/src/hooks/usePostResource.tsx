@@ -50,7 +50,7 @@ const usePostResource = <Resource extends WithId, ResourceUpload>(
   });
 
   const postResource = useCallback(async (resourceUpload: ResourceUpload): Promise<void> => {
-    await call({postData: resourceUpload});
+    await call({data: resourceUpload});
   }, [call]);
 
   return { posting, postResource };

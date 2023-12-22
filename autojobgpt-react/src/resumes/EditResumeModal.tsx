@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import BootstrapModal from 'react-bootstrap/Modal';
 import BootstrapAlert from 'react-bootstrap/Alert';
 import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
@@ -30,15 +30,15 @@ const EditResumeModal = ({
   const [errors, setErrors] = useState<Record<string,string[]>>({});
   const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
 
-  const handleDuplicateSuccess = useCallback((resume: Resume) => {
+  const handleDuplicateSuccess = (resume: Resume) => {
     setResources([...resources, resume]);
     setShowErrorAlert(false);
-  }, [resources, setResources]);
+  };
 
-  const handleDuplicateFail = useCallback((es: Record<string,string[]>) => {
+  const handleDuplicateFail = (es: Record<string,string[]>) => {
     setErrors(es);
     setShowErrorAlert(true);
-  }, []);
+  };
 
   const { posting: duplicating, post: duplicate } = usePost<Resume>(
     `${apiPath}${editId}/duplicate/`, {

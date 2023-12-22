@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useState, useEffect, useId } from "react";
 import { ReactComponent as FloppyIcon } from "bootstrap-icons/icons/floppy.svg";
 
 import useInputControl from "../hooks/useInputControl";
@@ -40,7 +40,7 @@ const InputWithSave = <Resource extends WithId>({
   if (!labelProperty && !labelText) throw new Error("InputWithSave must have either labelProperty or labelText");
 
   const resource: Resource = resources.find((resource) => resource.id === editId)!;
-  const id: string = `${apiPath.replace("/", "")}${editId}${editableProperty}`;
+  const id = useId();
   
   let tmp: string;
   if (typeof resource[editableProperty] === "string") {
@@ -68,15 +68,15 @@ const InputWithSave = <Resource extends WithId>({
     }
   }, [value, resourceEditableProperty]);
 
-  const handleUpdateFail = useCallback((errors: Record<string,string[]>) => {
+  const handleUpdateFail = (errors: Record<string,string[]>) => {
     setErrors(errors);
-  }, [setErrors]);
+  };
 
-  const handleUpdateSuccess = useCallback(() => {
+  const handleUpdateSuccess = () => {
     setErrors({});
     setSaved(true);
     onSaveSuccess && onSaveSuccess();
-  }, [setErrors, onSaveSuccess]);
+  };
 
   const {patchResource: updateResource, patching: updating } = usePatch<Resource>(apiPath, resources, setResources, {
     onFail: handleUpdateFail,

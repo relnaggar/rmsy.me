@@ -3,7 +3,6 @@ import { useContext, useState, useRef, useCallback } from "react";
 import useApiRoot from "./useApiRoot";
 import { FetchDataContext } from "../routes/routesConfig";
 import { CSRFTokenContext } from "../routes/Layout";
-import { makeErrorMessage } from "./hooksUtils";
 
 
 export interface OnSuccessParams {
@@ -15,10 +14,28 @@ export interface AfterCallParams {
   resourceId?: number,
 };
 
+interface CallParams {
+  data?: any,
+  resourceId?: number,
+  paramString?: string,
+};
+
 export interface UseApiCall {
   calling: boolean,
-  call: (_: {postData?: any, resourceId?: number}) => Promise<void>,
+  call: (params?: CallParams) => Promise<void>,
   cancel?: () => void,
+};
+
+const makeErrorMessage = (error: any): string[] => {
+  if (error instanceof Error) {
+    if (error.message === "Failed to fetch") {
+      return ["Failed to connect to server. Please check your internet connection and try again."];
+    } else {
+      return [error.message];
+    }
+  } else {
+    return [String(error)];
+  }
 };
 
 const useApiCall = (
@@ -41,7 +58,9 @@ const useApiCall = (
   const [calling, setCalling] = useState<boolean>(false);
   const abortControllerRef = useRef<AbortController>(new AbortController());
 
-  const call = useCallback(async ({postData, resourceId}: {postData?: any, resourceId?: number}): Promise<void> => {
+  const call = useCallback(async (params?: CallParams): Promise<void> => {
+    const { data, resourceId, paramString } = params || {};
+
     if (method === "GET") {
       if (calling) {
         abortControllerRef.current.abort();
@@ -50,21 +69,21 @@ const useApiCall = (
     }
     setCalling(true);
 
-    beforeCall?.(postData);
+    beforeCall?.(data);
 
     let body: FormData | string | undefined;
-    if (postData === undefined) {
+    if (data === undefined) {
       body = undefined;
     } else {
       const formData = new FormData();
       let containsFile = false;
-      for (const [key, value] of Object.entries(postData as Record<string, string | Blob>)) {
+      for (const [key, value] of Object.entries(data as Record<string, string | Blob>)) {
         if (value instanceof File) {
           containsFile = true;          
         }
         formData.append(key, value as string | Blob);
       }
-      body = containsFile ? formData : JSON.stringify(postData);
+      body = containsFile ? formData : JSON.stringify(data);
     }
 
     let errors: Record<string,string[]> = {};
@@ -79,6 +98,9 @@ const useApiCall = (
       let url: string = `${apiRoot}${apiPath}`;
       if (resourceId !== undefined) {
         url += `${resourceId}/`;
+      }
+      if (paramString !== undefined) {
+        url += `?${paramString}`;
       }
 
       const response: Response = await fetchData(url, {

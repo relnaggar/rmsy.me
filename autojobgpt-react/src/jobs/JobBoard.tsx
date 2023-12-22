@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from "react";
+import React, { useContext } from "react";
 
 import { ConfirmationModalContext } from "../routes/Layout";
 import useAddModal from "../hooks/useAddModal";
@@ -62,7 +62,7 @@ const JobBoard = (): React.JSX.Element => {
     openConfirmationModal(() => deleteJob(id), `delete job "${job.title}, ${job.company}"`, "Delete");
   };  
 
-  const handlePatchStatusSuccess = useCallback((
+  const handlePatchStatusSuccess = (
     oldStatus: Status,
     setStatuses: React.Dispatch<React.SetStateAction<Status[]>>
   ) => {    
@@ -86,9 +86,9 @@ const JobBoard = (): React.JSX.Element => {
       }
       return newStatuses;
     });
-  }, []);
+  };
 
-  const handleDeleteStatusSuccess = useCallback((
+  const handleDeleteStatusSuccess = (
     deletedStatus: Status,
     setStatuses: React.Dispatch<React.SetStateAction<Status[]>>
   ) => {
@@ -102,7 +102,7 @@ const JobBoard = (): React.JSX.Element => {
       }
       return newStatuses;
     });
-  }, []);
+  };
 
   const statusManager = useResource<Status,StatusUpload>("statuses/", generatePlaceholderStatus, {
     onFetchFail: errorAlert.showErrors,

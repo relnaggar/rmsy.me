@@ -76,7 +76,7 @@ test(`clicking close button closes the ${modalName} modal within 1 second`, asyn
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await clickCloseButton(modal);
-  waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
+  await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
 });
 
 describe(`${modalName} modal has all select inputs`, () => {
@@ -126,7 +126,7 @@ test(`submitting the ${modalName} modal with valid input closes the modal within
   await fillWithValidValues(modal);
   mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
   await clickSubmitButton(modal);
-  waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
+  await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
 });
 
 test(`submitting the ${modalName} modal with valid input makes an api call`, async () => {
@@ -219,6 +219,7 @@ test(`${modalName} modal retains api input errors on close and reopen`, async ()
   }
   mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse(errorResponse));
   await clickSubmitButton(modal);
+  modal = await openAndGetModal(openAndGetModalParams);
   await clickCloseButton(modal);
   modal = await openAndGetModal(openAndGetModalParams);
   for (const testDataForInput of testData) {
@@ -236,6 +237,7 @@ describe(`${modalName} modal retains api general errors on close and reopen`, ()
       await fillWithValidValues(modal);
       testDataForApiGeneralError.mockApiError();
       await clickSubmitButton(modal);
+      modal = await openAndGetModal(openAndGetModalParams);
       await clickCloseButton(modal);
       modal = await openAndGetModal(openAndGetModalParams);
       const errorAlert = getByRole(modal, "alert");

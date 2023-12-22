@@ -120,7 +120,7 @@ test(`submitting the ${modalName} modal with valid input closes the modal within
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
   await clickSubmitButton(modal);
-  waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
+  await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
 });
 
 test(`submitting the ${modalName} modal with valid input makes an api call`, async () => {
@@ -201,7 +201,7 @@ describe(`api input error after submitting the ${modalName} modal can be cleared
       const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp(testDataForInput.label, "i")});
       await userTypeInput(modal, testDataForInput.label, "abc");
       expect(errorAlert).not.toBeInTheDocument();
-      await clickSubmitButton(modal); // close the modal to make sure transition is complete by the end of the test
+      await clickCloseButton(modal); // close the modal to make sure transition is complete by the end of the test
     });
   }
 });
@@ -242,6 +242,7 @@ test(`${modalName} modal retains api input errors on close and reopen`, async ()
   }
   mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse(errorResponse));
   await clickSubmitButton(modal);
+  modal = await openAndGetModal(openAndGetModalParams);
   await clickCloseButton(modal);
   modal = await openAndGetModal(openAndGetModalParams);
   for (const testDataForInput of testData) {
@@ -255,13 +256,14 @@ describe(`${modalName} retains api general errors on close and reopen`, () => {
   for (const testDataForApiGeneralError of testDataForApiGeneralErrors(mockFunctions)) {
     test(`${modalName} modal retains api ${testDataForApiGeneralError.apiErrorType} error on close and reopen`, async () => {
       await renderRoute(thisRoute);
-      const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
+      let modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       await fillWithValidValues(modal);
       testDataForApiGeneralError.mockApiError();
       await clickSubmitButton(modal);
+      modal = await openAndGetModal(openAndGetModalParams);
       await clickCloseButton(modal);
-      const newModal = await openAndGetModal(openAndGetModalParams);
-      const errorAlert = getByRole(newModal, "alert");
+      modal = await openAndGetModal(openAndGetModalParams);
+      const errorAlert = getByRole(modal, "alert");
       expect(errorAlert).toBeInTheDocument();
       expect(errorAlert).toHaveTextContent(errorMessage);
     });
@@ -335,7 +337,6 @@ describe(`api general errors after clicking the ${modalName} modal fill button s
   }
 });
 
-
 test(`api input error after clicking the ${modalName} modal fill button shows an error message attached to the URL input`, async () => {
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
@@ -378,7 +379,7 @@ describe(`api general errors after clicking the ${modalName} modal fill button c
       testDataForApiGeneralError.mockApiError();
       await clickFillButton(modal);
       await clickFillButton(modal);
-      waitFor(() => expect(queryByRole(modal, "alert")).not.toBeInTheDocument(), {timeout: 1000});
+      await waitFor(() => expect(queryByRole(modal, "alert")).not.toBeInTheDocument(), {timeout: 1000});
     });
   }
 });

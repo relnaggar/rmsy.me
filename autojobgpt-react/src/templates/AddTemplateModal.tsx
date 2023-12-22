@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 
 import useInputControl from "../hooks/useInputControl";
 import AddModal, { AddResourceModalProps } from "../common/AddModal";
@@ -14,7 +14,7 @@ const AddTemplateModal = ({
   const uploadInput = useInputControl();
   const descriptionInput = useInputControl();
 
-  const modalId: string = `addTemplateModal`;
+  const modalId = useId();
 
   const validateSubmit = (): boolean => {
     let valid = true;
@@ -48,16 +48,16 @@ const AddTemplateModal = ({
       title="Add Resume Template" modalId={modalId}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
-      <BaseInput id={`${modalId}Name`} ref={nameInput.ref}
+      <BaseInput ref={nameInput.ref}
         value={nameInput.value} editing={nameInput.editing} handleChange={nameInput.handleChange}
         label="Template Name" type="text" errors={addModal.errors["name"]}
       />
-      <BaseInput id={`${modalId}Upload`} ref={uploadInput.ref}
+      <BaseInput ref={uploadInput.ref}
         value={uploadInput.value} editing={uploadInput.editing} handleChange={uploadInput.handleChange}
         label="Upload" type="file" errors={addModal.errors["upload"]}
         accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       />
-      <BaseInput id={`${modalId}Description`} ref={descriptionInput.ref}
+      <BaseInput ref={descriptionInput.ref}
         value={descriptionInput.value} editing={descriptionInput.editing} handleChange={descriptionInput.handleChange}
         label="Description (optional)" type="textarea" errors={addModal.errors["description"]} rows={3}         
       />

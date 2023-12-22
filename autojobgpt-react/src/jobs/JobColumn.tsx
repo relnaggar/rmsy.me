@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import { ReactComponent as CaretLeftIcon } from 'bootstrap-icons/icons/caret-left.svg';
 import { ReactComponent as CaretRightIcon } from 'bootstrap-icons/icons/caret-right.svg';
 
@@ -42,7 +42,7 @@ const JobColumn = ({
   onDragOver,
   onDrop,
 }: JobColumnProps): React.JSX.Element => {
-  const columnId = `column${status.order}`;
+  const columnId = useId();
 
   const moveStatus = (direction: "left" | "right"): void => {
     for (let i = 0; i < allStatuses.length; i++) {
@@ -74,13 +74,13 @@ const JobColumn = ({
   });
 
   return (
-    <div aria-labelledby={`${columnId}Title`}
+    <div aria-labelledby={columnId}
       role="region" className="kanban-column me-2" onDragOver={onDragOver} onDrop={onDrop}
     >
       <div className="card">
         <div className="card-header">
           <span className="d-flex">
-            <h5 id={`${columnId}Title`} className="mt-2 card-title flex-grow-1">{status.name}</h5>
+            <h5 id={columnId} className="mt-2 card-title flex-grow-1">{status.name}</h5>
             <div className="btn-group ms-1" role="group">
               {status.id !== allStatuses[0].id &&
                 <button aria-label="Move Left"
