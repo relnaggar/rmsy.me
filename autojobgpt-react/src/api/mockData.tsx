@@ -53,6 +53,14 @@ export const validJob2: Job = {
   status: 2,
 }
 
+export const validJob3: Job = {
+  id: 3,
+  url: "https://www.example3.com",
+  title: "Test Job 3",
+  company: "Test Company 3",
+  posting: "Test Text 3",
+  status: 3,
+}
 
 export const validResumeTemplate1: ResumeTemplate = {
   id: 1,

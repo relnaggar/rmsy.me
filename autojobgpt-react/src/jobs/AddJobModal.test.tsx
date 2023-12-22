@@ -1,19 +1,10 @@
 import { screen, getAllByRole, getByRole, waitFor, queryByRole } from "@testing-library/react";
 
-import { injectMocks, renderRoute, openAndGetModal, getSubmitButton, clickCloseButton, clickSubmitButton, userTypeInput, mockFunctions, OpenAndGetModalParams, getFillButton, clickFillButton, getFirstColumn } from "../common/testUtils";
+import { injectMocks, renderRoute, openAndGetModal, getSubmitButton, clickCloseButton, clickSubmitButton, userInput, mockFunctions, OpenAndGetModalParams, getFillButton, clickFillButton, getFirstColumn } from "../common/testUtils";
 import { generateResponse, generateErrorResponse, generateConditionalResponseByRoute } from "../api/mockApi";
 import { errorMessage, testDataForApiGeneralErrors, validJob1, validStatus1, validStatus2 } from "../api/mockData";
 import { Job, JobDetails } from '../api/types';
 
-
-beforeEach(() => {
-  jest.clearAllMocks();
-  injectMocks();
-  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
-    url: "../api/statuses/",
-    data: [validStatus1, validStatus2],
-  }]));
-});
 
 const thisRoute = "/jobs";
 const modalName = "add job";
@@ -43,13 +34,22 @@ const testData: {
 
 const fillWithValidValues = async (modal: HTMLElement): Promise<void> => {
   for (const testDataForInput of testData) {
-    await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+    await userInput(modal, testDataForInput.label, testDataForInput.validValue);
   }
 };
 
 const fillValidURL = async (modal: HTMLElement): Promise<void> => {
-  await userTypeInput(modal, "url", validJob1.url);
+  await userInput(modal, "url", validJob1.url);
 };
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  injectMocks();
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
+    url: "../api/statuses/",
+    data: [validStatus1, validStatus2],
+  }]));
+});
 
 test(`${modalName} button appears once on the page`, async () => {
   await renderRoute(thisRoute);
@@ -199,7 +199,7 @@ describe(`api input error after submitting the ${modalName} modal can be cleared
       mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({[testDataForInput.label]: [errorMessage]}));
       await clickSubmitButton(modal);
       const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp(testDataForInput.label, "i")});
-      await userTypeInput(modal, testDataForInput.label, "abc");
+      await userInput(modal, testDataForInput.label, "abc");
       expect(errorAlert).not.toBeInTheDocument();
       await clickCloseButton(modal); // close the modal to make sure transition is complete by the end of the test
     });
@@ -223,12 +223,12 @@ describe(`api general errors after submitting the ${modalName} modal can be clea
 
 test(`${modalName} modal retains input values on close and reopen`, async () => {
   await renderRoute(thisRoute);
-  let addColumnModal: HTMLElement = await openAndGetModal(openAndGetModalParams);
-  await fillWithValidValues(addColumnModal);
-  await clickCloseButton(addColumnModal);
-  addColumnModal = await openAndGetModal(openAndGetModalParams);
+  let modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
+  await fillWithValidValues(modal);
+  await clickCloseButton(modal);
+  modal = await openAndGetModal(openAndGetModalParams);
   for (const testDataForInput of testData) {
-    expect(getByRole(addColumnModal, "textbox", {name: new RegExp(testDataForInput.label, "i")})).toHaveValue(testDataForInput.validValue);
+    expect(getByRole(modal, "textbox", {name: new RegExp(testDataForInput.label, "i")})).toHaveValue(testDataForInput.validValue);
   }
 });
 
@@ -355,7 +355,7 @@ test(`api input error after clicking the ${modalName} modal fill button can be c
   mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({url: [errorMessage]}));
   await clickFillButton(modal);
   const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp("url", "i")});
-  await userTypeInput(modal, "url", "abc");
+  await userInput(modal, "url", "abc");
   expect(errorAlert).not.toBeInTheDocument();
   await clickCloseButton(modal); // close the modal to make sure transition is complete by the end of the test
 });
@@ -365,7 +365,7 @@ test(`empty URL input error after clicking the ${modalName} modal fill button ca
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await clickFillButton(modal);
   const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp("url", "i")});
-  await userTypeInput(modal, "url", "abc");
+  await userInput(modal, "url", "abc");
   expect(errorAlert).not.toBeInTheDocument();
   await clickCloseButton(modal); // close the modal to make sure transition is complete by the end of the test
 });

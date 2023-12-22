@@ -1,6 +1,6 @@
 import { screen, getAllByRole, getByRole, waitFor, queryByRole } from "@testing-library/react";
 
-import { injectMocks, renderRoute, getSubmitButton, clickSubmitButton, userTypeInput, mockFunctions, clickCloseButton, openAndGetModal, OpenAndGetModalParams, getColumnByName } from "../common/testUtils";
+import { injectMocks, renderRoute, getSubmitButton, clickSubmitButton, userInput, mockFunctions, clickCloseButton, openAndGetModal, OpenAndGetModalParams, getColumnByName } from "../common/testUtils";
 import { generateResponse, generateErrorResponse } from "../api/mockApi";
 import { errorMessage, testDataForApiGeneralErrors, validStatus1 } from "../api/mockData";
 
@@ -23,7 +23,7 @@ const testData: {
 
 const fillWithValidValues = async (modal: HTMLElement): Promise<void> => {
   for (const testDataForInput of testData) {
-    await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+    await userInput(modal, testDataForInput.label, testDataForInput.validValue);
   }
 };
 
@@ -177,7 +177,7 @@ describe(`api input error after submitting the ${modalName} modal can be cleared
       mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({[testDataForInput.label]: [errorMessage]}));
       await clickSubmitButton(modal);
       const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp(testDataForInput.label, "i")});
-      await userTypeInput(modal, testDataForInput.label, "abc");
+      await userInput(modal, testDataForInput.label, "abc");
       expect(errorAlert).not.toBeInTheDocument();
       await clickCloseButton(modal); // close the modal to make sure transition is complete by the end of the test
     });

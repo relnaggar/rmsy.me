@@ -100,18 +100,30 @@ export const clickSubmitButton = async (modal: HTMLElement): Promise<void> => {
   });
 };
 
-export const userTypeInput = async (modal: HTMLElement, inputLabel: string, text: string): Promise<void> => {
-  const input: HTMLElement = getByRole(modal, "textbox", {name: new RegExp(inputLabel, "i")});
-  await act(async () => {
-    userEvent.type(input, text);
-  });
+export const userInput = async (modal: HTMLElement, inputLabel: string, value: string, role = "textbox"): Promise<void> => {
+  const input: HTMLElement = getByRole(modal, role, {name: new RegExp(inputLabel, "i")});
+  if (role === "combobox") {
+    await act(async () => {
+      userEvent.selectOptions(input, value);
+    });
+  } else {
+    await act(async () => {
+      userEvent.type(input, value);
+    });
+  }
 };
 
-export const userClearInput = async (modal: HTMLElement, inputLabel: string): Promise<void> => {
-  const input: HTMLElement = getByRole(modal, "textbox", {name: new RegExp(inputLabel, "i")});
-  await act(async () => {
-    userEvent.clear(input);
-  });
+export const userClearInput = async (modal: HTMLElement, inputLabel: string, role = "textbox"): Promise<void> => {
+  const input: HTMLElement = getByRole(modal, role, {name: new RegExp(inputLabel, "i")});
+  if (role === "combobox") {
+    await act(async () => {
+      userEvent.selectOptions(input, "0");
+    });
+  } else {
+    await act(async () => {
+      userEvent.clear(input);
+    });
+  }
 }
 
 export const clickCloseButton = async (modal: HTMLElement): Promise<void> => {

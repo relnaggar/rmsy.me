@@ -1,6 +1,6 @@
 import { getByRole, screen, getAllByRole, waitFor, queryByRole } from "@testing-library/react";
 
-import { injectMocks, mockFunctions, renderRoute, queryResources, openAndGetEditModal, clickCloseButton, userClearInput, getSaveButton, clickSaveButton, userTypeInput } from "../common/testUtils";
+import { injectMocks, mockFunctions, renderRoute, queryResources, openAndGetEditModal, clickCloseButton, userClearInput, getSaveButton, clickSaveButton, userInput } from "../common/testUtils";
 import { generateConditionalResponseByRoute, generateResponse, generateErrorResponse } from "../api/mockApi";
 import { validStatus1, validStatus2, validStatus3, testDataForApiGeneralErrors, errorMessage } from "../api/mockData";
 import { Status } from "../api/types";
@@ -127,7 +127,7 @@ describe(`for each ${modalName} modal, saving each input with valid input makes 
   for (const testDataForInput of testData) {
     testEachModal(`saving input ${testDataForInput.label} with valid input makes an api call`, async (modal, mockData) => {
       await userClearInput(modal, testDataForInput.label);
-      await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+      await userInput(modal, testDataForInput.label, testDataForInput.validValue);
       const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
       mockFunctions.fetchData.mockImplementationOnce(generateResponse({...mockData, [testDataForInput.label]: testDataForInput.validValue}));
       await clickSaveButton(modal, testDataForInput.label);
@@ -140,7 +140,7 @@ describe(`for each ${modalName} modal, saving each input with valid input makes 
   for (const testDataForInput of testData) {
     testEachModal(`saving input ${testDataForInput.label} with valid input makes an api call to save the data`, async (modal, mockData) => {
       await userClearInput(modal, testDataForInput.label);
-      await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+      await userInput(modal, testDataForInput.label, testDataForInput.validValue);
       mockFunctions.fetchData.mockImplementationOnce(generateResponse({...mockData, [testDataForInput.label]: testDataForInput.validValue}));
       await clickSaveButton(modal, testDataForInput.label);
       expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${thisApiPath}${mockData.id}/`, expect.objectContaining({
@@ -155,7 +155,7 @@ describe(`for each ${modalName} modal, saving each input with valid input change
   for (const testDataForInput of testData) {
     testEachModal(`saving input ${testDataForInput.label} with valid input changes the input's value to the saved value`, async (modal, mockData, modalNumber) => {
       await userClearInput(modal, testDataForInput.label);
-      await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+      await userInput(modal, testDataForInput.label, testDataForInput.validValue);
       mockFunctions.fetchData.mockImplementationOnce(generateResponse({...mockData, [testDataForInput.label]: testDataForInput.validValue}));
       await clickSaveButton(modal, testDataForInput.label);
       await clickCloseButton(modal);
@@ -171,7 +171,7 @@ describe(`for each ${modalName} modal, saving the name changes the ${thisResourc
   testEachModal(`saving saving the name changes the ${thisResource}'s name`, async (modal, mockData, modalNumber) => {
     const testDataForInput = testData[0];
     await userClearInput(modal, testDataForInput.label);
-    await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+    await userInput(modal, testDataForInput.label, testDataForInput.validValue);
     mockFunctions.fetchData.mockImplementationOnce(generateResponse({...mockData, [testDataForInput.label]: testDataForInput.validValue}));
     await clickSaveButton(modal, testDataForInput.label);
     await clickCloseButton(modal);
@@ -186,7 +186,7 @@ describe(`api general errors after saving each ${modalName} modal input show an 
     for (const testDataForInput of testData) {
       testEachModal(`api ${testDataForApiGeneralError.apiErrorType} error after saving input ${testDataForInput.label} show an error alert for that input`, async (modal) => {
         await userClearInput(modal, testDataForInput.label);
-        await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+        await userInput(modal, testDataForInput.label, testDataForInput.validValue);
         testDataForApiGeneralError.mockApiError();
         await clickSaveButton(modal, testDataForInput.label);
         const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp(testDataForInput.label, "i")});
@@ -201,7 +201,7 @@ describe(`api input error after saving each ${modalName} modal input shows an er
   for (const testDataForInput of testData) {
     testEachModal(`api input error after saving input ${testDataForInput.label} shows an error message attached to the input`, async (modal) => {
       await userClearInput(modal, testDataForInput.label);
-      await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+      await userInput(modal, testDataForInput.label, testDataForInput.validValue);
       mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({[testDataForInput.label]: [errorMessage]}));
       await clickSaveButton(modal, testDataForInput.label);
       const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp(testDataForInput.label, "i")});
@@ -215,10 +215,10 @@ describe(`api input error after saving each ${modalName} modal input can be clea
   for (const testDataForInput of testData) {
     testEachModal(`api input error after saving input ${testDataForInput.label} can be cleared by editing the corresponding input`, async (modal) => {
       await userClearInput(modal, testDataForInput.label);
-      await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+      await userInput(modal, testDataForInput.label, testDataForInput.validValue);
       mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({[testDataForInput.label]: [errorMessage]}));
       await clickSaveButton(modal, testDataForInput.label);
-      await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+      await userInput(modal, testDataForInput.label, testDataForInput.validValue);
       expect(queryByRole(modal, "alert", {name: new RegExp(testDataForInput.label, "i")})).not.toBeInTheDocument();
       await clickCloseButton(modal); // close the modal to make sure transition is complete by the end of the test
     });
@@ -229,7 +229,7 @@ describe(`each ${modalName} modal does not retain input values on close and reop
   for (const testDataForInput of testData) {
     testEachModal(`does not retain input value for ${testDataForInput.label} on close and reopen`, async (modal, mockData, modalNumber) => {
       await userClearInput(modal, testDataForInput.label);
-      await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+      await userInput(modal, testDataForInput.label, testDataForInput.validValue);
       await clickCloseButton(modal);
       const resourceElements: HTMLElement[] = queryResources(thisHeadingLabel, "region");
       const newModal =  await openAndGetEditModal(resourceElements[modalNumber]);
@@ -243,7 +243,7 @@ describe(`each ${modalName} modal does not retain input errors on close and reop
   for (const testDataForInput of testData) {
     testEachModal(`does not retain input error for ${testDataForInput.label} on close and reopen`, async (modal, _, modalNumber) => {
       await userClearInput(modal, testDataForInput.label);
-      await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+      await userInput(modal, testDataForInput.label, testDataForInput.validValue);
       mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({[testDataForInput.label]: [errorMessage]}));
       await clickSaveButton(modal, testDataForInput.label);
       await clickCloseButton(modal);

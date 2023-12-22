@@ -1,6 +1,6 @@
 import { screen, getAllByRole, getByRole, getByLabelText, waitFor } from "@testing-library/react";
 
-import { injectMocks, renderRoute, getSubmitButton, openAndGetModal, clickCloseButton, clickSubmitButton, userTypeInput, mockFunctions, OpenAndGetModalParams, queryResources, userUploadDocxFile } from "../common/testUtils";
+import { injectMocks, renderRoute, getSubmitButton, openAndGetModal, clickCloseButton, clickSubmitButton, userInput, mockFunctions, OpenAndGetModalParams, queryResources, userUploadDocxFile } from "../common/testUtils";
 import { generateResponse, generateErrorResponse } from "../api/mockApi";
 import { validResumeTemplate1, errorMessage, testDataForApiGeneralErrors } from "../api/mockData";
 import { ResumeTemplate } from '../api/types';
@@ -48,7 +48,7 @@ const fillWithValidValues = async (modal: HTMLElement): Promise<void> => {
     if (testDataForInput.role === "file") {
       await userUploadDocxFile(modal, testDataForInput.label, testDataForInput.validValue);      
     } else { 
-      await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+      await userInput(modal, testDataForInput.label, testDataForInput.validValue);
     }
   }
 };
@@ -200,7 +200,7 @@ describe(`api input error after submitting the ${modalName} modal can be cleared
       if (testDataForInput.role === "file") {
         await userUploadDocxFile(modal, testDataForInput.label, testDataForInput.validValue);
       } else {
-        await userTypeInput(modal, testDataForInput.label, testDataForInput.validValue);
+        await userInput(modal, testDataForInput.label, testDataForInput.validValue);
       }
       expect(errorAlert).not.toBeInTheDocument();
       await clickCloseButton(modal); // close the modal to make sure transition is complete by the end of the test

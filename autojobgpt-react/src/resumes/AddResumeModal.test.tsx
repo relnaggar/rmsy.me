@@ -190,7 +190,6 @@ describe(`api general errors after submitting the ${modalName} modal can be clea
       testDataForApiGeneralError.mockApiError();
       await clickSubmitButton(modal);
       modal = await openAndGetModal(openAndGetModalParams);
-      const errorAlert: HTMLElement = getByRole(modal, "alert");
       mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
       await clickSubmitButton(modal);
       modal = await openAndGetModal(openAndGetModalParams);
