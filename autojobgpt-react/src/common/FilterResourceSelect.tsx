@@ -4,12 +4,12 @@ import useInputControl from "../hooks/useInputControl";
 import { WithId } from "../api/types";
 
 
-export interface FilterResourceMixin<FilterByOption extends WithId> {
+export interface CommonFilterResourceProps<FilterByOption extends WithId> {
   inputControl: ReturnType<typeof useInputControl>,
   filterByOptions: FilterByOption[],
 }
 
-interface FilterResourceSelectProps<FilterByOption extends WithId> extends FilterResourceMixin<FilterByOption> {
+interface FilterResourceSelectProps<FilterByOption extends WithId> extends CommonFilterResourceProps<FilterByOption> {
   filterByOptionToString: (resource: FilterByOption) => string,
   filterLabel: string,
   defaultOptionLabel: string,

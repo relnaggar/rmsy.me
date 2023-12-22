@@ -51,12 +51,12 @@ const ResumeList = (): React.JSX.Element => {
   const substitutionManager = useFetchResource<Substitution>("substitutions/", {
     onFail: errorAlert.showErrors
   });
-  const { resources: substitutions, setResources: setSubstitutions } = substitutionManager;
+  const { setResources: setSubstitutions } = substitutionManager;
 
   const handleAddResumeSuccess = useCallback((resume: Resume) => {
     addResumeModal.handleAddSuccess();
-    setSubstitutions([...substitutions, ...resume.substitutions]);
-  }, [addResumeModal, substitutions, setSubstitutions]);
+    setSubstitutions((substitutions) => [...substitutions, ...resume.substitutions]);
+  }, [addResumeModal, setSubstitutions]);
 
   const resumeManager = useResource<Resume,ResumeUpload>("resumes/", getPlaceholderResume, {
     onFetchFail: errorAlert.showErrors,

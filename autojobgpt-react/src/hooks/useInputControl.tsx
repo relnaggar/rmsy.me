@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import useControlledState from "./useControlledState";
 
 
-export interface InputControlMixin {
+export interface CommonInputControlProps {
   value: string,
   editing: boolean,
   handleChange: (
@@ -13,7 +13,7 @@ export interface InputControlMixin {
   ),
 };
 
-export interface UseInputControl extends InputControlMixin {
+export interface UseInputControl extends CommonInputControlProps {
   edit: (value: string) => void,
   stopEditing: () => void,
   ref: React.RefObject<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
@@ -37,14 +37,14 @@ const useInputControl = (
     }
   }, [value]);
 
-  const handleChange = (e:
+  const handleChange = useCallback((e:
     React.ChangeEvent<HTMLInputElement> |
     React.ChangeEvent<HTMLTextAreaElement> |
     React.ChangeEvent<HTMLSelectElement>
   ) => {
     setValue(e.target.value);
     setEditing(true);
-  };
+  }, [setValue]);
 
   const edit = useCallback((value: string) => {
     setValue(value);

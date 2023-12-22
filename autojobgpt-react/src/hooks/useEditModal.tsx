@@ -1,14 +1,14 @@
 import { useCallback, useState } from 'react';
 
-import { ModalMixin } from "../common/InputModal";
-import { EditResourceMixin } from '../common/EditModal';
+import { CommonModalProps } from "../common/InputModal";
+import { CommonEditModalProps } from '../common/EditModal';
 
 
-interface EditModalMixin extends ModalMixin, Pick<EditResourceMixin<never>, "editId"> {
+interface UseEditModal extends CommonModalProps, Pick<CommonEditModalProps<never>, "editId"> {
   open: (id: number) => void,
 };
 
-const useEditModal = (): EditModalMixin => {
+const useEditModal = (): UseEditModal => {
   const [show, setShow] = useState<boolean>(false);
   const [editId, setEditId] = useState<number>(-1);
 

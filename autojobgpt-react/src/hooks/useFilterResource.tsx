@@ -1,9 +1,9 @@
 import useInputControl from "../hooks/useInputControl";
 import { WithId } from "../api/types";
-import { FilterResourceMixin } from "../common/FilterResourceSelect";
+import { CommonFilterResourceProps } from "../common/FilterResourceSelect";
 
 interface UseFilterResource<Resource extends WithId, FilterByOption extends WithId>
-    extends FilterResourceMixin<FilterByOption> {
+    extends CommonFilterResourceProps<FilterByOption> {
   filteredResources: Resource[],
 };
 

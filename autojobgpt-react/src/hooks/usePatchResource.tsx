@@ -17,7 +17,7 @@ const usePatchResource = <Resource extends WithId>(
   resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
   options?: {
-    onSuccess?: (patchedResource: Resource, resources: Resource[], setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
+    onSuccess?: (oldResource: Resource, setResources: React.Dispatch<React.SetStateAction<Resource[]>>) => void,
     onFail?: (errors: Record<string,string[]>) => void,
   },
 ): UsePatchResource<Resource> => {
@@ -48,8 +48,11 @@ const usePatchResource = <Resource extends WithId>(
 
         if (response.ok) {
           const patchedResource: Resource = await response.json();
-          setResources(resources.map((resource) => resource.id === idBeingPatched ? patchedResource : resource));
-          onSuccess?.(patchedResource, resources, setResources);
+          const oldResource: Resource = resources.find((resource) => resource.id === idBeingPatched)!;
+          setResources((resources) => resources.map(
+            (resource) => resource.id === idBeingPatched ? patchedResource : resource
+          ));
+          onSuccess?.(oldResource, setResources);
         } else {          
           errors = await response.json();
           if (!String(errors)) {

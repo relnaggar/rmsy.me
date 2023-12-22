@@ -1,4 +1,4 @@
-import { useContext, useState, useRef } from "react";
+import { useContext, useState, useRef, useCallback } from "react";
 
 import useApiRoot from "./useApiRoot";
 import { FetchDataContext } from "../routes/routesConfig";
@@ -6,19 +6,28 @@ import { CSRFTokenContext } from "../routes/Layout";
 import { makeErrorMessage } from "./hooksUtils";
 
 
-export interface UseApiCall {
-  calling: boolean,
-  call: (postData: any) => Promise<void>,  
-  cancel: () => void,
+export interface OnSuccessParams {
+  response: Response,
+  resourceId?: number,
 };
 
-const useApiCall = <Resource extends unknown = never>(
+export interface AfterCallParams {
+  resourceId?: number,
+};
+
+export interface UseApiCall {
+  calling: boolean,
+  call: (_: {postData?: any, resourceId?: number}) => Promise<void>,
+  cancel?: () => void,
+};
+
+const useApiCall = (
   apiPath: string,
   method: "GET" | "POST" | "PATCH" | "DELETE",
   options?: {
-    beforeCall?: (postData: any) => Resource[],
-    onSuccess?: ((response: Response) => Promise<void>) | ((response: Response, newResources: Resource[]) => Promise<void>),
-    afterCall?: (newResources: Resource[]) => void,
+    beforeCall?: (postData: any) => void,
+    onSuccess?: (params: OnSuccessParams) => Promise<void>,
+    afterCall?: (params : AfterCallParams) => void,
     onFail?: (errors: Record<string,string[]>) => void,
   },
 ): UseApiCall => {
@@ -32,14 +41,16 @@ const useApiCall = <Resource extends unknown = never>(
   const [calling, setCalling] = useState<boolean>(false);
   const abortControllerRef = useRef<AbortController>(new AbortController());
 
-  const call = async (postData: any): Promise<void> => {
-    if (calling) {
-      abortControllerRef.current.abort();
+  const call = useCallback(async ({postData, resourceId}: {postData?: any, resourceId?: number}): Promise<void> => {
+    if (method === "GET") {
+      if (calling) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
     }
-    abortControllerRef.current = new AbortController();
     setCalling(true);
 
-    let newResources = beforeCall?.(postData);
+    beforeCall?.(postData);
 
     let body: FormData | string | undefined;
     if (postData === undefined) {
@@ -65,24 +76,23 @@ const useApiCall = <Resource extends unknown = never>(
         headers["X-CSRFToken"] = csrfToken;
       }
 
-      const response: Response = await fetchData(`${apiRoot}${apiPath}`, {
+      let url: string = `${apiRoot}${apiPath}`;
+      if (resourceId !== undefined) {
+        url += `${resourceId}/`;
+      }
+
+      const response: Response = await fetchData(url, {
         method: method,
         headers: headers,
         body: body,
-        signal: abortControllerRef.current.signal,
+        signal: method === "GET" ? abortControllerRef.current.signal : undefined,
       });
 
       // wait for 3 seconds before continuing
       // await new Promise(resolve => setTimeout(resolve, 3000));
 
       if (response.ok) {
-        if (newResources !== undefined) {
-          const onSuccessWithResource = onSuccess as ((response: Response, newResources: Resource[]) => Promise<void>);
-          await onSuccessWithResource(response, newResources);
-        } else if (onSuccess !== undefined) {
-          const onSuccessWithoutResource = onSuccess as ((response: Response) => Promise<void>);
-          await onSuccessWithoutResource(response);
-        }
+        await onSuccess?.({response, resourceId});
       } else {
         errors = await response.json();
         if (!String(errors)) {
@@ -96,20 +106,23 @@ const useApiCall = <Resource extends unknown = never>(
         errors["error"] = makeErrorMessage(error);
       }
     } finally {
-      if (!abortControllerRef.current.signal.aborted) {
-        afterCall?.(newResources!);
+      if (method !== "GET" || !abortControllerRef.current.signal.aborted) {
+        afterCall?.({resourceId});
         setCalling(false);
         if (Object.keys(errors).length > 0) {
           onFail?.(errors);
         }
       }
     }
-  };
+  }, [fetchData, apiRoot, apiPath, method, csrfToken, includeCsrfToken, calling, beforeCall, onSuccess, afterCall, onFail]);
 
-  const cancel = (): void => {
-    abortControllerRef.current.abort();
-    setCalling(false);
-  };
+  let cancel = undefined;
+  if (method === "GET") {
+    cancel = (): void => {
+      abortControllerRef.current.abort();
+      setCalling(false);
+    }
+  }
 
   return { calling, call, cancel };
 };

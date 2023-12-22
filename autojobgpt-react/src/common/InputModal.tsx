@@ -1,21 +1,21 @@
 import React from "react";
 import BootstrapModal from 'react-bootstrap/Modal';
 
-import ErrorAlert, { ErrorAlertMixin } from "./ErrorAlert";
+import ErrorAlert, { CommonErrorAlertProps } from "./ErrorAlert";
 
 
-export interface InputModalMixin extends ModalMixin {
+export interface CommonInputModalProps extends CommonModalProps {
   modalId: string,
   title: string,
   size?: "sm" | "lg" | "xl",
 };
 
-export interface ModalMixin {
+export interface CommonModalProps {
   show: boolean,
   setShow: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-interface InputModalProps extends InputModalMixin, Partial<ErrorAlertMixin> {
+interface InputModalProps extends CommonInputModalProps, Partial<CommonErrorAlertProps> {
   staticBackdrop?: boolean,
   handleSubmit?: (e: React.FormEvent<HTMLFormElement>) => void,
   submitDisabled?: boolean,

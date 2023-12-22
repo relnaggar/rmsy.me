@@ -1,7 +1,7 @@
 import React from "react";
 import { ReactComponent as ArrowClockwiseIcon } from "bootstrap-icons/icons/arrow-clockwise.svg";
 
-import { InputControlMixin } from "../hooks/useInputControl";
+import { CommonInputControlProps } from "../hooks/useInputControl";
 import { UseFetchResource } from "../hooks/useFetchResource";
 import InputActionButton from "./InputActionButton";
 import BaseInput, { BaseInputProps } from "./BaseInput";
@@ -9,7 +9,7 @@ import { WithId } from '../api/types';
 
 
 interface SelectInputWithRefreshProps<Option extends WithId> extends
-  InputControlMixin,
+  CommonInputControlProps,
   UseFetchResource<Option>,
   Pick<BaseInputProps, "id" | "label" | "errors">
 {

@@ -7,7 +7,7 @@ import { Document } from '../api/types';
 
 
 interface DocumentListProps extends Pick<UseResource<Document,Document>,
-  "resources" | "fetching" | "idBeingDeleted" | "posting"
+  "resources" | "fetching" | "idsBeingDeleted" | "posting"
 > {
   onClickEditDocument: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   onClickRemoveDocument: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
@@ -22,7 +22,7 @@ const DocumentList = ({
   addButtonText,
   ...resourceManager
 }: DocumentListProps): React.JSX.Element => {
-  const { resources: documents, fetching, idBeingDeleted, posting } = resourceManager;
+  const { resources: documents, fetching, idsBeingDeleted, posting } = resourceManager;
 
   // sort documents by id, putting placeholders with id -1 at the end
   documents.sort((a, b) => {
@@ -53,7 +53,7 @@ const DocumentList = ({
               document={document}              
               onClickEdit={onClickEditDocument(document.id)}
               onClickRemove={onClickRemoveDocument(document.id)}
-              beingRemoved={idBeingDeleted === document.id}
+              beingRemoved={idsBeingDeleted.includes(document.id)}
             />
           )}
           <AddDocumentButton onClick={onClickAddDocument} buttonText={addButtonText} disabled={posting} />

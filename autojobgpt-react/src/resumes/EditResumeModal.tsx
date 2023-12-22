@@ -40,7 +40,7 @@ const EditResumeModal = ({
     setShowErrorAlert(true);
   }, []);
 
-  const { posting: duplicating, post: duplicate, cancel: cancelDuplicate } = usePost<Resume>(
+  const { posting: duplicating, post: duplicate } = usePost<Resume>(
     `${apiPath}${editId}/duplicate/`, {
       onSuccess: handleDuplicateSuccess,
       onFail: handleDuplicateFail,
@@ -125,11 +125,11 @@ const EditResumeModal = ({
             {Object.values(errors).join(" ")}
         </BootstrapAlert>
         <button className="btn btn-outline-primary" type="button"
-          onClick={duplicating ? () => cancelDuplicate() : handleClickDuplicate }
+          onClick={handleClickDuplicate} disabled={duplicating}
         >
           {duplicating?<>
             <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-            Cancel
+            Duplicating...
           </>:<>
             <CopyIcon className="me-1" />
             Duplicate

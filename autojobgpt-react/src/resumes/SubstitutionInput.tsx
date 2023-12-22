@@ -34,7 +34,7 @@ export default function SubstitutionInput({
     setShowErrorAlert(true);
   };
 
-  const { posting: filling, post: fill, cancel: cancelFill } = usePost(
+  const { posting: filling, post: fill } = usePost(
     `substitutions/${substitution.id}/regenerate/`, {
       onSuccess: onFillSuccess,
       onFail: onFillFail,
@@ -67,12 +67,12 @@ export default function SubstitutionInput({
       >
         {!["JOB_TITLE", "COMPANY"].includes(substitution.key) && <>
           <button className="btn btn-outline-primary" type="button"
-            onClick={filling ? () => cancelFill() : handleClickFillDetails }
-            disabled={!filling && showFeedback && feedback === ""}
+            onClick={handleClickFillDetails }
+            disabled={showFeedback && feedback === ""}
           >
             {filling?<>
               <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-              Cancel
+              Regenerating...
             </>:<>
               <Robot className="me-1" />
               Regenerate

@@ -1,10 +1,10 @@
 import React from 'react';
 import BoostrapModal from 'react-bootstrap/Modal';
 
-import { ModalMixin } from './InputModal';
+import { CommonModalProps } from './InputModal';
 
 
-interface ConfirmationModalProps extends ModalMixin {
+interface ConfirmationModalProps extends CommonModalProps {
   action: () => void,
   actionDescription: string
   actionVerb: string

@@ -28,11 +28,11 @@ const generatePlaceholderStatus = (statusUpload: StatusUpload): Status => {
 const generatePlaceholderJob = (jobUpload: JobUpload): Job => {
   return {
     "id": -1,
-    "url": jobUpload.url,
-    "title": jobUpload.title,
-    "company": jobUpload.company,
-    "posting": jobUpload.posting,
-    "status": -1, // status should be the id of the first column
+    "url": "",
+    "title": "",
+    "company": "",
+    "posting": "",
+    "status": -1,
   }
 };
 
@@ -63,42 +63,45 @@ const JobBoard = (): React.JSX.Element => {
   };  
 
   const handlePatchStatusSuccess = useCallback((
-    newStatus: Status, statuses: Status[],
+    oldStatus: Status,
     setStatuses: React.Dispatch<React.SetStateAction<Status[]>>
-  ) => {
-    // swap order of status with the same order as the new status
-    const newStatuses: Status[] = [...statuses];
-    let swappedOrder: number | undefined = undefined;
-    for (const currentStatus of newStatuses) {
-      if (currentStatus.id === newStatus.id && currentStatus.order !== newStatus.order) {
-        swappedOrder = currentStatus.order;
-        currentStatus.order = newStatus.order;
-        break;
-      }
-    }
-    // decrease order of all statuses with order greater than the new status
-    if (swappedOrder !== undefined) {
+  ) => {    
+    setStatuses((statuses: Status[]) => {
+      // swap order of status with the same order as the new status
+      const newStatuses: Status[] = [...statuses];
+      let swappedOrder: number | undefined = undefined;
       for (const currentStatus of newStatuses) {
-        if (currentStatus.order === newStatus.order && currentStatus.id !== newStatus.id) {
-          currentStatus.order = swappedOrder;
+        if (currentStatus.id === oldStatus.id && currentStatus.order !== oldStatus.order) {
+          swappedOrder = currentStatus.order;
+          break;
         }
       }
-    }
-    setStatuses(newStatuses);
+      // decrease order of all statuses with order greater than the new status
+      if (swappedOrder !== undefined) {
+        for (const currentStatus of newStatuses) {
+          if (currentStatus.order === swappedOrder && currentStatus.id !== oldStatus.id) {
+            currentStatus.order = oldStatus.order;
+          }
+        }
+      }
+      return newStatuses;
+    });
   }, []);
 
   const handleDeleteStatusSuccess = useCallback((
-    deletedStatus: Status, statuses: Status[],
+    deletedStatus: Status,
     setStatuses: React.Dispatch<React.SetStateAction<Status[]>>
   ) => {
-    // decrease order of all statuses with order greater than the deleted status
-    const newStatuses: Status[] = [...statuses];
-    for (let i = 0; i < newStatuses.length; i++) {
-      if (newStatuses[i].order > deletedStatus.order) {
-        newStatuses[i].order--;
+    setStatuses((statuses: Status[]) => {
+      // decrease order of all statuses with order greater than the deleted status
+      const newStatuses: Status[] = [...statuses];
+      for (let i = 0; i < newStatuses.length; i++) {
+        if (newStatuses[i].order > deletedStatus.order) {
+          newStatuses[i].order--;
+        }
       }
-    }
-    setStatuses(newStatuses);
+      return newStatuses;
+    });
   }, []);
 
   const statusManager = useResource<Status,StatusUpload>("statuses/", generatePlaceholderStatus, {
@@ -106,9 +109,9 @@ const JobBoard = (): React.JSX.Element => {
     onPostFail: addColumnModal.handleAddFail,
     onPostSuccess: addColumnModal.handleAddSuccess,
     onDeleteSuccess: handleDeleteStatusSuccess,
-    onDeleteFail:  errorAlert.showErrors,
+    onDeleteFail: errorAlert.showErrors,
     onPatchSuccess: handlePatchStatusSuccess,
-    onPatchFail:  errorAlert.showErrors,
+    onPatchFail: errorAlert.showErrors,
   });
   const {resources: statuses, deleteResource: deleteStatus } = statusManager;
 
@@ -150,8 +153,8 @@ const JobBoard = (): React.JSX.Element => {
                 <JobColumn key={`${status.id}-${index}`}
                   status={status} allStatuses={statuses}
                   jobs={jobs.filter((job) => (job.status === status.id || (job.status === -1 && status.order === statuses[0].order)))}
-                  jobIdBeingDeleted={jobManager.idBeingDeleted} postingJob={jobManager.posting}
-                  beingRemoved={statusManager.idBeingDeleted === status.id}
+                  jobIdsBeingDeleted={jobManager.idsBeingDeleted} postingJob={jobManager.posting}
+                  beingRemoved={statusManager.idsBeingDeleted.includes(status.id)}
                   patchStatus={statusManager.patchResource}                  
                   onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleDrop(status)}
                   onClickAddJob={addJobModal.open} onClickEditJob={handleClickEditJob} onClickRemoveJob={handleClickRemoveJob}

@@ -11,7 +11,7 @@ interface JobColumnProps {
   status: Status,
   allStatuses: Status[],
   jobs: Job[],
-  jobIdBeingDeleted: number,  
+  jobIdsBeingDeleted: number[],  
   postingJob: boolean,
   beingRemoved: boolean,
   patchStatus: (id: number, data: Partial<Status>) => void,
@@ -29,7 +29,7 @@ const JobColumn = ({
   status,
   allStatuses,
   jobs,
-  jobIdBeingDeleted,
+  jobIdsBeingDeleted,
   postingJob,
   beingRemoved,
   patchStatus,
@@ -117,7 +117,7 @@ const JobColumn = ({
               onDragStart={onDragStart(job.id)}
               onClickEdit={onClickEditJob(job.id)}
               onClickRemove={onClickRemoveJob(job.id)}
-              beingRemoved={jobIdBeingDeleted === job.id}
+              beingRemoved={jobIdsBeingDeleted.includes(job.id)}
             />
           )}
         </div>

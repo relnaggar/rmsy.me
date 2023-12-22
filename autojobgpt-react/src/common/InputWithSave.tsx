@@ -3,13 +3,13 @@ import { ReactComponent as FloppyIcon } from "bootstrap-icons/icons/floppy.svg";
 
 import useInputControl from "../hooks/useInputControl";
 import usePatch from "../hooks/usePatchResource";
-import { EditResourceMixin } from "../common/EditModal";
+import { CommonEditModalProps } from "../common/EditModal";
 import BaseInput, { SelectOption } from "./BaseInput";
 import { WithId } from '../api/types';
 
 
 interface InputWithSaveProps<Resource extends WithId> extends
-  EditResourceMixin<Resource>,
+  CommonEditModalProps<Resource>,
   Omit<React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'id' | 'value'>
 {
   type: string,

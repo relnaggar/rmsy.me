@@ -1,10 +1,9 @@
-import useApiCall from "./useApiCall";
+import useApiCall, { OnSuccessParams } from "./useApiCall";
 
 
 export interface UsePost {
   posting: boolean,
-  post: (postData?: any) => Promise<void>,  
-  cancel: () => void,
+  post: (postData?: any) => Promise<void>,
 };
 
 const usePost = <ResponseData extends unknown>(
@@ -16,17 +15,21 @@ const usePost = <ResponseData extends unknown>(
 ): UsePost => {
   const { onSuccess, onFail } = options || {};
 
-  const handleSuccess = async (response: Response): Promise<void> => {
+  const handleSuccess = async ({response}: OnSuccessParams): Promise<void> => {
     const responseData: ResponseData = await response.json();
     onSuccess?.(responseData);
   }
 
-  const { calling: posting, call: post, cancel } = useApiCall(apiPath, "POST", {
+  const { calling: posting, call } = useApiCall(apiPath, "POST", {
     onSuccess: handleSuccess,
     onFail
   });
 
-  return { posting, post, cancel };
+  const post = async (postData?: any): Promise<void> => {
+    await call({postData});
+  }
+
+  return { posting, post };
 };
 
 export default usePost;

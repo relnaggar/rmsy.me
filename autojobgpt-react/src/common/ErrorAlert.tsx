@@ -2,14 +2,14 @@ import React from 'react';
 import BootstrapAlert from 'react-bootstrap/Alert';
 
 
-export interface ErrorAlertMixin {
+export interface CommonErrorAlertProps {
   errors: Record<string,string[]>,
   setErrors: React.Dispatch<React.SetStateAction<Record<string,string[]>>>,
   showErrorAlert: boolean,
   setShowErrorAlert: React.Dispatch<React.SetStateAction<boolean>>,
 };
 
-interface ErrorAlertProps extends Omit<ErrorAlertMixin, "setErrors"> {};
+interface ErrorAlertProps extends Omit<CommonErrorAlertProps, "setErrors"> {};
 
 const ErrorAlert = ({
   errors,

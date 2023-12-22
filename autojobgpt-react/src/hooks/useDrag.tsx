@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 import { Job, Status } from '../api/types';
 
@@ -16,18 +16,18 @@ const useDrag = (
 ): UseDrag => {
   const [draggingJobId, setDraggingJobId] = useState<number>(-1);
 
-  const handleDragStart = (jobId: number) => (e: React.DragEvent<HTMLDivElement>): void => {
+  const handleDragStart = useCallback((jobId: number) => (e: React.DragEvent<HTMLDivElement>): void => {
     setDraggingJobId(jobId);
     try { // e.currentTarget not supported in jsdom
       e.currentTarget.scrollIntoView({behavior: "smooth", block: "center"});
     } catch (error) {}
-  };
+  }, []);
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>): void => {
     e.preventDefault();
-  }
+  }, []);
 
-  const handleDrop = (endStatus: Status) => (e: React.DragEvent<HTMLDivElement>): void => {
+  const handleDrop = useCallback((endStatus: Status) => (e: React.DragEvent<HTMLDivElement>): void => {
     e.preventDefault(); // prevent page from reloading    
     const job: Job = jobs.find((job) => job.id === draggingJobId)!;
     const jobStatus: Status = statuses.find((status) => status.id === job.status)!;
@@ -35,7 +35,7 @@ const useDrag = (
       patchJob(draggingJobId, {status: endStatus.id});
       setDraggingJobId(-1);
     }
-  };
+  }, [jobs, statuses, draggingJobId, patchJob]);
 
   return {handleDragStart, handleDragOver, handleDrop};
 };

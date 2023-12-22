@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 
-import { InputControlMixin } from "../hooks/useInputControl";
+import { CommonInputControlProps } from "../hooks/useInputControl";
 
 
 export type SelectOption = {
@@ -8,7 +8,7 @@ export type SelectOption = {
   label: string,
 };
 
-export interface BaseInputProps extends InputControlMixin,
+export interface BaseInputProps extends CommonInputControlProps,
   Omit<React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'id' | 'value'>
 {
   type: string,

@@ -1,16 +1,16 @@
 import React from "react";
 
 import { UsePostResource } from "../hooks/usePostResource";
-import { ErrorAlertMixin } from "./ErrorAlert";
-import InputModal, { ModalMixin, InputModalMixin } from "./InputModal";
+import { CommonErrorAlertProps } from "./ErrorAlert";
+import InputModal, { CommonModalProps, CommonInputModalProps } from "./InputModal";
 
 
-export interface AddResourceModalProps<ResourceUpload> extends AddModalMixin,
+export interface AddResourceModalProps<ResourceUpload> extends CommonAddModalProps,
   Pick<UsePostResource<ResourceUpload>, "postResource"> {};
 
-export interface AddModalMixin extends ModalMixin, ErrorAlertMixin {};
+export interface CommonAddModalProps extends CommonModalProps, CommonErrorAlertProps {};
 
-interface AddModalProps extends InputModalMixin, ErrorAlertMixin {
+interface AddModalProps extends CommonInputModalProps, CommonErrorAlertProps {
   onSubmit?: () => void,
   onValidatedSubmit: () => void,
   submitDisabled?: boolean,

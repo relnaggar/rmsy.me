@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
 
-import { ErrorAlertMixin } from "../common/ErrorAlert";
+import { CommonErrorAlertProps } from "../common/ErrorAlert";
 
 
-interface UseErrorAlert extends ErrorAlertMixin {  
+interface UseErrorAlert extends CommonErrorAlertProps {  
   clearErrors: () => void,
   showErrors: (errors: Record<string,string[]>) => void,
 };

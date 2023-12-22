@@ -1,11 +1,11 @@
 import { useState, useCallback } from "react";
 
 import useErrorAlert from "./useErrorAlert";
-import { ErrorAlertMixin } from "../common/ErrorAlert";
-import { AddModalMixin } from "../common/AddModal";
+import { CommonErrorAlertProps } from "../common/ErrorAlert";
+import { CommonAddModalProps } from "../common/AddModal";
 
 
-export interface UseAddModal extends AddModalMixin, ErrorAlertMixin {
+export interface UseAddModal extends CommonAddModalProps, CommonErrorAlertProps {
   handleAddSuccess: () => void,
   handleAddFail: (errors: Record<string,string[]>) => void,
   open: () => void,
