@@ -14,7 +14,6 @@ interface InputWithSaveProps<Resource extends WithId> extends
 {
   type: string,
   editableProperty: keyof Resource & string,
-  validateSubmit?: (value: string) => Record<string,string[]>,
   labelProperty?: keyof Resource,
   labelText?: string,
   onSaveSuccess?: () => void,
@@ -27,7 +26,6 @@ const InputWithSave = <Resource extends WithId>({
   apiPath, resources, setResources, editId,
   type,  
   editableProperty,
-  validateSubmit = () => ({}),
   labelProperty,
   labelText,
   onSaveSuccess,  
@@ -35,6 +33,7 @@ const InputWithSave = <Resource extends WithId>({
   value: valueProp,
   setValue: setValueProp,
   children,
+  required,
   ...extraInputProps
 }: React.PropsWithChildren<InputWithSaveProps<Resource>>): React.JSX.Element => {
   if (!labelProperty && !labelText) throw new Error("InputWithSave must have either labelProperty or labelText");
@@ -51,6 +50,14 @@ const InputWithSave = <Resource extends WithId>({
     throw new Error(`resourceEditableProperty must be a string or number, but it is a ${typeof resource[editableProperty]}`);
   }
   const resourceEditableProperty: string = tmp;
+
+  const validateSubmit = (value: string) => {
+    const errors: Record<string,string[]> = {};
+    if (required && (value === "" || (type === "select" && value === "0"))) {
+      errors[editableProperty] = [`Please enter a ${labelText ? labelText.toLowerCase() : editableProperty}.`];
+    }
+    return errors;
+  };
 
   const [saved, setSaved] = useState<boolean>(true);
   const [errors, setErrors] = useState<Record<string,string[]>>({});

@@ -303,6 +303,7 @@ describe(`clicking the move right button for each ${thisResource} makes an api c
       await renderRoute(thisRoute);
       const resourceElements: HTMLElement[] = queryResources(thisHeadingLabel, "region");
       const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
+      mockFunctions.fetchData.mockImplementationOnce(generateResponse({...thisMockData[i], order: thisMockData[i].order + 1}));
       await clickMoveRightButton(resourceElements[i]);
       expect(mockFunctions.fetchData.mock.calls.length).toBe(initialFetchDataCalls + 1);
     });
@@ -315,6 +316,7 @@ describe(`clicking the move left button for each ${thisResource} makes an api ca
       await renderRoute(thisRoute);
       const resourceElements: HTMLElement[] = queryResources(thisHeadingLabel, "region");
       const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
+      mockFunctions.fetchData.mockImplementationOnce(generateResponse({...thisMockData[i], order: thisMockData[i].order - 1}));
       await clickMoveLeftButton(resourceElements[i]);
       expect(mockFunctions.fetchData.mock.calls.length).toBe(initialFetchDataCalls + 1);
     });
@@ -326,6 +328,7 @@ describe(`clicking the move right button for each ${thisResource} makes an api c
     test(`clicking the move right button for ${thisMockData[i].name} makes an api call to move the ${thisResource} right`, async () => {
       await renderRoute(thisRoute);
       const resourceElements: HTMLElement[] = queryResources(thisHeadingLabel, "region");
+      mockFunctions.fetchData.mockImplementationOnce(generateResponse({...thisMockData[i], order: thisMockData[i].order + 1}));
       await clickMoveRightButton(resourceElements[i]);
       expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${thisApiPath}${thisMockData[i].id}/`,
         expect.objectContaining({
@@ -342,6 +345,7 @@ describe(`clicking the move left button for each ${thisResource} makes an api ca
     test(`clicking the move left button for ${thisMockData[i].name} makes an api call to move the ${thisResource} left`, async () => {
       await renderRoute(thisRoute);
       const resourceElements: HTMLElement[] = queryResources(thisHeadingLabel, "region");
+      mockFunctions.fetchData.mockImplementationOnce(generateResponse({...thisMockData[i], order: thisMockData[i].order - 1}));
       await clickMoveLeftButton(resourceElements[i]);
       expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${thisApiPath}${thisMockData[i].id}/`,
         expect.objectContaining({

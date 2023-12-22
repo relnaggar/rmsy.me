@@ -100,6 +100,7 @@ test(`submitting the ${modalName} modal with valid input closes the modal within
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse(validStatus1));
   await clickSubmitButton(modal);
   await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
 });
@@ -109,6 +110,7 @@ test(`submitting the ${modalName} modal with valid input makes an api call`, asy
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
   const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse(validStatus1));
   await clickSubmitButton(modal);
   expect(mockFunctions.fetchData.mock.calls.length).toBe(initialFetchDataCalls + 1);
 });
@@ -117,6 +119,7 @@ test(`submitting the ${modalName} modal with valid input makes an api call to ad
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse(validStatus1));
   await clickSubmitButton(modal);
   expect(mockFunctions.fetchData).toHaveBeenLastCalledWith("../api/statuses/", expect.objectContaining({
     method: "POST",
@@ -189,6 +192,7 @@ describe(`api general errors after submitting the ${modalName} modal can be clea
       await fillWithValidValues(modal);
       testDataForApiGeneralError.mockApiError();
       await clickSubmitButton(modal);
+      mockFunctions.fetchData.mockImplementationOnce(generateResponse(validStatus1));
       await clickSubmitButton(modal);
       await waitFor(() => expect(queryByRole(modal, "alert")).not.toBeInTheDocument(), {timeout: 1000});
     });

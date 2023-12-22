@@ -12,19 +12,12 @@ const EditColumnModal = ({
   ...resourceManager
 }: EditColumnModalProps): React.JSX.Element => {
   const modalId = useId();
-  const title = "Edit Column";
 
   return (
-    <EditModal title={title} modalId={modalId} show={show} setShow={setShow}>
-      <InputWithSave editId={editId} {...resourceManager}
+    <EditModal title={"Edit Column"} modalId={modalId} show={show} setShow={setShow}>
+      <InputWithSave editId={editId} {...resourceManager} 
         type="text" editableProperty="name" labelText="Column Name"
-        validateSubmit={(value: string) => {
-          const errors: Record<string,string[]> = {};
-          if (value === "") {
-            errors["name"] = ["Please enter a column name."];
-          }
-          return errors;
-        }}
+        required
       />
     </EditModal>
   );

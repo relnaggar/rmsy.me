@@ -21,7 +21,7 @@ const EditModal = ({
   children,
 }: React.PropsWithChildren<EditModalProps>): React.JSX.Element => {
   return (
-    <InputModal modalId={modalId} title={title} show={show} setShow={setShow} size={size}>
+    <InputModal modalId={modalId} title={title} show={show} setShow={setShow} size={size} staticBackdrop={true}>
       {children}
     </InputModal>
   );
