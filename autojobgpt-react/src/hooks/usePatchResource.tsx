@@ -4,9 +4,9 @@ import useApiCall, { OnSuccessParams, AfterCallParams } from "./useApiCall"
 import { WithId } from '../api/types';
 
 
-export interface UsePatchResource<Resource> {
-  patching: boolean,
+export interface UsePatchResource<Resource> {  
   patchResource: (id: number, patch: Partial<Resource>) => void,
+  idsBeingPatched: number[],
 };
 
 const usePatchResource = <Resource extends WithId>(
@@ -42,7 +42,7 @@ const usePatchResource = <Resource extends WithId>(
     call({data: patchData, resourceId: id});    
   }, [call]);
 
-  return { patching: idsBeingPatched.length !== 0, patchResource };
+  return { patchResource, idsBeingPatched };
 };
 
 export default usePatchResource;

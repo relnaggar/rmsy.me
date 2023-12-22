@@ -30,7 +30,7 @@ const EditDeleteButtonGroup = ({
       >
         {beingRemoved ?
           <div className="spinner-border spinner-border-sm" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">Removing...</span>
           </div>
         :
           <Trash3Icon />

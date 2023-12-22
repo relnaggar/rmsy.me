@@ -6,10 +6,10 @@ import { WithId } from '../api/types';
 
 
 export interface UseResource<Resource extends WithId, ResourceUpload> extends
-    UseFetchResource<Resource>,
-    UsePostResource<ResourceUpload>,
-    UseDeleteResource,
-    UsePatchResource<Resource>
+  UseFetchResource<Resource>,
+  UsePostResource<ResourceUpload>,
+  UseDeleteResource,
+  UsePatchResource<Resource>
 {
   apiPath: string,
 };

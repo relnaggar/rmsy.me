@@ -85,10 +85,11 @@ const InputWithSave = <Resource extends WithId>({
     onSaveSuccess && onSaveSuccess();
   };
 
-  const {patchResource: updateResource, patching: updating } = usePatch<Resource>(apiPath, resources, setResources, {
+  const {patchResource: updateResource, idsBeingPatched } = usePatch<Resource>(apiPath, resources, setResources, {
     onFail: handleUpdateFail,
     onSuccess: handleUpdateSuccess,
   });
+  const updating = idsBeingPatched.includes(editId);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {  
     e.preventDefault(); // prevent page from reloading

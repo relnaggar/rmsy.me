@@ -1,4 +1,4 @@
-import React, { useId } from "react";
+import React, { useId, useState } from "react";
 import { ReactComponent as CaretLeftIcon } from 'bootstrap-icons/icons/caret-left.svg';
 import { ReactComponent as CaretRightIcon } from 'bootstrap-icons/icons/caret-right.svg';
 
@@ -14,6 +14,7 @@ interface JobColumnProps {
   jobIdsBeingDeleted: number[],  
   postingJob: boolean,
   beingRemoved: boolean,
+  beingMoved: boolean,
   patchStatus: (id: number, data: Partial<Status>) => void,
   onClickAddJob: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   onClickEditJob: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,  
@@ -32,6 +33,7 @@ const JobColumn = ({
   jobIdsBeingDeleted,
   postingJob,
   beingRemoved,
+  beingMoved,
   patchStatus,
   onClickAddJob,
   onClickEditJob,
@@ -44,6 +46,8 @@ const JobColumn = ({
 }: JobColumnProps): React.JSX.Element => {
   const columnId = useId();
 
+  const [movingDirection, setMovingDirection] = useState<"left" | "right" | null>(null);
+
   const moveStatus = (direction: "left" | "right"): void => {
     for (let i = 0; i < allStatuses.length; i++) {
       if (direction === "left" && status.id === allStatuses[i].id) {
@@ -55,11 +59,13 @@ const JobColumn = ({
   };
 
   const onClickMoveLeft = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    moveStatus("left");    
+    moveStatus("left");
+    setMovingDirection("left");
   };
 
   const onClickMoveRight = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     moveStatus("right");
+    setMovingDirection("right");
   };
 
   // sort jobs by id, putting placeholders with id -1 at the end
@@ -87,9 +93,15 @@ const JobColumn = ({
                   type="button"
                   className="btn btn-secondary"                  
                   onClick={onClickMoveLeft}
-                  disabled={beingRemoved}
+                  disabled={beingRemoved || beingMoved}
                 >
-                  <CaretLeftIcon />
+                  { beingMoved && movingDirection === "left" ?
+                    <div className="spinner-border spinner-border-sm" role="status">
+                      <span className="visually-hidden">Moving...</span>
+                    </div>
+                  :
+                    <CaretLeftIcon />
+                  }
                 </button>
               }
               {status.id !== allStatuses[allStatuses.length-1].id &&
@@ -97,9 +109,15 @@ const JobColumn = ({
                   type="button"
                   className="btn btn-secondary"                
                   onClick={onClickMoveRight}
-                  disabled={beingRemoved}
+                  disabled={beingRemoved || beingMoved}
                 >
-                  <CaretRightIcon />
+                  { beingMoved && movingDirection === "right" ?
+                    <div className="spinner-border spinner-border-sm" role="status">
+                      <span className="visually-hidden">Moving...</span>
+                    </div>
+                  :
+                    <CaretRightIcon />
+                  }
                 </button>
               }
             </div>

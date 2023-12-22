@@ -154,6 +154,7 @@ const JobBoard = (): React.JSX.Element => {
                   status={status} allStatuses={statuses}
                   jobs={jobs.filter((job) => (job.status === status.id || (job.status === -1 && status.order === statuses[0].order)))}
                   jobIdsBeingDeleted={jobManager.idsBeingDeleted} postingJob={jobManager.posting}
+                  beingMoved={statusManager.idsBeingPatched.includes(status.id)}
                   beingRemoved={statusManager.idsBeingDeleted.includes(status.id)}
                   patchStatus={statusManager.patchResource}                  
                   onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleDrop(status)}
