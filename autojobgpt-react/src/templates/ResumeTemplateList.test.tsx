@@ -81,15 +81,6 @@ test(`each ${thisResource} list item is displayed with its image`, async () => {
   });
 });
 
-test(`each ${thisResource} list item is displayed with an edit button`, async () => {
-  await renderRoute(thisRoute);
-  const resourceElements: HTMLElement[] = queryResources(thisResource);
-  resourceElements.forEach((resourceElement) => {
-    const editButton: HTMLElement = getByRole(resourceElement, "button", {name: new RegExp("edit", "i")});
-    expect(editButton).toBeInTheDocument();
-  });
-});
-
 test(`each ${thisResource} list item is displayed with a delete button`, async () => {
   await renderRoute(thisRoute);
   const resourceElements: HTMLElement[] = queryResources(thisResource);

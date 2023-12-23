@@ -80,6 +80,14 @@ export const validResumeTemplate2: ResumeTemplate = {
   fillFields: [],
 };
 
+export const validResumeTemplate3: ResumeTemplate = {
+  id: 3,
+  name: "Test Resume Template 3",
+  description: "Test Description 3",
+  docx: "https://www.example.com/test3.docx",
+  png: "https://www.example.com/test3.png",
+  fillFields: [],
+};
 
 export const validResume1: Resume = {
   id: 1,
@@ -103,4 +111,16 @@ export const validResume2: Resume = {
   job: validJob2,
   template: validResumeTemplate2,
   name: validJob2.title + ", " + validJob2.company + ", " + 1
+};
+
+export const validResume3: Resume = {
+  id: 3,
+  substitutions: [],
+  version: 1,
+  docx: "https://www.example.com/test3.docx",
+  png: "https://www.example.com/test3.png",
+  chat_messages: [],
+  job: validJob3,
+  template: validResumeTemplate3,
+  name: validJob3.title + ", " + validJob3.company + ", " + 1
 };

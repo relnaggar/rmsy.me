@@ -74,7 +74,7 @@ const EditResumeModal = ({
 
         {resume &&
           <div className="d-flex flex-wrap">
-            <div className="mb-3 flex-fill">
+            <div className="mb-3 me-1 flex-fill">
               <span className="form-label">Job</span>
               <a
                 href={resume.job!.url} target="_blank" rel="noreferrer"
@@ -84,16 +84,16 @@ const EditResumeModal = ({
                 <BoxArrowUpRightIcon className="ms-1" />
               </a>
             </div>
-            <div className="mb-3 flex-fill">
+            <div className="mb-3 me-1 flex-fill">
               <span className="form-label">Template</span>
-              <a href={resume.template!.docx} className="form-control link-primary border border-0">
+              <a download href={resume.template!.docx} className="form-control link-primary border border-0">
                 {resume!.template.name}
                 <FileArrowDownIcon className="ms-1" />
               </a>
             </div>
-            <div className="mb-3 flex-fill">
+            <div className="mb-3 me-1 flex-fill">
               <span className="form-label">Resume</span>
-              <a href={resume!.docx} className="form-control link-primary border border-0">
+              <a download href={resume!.docx} className="form-control link-primary border border-0">
                 Version {resume.version}
                 <FileArrowDownIcon className="ms-1" />
               </a>

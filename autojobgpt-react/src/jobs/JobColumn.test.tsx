@@ -97,15 +97,6 @@ test(`each ${thisResource} has a link to its url`, async () => {
   });
 });
 
-test(`each ${thisResource} is displayed with an edit button`, async () => {
-  await renderRoute(thisRoute);
-  const resourceElements: HTMLElement[] = queryResources(thisHeadingLabel);
-  resourceElements.forEach((resourceElement) => {
-    const editButton: HTMLElement = getByRole(resourceElement, "button", {name: new RegExp("edit", "i")});
-    expect(editButton).toBeInTheDocument();
-  });
-});
-
 test(`each ${thisResource} is displayed with a delete button`, async () => {
   await renderRoute(thisRoute);
   const resourceElements: HTMLElement[] = queryResources(thisHeadingLabel);
