@@ -183,6 +183,15 @@ export const clickDeleteButton = async (modal: HTMLElement): Promise<void> => {
 }
 
 export const getActionButton = (modal: HTMLElement, inputLabel: string, buttonLabel: string): HTMLElement => {
+  const actionButton: HTMLElement | null = queryActionButton(modal, inputLabel, buttonLabel);
+  if (actionButton === null) {
+    throw new Error(`Button ${buttonLabel} controlling input ${inputLabel} not found`);
+  } else {
+    return actionButton;  
+  }
+};
+
+export const queryActionButton = (modal: HTMLElement, inputLabel: string, buttonLabel: string): HTMLElement | null => {
   const matchingInputs: HTMLElement[] = [
     ...queryAllByRole(modal, "combobox", {name: new RegExp(inputLabel, "i")}),
     ...queryAllByRole(modal, "textbox", {name: new RegExp(inputLabel, "i")})
@@ -196,7 +205,7 @@ export const getActionButton = (modal: HTMLElement, inputLabel: string, buttonLa
     return button.getAttribute("aria-controls") === inputId;
   });
   if (!matchingButton) {
-    throw new Error(`Button ${buttonLabel} controlling input ${inputLabel} not found`);
+    return null;
   } else {
     return matchingButton;  
   }
@@ -219,6 +228,10 @@ export const clickRefreshButton = async (modal: HTMLElement, label: string): Pro
 
 export const getSaveButton = (modal: HTMLElement, label: string): HTMLElement => {
   return getActionButton(modal, label, "save");
+};
+
+export const querySaveButton = (modal: HTMLElement, label: string): HTMLElement | null => {
+  return queryActionButton(modal, label, "save");
 };
 
 export const clickSaveButton = async (modal: HTMLElement, label: string): Promise<void> => {

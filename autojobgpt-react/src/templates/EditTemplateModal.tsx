@@ -41,18 +41,18 @@ const EditTemplateModal = ({
             if (fillField.key === "JOB_TITLE" || fillField.key === "COMPANY") {
               const elementId: string = `${resourceManager.apiPath.replace("/", "-")}${fillField.id}-description`;
               return (
-                <div className="mb-3 form-floating">
-                  <textarea
+                <div className="mb-3 form-floating" key={fillField.id}>
+                  <textarea id={elementId}
                     className="form-control"
                     style={{ minHeight: "64px" }}
-                    id={elementId}
                     disabled={true}
-                  >{fillField.description}</textarea>
+                    defaultValue={fillField.description}
+                  />
                   <label htmlFor={elementId}>{fillField.key}</label>  
                 </div>
               )
             } else {
-              return <InputWithSave editId={fillField.id}
+              return <InputWithSave key={fillField.id} editId={fillField.id}
                 apiPath="fillFields/" resources={fillFields} setResources={setFillFields}
                 type="textarea" editableProperty="description" labelProperty="key"
               />
