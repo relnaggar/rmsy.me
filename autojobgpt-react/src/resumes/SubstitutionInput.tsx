@@ -1,9 +1,11 @@
-import React, { useState } from "react";
-import Alert from 'react-bootstrap/Alert';
-import { ReactComponent as Robot } from "bootstrap-icons/icons/robot.svg";
+import React, { useId, useState } from "react";
+import { ReactComponent as RobotIcon } from "bootstrap-icons/icons/robot.svg";
 
+import useErrorAlert from "../hooks/useErrorAlert";
 import usePost from "../hooks/usePost";
 import InputWithSave from "../common/InputWithSave";
+import ErrorAlert from "../common/ErrorAlert";
+import { defaultFillFields } from "../api/constants";
 import { Substitution } from '../api/types';
 
 
@@ -18,93 +20,86 @@ export default function SubstitutionInput({
   setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
   onSubstitutionSaveSuccess: () => void,
 }): React.JSX.Element {
-  const [errors, setErrors] = useState<Record<string,string[]>>({});
-  const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
+  const feedbackSwitchId = useId();
+  const errorAlert = useErrorAlert();
   const [value, setValue] = useState<string>(substitution.value);
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
   const [feedback, setFeedback] = useState<string>("");
 
   const onFillSuccess = (substitution: Substitution): void => {
     setValue(substitution.value);
-    setShowErrorAlert(false);
+    errorAlert.clearErrors();
   }
-
-  const onFillFail = (errors: Record<string,string[]>): void => {
-    setErrors(errors);
-    setShowErrorAlert(true);
-  };
 
   const { posting: filling, post: fill } = usePost(
     `substitutions/${substitution.id}/regenerate/`, {
       onSuccess: onFillSuccess,
-      onFail: onFillFail,
+      onFail: errorAlert.showErrors,
     }
   );
 
-  function handleClickFillDetails(): void {
+  const handleClickFillDetails = (): void => {
     if (showFeedback) {
       fill({value: value, feedback: feedback});
     } else {
       fill({value: value});
     }
-  }
+  };
+
+  const handleChangeFeedback = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
+    setFeedback(e.target.value);
+  };
+
+  const handleChangeFeedbackSwitch = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setShowFeedback((showFeedback) => !showFeedback);
+  };
 
   return (
     <>
-      <InputWithSave
-        type="textarea"
-        apiPath="substitutions/"
-        resources={substitutions}
-        setResources={setSubstitutions}
-        editId={substitution.id}
-        editableProperty="value"
-        labelProperty="key"
+      <InputWithSave editId={substitution.id}
+        apiPath="substitutions/" resources={substitutions} setResources={setSubstitutions}
+        type="textarea" editableProperty="value" labelProperty="key"
         onSaveSuccess={onSubstitutionSaveSuccess}
-        value={value}
-        setValue={setValue}
-        style={{minHeight: "84px"}}
-        disabled={filling}
+        value={value} setValue={setValue}
+        disabled={filling} style={{minHeight: "84px"}}
       >
-        {!["JOB_TITLE", "COMPANY"].includes(substitution.key) && <>
-          <button className="btn btn-outline-primary" type="button"
-            onClick={handleClickFillDetails }
-            disabled={showFeedback && feedback === ""}
-          >
-            {filling?<>
-              <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-              Regenerating...
-            </>:<>
-              <Robot className="me-1" />
-              Regenerate
-            </>}
-          </button>
-          <div className="form-check form-switch mt-2">
-            <input
-              className="form-check-input" type="checkbox" role="switch" checked={showFeedback}
-              id={`feedback-switch-${substitution.key}`} onChange={() => setShowFeedback(!showFeedback)}
-            />
-            <label className="form-check-label" htmlFor={`feedback-switch-${substitution.key}`} >
-              with feedback
-            </label>
-          </div>
-        </>}
+        { ! defaultFillFields.includes(substitution.key) &&
+          <>
+            <button className="btn btn-outline-primary" type="button"
+              onClick={handleClickFillDetails}
+              disabled={showFeedback && feedback === ""}
+            >
+              { filling ?
+                <>
+                  <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                  Regenerating...
+                </>
+              :
+                <>
+                  <RobotIcon className="me-1" />
+                  Regenerate
+                </>
+              }
+            </button>
+            <div className="form-check form-switch mt-2">
+              <input id={feedbackSwitchId}
+                className="form-check-input" type="checkbox" role="switch"
+                checked={showFeedback} onChange={handleChangeFeedbackSwitch}
+              />
+              <label className="form-check-label" htmlFor={feedbackSwitchId}>with feedback</label>
+            </div>
+          </>
+        }
       </InputWithSave>
-
-      {showFeedback &&
+      { showFeedback &&
         <div className="mb-3">
           <textarea
-            className="form-control" value={feedback} onChange={(e) => setFeedback(e.target.value)} disabled={filling}
+            className="form-control" value={feedback} onChange={handleChangeFeedback} disabled={filling}
             placeholder="Write your feedback here..." aria-label="Feedback"
           />
         </div>
       }
-
-      <Alert
-        variant="danger" dismissible className="w-100"
-        show={showErrorAlert} onClose={() => setShowErrorAlert(false)}
-      >
-        {Object.values(errors).join(" ")}
-      </Alert>
+      <ErrorAlert {...errorAlert} />
     </>
   );
 }
