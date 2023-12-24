@@ -60,7 +60,7 @@ const InputWithSave = <Resource extends WithId>({
   const validateSubmit = (value: string) => {
     const errors: Record<string,string[]> = {};
     if (required && value === "") {
-      errors[editableProperty] = [`Please enter a ${labelText ? labelText.toLowerCase() : editableProperty}.`];
+      errors[editableProperty] = [`${labelText ? labelText : editableProperty} is required.`];      
     }
     return errors;
   };

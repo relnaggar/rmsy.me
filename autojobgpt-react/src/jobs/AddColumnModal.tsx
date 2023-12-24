@@ -18,7 +18,7 @@ const AddColumnModal = ({
     const newErrors: Record<string,string[]> = {};
 
     if (nameInput.value === "") {
-      newErrors["name"] = ["Please enter a column name."];
+      newErrors["name"] = ["Column name is required."];
       valid = false;
     }
 

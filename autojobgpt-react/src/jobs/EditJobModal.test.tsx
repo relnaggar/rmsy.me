@@ -141,6 +141,29 @@ describe(`each ${modalName} modal has all inputs`, () => {
   }
 });
 
+describe(`each ${modalName} modal has all options for status input`, () => {
+  testEachModal(`modal has all options for status input`, async (modal) => {
+    const statusInput: HTMLElement = getByRole(modal, "combobox", {name: new RegExp("status", "i")});
+    const options: HTMLElement[] = getAllByRole(statusInput, "option");
+    expect(options.length).toBe(thisAllMockData.statuses.length+1);
+    for (let i = 0; i < thisAllMockData.statuses.length; i++) {
+      expect(options[i+1]).toHaveTextContent(thisAllMockData.statuses[i].name);
+    }
+  });
+});
+
+describe(`each ${modalName} modal has all options for chosen resume input`, () => {
+  testEachModal(`modal has all options for chosen resume input`, async (modal, _, modalNumber) => {
+    const resumeInput: HTMLElement = getByRole(modal, "combobox", {name: new RegExp("chosen resume", "i")});
+    const options: HTMLElement[] = getAllByRole(resumeInput, "option");
+    const matchingResumes: Resume[] = thisAllMockData.resumes.filter((resume) => resume.job.id === thisAllMockData.jobs[modalNumber].id);
+    expect(options.length).toBe(matchingResumes.length+1);
+    for (let i = 0; i < matchingResumes.length; i++) {
+      expect(options[i+1]).toHaveTextContent(matchingResumes[i].name);
+    }
+  });
+});
+
 describe(`each ${modalName} modal automatically focuses on the first input within 1 second`, () => {
   testEachModal(`modal automatically focuses on the first input within 1 second`, async (modal) => {
     const firstInput: HTMLElement = getByRole(modal,testData[0].role, {name: new RegExp(testData[0].label, "i")});

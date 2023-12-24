@@ -39,10 +39,10 @@ const AddResumeModal = ({
     if (jobInput.value === "" || templateInput.value === "") {
       const newErrors: Record<string, string[]> = {};
       if (jobInput.value === "") {
-        newErrors["job"] = ["Please select a job."];
+        newErrors["job"] = ["Job is required."];
       }
       if (templateInput.value === "") {
-        newErrors["template"] = ["Please select a template."];
+        newErrors["template"] = ["Template is required."];
       }
       addModal.setErrors(newErrors);
       jobInput.stopEditing();

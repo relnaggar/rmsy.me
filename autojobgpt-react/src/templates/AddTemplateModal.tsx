@@ -21,11 +21,11 @@ const AddTemplateModal = ({
     const newErrors: Record<string,string[]> = {};
 
     if (nameInput.value === "") {
-      newErrors["name"] = ["Please enter a template name."];
+      newErrors["name"] = ["Template name is required."];
       valid = false;
     }
     if ((uploadInput.ref.current as HTMLInputElement).files?.length === 0) {
-      newErrors["upload"] = ["Please upload a template file."];
+      newErrors["upload"] = ["Upload is required."];
       valid = false;
     }
 

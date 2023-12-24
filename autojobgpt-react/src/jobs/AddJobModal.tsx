@@ -77,17 +77,17 @@ const AddJobModal = ({
     const newErrors: Record<string,string[]> = {};
 
     if (titleInput.value === "") {
-      newErrors["title"] = ["Enter a title."];
+      newErrors["title"] = ["Title is required."];
       valid = false;
     }
 
     if (companyInput.value === "") {
-      newErrors["company"] = ["Enter a company."];
+      newErrors["company"] = ["Company is required."];
       valid = false;
     }
 
     if (postingInput.value === "") {
-      newErrors["posting"] = ["Enter a posting."];
+      newErrors["posting"] = ["Posting is required."];
       valid = false;
     }
 
