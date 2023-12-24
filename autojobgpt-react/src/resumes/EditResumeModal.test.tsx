@@ -509,7 +509,6 @@ describe(`each ${modalName} modal does not retain ${relatedResourceName} input v
 
 describe(`each ${modalName} modal does not retain ${relatedResourceName} input errors on close and reopen`, () => {
   testEachModal(`does not retain ${relatedResourceName} input errors on close and reopen`, async (modal, mockData, modalNumber) => {
-    jest.setTimeout(10000);
     for (const relatedResource of mockData[relatedResourceKey]) {
       await userClearInput(modal, relatedResource.key);
       mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({[relatedResourceValueKey]: [errorMessage]}));
