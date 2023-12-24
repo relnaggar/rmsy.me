@@ -30,7 +30,8 @@ const getPlaceholderResume = (resumeUpload: ResumeUpload): Resume => {
       "title": "",
       "company": "",
       "posting": "",
-      "status": 1
+      "status": 1,
+      "chosen_resume": null,
     },
     template: {
       "id": resumeUpload.template,

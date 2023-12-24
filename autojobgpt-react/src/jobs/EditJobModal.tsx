@@ -2,16 +2,18 @@ import React, { useId } from "react";
 
 import EditModal, { EditResourceModalProps } from "../common/EditModal";
 import InputWithSave from "../common/InputWithSave";
-import { Status, Job } from '../api/types';
+import { Status, Job, Resume } from '../api/types';
 
 
 interface EditJobModalProps extends EditResourceModalProps<Job> {
   statuses: Status[],
+  resumes: Resume[],
 };
 
 const EditJobModal = ({
   show, setShow, editId,
   statuses,
+  resumes,
   ...resourceManager
 }: EditJobModalProps): React.JSX.Element => {
   const modalId = useId();
@@ -24,6 +26,15 @@ const EditJobModal = ({
           return { value: status.id.toString(), label: status.name };
         })}
         required
+      />
+      <InputWithSave editId={editId} {...resourceManager} 
+        type="select" editableProperty="chosen_resume" labelText="Chosen Resume" defaultOptionLabel="None"
+        selectOptions={resumes
+          .filter((resume: Resume) => resume.job.id === editId)
+          .map((resume: Resume) => {
+            return { value: resume.id.toString(), label: resume.name };
+          })
+        }
       />
       <InputWithSave editId={editId} {...resourceManager}
         type="url" editableProperty="url" labelText="URL"

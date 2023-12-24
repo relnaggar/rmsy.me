@@ -17,6 +17,7 @@ export interface Job extends WithId {
   company: string,
   posting: string,
   status: number,
+  chosen_resume: number | null,
 };
 
 export interface JobUpload extends Pick<Job,

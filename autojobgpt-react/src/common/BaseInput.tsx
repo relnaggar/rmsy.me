@@ -38,7 +38,7 @@ const BaseInput = React.forwardRef(({
   isValid = false,
   selectOptions,
   loadingOptionLabel = "Loading...",
-  defaultOptionValue = "0",
+  defaultOptionValue = "",
   defaultOptionLabel = "Select...",
   children,
   ...extraInputProps

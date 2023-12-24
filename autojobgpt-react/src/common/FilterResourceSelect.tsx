@@ -35,7 +35,7 @@ const FilterResourceSelect = <FilterByOption extends WithId>({
           value={inputControl.value}
           onChange={inputControl.handleChange as (e: React.ChangeEvent<HTMLSelectElement>) => void}
         >
-          <option value="0">{defaultOptionLabel}</option>
+          <option value="">{defaultOptionLabel}</option>
           {filterByOptions.map((filterByOption) => (
             <option key={filterByOption.id} value={filterByOption.id}>{filterByOptionToString(filterByOption)}</option>
           ))}

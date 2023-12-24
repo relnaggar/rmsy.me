@@ -117,7 +117,7 @@ export const userClearInput = async (modal: HTMLElement, inputLabel: string, rol
   const input: HTMLElement = getByRole(modal, role, {name: new RegExp(inputLabel, "i")});
   if (role === "combobox") {
     await act(async () => {
-      userEvent.selectOptions(input, "0");
+      userEvent.selectOptions(input, "");
     });
   } else {
     await act(async () => {

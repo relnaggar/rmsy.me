@@ -6,6 +6,7 @@ import useEditModal from "../hooks/useEditModal";
 import useResource from "../hooks/useResource";
 import useErrorAlert from "../hooks/useErrorAlert";
 import useDrag from "../hooks/useDrag";
+import useFetchResource from "../hooks/useFetchResource";
 import ErrorAlert from "../common/ErrorAlert";
 import JobColumn from "./JobColumn";
 import EditJobModal from "./EditJobModal";
@@ -13,8 +14,8 @@ import AddJobModal from "./AddJobModal";
 import EditColumnModal from "./EditColumnModal";
 import AddColumnModal from "./AddColumnModal";
 import PlaceholderColumn from "./PlaceholderColumn";
-import { Status, StatusUpload, Job, JobUpload } from '../api/types';
 import AddColumnButton from "./AddColumnButton";
+import { Status, StatusUpload, Job, JobUpload, Resume } from '../api/types';
 
 
 const generatePlaceholderStatus = (statusUpload: StatusUpload): Status => {
@@ -33,6 +34,7 @@ const generatePlaceholderJob = (jobUpload: JobUpload): Job => {
     "company": "",
     "posting": "",
     "status": -1,
+    "chosen_resume": null,
   }
 };
 
@@ -125,7 +127,6 @@ const JobBoard = (): React.JSX.Element => {
   };
 
   const {handleDragStart, handleDragOver, handleDrop} = useDrag(jobs, statuses, patchJob);
-  const loading: boolean = jobManager.fetching || statusManager.fetching;
 
   // sort statuses by order, putting placeholders with id -1 at the end
   statuses.sort((a, b) => {
@@ -137,6 +138,12 @@ const JobBoard = (): React.JSX.Element => {
       return a.order - b.order;
     }
   });
+
+  const { resources: resumes } = useFetchResource<Resume>("resumes/", {
+    onFail: errorAlert.showErrors,
+  });
+
+  const loading: boolean = jobManager.fetching || statusManager.fetching;
   return (
     <section>
       <h2>Job Board</h2>
@@ -173,6 +180,7 @@ const JobBoard = (): React.JSX.Element => {
         resources={jobManager.resources}
         setResources={jobManager.setResources}        
         statuses={statusManager.resources}
+        resumes={resumes}
       />
       <AddJobModal {...addJobModal} postResource={jobManager.postResource} />
       <EditColumnModal editId={editColumnModal.editId}

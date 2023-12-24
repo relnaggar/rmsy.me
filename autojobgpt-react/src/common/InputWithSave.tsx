@@ -4,13 +4,14 @@ import { ReactComponent as FloppyIcon } from "bootstrap-icons/icons/floppy.svg";
 import useInputControl from "../hooks/useInputControl";
 import usePatch from "../hooks/usePatchResource";
 import { CommonEditModalProps } from "../common/EditModal";
-import BaseInput, { SelectOption } from "./BaseInput";
+import BaseInput, { BaseInputProps } from "./BaseInput";
 import { WithId } from '../api/types';
 
 
 interface InputWithSaveProps<Resource extends WithId> extends
   CommonEditModalProps<Resource>,
-  Omit<React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'id' | 'value'>
+  Omit<React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'id' | 'value'>,
+  Pick<BaseInputProps, "selectOptions" | "defaultOptionLabel">
 {
   type: string,
   id?: string,
@@ -18,7 +19,6 @@ interface InputWithSaveProps<Resource extends WithId> extends
   labelProperty?: keyof Resource,
   labelText?: string,
   onSaveSuccess?: () => void,
-  selectOptions?: SelectOption[],
   value?: string,
   setValue?: React.Dispatch<React.SetStateAction<string>>,
 }
@@ -32,6 +32,7 @@ const InputWithSave = <Resource extends WithId>({
   labelText,
   onSaveSuccess,  
   selectOptions,
+  defaultOptionLabel = "Select...",
   value: valueProp,
   setValue: setValueProp,
   children,
@@ -49,6 +50,8 @@ const InputWithSave = <Resource extends WithId>({
     tmp = resource[editableProperty] as string;
   } else if (typeof resource[editableProperty] === "number") {
     tmp = (resource[editableProperty] as number).toString();
+  } else if (typeof resource[editableProperty] === "object" && resource[editableProperty] === null) {
+    tmp = "";
   } else {
     throw new Error(`resourceEditableProperty must be a string or number, but it is a ${typeof resource[editableProperty]}`);
   }
@@ -56,7 +59,7 @@ const InputWithSave = <Resource extends WithId>({
 
   const validateSubmit = (value: string) => {
     const errors: Record<string,string[]> = {};
-    if (required && (value === "" || (type === "select" && value === "0"))) {
+    if (required && value === "") {
       errors[editableProperty] = [`Please enter a ${labelText ? labelText.toLowerCase() : editableProperty}.`];
     }
     return errors;
@@ -138,7 +141,7 @@ const InputWithSave = <Resource extends WithId>({
       value={value} editing={editing} handleChange={handleChange}
       type={type} label={label} loading={updating} errors={Object.values(errors).flat()}      
       handleSubmit={handleSubmit} floatingLabel={labelProperty !== undefined} isValid={saved}
-      selectOptions={selectOptions} {...extraInputProps}
+      selectOptions={selectOptions} {...extraInputProps} defaultOptionLabel={defaultOptionLabel}
     >
       {saveButton}
       {children}

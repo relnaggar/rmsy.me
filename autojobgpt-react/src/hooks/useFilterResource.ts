@@ -12,7 +12,7 @@ const useFilterResource = <Resource extends WithId, FilterByOption extends WithI
   resources: Resource[],
   filterByKey: keyof Resource,
 ): UseFilterResource<Resource,FilterByOption > => {
-  const inputControl = useInputControl("0");
+  const inputControl = useInputControl("");
 
   const filterByOptionIds: number[] = [];
   const filterByOptions: FilterByOption[] = [];
@@ -30,7 +30,7 @@ const useFilterResource = <Resource extends WithId, FilterByOption extends WithI
   });
 
   let filteredResources: Resource[]
-  if (inputControl.value === "0") {
+  if (inputControl.value === "") {
     filteredResources = resources;
   } else {
     filteredResources = resources.filter(

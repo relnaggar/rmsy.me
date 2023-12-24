@@ -12,8 +12,8 @@ const AddResumeModal = ({
   ...addModal
 }: AddResourceModalProps<ResumeUpload>): React.JSX.Element => {
   const modalId = useId();
-  const jobInput = useInputControl("0");
-  const templateInput = useInputControl("0");
+  const jobInput = useInputControl("");
+  const templateInput = useInputControl("");
 
   const handleRefreshSuccess = useCallback(() => {
     addModal.setShowErrorAlert(false);
@@ -36,15 +36,12 @@ const AddResumeModal = ({
   });
 
   const validateSubmit = (): boolean => {
-    const jobValue: number = parseInt(jobInput.value);
-    const templateValue: number = parseInt(templateInput.value);
-
-    if (jobValue === 0 || templateValue === 0) {
+    if (jobInput.value === "" || templateInput.value === "") {
       const newErrors: Record<string, string[]> = {};
-      if (jobValue === 0) {
+      if (jobInput.value === "") {
         newErrors["job"] = ["Please select a job."];
       }
-      if (templateValue === 0) {
+      if (templateInput.value === "") {
         newErrors["template"] = ["Please select a template."];
       }
       addModal.setErrors(newErrors);
