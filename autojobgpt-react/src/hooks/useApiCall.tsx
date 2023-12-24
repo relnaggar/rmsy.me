@@ -42,13 +42,14 @@ const useApiCall = (
   apiPath: string,
   method: "GET" | "POST" | "PATCH" | "DELETE",
   options?: {
+    cancelable?: boolean,
     beforeCall?: (postData: any) => void,
     onSuccess?: (params: OnSuccessParams) => Promise<void>,
     afterCall?: (params : AfterCallParams) => void,
     onFail?: (errors: Record<string,string[]>) => void,
   },
 ): UseApiCall => {
-  const { beforeCall, onSuccess, afterCall, onFail } = options || {};
+  const { beforeCall, onSuccess, afterCall, onFail, cancelable = false } = options || {};
 
   const csrfToken: string = useContext(CSRFTokenContext)
   const includeCsrfToken: boolean = method === "POST" || method === "PATCH" || method === "DELETE";
@@ -61,7 +62,7 @@ const useApiCall = (
   const call = useCallback(async (params?: CallParams): Promise<void> => {
     const { data, resourceId, paramString } = params || {};
 
-    if (method === "GET") {
+    if (cancelable) {
       if (calling) {
         abortControllerRef.current.abort();
       }
@@ -107,7 +108,7 @@ const useApiCall = (
         method: method,
         headers: headers,
         body: body,
-        signal: method === "GET" ? abortControllerRef.current.signal : undefined,
+        signal: cancelable ? abortControllerRef.current.signal : undefined,
       });
 
       // wait for 3 seconds before continuing
@@ -128,7 +129,7 @@ const useApiCall = (
         errors["error"] = makeErrorMessage(error);
       }
     } finally {
-      if (method !== "GET" || !abortControllerRef.current.signal.aborted) {
+      if (!cancelable || !abortControllerRef.current.signal.aborted) {
         afterCall?.({resourceId});
         setCalling(false);
         if (Object.keys(errors).length > 0) {
@@ -136,10 +137,10 @@ const useApiCall = (
         }
       }
     }
-  }, [fetchData, apiRoot, apiPath, method, csrfToken, includeCsrfToken, calling, beforeCall, onSuccess, afterCall, onFail]);
+  }, [fetchData, apiRoot, apiPath, method, csrfToken, includeCsrfToken, calling, beforeCall, onSuccess, afterCall, onFail, cancelable]);
 
   let cancel = undefined;
-  if (method === "GET") {
+  if (cancelable) {
     cancel = (): void => {
       abortControllerRef.current.abort();
       setCalling(false);

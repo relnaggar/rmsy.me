@@ -122,7 +122,24 @@ export const validResumeTemplate3: ResumeTemplate = {
 
 export const validResume1: Resume = {
   id: 1,
-  substitutions: [],
+  substitutions: [
+    {
+      id: 1,
+      key: "Test Fill Field Key 1",
+      value: "Test Value 1",
+      resume: 1,
+    }, {
+      id: 2,
+      key: "Test Fill Field Key 2",
+      value: "Test Value 2",
+      resume: 1,
+    }, {
+      id: 3,
+      key: "Test Fill Field Key 3",
+      value: "Test Value 3",
+      resume: 1,
+    }
+  ],
   version: 1,
   docx: "https://www.example.com/test1.docx",
   png: "https://www.example.com/test1.png",
@@ -134,7 +151,24 @@ export const validResume1: Resume = {
 
 export const validResume2: Resume = {
   id: 2,
-  substitutions: [],
+  substitutions: [
+    {
+      id: 4,
+      key: defaultFillFields[0],
+      value: "Test Value 4",
+      resume: 2,
+    }, {
+      id: 5,
+      key: defaultFillFields[1],
+      value: "Test Value 5",
+      resume: 2,
+    }, {
+      id: 6,
+      key: "Test Fill Field Key 6",
+      value: "Test Value 6",
+      resume: 2,
+    }
+  ],
   version: 1,
   docx: "https://www.example.com/test2.docx",
   png: "https://www.example.com/test2.png",

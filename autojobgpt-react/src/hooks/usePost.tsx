@@ -6,6 +6,7 @@ import useApiCall, { OnSuccessParams } from "./useApiCall";
 export interface UsePost {
   posting: boolean,
   post: (postData?: any) => Promise<void>,
+  cancel: () => void,
 };
 
 const usePost = <ResponseData extends unknown>(
@@ -22,7 +23,8 @@ const usePost = <ResponseData extends unknown>(
     onSuccess?.(responseData);
   }, [onSuccess]);
 
-  const { calling: posting, call } = useApiCall(apiPath, "POST", {
+  const { calling: posting, call, cancel } = useApiCall(apiPath, "POST", {
+    cancelable: true,
     onSuccess: handleSuccess,
     onFail
   });
@@ -31,7 +33,11 @@ const usePost = <ResponseData extends unknown>(
     await call({data: postData});
   }, [call]);
 
-  return { posting, post };
+  const cancelPost = useCallback((): void => {
+    cancel!();
+  }, [cancel]);
+
+  return { posting, post, cancel: cancelPost };
 };
 
 export default usePost;

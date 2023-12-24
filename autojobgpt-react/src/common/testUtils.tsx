@@ -127,7 +127,8 @@ export const userClearInput = async (modal: HTMLElement, inputLabel: string, rol
 }
 
 export const clickCloseButton = async (modal: HTMLElement): Promise<void> => {
-  const closeButton: HTMLElement = getAllByRole(modal, "button", {name: new RegExp("close", "i")})[0];
+  const allCloseButtons: HTMLElement[] = getAllByRole(modal, "button", {name: new RegExp("close", "i")});
+  const closeButton: HTMLElement = getAllByRole(modal, "button", {name: new RegExp("close", "i")})[allCloseButtons.length - 1];
   await act(async () => {
     userEvent.click(closeButton);
   });
@@ -216,6 +217,18 @@ export const clickActionButton = async (modal: HTMLElement, inputLabel: string, 
   await act(async () => {
     userEvent.click(actionButton);
   });
+};
+
+export const clickRegenerateButton = async (modal: HTMLElement, label: string): Promise<void> => {
+  await clickActionButton(modal, label, "regenerate");
+};
+
+export const getRegenerateButton = (modal: HTMLElement, label: string): HTMLElement => {
+  return getActionButton(modal, label, "regenerate");
+};
+
+export const queryRegenerateButton = (modal: HTMLElement, label: string): HTMLElement | null => {
+  return queryActionButton(modal, label, "regenerate");
 };
 
 export const getRefreshButton = (modal: HTMLElement, label: string): HTMLElement => {
@@ -315,4 +328,16 @@ export const clickMoveLeftButton = async (columnElement: HTMLElement): Promise<v
   await act(async () => {
     userEvent.click(moveLeftButton);
   });
+};
+
+export const clearDisssmissibleErrorAlerts = async (modalElement: HTMLElement): Promise<void> => {
+  const errorAlerts: HTMLElement[] = queryAllByRole(modalElement, "alert");
+  for (const errorAlert of errorAlerts) {
+    const closeButton: HTMLElement | null = queryByRole(errorAlert, "button", {name: new RegExp("close alert", "i")});
+    if (closeButton !== null) {
+      await act(async () => {
+        userEvent.click(closeButton);
+      });
+    }
+  }
 };

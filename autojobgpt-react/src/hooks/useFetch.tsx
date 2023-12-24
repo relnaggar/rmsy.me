@@ -34,6 +34,7 @@ const useFetch = <Data extends unknown>(
   }, [onSuccess]);
 
   const { calling: fetching, call, cancel } = useApiCall(apiPath, "GET", {
+    cancelable: true,
     onSuccess: handleSuccess,
     onFail
   });
@@ -50,7 +51,7 @@ const useFetch = <Data extends unknown>(
   }, [call]);
 
   const cancelFetch = useCallback((): void => {
-    (cancel as () => void)();
+    cancel!();
   }, [cancel]);
 
   return { responseData, setResponseData, fetching, refetch, cancel: cancelFetch };

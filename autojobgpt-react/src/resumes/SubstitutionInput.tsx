@@ -4,6 +4,7 @@ import { ReactComponent as RobotIcon } from "bootstrap-icons/icons/robot.svg";
 import useErrorAlert from "../hooks/useErrorAlert";
 import usePost from "../hooks/usePost";
 import InputWithSave from "../common/InputWithSave";
+import InputActionButton from "../common/InputActionButton";
 import ErrorAlert from "../common/ErrorAlert";
 import { defaultFillFields } from "../api/constants";
 import { Substitution } from '../api/types';
@@ -20,6 +21,7 @@ export default function SubstitutionInput({
   setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
   onSubstitutionSaveSuccess: () => void,
 }): React.JSX.Element {
+  const id = useId();
   const feedbackSwitchId = useId();
   const errorAlert = useErrorAlert();
   const [value, setValue] = useState<string>(substitution.value);
@@ -31,7 +33,7 @@ export default function SubstitutionInput({
     errorAlert.clearErrors();
   }
 
-  const { posting: filling, post: fill } = usePost(
+  const { posting: filling, post: fill, cancel: cancelFill } = usePost(
     `substitutions/${substitution.id}/regenerate/`, {
       onSuccess: onFillSuccess,
       onFail: errorAlert.showErrors,
@@ -56,7 +58,7 @@ export default function SubstitutionInput({
 
   return (
     <>
-      <InputWithSave editId={substitution.id}
+      <InputWithSave editId={substitution.id} id={id}
         apiPath="substitutions/" resources={substitutions} setResources={setSubstitutions}
         type="textarea" editableProperty="value" labelProperty="key"
         onSaveSuccess={onSubstitutionSaveSuccess}
@@ -65,22 +67,10 @@ export default function SubstitutionInput({
       >
         { ! defaultFillFields.includes(substitution.key) &&
           <>
-            <button className="btn btn-outline-primary" type="button"
-              onClick={handleClickFillDetails}
-              disabled={showFeedback && feedback === ""}
-            >
-              { filling ?
-                <>
-                  <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-                  Regenerating...
-                </>
-              :
-                <>
-                  <RobotIcon className="me-1" />
-                  Regenerate
-                </>
-              }
-            </button>
+            <InputActionButton controlsId={id}
+              label="Regenerate" icon={<RobotIcon />} loading={filling} disabled={showFeedback && feedback === ""}
+              onClickAction={handleClickFillDetails} onClickCancel={cancelFill}
+            />
             <div className="form-check form-switch mt-2">
               <input id={feedbackSwitchId}
                 className="form-check-input" type="checkbox" role="switch"

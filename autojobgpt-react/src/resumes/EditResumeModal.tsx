@@ -107,7 +107,7 @@ const EditResumeModal = ({
           .filter((substitution: Substitution) => substitution.resume === editId)
           .map((substitution: Substitution) => {
             return (
-              <SubstitutionInput
+              <SubstitutionInput key={substitution.id}
                 substitution={substitution}
                 substitutions={substitutions}
                 setSubstitutions={setSubstitutions}

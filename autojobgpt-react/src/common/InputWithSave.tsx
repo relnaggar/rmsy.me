@@ -13,6 +13,7 @@ interface InputWithSaveProps<Resource extends WithId> extends
   Omit<React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'id' | 'value'>
 {
   type: string,
+  id?: string,
   editableProperty: keyof Resource & string,
   labelProperty?: keyof Resource,
   labelText?: string,
@@ -24,7 +25,8 @@ interface InputWithSaveProps<Resource extends WithId> extends
 
 const InputWithSave = <Resource extends WithId>({
   apiPath, resources, setResources, editId,
-  type,  
+  type,
+  id,
   editableProperty,
   labelProperty,
   labelText,
@@ -39,7 +41,8 @@ const InputWithSave = <Resource extends WithId>({
   if (!labelProperty && !labelText) throw new Error("InputWithSave must have either labelProperty or labelText");
 
   const resource: Resource = resources.find((resource) => resource.id === editId)!;
-  const id = useId();
+  const autoId = useId();
+  const currentId = id ?? autoId;
   
   let tmp: string;
   if (typeof resource[editableProperty] === "string") {
@@ -61,11 +64,7 @@ const InputWithSave = <Resource extends WithId>({
 
   const [saved, setSaved] = useState<boolean>(true);
   const [errors, setErrors] = useState<Record<string,string[]>>({});
-  const { editing, value, edit, handleChange, stopEditing, ref } = useInputControl(resourceEditableProperty, valueProp, setValueProp);
-
-  useEffect(() => {
-    edit(resourceEditableProperty);
-  }, [edit, resourceEditableProperty]);
+  const { editing, value, handleChange, stopEditing, ref } = useInputControl(resourceEditableProperty, valueProp, setValueProp);
   
   useEffect(() => {
     if (value === resourceEditableProperty) {
@@ -94,7 +93,7 @@ const InputWithSave = <Resource extends WithId>({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {  
     e.preventDefault(); // prevent page from reloading
 
-    const value: string = (document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
+    const value: string = (document.getElementById(currentId) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
     const errorMessage = validateSubmit(value);
     if (Object.keys(errorMessage).length === 0) {
       updateResource(editId, { [editableProperty]: value } as Partial<Resource>);
@@ -112,7 +111,7 @@ const InputWithSave = <Resource extends WithId>({
   }
 
   const saveButton: React.JSX.Element = (
-    <button aria-controls={id}
+    <button aria-controls={currentId}
       type="submit" className="btn btn-outline-primary" disabled={updating || saved} aria-busy={updating}
     >
       { updating ?
@@ -135,7 +134,7 @@ const InputWithSave = <Resource extends WithId>({
   );
   
   return (
-    <BaseInput id={id} ref={ref}
+    <BaseInput id={currentId} ref={ref}
       value={value} editing={editing} handleChange={handleChange}
       type={type} label={label} loading={updating} errors={Object.values(errors).flat()}      
       handleSubmit={handleSubmit} floatingLabel={labelProperty !== undefined} isValid={saved}
