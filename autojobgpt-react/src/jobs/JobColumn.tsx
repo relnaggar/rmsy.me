@@ -5,14 +5,14 @@ import { ReactComponent as CaretRightIcon } from 'bootstrap-icons/icons/caret-ri
 import JobCard from "./JobCard";
 import { Status, Job } from '../api/types';
 import EditDeleteButtonGroup from "../common/EditDeleteButtonGroup";
+import { sortByIdPlaceholdersAtTheEnd } from "../common/utils";
 
 
 interface JobColumnProps {
   status: Status,
   allStatuses: Status[],
   jobs: Job[],
-  jobIdsBeingDeleted: number[],  
-  postingJob: boolean,
+  jobIdsBeingDeleted: number[],
   beingRemoved: boolean,
   beingMoved: boolean,
   patchStatus: (id: number, data: Partial<Status>) => void,
@@ -31,7 +31,6 @@ const JobColumn = ({
   allStatuses,
   jobs,
   jobIdsBeingDeleted,
-  postingJob,
   beingRemoved,
   beingMoved,
   patchStatus,
@@ -68,16 +67,7 @@ const JobColumn = ({
     setMovingDirection("right");
   };
 
-  // sort jobs by id, putting placeholders with id -1 at the end
-  jobs.sort((a, b) => {
-    if (a.id === -1) {
-      return 1;
-    } else if (b.id === -1) {
-      return -1;
-    } else {
-      return a.id - b.id;
-    }
-  });
+  sortByIdPlaceholdersAtTheEnd(jobs);
 
   return (
     <div aria-labelledby={columnId}
@@ -129,8 +119,8 @@ const JobColumn = ({
           </span>
         </div>  
         <div className="card-body">
-          {jobs.map((job) =>
-            <JobCard key={job.id}
+          {jobs.map((job, index) =>
+            <JobCard key={`${job.id}-${index}`}
               job={job}
               onDragStart={onDragStart(job.id)}
               onClickEdit={onClickEditJob(job.id)}
@@ -141,7 +131,7 @@ const JobColumn = ({
         </div>
         <div className="card-footer">
           { status.id === allStatuses[0].id &&
-            <button type="button" className="btn btn-primary" onClick={onClickAddJob} disabled={postingJob}>
+            <button type="button" className="btn btn-primary" onClick={onClickAddJob}>
               + Add job
             </button>
           }

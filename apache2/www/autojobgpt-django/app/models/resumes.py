@@ -133,7 +133,7 @@ f"""<fillField>
   def generate_docx(self):
     if not self.is_filled:
       raise Exception(
-        "you have to fill the resume with .fill() before you can generate the docx file"
+        "you have to fill the resume before you can generate a docx file"
       )
 
     # get all the fillFields

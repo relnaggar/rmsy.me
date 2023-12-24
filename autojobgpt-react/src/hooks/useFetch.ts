@@ -33,7 +33,8 @@ const useFetch = <Data extends unknown>(
     onSuccess?.(responseData, setResponseData);
   }, [onSuccess]);
 
-  const { calling: fetching, call, cancel } = useApiCall(apiPath, "GET", {
+  const { calling: fetching, call, cancel } = useApiCall("GET", {
+    apiPath,
     cancelable: true,
     onSuccess: handleSuccess,
     onFail

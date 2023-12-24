@@ -18,6 +18,7 @@ interface CallParams {
   data?: any,
   resourceId?: number,
   paramString?: string,
+  apiPath?: string,
 };
 
 export interface UseApiCall {
@@ -38,10 +39,10 @@ const makeErrorMessage = (error: any): string[] => {
   }
 };
 
-const useApiCall = (
-  apiPath: string,
-  method: "GET" | "POST" | "PATCH" | "DELETE",
+const useApiCall = (  
+  method: "GET" | "POST" | "PATCH" | "DELETE",  
   options?: {
+    apiPath?: string,
     cancelable?: boolean,
     beforeCall?: (postData: any) => void,
     onSuccess?: (params: OnSuccessParams) => Promise<void>,
@@ -49,7 +50,7 @@ const useApiCall = (
     onFail?: (errors: Record<string,string[]>) => void,
   },
 ): UseApiCall => {
-  const { beforeCall, onSuccess, afterCall, onFail, cancelable = false } = options || {};
+  const { apiPath, beforeCall, onSuccess, afterCall, onFail, cancelable = false } = options || {};
 
   const csrfToken: string = useContext(CSRFTokenContext)
   const includeCsrfToken: boolean = method === "POST" || method === "PATCH" || method === "DELETE";
@@ -60,7 +61,7 @@ const useApiCall = (
   const abortControllerRef = useRef<AbortController>(new AbortController());
 
   const call = useCallback(async (params?: CallParams): Promise<void> => {
-    const { data, resourceId, paramString } = params || {};
+    const { data, resourceId, paramString, apiPath: apiPathOverride } = params || {};
 
     if (cancelable) {
       if (calling) {
@@ -96,7 +97,14 @@ const useApiCall = (
         headers["X-CSRFToken"] = csrfToken;
       }
 
-      let url: string = `${apiRoot}${apiPath}`;
+      let url: string = apiRoot
+      if (apiPathOverride !== undefined) {
+        url += apiPathOverride;
+      } else if (apiPath !== undefined) {
+        url += apiPath;
+      } else {
+        throw new Error("apiPath must be provided");
+      }
       if (resourceId !== undefined) {
         url += `${resourceId}/`;
       }

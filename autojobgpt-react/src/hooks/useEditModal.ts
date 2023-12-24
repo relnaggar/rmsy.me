@@ -6,6 +6,7 @@ import { CommonEditModalProps } from '../common/EditModal';
 
 interface UseEditModal extends CommonModalProps, Pick<CommonEditModalProps<never>, "editId"> {
   open: (id: number) => void,
+  close: () => void,
 };
 
 const useEditModal = (): UseEditModal => {
@@ -17,7 +18,11 @@ const useEditModal = (): UseEditModal => {
     setShow(true);
   }, []);
 
-  return { show, setShow, editId, open };
+  const close = useCallback(() => {
+    setShow(false);
+  }, []);
+
+  return { show, setShow, editId, open, close };
 };
 
 export default useEditModal;

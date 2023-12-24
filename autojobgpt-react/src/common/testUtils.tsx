@@ -124,7 +124,7 @@ export const userClearInput = async (modal: HTMLElement, inputLabel: string, rol
       userEvent.clear(input);
     });
   }
-}
+};
 
 export const clickCloseButton = async (modal: HTMLElement): Promise<void> => {
   const allCloseButtons: HTMLElement[] = getAllByRole(modal, "button", {name: new RegExp("close", "i")});
@@ -170,7 +170,7 @@ export const openAndGetEditModal = async (resourceElement: HTMLElement, timeout:
     userEvent.click(editButton);
   });
   return await screen.findByRole("dialog", {name: new RegExp("edit", "i")}, {timeout: timeout});
-}
+};
 
 export const getDeleteButton = (modal: HTMLElement): HTMLElement => {
   return getByRole(modal, "button", {name: new RegExp("delete", "i")});
@@ -181,18 +181,9 @@ export const clickDeleteButton = async (modal: HTMLElement): Promise<void> => {
   await act(async () => {
     userEvent.click(deleteButton);
   });
-}
-
-export const getActionButton = (modal: HTMLElement, inputLabel: string, buttonLabel: string): HTMLElement => {
-  const actionButton: HTMLElement | null = queryActionButton(modal, inputLabel, buttonLabel);
-  if (actionButton === null) {
-    throw new Error(`Button ${buttonLabel} controlling input ${inputLabel} not found`);
-  } else {
-    return actionButton;  
-  }
 };
 
-export const queryActionButton = (modal: HTMLElement, inputLabel: string, buttonLabel: string): HTMLElement | null => {
+export const queryActionElement = (modal: HTMLElement, inputLabel: string, actionElementLabel: string, actionRole: string): HTMLElement | null => {
   const matchingInputs: HTMLElement[] = [
     ...queryAllByRole(modal, "combobox", {name: new RegExp(inputLabel, "i")}),
     ...queryAllByRole(modal, "textbox", {name: new RegExp(inputLabel, "i")})
@@ -201,34 +192,75 @@ export const queryActionButton = (modal: HTMLElement, inputLabel: string, button
     throw new Error(`Input ${inputLabel} not found`);
   }
   const inputId: string = matchingInputs[0].getAttribute("id")!;
-  const buttons: HTMLElement[] = getAllByRole(modal, "button", {name: new RegExp(buttonLabel, "i")});
-  const matchingButton: HTMLElement | undefined = buttons.find((button: HTMLElement) => {
+  const actionElements: HTMLElement[] = queryAllByRole(modal, actionRole, {name: new RegExp(actionElementLabel, "i")});
+  const matchingActionElement: HTMLElement | undefined = actionElements.find((button: HTMLElement) => {
     return button.getAttribute("aria-controls") === inputId;
   });
-  if (!matchingButton) {
+  if (!matchingActionElement) {
     return null;
   } else {
-    return matchingButton;  
+    return matchingActionElement;  
   }
 };
 
-export const clickActionButton = async (modal: HTMLElement, inputLabel: string, buttonLabel: string): Promise<void> => {
-  const actionButton: HTMLElement = getActionButton(modal, inputLabel, buttonLabel);
+export const getActionElement = (modal: HTMLElement, inputLabel: string, actionElementLabel: string, actionRole: string): HTMLElement => {
+  const actionElement: HTMLElement | null = queryActionElement(modal, inputLabel, actionElementLabel, actionRole);
+  if (actionElement === null) {
+    throw new Error(`Action element ${actionElementLabel} controlling input ${inputLabel} not found`);
+  } else {
+    return actionElement;  
+  }
+};
+
+export const clickActionElement = async (modal: HTMLElement, inputLabel: string, actionElementLabel: string, actionRole: string): Promise<void> => {
+  const actionElement: HTMLElement = getActionElement(modal, inputLabel, actionElementLabel, actionRole);
   await act(async () => {
-    userEvent.click(actionButton);
+    userEvent.click(actionElement);
   });
 };
 
-export const clickRegenerateButton = async (modal: HTMLElement, label: string): Promise<void> => {
-  await clickActionButton(modal, label, "regenerate");
+export const queryActionButton = (modal: HTMLElement, inputLabel: string, buttonLabel: string): HTMLElement | null => {
+  return queryActionElement(modal, inputLabel, buttonLabel, "button");
+};
+
+export const getActionButton = (modal: HTMLElement, inputLabel: string, buttonLabel: string): HTMLElement => {
+  return getActionElement(modal, inputLabel, buttonLabel, "button");
+};
+
+export const clickActionButton = async (modal: HTMLElement, inputLabel: string, buttonLabel: string): Promise<void> => {
+  await clickActionElement(modal, inputLabel, buttonLabel, "button");
+};
+
+export const queryFeedbackSwitch = (modal: HTMLElement, label: string): HTMLElement | null => {
+  return queryActionElement(modal, label, "feedback", "switch");
+};
+
+export const getFeedbackSwitch = (modal: HTMLElement, label: string): HTMLElement => {
+  return getActionElement(modal, label, "feedback", "switch");
+};
+
+export const clickFeedbackSwitch = async (modal: HTMLElement, label: string): Promise<void> => {
+  await clickActionElement(modal, label, "feedback", "switch");
+};
+
+export const queryFeedbackInput = (modal: HTMLElement, label: string): HTMLElement | null => {
+  return queryActionElement(modal, label, "feedback", "textbox");
+};
+
+export const getFeedbackInput = (modal: HTMLElement, label: string): HTMLElement => {
+  return getActionElement(modal, label, "feedback", "textbox");
+};
+
+export const queryRegenerateButton = (modal: HTMLElement, label: string): HTMLElement | null => {
+  return queryActionButton(modal, label, "regenerate");
 };
 
 export const getRegenerateButton = (modal: HTMLElement, label: string): HTMLElement => {
   return getActionButton(modal, label, "regenerate");
 };
 
-export const queryRegenerateButton = (modal: HTMLElement, label: string): HTMLElement | null => {
-  return queryActionButton(modal, label, "regenerate");
+export const clickRegenerateButton = async (modal: HTMLElement, label: string): Promise<void> => {
+  await clickActionButton(modal, label, "regenerate");
 };
 
 export const getRefreshButton = (modal: HTMLElement, label: string): HTMLElement => {
@@ -239,12 +271,12 @@ export const clickRefreshButton = async (modal: HTMLElement, label: string): Pro
   await clickActionButton(modal, label, "refresh");
 };
 
-export const getSaveButton = (modal: HTMLElement, label: string): HTMLElement => {
-  return getActionButton(modal, label, "save");
-};
-
 export const querySaveButton = (modal: HTMLElement, label: string): HTMLElement | null => {
   return queryActionButton(modal, label, "save");
+};
+
+export const getSaveButton = (modal: HTMLElement, label: string): HTMLElement => {
+  return getActionButton(modal, label, "save");
 };
 
 export const clickSaveButton = async (modal: HTMLElement, label: string): Promise<void> => {
@@ -340,4 +372,15 @@ export const clearDisssmissibleErrorAlerts = async (modalElement: HTMLElement): 
       });
     }
   }
+};
+
+export const getDuplicateButton = (modalElement: HTMLElement): HTMLElement => {
+  return getByRole(modalElement, "button", {name: new RegExp("duplicate", "i")});
+};
+
+export const clickDuplicateButton = async (modalElement: HTMLElement): Promise<void> => {
+  const duplicateButton: HTMLElement = getDuplicateButton(modalElement);
+  await act(async () => {
+    userEvent.click(duplicateButton);
+  });
 };

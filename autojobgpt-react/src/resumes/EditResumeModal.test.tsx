@@ -1,10 +1,12 @@
 import { screen, getByRole, getAllByRole, waitFor, queryByRole } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
-import { injectMocks, mockFunctions, renderRoute, queryResources, openAndGetEditModal, clickCloseButton, getSaveButton, userClearInput, clickSaveButton, userInput, getSection, getRegenerateButton, queryRegenerateButton, clickRegenerateButton, clearDisssmissibleErrorAlerts } from "../common/testUtils";
+import { injectMocks, mockFunctions, renderRoute, queryResources, openAndGetEditModal, clickCloseButton, getSaveButton, userClearInput, clickSaveButton, userInput, getSection, getRegenerateButton, queryRegenerateButton, clickRegenerateButton, clearDisssmissibleErrorAlerts, getFeedbackSwitch, queryFeedbackSwitch, clickFeedbackSwitch, queryFeedbackInput, getFeedbackInput, getDuplicateButton, clickDuplicateButton } from "../common/testUtils";
 import { validResume1, validResume2, validResume3, testDataForApiGeneralErrors, errorMessage } from "../api/mockData";
 import { generateConditionalResponseByRoute, generateResponse, generateErrorResponse } from "../api/mockApi";
 import { defaultFillFields } from "../api/constants";
 import { Resume, Substitution } from "../api/types";
+import { act } from "react-dom/test-utils";
 
 
 const thisRoute = "/resumes";
@@ -507,6 +509,7 @@ describe(`each ${modalName} modal does not retain ${relatedResourceName} input v
 
 describe(`each ${modalName} modal does not retain ${relatedResourceName} input errors on close and reopen`, () => {
   testEachModal(`does not retain ${relatedResourceName} input errors on close and reopen`, async (modal, mockData, modalNumber) => {
+    jest.setTimeout(10000);
     for (const relatedResource of mockData[relatedResourceKey]) {
       await userClearInput(modal, relatedResource.key);
       mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({[relatedResourceValueKey]: [errorMessage]}));
@@ -611,4 +614,133 @@ describe(`api regenerate error after regenerating each ${modalName} modal non-de
       }
     }
   });
+});
+
+describe(`for each ${modalName} modal, each default ${relatedResourceName} input doesn't have a feedback toggle switch`, () => {
+  testEachModal(`each default ${relatedResourceName} input doesn't have a feedback toggle switch`, async (modal, mockData) => {
+    for (const relatedResource of mockData[relatedResourceKey]) {
+      if (defaultFillFields.includes(relatedResource.key)) {
+        expect(queryFeedbackSwitch(modal, relatedResource.key)).not.toBeInTheDocument();
+      }
+    }
+  });
+});
+
+describe(`for each ${modalName} modal, each non-default ${relatedResourceName} input has a feedback toggle switch`, () => {
+  testEachModal(`each non-default ${relatedResourceName} input has a feedback toggle switch`, async (modal, mockData) => {
+    for (const relatedResource of mockData[relatedResourceKey]) {
+      if (! defaultFillFields.includes(relatedResource.key)) {
+        const toggleSwitch: HTMLElement = getFeedbackSwitch(modal, relatedResource.key);
+        expect(toggleSwitch).toBeInTheDocument();
+      }
+    }
+  });
+});
+
+describe(`for each ${modalName} modal, before clicking each non-default ${relatedResourceName} input's feedback toggle switch, no feedback textbox appears`, () => {
+  testEachModal(`before clicking each non-default ${relatedResourceName} input's feedback toggle switch, no feedback textbox appears`, async (modal, mockData) => {
+    for (const relatedResource of mockData[relatedResourceKey]) {
+      if (! defaultFillFields.includes(relatedResource.key)) {
+        expect(queryFeedbackInput(modal, relatedResource.key)).not.toBeInTheDocument();
+      }
+    }
+  });
+});
+
+
+describe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's feedback toggle switch makes a feedback textbox appear`, () => {
+  testEachModal(`clicking each non-default ${relatedResourceName} input's feedback toggle switch makes a feedback textbox appear`, async (modal, mockData) => {
+    for (const relatedResource of mockData[relatedResourceKey]) {
+      if (! defaultFillFields.includes(relatedResource.key)) {
+        await clickFeedbackSwitch(modal, relatedResource.key);
+        const feedbackTextbox: HTMLElement = getFeedbackInput(modal, relatedResource.key);
+        expect(feedbackTextbox).toBeInTheDocument();
+      }
+    }
+  });
+});
+
+describe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button after typing feedback sends an api call including the feedback`, () => {
+  testEachModal(`clicking each non-default ${relatedResourceName} input's regenerate button after typing feedback sends an api call including the feedback`, async (modal, mockData) => {
+    for (const relatedResource of mockData[relatedResourceKey]) {
+      if (! defaultFillFields.includes(relatedResource.key)) {
+        await clickFeedbackSwitch(modal, relatedResource.key);
+        const feedbackTextbox: HTMLElement = getFeedbackInput(modal, relatedResource.key);
+        await act(async () => {
+          userEvent.type(feedbackTextbox, "some feedback");
+        });
+        mockFunctions.fetchData.mockImplementationOnce(generateResponse({...relatedResource, [relatedResourceValueKey]: newRelatedResourceValue}));
+        await clickRegenerateButton(modal, relatedResource.key);
+        expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${relatedApiPath}${relatedResource.id}/regenerate/`, expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({[relatedResourceValueKey]: relatedResource[relatedResourceValueKey], feedback: "some feedback"}),
+        }));
+      }
+    }
+  });
+});
+
+describe(`each ${modalName} modal has a duplicate button`, () => {
+  testEachModal(`modal has a duplicate button`, async (modal) => {
+    const duplicateButton: HTMLElement = getDuplicateButton(modal);
+    expect(duplicateButton).toBeInTheDocument();
+  });
+});
+
+describe(`clicking each ${modalName} modal duplicate button makes an api call`, () => {
+  testEachModal(`clicking duplicate button makes an api call`, async (modal, mockData) => {
+    const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
+    mockFunctions.fetchData.mockImplementationOnce(generateResponse(mockData));
+    await clickDuplicateButton(modal);
+    expect(mockFunctions.fetchData.mock.calls.length).toBe(initialFetchDataCalls + 1);
+  });
+});
+
+describe(`clicking each ${modalName} modal duplicate button makes an api call to duplicate the data`, () => {
+  testEachModal(`clicking duplicate button makes an api call to duplicate the data`, async (modal, mockData) => {
+    mockFunctions.fetchData.mockImplementationOnce(generateResponse(newResume));
+    await clickDuplicateButton(modal);
+    expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${thisApiPath}${mockData.id}/duplicate/`, expect.objectContaining({
+      method: "POST",
+    }));
+  });
+});
+
+describe(`clicking each ${modalName} modal duplicate button makes a new ${thisResource}`, () => {
+  testEachModal(`clicking duplicate button makes a new ${thisResource}`, async (modal) => {
+    let initialResourceElements: HTMLElement[] = queryResources(thisResource);
+    mockFunctions.fetchData.mockImplementationOnce(generateResponse(newResume));
+    await clickDuplicateButton(modal);
+    expect(queryResources(thisResource).length).toBe(initialResourceElements.length + 1);
+  });
+});
+
+describe(`clicking each ${modalName} modal duplicate button makes a new ${thisResource} with the returned name`, () => {
+  testEachModal(`clicking duplicate button makes a new ${thisResource} with the returned name`, async (modal) => {
+    mockFunctions.fetchData.mockImplementationOnce(generateResponse(newResume));
+    await clickDuplicateButton(modal);
+    const resourceElements: HTMLElement[] = queryResources(thisResource);
+    expect(resourceElements[resourceElements.length - 1]).toHaveTextContent(newResume.name);
+  });
+});
+
+describe(`clicking each ${modalName} modal duplicate button closes the modal`, () => {
+  testEachModal(`clicking duplicate button makes a new ${thisResource}`, async (modal) => {
+    mockFunctions.fetchData.mockImplementationOnce(generateResponse(newResume));
+    await clickDuplicateButton(modal);
+    expect(queryByRole(modal, "dialog")).not.toBeInTheDocument();
+  });
+});
+
+describe(`api general errors after clicking each ${modalName} modal duplicate button show an error alert in the ${thisResource} list`, () => {
+  for (const testDataForApiGeneralError of testDataForApiGeneralErrors(mockFunctions)) {
+    testEachModal(`api ${testDataForApiGeneralError.apiErrorType} error after clicking duplicate button shows an error alert in the ${thisResource} list`, async (modal) => {
+      testDataForApiGeneralError.mockApiError();
+      await clickDuplicateButton(modal);
+      const listSection: HTMLElement = getSection(thisResource);
+      const errorAlert: HTMLElement = getByRole(listSection, "alert");
+      expect(errorAlert).toBeInTheDocument();
+      expect(errorAlert).toHaveTextContent(new RegExp(errorMessage, "i"));
+    });
+  }
 });

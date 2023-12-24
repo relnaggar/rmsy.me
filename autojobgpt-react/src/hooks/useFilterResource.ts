@@ -1,6 +1,7 @@
-import useInputControl from "../hooks/useInputControl";
+import useInputControl from "./useInputControl";
 import { WithId } from "../api/types";
 import { CommonFilterResourceProps } from "../common/FilterResourceSelect";
+
 
 interface UseFilterResource<Resource extends WithId, FilterByOption extends WithId>
     extends CommonFilterResourceProps<FilterByOption> {

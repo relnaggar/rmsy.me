@@ -47,7 +47,7 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
     elif isinstance(error, ChatException):
       return Response({'error': [str(error)]}, status=status.HTTP_400_BAD_REQUEST)
     else:
-      raise error
+      return Response({'error': ["Internal server error: " + str(error)]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
   def create(self, request, *args, **kwargs):
     try:

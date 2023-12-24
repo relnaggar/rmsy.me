@@ -35,7 +35,7 @@ const usePatchResource = <Resource extends WithId>(
     setIdsBeingPatched((idsBeingPatched) => idsBeingPatched.filter((idBeingPatched) => idBeingPatched !== resourceId));
   }, []);
   
-  const { call } = useApiCall(apiPath, "PATCH", { onSuccess: handleSuccess, afterCall, onFail });
+  const { call } = useApiCall("PATCH", { apiPath, onSuccess: handleSuccess, afterCall, onFail });
 
   const patchResource = useCallback((id: number, patchData: Partial<Resource>): void => {
     setIdsBeingPatched((idsBeingPatched) => [...idsBeingPatched, id]);

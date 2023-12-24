@@ -1,5 +1,6 @@
-import React, { useId, useRef } from 'react';
+import React, { useId } from 'react';
 
+import useResponsive from "../hooks/useResponsive";
 import { CommonInputControlProps } from "../hooks/useInputControl";
 
 
@@ -49,7 +50,7 @@ const BaseInput = React.forwardRef(({
   const autoId = useId();
   const currentId = id ?? autoId;
   const feedbackId = useId();
-  const childrenRef = useRef<HTMLDivElement>(null);
+  const isMobile = useResponsive();
 
   const inputProps: React.TextareaHTMLAttributes<HTMLTextAreaElement> | React.InputHTMLAttributes<HTMLInputElement> = {
     id: currentId,
@@ -62,6 +63,7 @@ const BaseInput = React.forwardRef(({
     value: type === "file" ? undefined : (value ?? ""),
     disabled: loading,
     "aria-busy": loading,
+    "aria-invalid": showError,
     "aria-describedby": showError ? feedbackId: undefined,
     ...extraInputProps,
   };
@@ -129,9 +131,11 @@ const BaseInput = React.forwardRef(({
               inputWithFeedback
             }
           </div>
-          <div className="d-none ps-2 d-md-flex flex-column gap-2" ref={childrenRef}>
-            {children}
-          </div>
+          { !isMobile &&
+            <div className="ps-2 d-flex flex-column gap-2">
+              {children}
+            </div>
+          }
         </div>
       :
         inputWithFeedback
@@ -150,8 +154,8 @@ const BaseInput = React.forwardRef(({
           inputContent
         }
       </div>
-      { children && childrenRef.current?.children.length === 0 &&
-        <div className="d-md-none d-flex justify-content-end mb-3 gap-2">
+      { isMobile &&
+        <div className="d-flex justify-content-end mb-3 gap-2">
           {children}
         </div>
       }

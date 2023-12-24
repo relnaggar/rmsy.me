@@ -15,10 +15,11 @@ export interface CommonModalProps {
   setShow: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-interface InputModalProps extends CommonInputModalProps, Partial<CommonErrorAlertProps> {
+export interface InputModalProps extends CommonInputModalProps, Partial<CommonErrorAlertProps> {
   staticBackdrop?: boolean,
   handleSubmit?: (e: React.FormEvent<HTMLFormElement>) => void,
   submitDisabled?: boolean,
+  footerButton?: React.JSX.Element,
 };
 
 const InputModal = ({
@@ -28,6 +29,7 @@ const InputModal = ({
   children,
   handleSubmit,
   submitDisabled = false,
+  footerButton = <></>,
   errors,
   showErrorAlert,
   setShowErrorAlert,
@@ -54,6 +56,7 @@ const InputModal = ({
         { hasErrorAlert &&
           <ErrorAlert errors={errors!} showErrorAlert={showErrorAlert!} setShowErrorAlert={setShowErrorAlert!} />
         }
+        { footerButton }
         <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
         { hasSubmit &&
           <button type="submit" className="btn btn-primary" disabled={submitDisabled} formNoValidate>

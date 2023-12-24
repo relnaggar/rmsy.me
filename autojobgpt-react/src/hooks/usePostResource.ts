@@ -1,7 +1,8 @@
-import React, { useRef, useCallback } from "react";
+import React, { useCallback } from "react";
 
 import useApiCall, { OnSuccessParams } from "./useApiCall";
 import { WithId } from "../api/types";
+import { removeOnePlaceholderResource } from "../common/utils";
 
 
 export interface UsePostResource<ResourceUpload> {
@@ -11,7 +12,6 @@ export interface UsePostResource<ResourceUpload> {
 
 const usePostResource = <Resource extends WithId, ResourceUpload>(
   apiPath: string,
-  resources: Resource[],
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>,
   getPlaceholderResource: (resourceUpload: ResourceUpload) => Resource,
   options?: {
@@ -21,28 +21,26 @@ const usePostResource = <Resource extends WithId, ResourceUpload>(
 ): UsePostResource<ResourceUpload> => {
   const { onSuccess, onFail } = options || {};
 
-  const newResources = useRef<Resource[]>([]);
-
   const beforeCall = useCallback((resourceUpload: ResourceUpload): void => {
     const placeHolderResource: Resource = getPlaceholderResource(resourceUpload);
     if (placeHolderResource.id !== -1) {
       throw new Error("Placeholder resource must have an id of -1");
     }
-    newResources.current = [...resources];
     setResources((resources) => [...resources, placeHolderResource]);
-  }, [resources, setResources, getPlaceholderResource]);
+  }, [setResources, getPlaceholderResource]);
 
   const handleSuccess = useCallback(async ({response}: OnSuccessParams): Promise<void> => {
     const resource: Resource = await response.json();
-    newResources.current = [...newResources.current, resource];
+    setResources((resources) => [...resources, resource]);
     onSuccess?.(resource);
-  }, [onSuccess]);
+  }, [setResources, onSuccess]);
 
   const afterCall = useCallback((): void => {
-    setResources(newResources.current);
+    removeOnePlaceholderResource(setResources);
   }, [setResources]);
 
-  const { calling: posting, call } = useApiCall(apiPath, "POST", {
+  const { calling: posting, call } = useApiCall("POST", {
+    apiPath,
     beforeCall,
     onSuccess: handleSuccess,
     afterCall,

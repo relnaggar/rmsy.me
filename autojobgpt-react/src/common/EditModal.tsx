@@ -1,6 +1,6 @@
 import React from "react";
 
-import InputModal, { CommonInputModalProps, CommonModalProps } from "./InputModal";
+import InputModal, { CommonInputModalProps, CommonModalProps, InputModalProps } from "./InputModal";
 import { UseResource } from "../hooks/useResource";
 import { WithId } from "../api/types";
 
@@ -13,15 +13,18 @@ export interface CommonEditModalProps<Resource extends WithId> extends
   editId: number,
 }
 
-interface EditModalProps extends CommonInputModalProps {};
+interface EditModalProps extends CommonInputModalProps, Pick<InputModalProps, "footerButton"> {};
 
 const EditModal = ({
   modalId, title, show, setShow,
   size = undefined,  
+  footerButton = <></>,
   children,
 }: React.PropsWithChildren<EditModalProps>): React.JSX.Element => {
   return (
-    <InputModal modalId={modalId} title={title} show={show} setShow={setShow} size={size} staticBackdrop={true}>
+    <InputModal modalId={modalId}
+      title={title} show={show} setShow={setShow} size={size} staticBackdrop={true} footerButton={footerButton}
+    >
       {children}
     </InputModal>
   );

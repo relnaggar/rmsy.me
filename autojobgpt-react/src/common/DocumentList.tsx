@@ -4,6 +4,7 @@ import { UseResource } from '../hooks/useResource';
 import DocumentThumbnail from './DocumentThumbnail';
 import AddDocumentButton from './AddDocumentButton';
 import { Document } from '../api/types';
+import { sortByIdPlaceholdersAtTheEnd } from './utils';
 
 
 interface DocumentListProps extends Pick<UseResource<Document,Document>,
@@ -22,18 +23,9 @@ const DocumentList = ({
   addButtonText,
   ...resourceManager
 }: DocumentListProps): React.JSX.Element => {
-  const { resources: documents, fetching, idsBeingDeleted, posting } = resourceManager;
+  const { resources: documents, fetching, idsBeingDeleted } = resourceManager;
 
-  // sort documents by id, putting placeholders with id -1 at the end
-  documents.sort((a, b) => {
-    if (a.id === -1) {
-      return 1;
-    } else if (b.id === -1) {
-      return -1;
-    } else {
-      return a.id - b.id;
-    }
-  });
+  sortByIdPlaceholdersAtTheEnd(documents);
 
   return (
     <div className="d-flex overflow-x-auto border border-5 p-2" role="list">
@@ -56,7 +48,7 @@ const DocumentList = ({
               beingRemoved={idsBeingDeleted.includes(document.id)}
             />
           )}
-          <AddDocumentButton onClick={onClickAddDocument} buttonText={addButtonText} disabled={posting} />
+          <AddDocumentButton onClick={onClickAddDocument} buttonText={addButtonText} />
         </>        
       }
     </div>

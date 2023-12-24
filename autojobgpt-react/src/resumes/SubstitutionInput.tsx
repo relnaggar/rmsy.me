@@ -33,18 +33,18 @@ export default function SubstitutionInput({
     errorAlert.clearErrors();
   }
 
-  const { posting: filling, post: fill, cancel: cancelFill } = usePost(
-    `substitutions/${substitution.id}/regenerate/`, {
-      onSuccess: onFillSuccess,
-      onFail: errorAlert.showErrors,
-    }
-  );
+  const { posting: filling, post: fill, cancel: cancelFill } = usePost({
+    apiPath: `substitutions/${substitution.id}/regenerate/`,
+    cancelable: true,
+    onSuccess: onFillSuccess,
+    onFail: errorAlert.showErrors,
+  });
 
   const handleClickFillDetails = (): void => {
     if (showFeedback) {
-      fill({value: value, feedback: feedback});
+      fill({postData: {value: value, feedback: feedback}});
     } else {
-      fill({value: value});
+      fill({postData: {value: value}});
     }
   };
 
@@ -73,7 +73,7 @@ export default function SubstitutionInput({
             />
             <div className="form-check form-switch mt-2">
               <input id={feedbackSwitchId}
-                className="form-check-input" type="checkbox" role="switch"
+                className="form-check-input" type="checkbox" role="switch" aria-controls={id}
                 checked={showFeedback} onChange={handleChangeFeedbackSwitch}
               />
               <label className="form-check-label" htmlFor={feedbackSwitchId}>with feedback</label>
@@ -85,7 +85,7 @@ export default function SubstitutionInput({
         <div className="mb-3">
           <textarea
             className="form-control" value={feedback} onChange={handleChangeFeedback} disabled={filling}
-            placeholder="Write your feedback here..." aria-label="Feedback"
+            placeholder="Write your feedback here..." aria-label="Feedback" aria-controls={id}
           />
         </div>
       }

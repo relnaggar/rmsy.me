@@ -210,10 +210,11 @@ describe(`api general errors after submitting the ${modalName} modal can be clea
   for (const testDataForApiGeneralError of testDataForApiGeneralErrors(mockFunctions)) {
     test(`api ${testDataForApiGeneralError.apiErrorType} error after submitting the ${modalName} modal can be cleared by clicking submit again`, async () => {
       await renderRoute(thisRoute);
-      const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
+      let modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       await fillWithValidValues(modal);
       testDataForApiGeneralError.mockApiError();
       await clickSubmitButton(modal);
+      modal = await openAndGetModal(openAndGetModalParams);
       const errorAlert: HTMLElement = getByRole(modal, "alert");
       await clickSubmitButton(modal);
       expect(errorAlert).not.toBeInTheDocument();

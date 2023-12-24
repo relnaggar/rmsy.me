@@ -7,6 +7,7 @@ import useErrorAlert from "../hooks/useErrorAlert";
 import useFetchResource from "../hooks/useFetchResource";
 import useResource from "../hooks/useResource";
 import useFilterResource from "../hooks/useFilterResource";
+import useDuplicate from '../hooks/useDuplicate';
 import ErrorAlert from '../common/ErrorAlert';
 import FilterResourceSelect from '../common/FilterResourceSelect';
 import DocumentList from '../common/DocumentList';
@@ -85,6 +86,21 @@ const ResumeList = (): React.JSX.Element => {
 
   const { filteredResources: filteredResumes, ...filterResumeManager} = useFilterResource<Resume, Job>(resumes, "job");
 
+  const { duplicate } = useDuplicate({
+    apiPath: resumeManager.apiPath, setResources: resumeManager.setResources,
+    ...errorAlert
+  });
+
+  const handleClickDuplicate = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    const resume: Resume = resumes.find((resume) => resume.id === id)!;
+    const resumeUpload: ResumeUpload = {
+      job: resume.job!.id,
+      template: resume.template!.id,
+    };
+    duplicate(id, getPlaceholderResume(resumeUpload));
+    editResumeModal.close();
+  }
+
   return(
     <section className="mt-3">
       <h2>Resumes</h2>
@@ -107,6 +123,7 @@ const ResumeList = (): React.JSX.Element => {
         setResources={resumeManager.setResources}        
         substitutions={substitutionManager.resources} setSubstitutions={substitutionManager.setResources}
         onSubstitutionSaveSuccess={handleSubstitutionSaveSuccess}
+        onClickDuplicate={handleClickDuplicate}
       />
       <AddResumeModal {...addResumeModal} postResource={resumeManager.postResource} />
     </section>

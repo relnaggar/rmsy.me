@@ -46,7 +46,7 @@ const useResource = <Resource extends WithId, ResourceUpload>(
 
   const { resources, setResources } = fetchResource;
 
-  const postResource = usePostResource<Resource,ResourceUpload>(apiPath, resources, setResources, getPlaceholderResource, {
+  const postResource = usePostResource<Resource,ResourceUpload>(apiPath, setResources, getPlaceholderResource, {
     onSuccess: onPostSuccess,
     onFail: onPostFail,
   });

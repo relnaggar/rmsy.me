@@ -37,7 +37,8 @@ const useDeleteResource = <Resource extends WithId>(
     );
   }, []);
 
-  const { call } = useApiCall(apiPath, "DELETE", {
+  const { call } = useApiCall("DELETE", {
+    apiPath,
     onSuccess: handleSuccess,
     onFail,
     afterCall,
@@ -52,40 +53,3 @@ const useDeleteResource = <Resource extends WithId>(
 };
 
 export default useDeleteResource;
-
-// useEffect(() => {
-  //   const doDelete = async (): Promise<void> => {
-  //     let errors: Record<string,string[]> = {};
-  //     try {
-  //       const response: Response = await fetchData(`${apiRoute}${apiPath}${idBeingDeleted}/`, { 
-  //         method: "DELETE", 
-  //         headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
-  //       })
-
-  //       // wait for 3 seconds before continuing
-  //       // await new Promise(resolve => setTimeout(resolve, 3000));
-
-  //       if (response.ok) {
-  //         const deletedResource: Resource = resources.find((resource) => resource.id === idBeingDeleted)!;
-  //         const newResources: Resource[] = resources.filter((resource) => resource.id !== idBeingDeleted);
-  //         setResources(newResources);
-  //         onSuccess?.(deletedResource, newResources, setResources);
-  //       } else {
-  //         errors = await response.json();
-  //         if (!String(errors)) {
-  //           errors = {error: makeErrorMessage(response.statusText)};
-  //         }
-  //       }
-  //     } catch (error) {
-  //       errors["error"] = makeErrorMessage(error);
-  //     } finally {
-  //       setIdBeingDeleted(-1);
-  //       if (Object.keys(errors).length > 0) {
-  //         onFail?.(errors);
-  //       }
-  //     }
-  //   };
-  //   if (idBeingDeleted !== -1) {
-  //     doDelete();
-  //   }
-  // }, [fetchData, apiRoute, apiPath, csrfToken, idBeingDeleted, resources, onSuccess, onFail, setResources]);

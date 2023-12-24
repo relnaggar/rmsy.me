@@ -36,7 +36,7 @@ const generatePlaceholderJob = (jobUpload: JobUpload): Job => {
   }
 };
 
-const JobBoard = (): React.JSX.Element => {  
+const JobBoard = (): React.JSX.Element => {
   const openConfirmationModal = useContext(ConfirmationModalContext);
   const errorAlert = useErrorAlert();
   const addJobModal = useAddModal();  
@@ -153,7 +153,7 @@ const JobBoard = (): React.JSX.Element => {
                 <JobColumn key={`${status.id}-${index}`}
                   status={status} allStatuses={statuses}
                   jobs={jobs.filter((job) => (job.status === status.id || (job.status === -1 && status.order === statuses[0].order)))}
-                  jobIdsBeingDeleted={jobManager.idsBeingDeleted} postingJob={jobManager.posting}
+                  jobIdsBeingDeleted={jobManager.idsBeingDeleted}
                   beingMoved={statusManager.idsBeingPatched.includes(status.id)}
                   beingRemoved={statusManager.idsBeingDeleted.includes(status.id)}
                   patchStatus={statusManager.patchResource}                  
@@ -164,7 +164,7 @@ const JobBoard = (): React.JSX.Element => {
             )
           }
         </>
-        <AddColumnButton onClick={addColumnModal.open} disabled={statusManager.posting} />
+        <AddColumnButton onClick={addColumnModal.open} />
       </div>
       <EditJobModal editId={editJobModal.editId}
         show={editJobModal.show}
