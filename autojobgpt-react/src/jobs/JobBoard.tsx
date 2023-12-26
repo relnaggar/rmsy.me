@@ -149,11 +149,11 @@ const JobBoard = (): React.JSX.Element => {
       <h2 className="mb-3">Job Board</h2>
       <ErrorAlert {...errorAlert} />
       <div className="kanban-board border">
-        <>
-          {loading ?
-            [...Array(3)].map((_, index) => <PlaceholderColumn jobs={3} key={index} />)
-          :
-            statuses.map((status, index) =>
+        {loading ?
+          [...Array(3)].map((_, index) => <PlaceholderColumn jobs={3} key={index} />)
+        :
+          <>
+            {statuses.map((status, index) =>
               status.id === -1 ?
                 <PlaceholderColumn jobs={0} key={`${status.id}-${index}`} />
               :
@@ -168,10 +168,10 @@ const JobBoard = (): React.JSX.Element => {
                   onClickAddJob={addJobModal.open} onClickEditJob={handleClickEditJob} onClickRemoveJob={handleClickRemoveJob}
                   onClickEditColumn={handleClickEditStatus(status.id)} onClickRemoveColumn={handleClickRemoveColumn(status.id)}                  
                 />
-            )
-          }
-        </>
-        <AddColumnButton onClick={addColumnModal.open} />
+            )}
+            <AddColumnButton onClick={addColumnModal.open} />
+          </>
+        }
       </div>
       <EditJobModal editId={editJobModal.editId}
         show={editJobModal.show}
