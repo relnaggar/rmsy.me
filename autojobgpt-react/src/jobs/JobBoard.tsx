@@ -146,7 +146,7 @@ const JobBoard = (): React.JSX.Element => {
   const loading: boolean = jobManager.fetching || statusManager.fetching;
   return (
     <section>
-      <h2>Job Board</h2>
+      <h2 className="mb-3">Job Board</h2>
       <ErrorAlert {...errorAlert} />
       <div className="kanban-board border">
         <>

@@ -24,7 +24,7 @@ const EditTemplateModal = ({
   return (
     <EditModal title={`Edit ${templateTypeLabel} Template`} modalId={modalId} show={show} setShow={setShow} size="xl">
       <InputWithSave editId={editId} {...resourceManager}
-        type="text" editableProperty="name" labelText="Template Name"
+        type="text" editableProperty="name" labelText={`${templateTypeLabel} Template Name`}
         required
       />
       <InputWithSave editId={editId} {...resourceManager}

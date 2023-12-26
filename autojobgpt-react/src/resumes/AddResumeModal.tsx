@@ -7,10 +7,15 @@ import SelectInputWithRefresh from "../common/SelectInputWithRefresh";
 import { Job, Template, ResumeUpload } from '../api/types';
 
 
+interface AddResumeModalProps extends AddResourceModalProps<ResumeUpload> {
+  templateTypeLabel: string,
+}
+
 const AddResumeModal = ({  
   postResource: postResume,
+  templateTypeLabel,
   ...addModal
-}: AddResourceModalProps<ResumeUpload>): React.JSX.Element => {
+}: AddResumeModalProps): React.JSX.Element => {
   const modalId = useId();
   const jobInput = useInputControl("");
   const templateInput = useInputControl("");
@@ -72,7 +77,7 @@ const AddResumeModal = ({
       />
       <SelectInputWithRefresh {...templateManager}
         value={templateInput.value} editing={templateInput.editing} handleChange={templateInput.handleChange}
-        label="Template" optionToString={(template) => template.name} errors={addModal.errors["template"]}
+        label={`${templateTypeLabel} Template`} optionToString={(template) => template.name} errors={addModal.errors["template"]}
       />
     </AddModal>
   );

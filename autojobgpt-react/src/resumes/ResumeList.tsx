@@ -105,7 +105,7 @@ const ResumeList = (): React.JSX.Element => {
 
   return(
     <section className="mt-3">
-      <h2>Resumes</h2>
+      <h2 className="mb-3">Resumes</h2>
       <ErrorAlert {...errorAlert} />
       <FilterResourceSelect {...filterResumeManager}
         filterByOptionToString={(job: Job) => `${job.title}, ${job.company}`}
@@ -127,7 +127,10 @@ const ResumeList = (): React.JSX.Element => {
         onSubstitutionSaveSuccess={handleSubstitutionSaveSuccess}
         onClickDuplicate={handleClickDuplicate}
       />
-      <AddResumeModal {...addResumeModal} postResource={resumeManager.postResource} />
+      <AddResumeModal {...addResumeModal}
+        postResource={resumeManager.postResource}
+        templateTypeLabel="Resume"
+      />
     </section>
   )
 };

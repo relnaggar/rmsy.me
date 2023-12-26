@@ -56,7 +56,9 @@ export const testRouteAndAllChildren = (
     theTest(route.path);
     if (route.children) {  
       for (const child of route.children) {
-        testRouteAndAllChildren(child, theTest);
+        if (child.path !== "*") {
+          testRouteAndAllChildren(child, theTest);
+        }
       }
     }
   }

@@ -11,6 +11,7 @@ import { act } from "react-dom/test-utils";
 
 const thisRoute = "/resumes";
 const thisResource = "resume";
+const thisResourceHeading = "Resumes";
 const modalName = "edit resume";
 const thisApiPath = `../api/resumes/`;
 const thisMockData: Resume[] = [validResume1, validResume2];
@@ -45,7 +46,7 @@ const testEachModal = async (testDescription: string, func: (
   for (let modalNumber = 0; modalNumber < thisMockData.length; modalNumber++) {
     test(`for ${modalName} modal ${thisMockData[modalNumber].name}, ${testDescription}`, async () => {
       await renderRoute(thisRoute);
-      const resourceElements: HTMLElement[] = queryResources(thisResource);
+      const resourceElements: HTMLElement[] = queryResources(thisResourceHeading);
       const modal: HTMLElement = await openAndGetEditModal(resourceElements[modalNumber]);
       await func(modal, thisMockData[modalNumber], modalNumber);
     });
@@ -66,7 +67,7 @@ beforeEach(() => {
 
 test(`each ${thisResource} list item is displayed with an edit button`, async () => {
   await renderRoute(thisRoute);
-  const resourceElements: HTMLElement[] = queryResources(thisResource);
+  const resourceElements: HTMLElement[] = queryResources(thisResourceHeading);
   resourceElements.forEach((resourceElement) => {
     const editButton: HTMLElement = getByRole(resourceElement, "button", {name: new RegExp("edit", "i")});
     expect(editButton).toBeInTheDocument();
@@ -238,7 +239,7 @@ describe(`for each ${modalName} modal, saving each input with valid input change
       mockFunctions.fetchData.mockImplementationOnce(generateResponse({...mockData, [testDataForInput.label]: testDataForInput.validValue}));
       await clickSaveButton(modal, testDataForInput.label);
       await clickCloseButton(modal);
-      const resourceElements: HTMLElement[] = queryResources(thisResource);
+      const resourceElements: HTMLElement[] = queryResources(thisResourceHeading);
       const newModal =  await openAndGetEditModal(resourceElements[modalNumber]);
       const input: HTMLElement = getByRole(newModal, testDataForInput.role, {name: new RegExp(testDataForInput.label, "i")});
       expect(input).toHaveValue(testDataForInput.validValue.toString());
@@ -254,7 +255,7 @@ describe(`for each ${modalName} modal, saving the name changes the ${thisResourc
     mockFunctions.fetchData.mockImplementationOnce(generateResponse({...mockData, [testDataForInput.label]: testDataForInput.validValue}));
     await clickSaveButton(modal, testDataForInput.label);
     await clickCloseButton(modal);
-    const resourceElements: HTMLElement[] = queryResources(thisResource);
+    const resourceElements: HTMLElement[] = queryResources(thisResourceHeading);
     const resourceElement: HTMLElement = resourceElements[modalNumber];
     expect(resourceElement).toHaveTextContent(testDataForInput.validValue.toString());
   });
@@ -310,7 +311,7 @@ describe(`each ${modalName} modal does not retain input values on close and reop
       await userClearInput(modal, testDataForInput.label, testDataForInput.role);
       await userInput(modal, testDataForInput.label, testDataForInput.validValue.toString(), testDataForInput.role);
       await clickCloseButton(modal);
-      const resourceElements: HTMLElement[] = queryResources(thisResource);
+      const resourceElements: HTMLElement[] = queryResources(thisResourceHeading);
       const newModal =  await openAndGetEditModal(resourceElements[modalNumber]);
       const input: HTMLElement = getByRole(newModal, testDataForInput.role, {name: new RegExp(testDataForInput.label, "i")});
       expect(input).toHaveValue(mockData[testDataForInput.label]!.toString());
@@ -326,7 +327,7 @@ describe(`each ${modalName} modal does not retain input errors on close and reop
       mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({[testDataForInput.label]: [errorMessage]}));
       await clickSaveButton(modal, testDataForInput.label);
       await clickCloseButton(modal);
-      const resourceElements: HTMLElement[] = queryResources(thisResource);
+      const resourceElements: HTMLElement[] = queryResources(thisResourceHeading);
       const newModal =  await openAndGetEditModal(resourceElements[modalNumber]);
       expect(queryByRole(newModal, "alert", {name: new RegExp(testDataForInput.label, "i")})).not.toBeInTheDocument();
     });
@@ -350,7 +351,7 @@ test(`api general error on fetching ${relatedResourceName}s shows an error alert
     url: relatedApiPath, data: {error: [errorMessage]}, status: 500
   }]));
   await renderRoute(thisRoute);
-  const listSection: HTMLElement = getSection(thisResource);
+  const listSection: HTMLElement = getSection(thisResourceHeading);
   const errorAlert: HTMLElement = getByRole(listSection, "alert");
   expect(errorAlert).toBeInTheDocument();
 });
@@ -360,7 +361,7 @@ test(`api network error on fetching fill fileds shows an error alert within the 
     url: relatedApiPath, reject: true
   }]));
   await renderRoute(thisRoute);
-  const listSection: HTMLElement = getSection(thisResource);
+  const listSection: HTMLElement = getSection(thisResourceHeading);
   const errorAlert: HTMLElement = getByRole(listSection, "alert");
   expect(errorAlert).toBeInTheDocument();
 });
@@ -443,7 +444,7 @@ describe(`for each ${modalName} modal, saving each ${relatedResourceName} input 
       mockFunctions.fetchData.mockImplementationOnce(generateResponse({...relatedResource, [relatedResourceValueKey]: newRelatedResourceValue}));
       await clickSaveButton(modal, relatedResource.key);
       await clickCloseButton(modal);
-      const resourceElements: HTMLElement[] = queryResources(thisResource);
+      const resourceElements: HTMLElement[] = queryResources(thisResourceHeading);
       modal = await openAndGetEditModal(resourceElements[modalNumber]);
       const input: HTMLElement = getByRole(modal, "textbox", {name: new RegExp(relatedResource.key, "i")});
       expect(input).toHaveValue(newRelatedResourceValue);
@@ -499,7 +500,7 @@ describe(`each ${modalName} modal does not retain ${relatedResourceName} input v
     for (const relatedResource of mockData[relatedResourceKey]) {
       await userClearInput(modal, relatedResource.key);
       await clickCloseButton(modal);
-      const resourceElements: HTMLElement[] = queryResources(thisResource);
+      const resourceElements: HTMLElement[] = queryResources(thisResourceHeading);
       modal = await openAndGetEditModal(resourceElements[modalNumber]);
       const input: HTMLElement = getByRole(modal, "textbox", {name: new RegExp(relatedResource.key, "i")});
       expect(input).toHaveValue(relatedResource[relatedResourceValueKey]);
@@ -514,7 +515,7 @@ describe(`each ${modalName} modal does not retain ${relatedResourceName} input e
       mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({[relatedResourceValueKey]: [errorMessage]}));
       await clickSaveButton(modal, relatedResource.key);
       await clickCloseButton(modal);
-      const resourceElements: HTMLElement[] = queryResources(thisResource);
+      const resourceElements: HTMLElement[] = queryResources(thisResourceHeading);
       modal =  await openAndGetEditModal(resourceElements[modalNumber]);
       expect(queryByRole(modal, "alert", {name: new RegExp(relatedResource.key, "i")})).not.toBeInTheDocument();
     }
@@ -707,10 +708,10 @@ describe(`clicking each ${modalName} modal duplicate button makes an api call to
 
 describe(`clicking each ${modalName} modal duplicate button makes a new ${thisResource}`, () => {
   testEachModal(`clicking duplicate button makes a new ${thisResource}`, async (modal) => {
-    let initialResourceElements: HTMLElement[] = queryResources(thisResource);
+    let initialResourceElements: HTMLElement[] = queryResources(thisResourceHeading);
     mockFunctions.fetchData.mockImplementationOnce(generateResponse(newResume));
     await clickDuplicateButton(modal);
-    expect(queryResources(thisResource).length).toBe(initialResourceElements.length + 1);
+    expect(queryResources(thisResourceHeading).length).toBe(initialResourceElements.length + 1);
   });
 });
 
@@ -718,7 +719,7 @@ describe(`clicking each ${modalName} modal duplicate button makes a new ${thisRe
   testEachModal(`clicking duplicate button makes a new ${thisResource} with the returned name`, async (modal) => {
     mockFunctions.fetchData.mockImplementationOnce(generateResponse(newResume));
     await clickDuplicateButton(modal);
-    const resourceElements: HTMLElement[] = queryResources(thisResource);
+    const resourceElements: HTMLElement[] = queryResources(thisResourceHeading);
     expect(resourceElements[resourceElements.length - 1]).toHaveTextContent(newResume.name);
   });
 });
@@ -736,7 +737,7 @@ describe(`api general errors after clicking each ${modalName} modal duplicate bu
     testEachModal(`api ${testDataForApiGeneralError.apiErrorType} error after clicking duplicate button shows an error alert in the ${thisResource} list`, async (modal) => {
       testDataForApiGeneralError.mockApiError();
       await clickDuplicateButton(modal);
-      const listSection: HTMLElement = getSection(thisResource);
+      const listSection: HTMLElement = getSection(thisResourceHeading);
       const errorAlert: HTMLElement = getByRole(listSection, "alert");
       expect(errorAlert).toBeInTheDocument();
       expect(errorAlert).toHaveTextContent(new RegExp(errorMessage, "i"));

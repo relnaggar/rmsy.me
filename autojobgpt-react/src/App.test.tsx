@@ -14,6 +14,8 @@ describe("every route renders without errors", () => {
     });
   } 
   for (const route of routesConfig) {
-    testRouteAndAllChildren(route, theTest);
+    if (route.path !== "*") {
+      testRouteAndAllChildren(route, theTest);
+    }
   }
 });

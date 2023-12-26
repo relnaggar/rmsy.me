@@ -71,7 +71,7 @@ const TemplateList = ({
 
   return(
     <section>
-      <h2>Templates</h2>
+      <h2 className="mb-3">{templateTypeLabel} Templates</h2>
       <ErrorAlert {...errorAlert} />
       <DocumentList {...templateManager}
         onClickEditDocument={handleClickEditTemplate}

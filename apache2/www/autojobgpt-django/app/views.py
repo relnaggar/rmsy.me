@@ -4,6 +4,7 @@ from django.middleware.csrf import get_token
 from django.http import JsonResponse
 from django.db import IntegrityError
 from django.db.models import Case, When, Value, IntegerField
+from rest_framework.exceptions import ValidationError
 
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -34,6 +35,10 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
       user_friendly_error = "An integrity error occurred: {}."
       if "job_unique_title_company" in error_message:
         user_friendly_error = user_friendly_error.format("A job with this title and company already exists")
+      elif "template_unique_name" in error_message:
+        user_friendly_error = user_friendly_error.format("A template with this name already exists")
+      elif "fill_field_unique_template_key" in error_message:
+        user_friendly_error = user_friendly_error.format("A fill field with this key already exists for this template")
       else:
         if "Status" in error_message:
           user_friendly_error = user_friendly_error.format("You cannot delete this job status because it is being used by a job")
@@ -46,8 +51,10 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
       return Response({'error': [user_friendly_error]}, status=status.HTTP_400_BAD_REQUEST)
     elif isinstance(error, ChatException):
       return Response({'error': [str(error)]}, status=status.HTTP_400_BAD_REQUEST)
+    elif isinstance(error, ValidationError):
+      return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
     else:
-      return Response({'error': [str(error)]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+      return Response({'error': [str(error), str(type(error))]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
   def create(self, request, *args, **kwargs):
     try:

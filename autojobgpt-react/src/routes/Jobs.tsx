@@ -5,9 +5,7 @@ import JobBoard from "../jobs/JobBoard";
 
 const Jobs = (): React.JSX.Element => {
   return (
-    <main>
-      <JobBoard />
-    </main>
+    <JobBoard />
   );
 };
 

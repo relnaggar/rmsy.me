@@ -9,6 +9,7 @@ import { Job, Template, Resume } from '../api/types';
 
 const thisRoute = "/resumes";
 const thisResource = "resume";
+const thisResourceHeading = "Resumes";
 const modalName = "generate resume";
 const openModalButtonText = "generate new resume";
 const openAndGetModalParams: OpenAndGetModalParams = {modalName, openModalButtonText};
@@ -162,7 +163,7 @@ test(`submitting the ${modalName} modal with valid input adds the ${thisResource
   await fillWithValidValues(modal);
   mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
   await clickSubmitButton(modal);
-  const resources: HTMLElement[] = queryResources(thisResource);
+  const resources: HTMLElement[] = queryResources(thisResourceHeading);
   expect(resources.length).toBe(1);
   const addedResource: HTMLElement = resources[0];
   expect(addedResource).toHaveTextContent(validResume1.name);

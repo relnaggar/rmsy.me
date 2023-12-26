@@ -5,6 +5,8 @@ import Layout from "./Layout";
 import Home from "../home/Home";
 import Jobs from "./Jobs";
 import Resumes from "./Resumes";
+import CoverLetters from "./CoverLetters";
+import PageNotFound from "./PageNotFound";
 
 
 export const FetchDataContext = createContext(
@@ -32,6 +34,16 @@ export const routesConfig: RouteObject[] = [{
     path: "/resumes",
     element: (
       <Resumes />
+    )
+  }, {
+    path: "/coverLetters",
+    element: (
+      <CoverLetters />
+    )
+  }, {
+    path: "*",
+    element: (
+      <PageNotFound />
     )
   }],
 }];

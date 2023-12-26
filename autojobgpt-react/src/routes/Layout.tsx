@@ -57,6 +57,9 @@ const Layout = (): React.JSX.Element => {
               <li className="nav-item">
                 <Link to="/resumes" className="nav-link">Resumes</Link>
               </li>
+              <li className="nav-item">
+                <Link to="/coverLetters" className="nav-link">Cover Letters</Link>
+              </li>
             </ul>
             <ul className="navbar-nav">
               <li className="nav-item">
@@ -79,7 +82,9 @@ const Layout = (): React.JSX.Element => {
               </div>
             </div>
           :
-            <Outlet />
+            <main className="mt-3">
+              <Outlet />
+            </main>
           }
         </ConfirmationModalContext.Provider>
       </CSRFTokenContext.Provider>
