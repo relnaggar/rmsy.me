@@ -9,7 +9,7 @@ import { injectMocks, renderRoute, mockFunctions, queryResources, openAndGetDele
 const thisRoute = "/resumes";
 const thisResource = "resume";
 const thisResourceHeading = "Resumes";
-const thisApiPath = `../api/${thisResource}s/`;
+const thisApiPath = "../api/tailoredDocuments/";
 const thisMockData = [validResume1,validResume2];
 
 beforeEach(() => {

@@ -10,11 +10,11 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from .models import Template, FillField, Job, Resume, Substitution, Status
+from .models import Template, FillField, Job, TailoredDocument, Substitution, Status
 from .models import DEFAULT_FILLFIELDS
 from .serializers import StatusSerializer, JobSerializer
 from .serializers import TemplateSerializer, FillFieldSerializer
-from .serializers import ResumeSerializer, SubstitutionSerializer
+from .serializers import TailoredDocumentSerializer, SubstitutionSerializer
 from .serializers import RegenerateSerializer, JobURLSerializer, JobDetailsSerializer, StatusSerializer
 from .gpt import ChatException
 
@@ -41,11 +41,11 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
         user_friendly_error = user_friendly_error.format("A fill field with this key already exists for this template")
       else:
         if "Status" in error_message:
-          user_friendly_error = user_friendly_error.format("You cannot delete this job status because it is being used by a job")
+          user_friendly_error = user_friendly_error.format("You can't delete this job status because it's being used by a job")
         elif "Job" in error_message:
-          user_friendly_error = user_friendly_error.format("You cannot delete this job because it is being used by a resume")
+          user_friendly_error = user_friendly_error.format("You can't delete this job because it's being used by a resume or cover letter")
         elif "Template" in error_message:
-          user_friendly_error = user_friendly_error.format("You cannot delete this resume template because it is being used by a resume")      
+          user_friendly_error = user_friendly_error.format("You can't delete this template because it's being used by a resume or cover letter")      
         else:
           user_friendly_error = user_friendly_error.format(error_message)
       return Response({'error': [user_friendly_error]}, status=status.HTTP_400_BAD_REQUEST)
@@ -168,18 +168,18 @@ class SubstitutionViewSet(ModelViewSetWithErrorHandling):
     
     return Response(self.serializer_class(regenerated_object).data)
 
-class ResumeViewSet(ModelViewSetWithErrorHandling):
-  queryset = Resume.objects.all()
-  serializer_class = ResumeSerializer
+class TailoredDocumentViewSet(ModelViewSetWithErrorHandling):
+  queryset = TailoredDocument.objects.all()
+  serializer_class = TailoredDocumentSerializer
 
   @action(detail=True, methods=['post'])
   def duplicate(self, request, pk=None):
-    resume = self.get_object()
+    tailored_document = self.get_object()
     try:
-      duplicated_resume = resume.duplicate()
+      duplicated_tailored_document = tailored_document.duplicate()
     except Exception as e:
       return Response(
         {'error': str(e)},
         status=status.HTTP_400_BAD_REQUEST
       )
-    return Response(self.serializer_class(duplicated_resume).data)
+    return Response(self.serializer_class(duplicated_tailored_document).data)

@@ -148,7 +148,7 @@ test(`submitting the ${modalName} modal with valid input makes an api call to ad
   await fillWithValidValues(modal);
   mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
   await clickSubmitButton(modal);
-  expect(mockFunctions.fetchData).toHaveBeenLastCalledWith("../api/resumes/", expect.objectContaining({
+  expect(mockFunctions.fetchData).toHaveBeenLastCalledWith("../api/tailoredDocuments/", expect.objectContaining({
     method: "POST",
     body: JSON.stringify({
       job: validJob1.id,

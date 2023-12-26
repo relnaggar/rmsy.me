@@ -61,7 +61,7 @@ class Job(models.Model):
   company = models.TextField()
   posting = models.TextField()
   status = models.ForeignKey(to="Status", on_delete=models.RESTRICT, related_name="jobs", default=Status.get_default)
-  chosen_resume = models.ForeignKey(to="Resume", on_delete=models.SET_NULL, related_name="jobs", null=True, blank=True)
+  chosen_resume = models.ForeignKey(to="TailoredDocument", on_delete=models.SET_NULL, related_name="jobs", null=True, blank=True)
 
   class Meta:
     constraints = [

@@ -139,7 +139,7 @@ const JobBoard = (): React.JSX.Element => {
     }
   });
 
-  const { resources: resumes } = useFetchResource<Resume>("resumes/", {
+  const { resources: resumes } = useFetchResource<Resume>("tailoredDocuments/", {
     onFail: errorAlert.showErrors,
   });
 

@@ -42,12 +42,12 @@ class FillField(models.Model):
       raise ValueError(f"FillField with the key `{self.key}` is read-only.")
 
     super().save(*args, **kwargs)
-    for resume in self.template.resumes.all():
-      chat = Chat(resume.chat_messages)
+    for tailored_document in self.template.tailored_documents.all():
+      chat = Chat(tailored_document.chat_messages)
       chat.log(f"""Log: the user has updated the fillField with the key `{self.key}` to have the following description:
   <description>{self.description}</description>.""")
-      resume.chat_messages = chat.get_messages()
-      resume.save()
+      tailored_document.chat_messages = chat.get_messages()
+      tailored_document.save()
 
 class Template(models.Model, DocumentMixin):  
   docx = models.FileField(upload_to="templates/")

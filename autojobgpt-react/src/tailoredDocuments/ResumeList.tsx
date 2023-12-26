@@ -61,7 +61,7 @@ const ResumeList = (): React.JSX.Element => {
     setSubstitutions((substitutions) => [...substitutions, ...resume.substitutions]);
   };
 
-  const resumeManager = useResource<Resume,ResumeUpload>("resumes/", getPlaceholderResume, {
+  const resumeManager = useResource<Resume,ResumeUpload>("tailoredDocuments/", getPlaceholderResume, {
     onFetchFail: errorAlert.showErrors,
     onPostSuccess: handleAddResumeSuccess,
     onPostFail: addResumeModal.handleAddFail,

@@ -91,7 +91,7 @@ beforeEach(() => {
     url: "../api/statuses/",
     data: thisAllMockData.statuses,
   }, {
-    url: "../api/resumes/",
+    url: "../api/tailoredDocuments/",
     data: thisAllMockData.resumes,
   }]));
 });

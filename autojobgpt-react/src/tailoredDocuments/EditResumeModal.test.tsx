@@ -13,7 +13,7 @@ const thisRoute = "/resumes";
 const thisResource = "resume";
 const thisResourceHeading = "Resumes";
 const modalName = "edit resume";
-const thisApiPath = `../api/resumes/`;
+const thisApiPath = `../api/tailoredDocuments/`;
 const thisMockData: Resume[] = [validResume1, validResume2];
 const newResume = validResume3;
 

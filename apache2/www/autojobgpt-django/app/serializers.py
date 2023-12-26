@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Status, Job, Template, FillField, Resume, Substitution
+from .models import Status, Job, Template, FillField, TailoredDocument, Substitution
 from .models import DEFAULT_FILLFIELDS
 
 
@@ -61,17 +61,17 @@ class SubstitutionSerializer(serializers.ModelSerializer):
     model = Substitution
     fields = "__all__"
     extra_kwargs = {
-      'resume': {'read_only': True},
+      'tailored_document': {'read_only': True},
       'key': {'read_only': True},
     }
 
-class ResumeSerializer(serializers.ModelSerializer):
+class TailoredDocumentSerializer(serializers.ModelSerializer):
   substitutions = serializers.SerializerMethodField()
   job_details = JobSerializer(source='job', read_only=True)
   template_details = TemplateSerializer(source='template', read_only=True)
   
   class Meta:
-    model = Resume
+    model = TailoredDocument
     fields = "__all__"
     extra_kwargs = {
       'name': {'required': False},
