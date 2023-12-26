@@ -4,7 +4,7 @@ import useInputControl from "../hooks/useInputControl";
 import useFetchResource from "../hooks/useFetchResource";
 import AddModal, { AddResourceModalProps } from "../common/AddModal";
 import SelectInputWithRefresh from "../common/SelectInputWithRefresh";
-import { Job, ResumeTemplate, ResumeUpload } from '../api/types';
+import { Job, Template, ResumeUpload } from '../api/types';
 
 
 const AddResumeModal = ({  
@@ -30,7 +30,7 @@ const AddResumeModal = ({
     onFail: handleRefreshFail,
   });
 
-  const templateManager = useFetchResource<ResumeTemplate>("templates/", {
+  const templateManager = useFetchResource<Template>("templates/?type=resume", {
     onSuccess: handleRefreshSuccess,
     onFail: handleRefreshFail,
   });

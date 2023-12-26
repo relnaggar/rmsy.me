@@ -3,24 +3,26 @@ import React, { useId } from "react";
 import EditModal, { EditResourceModalProps } from "../common/EditModal";
 import InputWithSave from "../common/InputWithSave";
 import { defaultFillFields } from "../api/constants";
-import { FillField, ResumeTemplate } from '../api/types';
+import { FillField, Template } from '../api/types';
 import DefaultFillField from "./DefaultFillField";
 
 
-interface EditTemplateModalProps extends EditResourceModalProps<ResumeTemplate> {
+interface EditTemplateModalProps extends EditResourceModalProps<Template> {
   fillFields: FillField[],
   setFillFields: React.Dispatch<React.SetStateAction<FillField[]>>,
+  templateTypeLabel: string,
 }
 
 const EditTemplateModal = ({
   show, setShow, editId,
   fillFields, setFillFields,
+  templateTypeLabel,
   ...resourceManager
 }: EditTemplateModalProps): React.JSX.Element => {
   const modalId = useId();
 
   return (
-    <EditModal title={"Edit Resume Template"} modalId={modalId} show={show} setShow={setShow} size="xl">
+    <EditModal title={`Edit ${templateTypeLabel} Template`} modalId={modalId} show={show} setShow={setShow} size="xl">
       <InputWithSave editId={editId} {...resourceManager}
         type="text" editableProperty="name" labelText="Template Name"
         required

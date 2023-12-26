@@ -6,7 +6,7 @@ from .views import app, csrf
 router = routers.DefaultRouter()
 router.register("statuses", StatusViewSet)
 router.register("jobs", JobViewSet)
-router.register("templates", TemplateViewSet)
+router.register("templates", TemplateViewSet, basename="templates")
 router.register("fillFields", FillFieldViewSet)
 router.register("resumes", ResumeViewSet)
 router.register("substitutions", SubstitutionViewSet, basename="substitutions")

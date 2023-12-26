@@ -45,12 +45,15 @@ export interface FillField extends WithId {
   template: number,
 };
 
-export interface ResumeTemplate extends Document {
+export type TemplateType = "resume" | "coverLetter";
+
+export interface Template extends Document {
   fillFields: FillField[],
-  description?: string
+  description?: string,
+  type: TemplateType,
 };
 
-export interface ResumeTemplateUpload extends Omit<ResumeTemplate,
+export interface TemplateUpload extends Omit<Template,
   "id" |
   "docx" |
   "fillFields" |
@@ -75,7 +78,7 @@ export interface Resume extends Document {
   version: number,
   chat_messages: ChatMessage[],
   job: Job,
-  template: ResumeTemplate,
+  template: Template,
 };
 
 export interface ResumeUpload {

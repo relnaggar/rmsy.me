@@ -7,7 +7,8 @@ import { injectMocks, renderRoute, mockFunctions, queryResources, openAndGetDele
 
 const thisRoute = "/resumes";
 const thisResource = "template";
-const thisApiPath = `../api/${thisResource}s/`;
+const thisBaseApiPath = `../api/${thisResource}s/`;
+const thisApiPath = `${thisBaseApiPath}?type=resume`;
 const thisMockData = [validResumeTemplate1,validResumeTemplate2];
 
 beforeEach(() => {
@@ -184,7 +185,7 @@ describe(`clicking the delete button for each ${thisResource} confirm delete mod
       const resourceElements: HTMLElement[] = queryResources(thisResource);
       const deleteModal: HTMLElement = await openAndGetDeleteModal(resourceElements[i]);
       await clickDeleteButton(deleteModal);
-      expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${thisApiPath}${thisMockData[i].id}/`,
+      expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${thisBaseApiPath}${thisMockData[i].id}/`,
         expect.objectContaining({
           method: "DELETE"
         }
@@ -240,7 +241,7 @@ describe(`api general error on clicking the delete button for each ${thisResourc
       const resourceElements: HTMLElement[] = queryResources(thisResource);
       const deleteModal: HTMLElement = await openAndGetDeleteModal(resourceElements[i]);
       mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
-        url: `${thisApiPath}${thisMockData[i].id}/`, data: {error: [errorMessage]}, status: 500
+        url: `${thisBaseApiPath}${thisMockData[i].id}/`, data: {error: [errorMessage]}, status: 500
       }]));
       await clickDeleteButton(deleteModal);
       const listSection: HTMLElement = getSection(thisResource);
@@ -257,7 +258,7 @@ describe(`api general error on clicking the delete button for each ${thisResourc
       const resourceElements: HTMLElement[] = queryResources(thisResource);
       const deleteModal: HTMLElement = await openAndGetDeleteModal(resourceElements[i]);
       mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([{
-        url: `${thisApiPath}${thisMockData[i].id}/`, reject: true
+        url: `${thisBaseApiPath}${thisMockData[i].id}/`, reject: true
       }]));
       await clickDeleteButton(deleteModal);
       const listSection: HTMLElement = getSection(thisResource);

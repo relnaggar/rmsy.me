@@ -18,6 +18,7 @@ const useResource = <Resource extends WithId, ResourceUpload>(
   apiPath: string,
   getPlaceholderResource: (resourceUpload: ResourceUpload) => Resource,
   options?: {
+    fetchParamString?: string,
     onFetchSuccess?: (resources: Resource[]) => void,
     onFetchFail?: (errors: Record<string,string[]>) => void,
     onPostSuccess?: (resource: Resource) => void,
@@ -29,6 +30,7 @@ const useResource = <Resource extends WithId, ResourceUpload>(
   },
 ): UseResource<Resource,ResourceUpload> => {
   const {
+    fetchParamString,
     onPostSuccess,
     onPostFail,
     onFetchSuccess,
@@ -39,7 +41,11 @@ const useResource = <Resource extends WithId, ResourceUpload>(
     onPatchFail,
   } = options || {};
 
-  const fetchResource = useFetchResource<Resource>(apiPath, {
+  let fetchApiPath = apiPath;
+  if (fetchParamString !== undefined) {
+    fetchApiPath += `?${fetchParamString}`;
+  }
+  const fetchResource = useFetchResource<Resource>(fetchApiPath, {
     onSuccess: onFetchSuccess,
     onFail: onFetchFail
   });

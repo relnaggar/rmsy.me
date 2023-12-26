@@ -4,22 +4,8 @@ import userEvent from "@testing-library/user-event";
 import { injectMocks, renderRoute, OpenAndGetModalParams, openAndGetModal, getSubmitButton, clickCloseButton, clickSubmitButton, mockFunctions, getRefreshButton, clickRefreshButton, queryResources } from "../common/testUtils";
 import { generateConditionalResponseByRoute, generateResponse, generateErrorResponse } from "../api/mockApi";
 import { validJob1, validJob2, validResumeTemplate1, validResumeTemplate2, validResume1, errorMessage, testDataForApiGeneralErrors } from "../api/mockData";
-import { Job, ResumeTemplate, Resume } from '../api/types';
+import { Job, Template, Resume } from '../api/types';
 
-
-beforeEach(() => {
-  jest.clearAllMocks();
-  injectMocks();
-  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([
-    {
-      url: "../api/jobs/",
-      data: [validJob1, validJob2],
-    }, {
-      url: "../api/templates/",
-      data: [validResumeTemplate1, validResumeTemplate2],
-    }
-  ]));
-});
 
 const thisRoute = "/resumes";
 const thisResource = "resume";
@@ -27,19 +13,35 @@ const modalName = "generate resume";
 const openModalButtonText = "generate new resume";
 const openAndGetModalParams: OpenAndGetModalParams = {modalName, openModalButtonText};
 
-const testData: {label: keyof Resume, required: boolean}[] = [{
+const testData: {label: keyof Resume, url: string, required: boolean}[] = [{
   label: "job",
+  url: "../api/jobs/",
   required: true,
 }, {
   label: "template",
+  url: "../api/templates/?type=resume",
   required: true,
 }];
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  injectMocks();
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([
+    {
+      url: testData[0].url,
+      data: [validJob1, validJob2],
+    }, {
+      url: testData[1].url,
+      data: [validResumeTemplate1, validResumeTemplate2],
+    }
+  ]));
+});
 
 const fillWithValidValues = async (modal: HTMLElement): Promise<void> => {
   for (const testDataForInput of testData) {
     const input: HTMLElement = getByRole(modal, "combobox", {name: new RegExp(testDataForInput.label, "i")});
     await act(async () => {
-      userEvent.selectOptions(input, (validResume1[testDataForInput.label] as Job | ResumeTemplate).id.toString());
+      userEvent.selectOptions(input, (validResume1[testDataForInput.label] as Job | Template).id.toString());
     });
   }
 };
@@ -206,7 +208,7 @@ test(`${modalName} modal retains input values on close and reopen`, async () => 
   addColumnModal = await openAndGetModal(openAndGetModalParams);
   for (const testDataForInput of testData) {
     const input: HTMLElement = getByRole(addColumnModal, "combobox", {name: new RegExp(testDataForInput.label, "i")});
-    expect(input).toHaveValue((validResume1[testDataForInput.label] as Job | ResumeTemplate).id.toString());  
+    expect(input).toHaveValue((validResume1[testDataForInput.label] as Job | Template).id.toString());  
   }
 });
 
@@ -278,7 +280,7 @@ describe(`clicking each ${modalName} modal refresh button makes an api call to g
       await renderRoute(thisRoute);
       const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
       await clickRefreshButton(modal, testDataForInput.label);
-      expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`../api/${testDataForInput.label}s/`,
+      expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(testDataForInput.url,
         expect.objectContaining({
           method: "GET",
           headers: expect.objectContaining({
@@ -298,10 +300,10 @@ describe(`clicking each ${modalName} modal refresh button updates select options
       const allOptionsBefore: HTMLElement[] = getAllByRole(modal, "option");
       expect(allOptionsBefore.length).toBe(6);
       mockFunctions.fetchData.mockImplementationOnce(generateConditionalResponseByRoute([{
-        url: "../api/jobs/",
+        url: testData[0].url,
         data: [validJob2],
       }, {
-        url: "../api/templates/",
+        url: testData[1].url,
         data: [validResumeTemplate2],
       }]));
       await clickRefreshButton(modal, testDataForInput.label);

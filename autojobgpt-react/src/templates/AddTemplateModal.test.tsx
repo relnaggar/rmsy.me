@@ -3,7 +3,7 @@ import { screen, getAllByRole, getByRole, getByLabelText, waitFor } from "@testi
 import { injectMocks, renderRoute, getSubmitButton, openAndGetModal, clickCloseButton, clickSubmitButton, userInput, mockFunctions, OpenAndGetModalParams, queryResources, userUploadDocxFile } from "../common/testUtils";
 import { generateResponse, generateErrorResponse } from "../api/mockApi";
 import { validResumeTemplate1, errorMessage, testDataForApiGeneralErrors } from "../api/mockData";
-import { ResumeTemplate } from '../api/types';
+import { Template } from '../api/types';
 
 
 beforeEach(() => {
@@ -126,7 +126,7 @@ test(`submitting the ${modalName} modal with valid input closes the modal within
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
-  mockFunctions.fetchData.mockImplementationOnce(generateResponse<ResumeTemplate>(validResumeTemplate1));
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse<Template>(validResumeTemplate1));
   await clickSubmitButton(modal);
   await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
 });
@@ -165,7 +165,7 @@ test(`submitting the ${modalName} modal with valid input adds the ${thisResource
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
-  mockFunctions.fetchData.mockImplementationOnce(generateResponse<ResumeTemplate>(validResumeTemplate1));
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse<Template>(validResumeTemplate1));
   await clickSubmitButton(modal);
   const resourceElements: HTMLElement[] = queryResources(thisResource);
   expect(resourceElements.length).toBe(1);

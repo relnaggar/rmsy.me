@@ -4,19 +4,20 @@ import { injectMocks, mockFunctions, renderRoute, queryResources, openAndGetEdit
 import { validResumeTemplate1, validResumeTemplate2, validResumeTemplate3, testDataForApiGeneralErrors, errorMessage } from "../api/mockData";
 import { generateConditionalResponseByRoute, generateResponse, generateErrorResponse } from "../api/mockApi";
 import { defaultFillFields } from "../api/constants";
-import { FillField, ResumeTemplate } from "../api/types";
+import { FillField, Template } from "../api/types";
 
 
 const thisRoute = "/resumes";
 const thisResource = "template";
 const modalName = "edit resume template";
-const thisApiPath = "../api/templates/";
-const thisMockData: ResumeTemplate[] = [validResumeTemplate1, validResumeTemplate2];
+const thisBaseApiPath = "../api/templates/";
+const thisApiPath = `${thisBaseApiPath}?type=resume`;
+const thisMockData: Template[] = [validResumeTemplate1, validResumeTemplate2];
 const newTemplate = validResumeTemplate3;
 
 const relatedApiPath = "../api/fillFields/";
 const relatedResourceKey = "fillFields";
-const relatedMockData: FillField[] = thisMockData.reduce((relatedMockData: FillField[], resource: ResumeTemplate) => {
+const relatedMockData: FillField[] = thisMockData.reduce((relatedMockData: FillField[], resource: Template) => {
   return relatedMockData.concat(resource[relatedResourceKey]);
 }, []);
 const relatedResourceName = "fill field";
@@ -24,7 +25,7 @@ const relatedResourceValueKey = "description";
 const newRelatedResourceValue = `new ${relatedResourceName} ${relatedResourceValueKey}`;
 
 const testData: {
-  label: keyof ResumeTemplate,
+  label: keyof Template,
   role: "textbox" | "combobox",
   required: boolean,
   validValue: string | number,
@@ -42,7 +43,7 @@ const testData: {
 
 const testEachModal = async (testDescription: string, func: (
   modal: HTMLElement,
-  mockData: ResumeTemplate,
+  mockData: Template,
   modalNumber: number,
 ) => Promise<void>) => {
   for (let modalNumber = 0; modalNumber < thisMockData.length; modalNumber++) {
@@ -162,7 +163,7 @@ describe(`for each ${modalName} modal, saving each input with valid input makes 
       await userInput(modal, testDataForInput.label, testDataForInput.validValue.toString(), testDataForInput.role);
       mockFunctions.fetchData.mockImplementationOnce(generateResponse({...mockData, [testDataForInput.label]: testDataForInput.validValue}));
       await clickSaveButton(modal, testDataForInput.label);
-      expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${thisApiPath}${mockData.id}/`, expect.objectContaining({
+      expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${thisBaseApiPath}${mockData.id}/`, expect.objectContaining({
         method: "PATCH",
         body: JSON.stringify({[testDataForInput.label]: testDataForInput.validValue.toString()}),
       }));

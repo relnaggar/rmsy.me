@@ -47,7 +47,7 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
     elif isinstance(error, ChatException):
       return Response({'error': [str(error)]}, status=status.HTTP_400_BAD_REQUEST)
     else:
-      return Response({'error': ["Internal server error: " + str(error)]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+      return Response({'error': [str(error)]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
   def create(self, request, *args, **kwargs):
     try:
@@ -70,6 +70,12 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
   def destroy(self, request, *args, **kwargs):
     try:
       return super().destroy(request, *args, **kwargs)
+    except Exception as e:
+      return self.error_response(e)
+    
+  def list(self, request, *args, **kwargs):
+    try:
+      return super().list(request, *args, **kwargs)
     except Exception as e:
       return self.error_response(e)
 
@@ -106,8 +112,17 @@ class FillFieldViewSet(viewsets.ModelViewSet):
   serializer_class = FillFieldSerializer
 
 class TemplateViewSet(ModelViewSetWithErrorHandling):
-  queryset = Template.objects.all()
   serializer_class = TemplateSerializer
+
+  def get_queryset(self):
+    queryset = Template.objects.all()
+    template_type = self.request.query_params.get("type", None)
+    if template_type is None:
+      return queryset
+    elif template_type in Template.Type.values:
+      return queryset.filter(type=template_type)
+    else:
+      raise ValueError(f"Invalid template type: {template_type}")
 
 
 class SubstitutionViewSet(ModelViewSetWithErrorHandling):

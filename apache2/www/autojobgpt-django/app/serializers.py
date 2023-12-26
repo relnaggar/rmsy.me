@@ -46,6 +46,11 @@ class TemplateSerializer(serializers.ModelSerializer):
       'png': {'read_only': True}
     }
 
+  def __init__(self, *args, **kwargs):
+    super(TemplateSerializer, self).__init__(*args, **kwargs)
+    if self.instance is not None: # update
+      self.fields["type"].read_only = True # type is read-only after creation
+
 
 class RegenerateSerializer(serializers.Serializer):
   value = serializers.CharField(allow_blank=True)

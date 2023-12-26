@@ -1,5 +1,5 @@
 import { generateErrorResponse } from "./mockApi";
-import { Job, Resume, ResumeTemplate, Status } from "./types";
+import { Job, Resume, Template, Status } from "./types";
 import { defaultFillFields } from "./constants";
 
 
@@ -66,7 +66,7 @@ export const validJob3: Job = {
   chosen_resume: null,
 }
 
-export const validResumeTemplate1: ResumeTemplate = {
+export const validResumeTemplate1: Template = {
   id: 1,
   name: "Test Resume Template 1",
   description: "Test Description 1",
@@ -88,9 +88,10 @@ export const validResumeTemplate1: ResumeTemplate = {
     description: "Test Fill Field Description 3",
     template: 1,
   }],
+  type: "resume",
 };
 
-export const validResumeTemplate2: ResumeTemplate = {
+export const validResumeTemplate2: Template = {
   id: 2,
   name: "Test Resume Template 2",
   description: "Test Description 2",
@@ -112,15 +113,17 @@ export const validResumeTemplate2: ResumeTemplate = {
     description: "Test Fill Field Description 6",
     template: 2,
   }],
+  type: "resume",
 };
 
-export const validResumeTemplate3: ResumeTemplate = {
+export const validResumeTemplate3: Template = {
   id: 3,
   name: "Test Resume Template 3",
   description: "Test Description 3",
   docx: "https://www.example.com/test3.docx",
   png: "https://www.example.com/test3.png",
   fillFields: [],
+  type: "resume",
 };
 
 export const validResume1: Resume = {

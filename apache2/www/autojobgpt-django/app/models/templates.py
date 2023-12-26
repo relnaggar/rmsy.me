@@ -22,7 +22,7 @@ class FillField(models.Model):
 
   class Meta:
     constraints = [
-      models.UniqueConstraint(fields=['template', 'key'], name='unique_template_key'),
+      models.UniqueConstraint(fields=["template", "key"], name="unique_template_key"),
     ]
 
   def __str__(self):
@@ -49,11 +49,16 @@ class FillField(models.Model):
       resume.chat_messages = chat.get_messages()
       resume.save()
 
-class Template(models.Model, DocumentMixin):
-  docx = models.FileField(upload_to='templates/')
-  png = models.FileField(upload_to='templates/')
+class Template(models.Model, DocumentMixin):  
+  docx = models.FileField(upload_to="templates/")
+  png = models.FileField(upload_to="templates/")
   name = models.TextField(unique=True)
   description = models.TextField(blank=True)
+  
+  class Type(models.TextChoices):
+    RESUME = "resume"
+    COVER_LETTER = "coverLetter"
+  type = models.CharField(max_length=20, choices=Type.choices)
 
   def __str__(self):
     return self.name

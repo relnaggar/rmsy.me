@@ -3,13 +3,20 @@ import React, { useId } from "react";
 import useInputControl from "../hooks/useInputControl";
 import AddModal, { AddResourceModalProps } from "../common/AddModal";
 import BaseInput from "../common/BaseInput";
-import { ResumeTemplateUpload } from '../api/types';
+import { TemplateUpload, TemplateType } from '../api/types';
 
+
+interface AddTemplateModalProps extends AddResourceModalProps<TemplateUpload> {
+  templateType: TemplateType,
+  templateTypeLabel: string,
+}
 
 const AddTemplateModal = ({
   postResource: postTemplate,
+  templateType,
+  templateTypeLabel,
   ...addModal
-}: AddResourceModalProps<ResumeTemplateUpload>): React.JSX.Element => {
+}: AddTemplateModalProps): React.JSX.Element => {
   const nameInput = useInputControl();
   const uploadInput = useInputControl();
   const descriptionInput = useInputControl();
@@ -39,13 +46,13 @@ const AddTemplateModal = ({
 
   const handleValidatedSubmit = (): void => {
     const docx: File = (uploadInput.ref.current as HTMLInputElement).files![0];
-    postTemplate({ name: nameInput.value, docx, description: descriptionInput.value });
+    postTemplate({ name: nameInput.value, docx, description: descriptionInput.value, type: templateType });
   };
 
   return (
     <AddModal
       {...addModal} errors={{error: addModal.errors["error"]}}
-      title="Add Resume Template" modalId={modalId}
+      title={`Add ${templateTypeLabel} Template`} modalId={modalId}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
       <BaseInput ref={nameInput.ref}
