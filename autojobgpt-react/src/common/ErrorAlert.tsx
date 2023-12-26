@@ -16,6 +16,7 @@ const ErrorAlert = ({
   showErrorAlert,
   setShowErrorAlert,  
 }: ErrorAlertProps): React.JSX.Element => {
+  console.log("rendering ErrorAlert")
   const numErrors: number = Object.keys(errors).length;
 
   const handleDismiss = (): void => {

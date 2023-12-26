@@ -21,6 +21,7 @@ interface UseFetchOptions<ResponseData> {
 const useFetch = <Data extends unknown>(
   apiPath: string,  
   options?: UseFetchOptions<Data>,
+  extraFetchOptions?: RequestInit,
 ): UseFetch<Data> => {
   const { initialData = {} as Data, initialFetch = true, onSuccess, onFail } = options || {};
 
@@ -35,9 +36,11 @@ const useFetch = <Data extends unknown>(
 
   const { calling: fetching, call, cancel } = useApiCall("GET", {
     apiPath,
+    initialFetch: initialFetch,
     cancelable: true,
     onSuccess: handleSuccess,
-    onFail
+    onFail,
+    extraFetchOptions,
   });
 
   useEffect(() => {

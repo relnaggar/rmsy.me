@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 
-import useAPI from "../hooks/useApiRoot";
-import { FetchDataContext } from "../routes/routesConfig";
+import useFetch from "../hooks/useFetch";
+import useErrorAlert from "../hooks/useErrorAlert";
 import ConfirmationModal from "../common/ConfirmationModal";
+import ErrorAlert from "../common/ErrorAlert";
 
 
 export const ConfirmationModalContext = createContext<
@@ -12,34 +13,31 @@ export const ConfirmationModalContext = createContext<
 
 export const CSRFTokenContext = createContext<string>("");
 
+interface WithCsrfToken {
+  csrfToken: string,
+};
+
 const Layout = (): React.JSX.Element => {
-  const apiRoute: string = useAPI();
-  const fetchData = useContext(FetchDataContext);    
-  const [csrfToken, setCsrfToken] = useState<string>("");  
-  
-  useEffect(() => {
-    async function fetchCSRFToken() {
-      await fetchData(`${apiRoute}csrf/`, {
-        credentials: "include",
-      })
-      .then(response => response.json())
-      .then(data => setCsrfToken(data.csrfToken))
-      .catch(error => console.error(error));
-    }
-    fetchCSRFToken();
-  }, [fetchData, apiRoute, setCsrfToken]);
+  const errorAlert = useErrorAlert();
+
+  const { responseData, fetching: fetchingCsrfToken} = useFetch<WithCsrfToken>("csrf/", {
+    initialData: { csrfToken: ""},
+    onFail: errorAlert.showErrors,
+  }, {
+    credentials: "include",
+  });
 
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
   const [confirmationAction, setConfirmationAction] = useState<() => void>(() => () => {});
   const [confirmationActionDescription, setConfirmationActionDescription] = useState<string>("");
   const [confirmationActionVerb, setConfirmationActionVerb] = useState<string>("");
 
-  function openConfirmationModal(action: () => void, actionDescription: string, actionVerb: string): void {
+  const openConfirmationModal = (action: () => void, actionDescription: string, actionVerb: string): void => {
     setConfirmationAction(() => action);
     setConfirmationActionDescription(actionDescription);
     setConfirmationActionVerb(actionVerb);
     setShowConfirmationModal(true);
-  }
+  };
 
   return (
     <div className="container">
@@ -73,29 +71,34 @@ const Layout = (): React.JSX.Element => {
         </div>        
       </nav>
 
-      <CSRFTokenContext.Provider value={csrfToken}>
-        <ConfirmationModalContext.Provider value={openConfirmationModal}>
-          {csrfToken === "" ?
-            <div className="position-fixed top-50 start-50 translate-middle">
-              <div className="spinner-border" role="status" aria-label="Loading Page">
-                <span className="visually-hidden">Loading...</span>
-              </div>
-            </div>
+      { fetchingCsrfToken ?
+        <div className="position-fixed top-50 start-50 translate-middle">
+          <div className="spinner-border" role="status" aria-label="Loading Page">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      :
+        <main className="mt-3">
+          { Object.keys(errorAlert.errors).length === 0 ?      
+            <>
+              <CSRFTokenContext.Provider value={responseData.csrfToken}>
+                <ConfirmationModalContext.Provider value={openConfirmationModal}>
+                  <Outlet />
+                </ConfirmationModalContext.Provider>
+              </CSRFTokenContext.Provider>
+              <ConfirmationModal
+                show={showConfirmationModal}
+                setShow={setShowConfirmationModal}
+                action={confirmationAction}
+                actionDescription={confirmationActionDescription}
+                actionVerb={confirmationActionVerb}
+              />
+            </>
           :
-            <main className="mt-3">
-              <Outlet />
-            </main>
+            <ErrorAlert {...errorAlert} />
           }
-        </ConfirmationModalContext.Provider>
-      </CSRFTokenContext.Provider>
-
-      <ConfirmationModal
-        show={showConfirmationModal}
-        setShow={setShowConfirmationModal}
-        action={confirmationAction}
-        actionDescription={confirmationActionDescription}
-        actionVerb={confirmationActionVerb}
-      />
+        </main>
+      }
     </div>
   )
 };

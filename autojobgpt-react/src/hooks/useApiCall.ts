@@ -43,25 +43,27 @@ const useApiCall = (
   method: "GET" | "POST" | "PATCH" | "DELETE",  
   options?: {
     apiPath?: string,
+    initialFetch?: boolean,
     cancelable?: boolean,
     beforeCall?: (postData: any) => void,
     onSuccess?: (params: OnSuccessParams) => Promise<void>,
     afterCall?: (params : AfterCallParams) => void,
     onFail?: (errors: Record<string,string[]>) => void,
+    extraFetchOptions?: RequestInit,
   },
 ): UseApiCall => {
-  const { apiPath, beforeCall, onSuccess, afterCall, onFail, cancelable = false } = options || {};
+  const { apiPath, beforeCall, onSuccess, afterCall, onFail, cancelable = false, initialFetch = false } = options || {};
 
   const csrfToken: string = useContext(CSRFTokenContext)
   const includeCsrfToken: boolean = method === "POST" || method === "PATCH" || method === "DELETE";
 
   const apiRoot: string = useApiRoot();
   const fetchData = useContext(FetchDataContext);
-  const [calling, setCalling] = useState<boolean>(false);
+  const [calling, setCalling] = useState<boolean>(initialFetch);
   const abortControllerRef = useRef<AbortController>(new AbortController());
 
   const call = useCallback(async (params?: CallParams): Promise<void> => {
-    const { data, resourceId, paramString, apiPath: apiPathOverride } = params || {};
+    const { data, resourceId, paramString, apiPath: apiPathOverride, ...extraFetchOptions } = params || {};
 
     if (cancelable) {
       if (calling) {
@@ -117,6 +119,7 @@ const useApiCall = (
         headers: headers,
         body: body,
         signal: cancelable ? abortControllerRef.current.signal : undefined,
+        ...extraFetchOptions,
       });
 
       // wait for 3 seconds before continuing
