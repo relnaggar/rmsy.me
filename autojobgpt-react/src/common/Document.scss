@@ -12,10 +12,6 @@ $document-height: 1754px * $document-scale;
     height: $document-height;
   }
 
-  img {
-    filter: blur(1px);
-  }  
-
   .document-header, .document-footer, .document-body {
     position: absolute;
     left: 50%;
