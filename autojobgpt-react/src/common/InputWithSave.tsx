@@ -115,7 +115,7 @@ const InputWithSave = <Resource extends WithId>({
 
   const saveButton: React.JSX.Element = (
     <button aria-controls={currentId}
-      type="submit" className="btn btn-outline-primary" disabled={updating || saved} aria-busy={updating}
+      type="submit" className="btn btn-outline-primary text-nowrap" disabled={updating || saved} aria-busy={updating}
     >
       { updating ?
         <>

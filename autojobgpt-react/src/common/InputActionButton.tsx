@@ -22,7 +22,7 @@ const InputActionButton = ({
 }: InputActionButtonProps): React.JSX.Element => {
   return (
     <button aria-controls={controlsId}
-      className="btn btn-outline-primary" type="button" onClick={loading ? onClickCancel : onClickAction }
+      className="btn btn-outline-primary text-nowrap" type="button" onClick={loading ? onClickCancel : onClickAction }
       disabled={disabled}
     >
       {loading ? <>
