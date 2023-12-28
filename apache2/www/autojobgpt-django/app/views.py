@@ -10,7 +10,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from .models import Template, FillField, Job, TailoredDocument, Substitution, Status
+from .models import Template, FillField, Job, TailoredDocument, Substitution, Status, DocumentType
 from .models import DEFAULT_FILLFIELDS
 from .serializers import StatusSerializer, JobSerializer
 from .serializers import TemplateSerializer, FillFieldSerializer
@@ -54,8 +54,8 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
     elif isinstance(error, ValidationError):
       return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
     else:
-      return Response({'error': [str(error), str(type(error))]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+      return Response({'error': [str(type(error)) + ":" + str(error)]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
   def create(self, request, *args, **kwargs):
     try:
       return super().create(request, *args, **kwargs)
@@ -83,6 +83,12 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
   def list(self, request, *args, **kwargs):
     try:
       return super().list(request, *args, **kwargs)
+    except Exception as e:
+      return self.error_response(e)
+    
+  def retrieve(self, request, *args, **kwargs):
+    try:
+      return super().retrieve(request, *args, **kwargs)
     except Exception as e:
       return self.error_response(e)
 
@@ -123,13 +129,13 @@ class TemplateViewSet(ModelViewSetWithErrorHandling):
 
   def get_queryset(self):
     queryset = Template.objects.all()
-    template_type = self.request.query_params.get("type", None)
-    if template_type is None:
+    document_type = self.request.query_params.get("type", None)
+    if document_type is None:
       return queryset
-    elif template_type in Template.Type.values:
-      return queryset.filter(type=template_type)
+    elif document_type in DocumentType.values:
+      return queryset.filter(type=document_type)
     else:
-      raise ValueError(f"Invalid template type: {template_type}")
+      raise ValueError(f"Invalid template type: {document_type}")
 
 
 class SubstitutionViewSet(ModelViewSetWithErrorHandling):
@@ -169,8 +175,17 @@ class SubstitutionViewSet(ModelViewSetWithErrorHandling):
     return Response(self.serializer_class(regenerated_object).data)
 
 class TailoredDocumentViewSet(ModelViewSetWithErrorHandling):
-  queryset = TailoredDocument.objects.all()
   serializer_class = TailoredDocumentSerializer
+
+  def get_queryset(self):
+    queryset = TailoredDocument.objects.all()
+    document_type = self.request.query_params.get("type", None)
+    if document_type is None:
+      return queryset
+    elif document_type in DocumentType.values:
+      return queryset.filter(type=document_type)
+    else:
+      raise ValueError(f"Invalid template type: {document_type}")
 
   @action(detail=True, methods=['post'])
   def duplicate(self, request, pk=None):

@@ -3,7 +3,7 @@ import { screen, getByRole, getAllByRole, waitFor, queryByRole } from "@testing-
 import { generateConditionalResponseByRoute, generateResponse, generateErrorResponse } from "../api/mockApi";
 import { validJob1, validJob2, validJob3, validStatus1, validStatus2, validStatus3, testDataForApiGeneralErrors, errorMessage, validResume1, validResume2, validResume3 } from "../api/mockData";
 import { injectMocks, mockFunctions, renderRoute, queryResources, openAndGetEditModal, clickCloseButton, getSaveButton, userClearInput, clickSaveButton, userInput, getJobByTitleCompany } from "../common/testUtils";
-import { Job, Status, Resume } from "../api/types";
+import { Job, Status, TailoredDocument } from "../api/types";
 
 
 const thisRoute = "/jobs";
@@ -14,7 +14,7 @@ const thisApiPath = `../api/jobs/`;
 const thisAllMockData: {
   jobs: Job[],
   statuses: Status[],
-  resumes: Resume[],
+  resumes: TailoredDocument[],
 } = {
   jobs: [validJob1, validJob2],
   statuses: [validStatus1, validStatus2, validStatus3],
@@ -91,7 +91,7 @@ beforeEach(() => {
     url: "../api/statuses/",
     data: thisAllMockData.statuses,
   }, {
-    url: "../api/tailoredDocuments/",
+    url: "../api/tailoredDocuments/?type=resume",
     data: thisAllMockData.resumes,
   }]));
 });
@@ -156,7 +156,7 @@ describe(`each ${modalName} modal has all options for chosen resume input`, () =
   testEachModal(`modal has all options for chosen resume input`, async (modal, _, modalNumber) => {
     const resumeInput: HTMLElement = getByRole(modal, "combobox", {name: new RegExp("chosen resume", "i")});
     const options: HTMLElement[] = getAllByRole(resumeInput, "option");
-    const matchingResumes: Resume[] = thisAllMockData.resumes.filter((resume) => resume.job.id === thisAllMockData.jobs[modalNumber].id);
+    const matchingResumes: TailoredDocument[] = thisAllMockData.resumes.filter((resume) => resume.job.id === thisAllMockData.jobs[modalNumber].id);
     expect(options.length).toBe(matchingResumes.length+1);
     for (let i = 0; i < matchingResumes.length; i++) {
       expect(options[i+1]).toHaveTextContent(matchingResumes[i].name);

@@ -5,26 +5,29 @@ import InputWithSave from "../common/InputWithSave";
 import { defaultFillFields } from "../api/constants";
 import { FillField, Template } from '../api/types';
 import DefaultFillField from "./DefaultFillField";
+import { DocumentsPageProps } from "../routes/DocumentsPage";
 
 
-interface EditTemplateModalProps extends EditResourceModalProps<Template> {
+interface EditTemplateModalProps extends
+  EditResourceModalProps<Template>,
+  Pick<DocumentsPageProps, "documentTypeLabel">
+{
   fillFields: FillField[],
   setFillFields: React.Dispatch<React.SetStateAction<FillField[]>>,
-  templateTypeLabel: string,
 }
 
 const EditTemplateModal = ({
   show, setShow, editId,
   fillFields, setFillFields,
-  templateTypeLabel,
+  documentTypeLabel,
   ...resourceManager
 }: EditTemplateModalProps): React.JSX.Element => {
   const modalId = useId();
 
   return (
-    <EditModal title={`Edit ${templateTypeLabel} Template`} modalId={modalId} show={show} setShow={setShow} size="xl">
+    <EditModal title={`Edit ${documentTypeLabel} Template`} modalId={modalId} show={show} setShow={setShow} size="xl">
       <InputWithSave editId={editId} {...resourceManager}
-        type="text" editableProperty="name" labelText={`${templateTypeLabel} Template Name`}
+        type="text" editableProperty="name" labelText={`${documentTypeLabel} Template Name`}
         required
       />
       <InputWithSave editId={editId} {...resourceManager}

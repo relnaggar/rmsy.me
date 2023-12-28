@@ -8,7 +8,7 @@ router.register("statuses", StatusViewSet)
 router.register("jobs", JobViewSet)
 router.register("templates", TemplateViewSet, basename="templates")
 router.register("fillFields", FillFieldViewSet)
-router.register("tailoredDocuments", TailoredDocumentViewSet)
+router.register("tailoredDocuments", TailoredDocumentViewSet, basename="tailoredDocuments")
 router.register("substitutions", SubstitutionViewSet, basename="substitutions")
 
 urlpatterns = [

@@ -1,4 +1,5 @@
 from django.core import files
+from django.db import models
 
 import os
 import io
@@ -54,3 +55,7 @@ class DocumentMixin():
         text = text.replace("{{" + key + "}}", value)
     
     return text
+
+class DocumentType(models.TextChoices):
+    RESUME = "resume", "resume"
+    COVER_LETTER = "coverLetter", "cover letter"

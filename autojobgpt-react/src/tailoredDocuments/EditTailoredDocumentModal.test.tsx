@@ -5,7 +5,7 @@ import { injectMocks, mockFunctions, renderRoute, queryResources, openAndGetEdit
 import { validResume1, validResume2, validResume3, testDataForApiGeneralErrors, errorMessage } from "../api/mockData";
 import { generateConditionalResponseByRoute, generateResponse, generateErrorResponse } from "../api/mockApi";
 import { defaultFillFields } from "../api/constants";
-import { Resume, Substitution } from "../api/types";
+import { TailoredDocument, Substitution } from "../api/types";
 import { act } from "react-dom/test-utils";
 
 
@@ -13,13 +13,14 @@ const thisRoute = "/resumes";
 const thisResource = "resume";
 const thisResourceHeading = "Resumes";
 const modalName = "edit resume";
-const thisApiPath = `../api/tailoredDocuments/`;
-const thisMockData: Resume[] = [validResume1, validResume2];
+const thisBaseApiPath = `../api/tailoredDocuments/`;
+const thisApiPath = `${thisBaseApiPath}?type=resume`;
+const thisMockData: TailoredDocument[] = [validResume1, validResume2];
 const newResume = validResume3;
 
 const relatedApiPath = `../api/substitutions/`;
 const relatedResourceKey = "substitutions";
-const relatedMockData: Substitution[] = thisMockData.reduce((relatedMockData: Substitution[], resource: Resume) => {
+const relatedMockData: Substitution[] = thisMockData.reduce((relatedMockData: Substitution[], resource: TailoredDocument) => {
   return relatedMockData.concat(resource[relatedResourceKey]);
 }, []);
 const relatedResourceName = "fill field substitution";
@@ -27,7 +28,7 @@ const relatedResourceValueKey = "value";
 const newRelatedResourceValue = `new ${relatedResourceName} ${relatedResourceValueKey}`;
 
 const testData: {
-  label: keyof Resume,
+  label: keyof TailoredDocument,
   role: "textbox" | "combobox",
   required: boolean,
   validValue: string | number,
@@ -40,7 +41,7 @@ const testData: {
 
 const testEachModal = async (testDescription: string, func: (
   modal: HTMLElement,
-  mockData: Resume,
+  mockData: TailoredDocument,
   modalNumber: number,
 ) => Promise<void>) => {
   for (let modalNumber = 0; modalNumber < thisMockData.length; modalNumber++) {
@@ -223,7 +224,7 @@ describe(`for each ${modalName} modal, saving each input with valid input makes 
       await userInput(modal, testDataForInput.label, testDataForInput.validValue.toString(), testDataForInput.role);
       mockFunctions.fetchData.mockImplementationOnce(generateResponse({...mockData, [testDataForInput.label]: testDataForInput.validValue}));
       await clickSaveButton(modal, testDataForInput.label);
-      expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${thisApiPath}${mockData.id}/`, expect.objectContaining({
+      expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${thisBaseApiPath}${mockData.id}/`, expect.objectContaining({
         method: "PATCH",
         body: JSON.stringify({[testDataForInput.label]: testDataForInput.validValue.toString()}),
       }));
@@ -700,7 +701,7 @@ describe(`clicking each ${modalName} modal duplicate button makes an api call to
   testEachModal(`clicking duplicate button makes an api call to duplicate the data`, async (modal, mockData) => {
     mockFunctions.fetchData.mockImplementationOnce(generateResponse(newResume));
     await clickDuplicateButton(modal);
-    expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${thisApiPath}${mockData.id}/duplicate/`, expect.objectContaining({
+    expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${thisBaseApiPath}${mockData.id}/duplicate/`, expect.objectContaining({
       method: "POST",
     }));
   });

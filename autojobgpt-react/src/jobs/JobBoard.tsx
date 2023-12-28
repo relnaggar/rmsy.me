@@ -15,7 +15,7 @@ import EditColumnModal from "./EditColumnModal";
 import AddColumnModal from "./AddColumnModal";
 import PlaceholderColumn from "./PlaceholderColumn";
 import AddColumnButton from "./AddColumnButton";
-import { Status, StatusUpload, Job, JobUpload, Resume } from '../api/types';
+import { Status, StatusUpload, Job, JobUpload, TailoredDocument } from '../api/types';
 
 
 const generatePlaceholderStatus = (statusUpload: StatusUpload): Status => {
@@ -139,7 +139,7 @@ const JobBoard = (): React.JSX.Element => {
     }
   });
 
-  const { resources: resumes } = useFetchResource<Resume>("tailoredDocuments/", {
+  const { resources: resumes } = useFetchResource<TailoredDocument>("tailoredDocuments/?type=resume", {
     onFail: errorAlert.showErrors,
   });
 

@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { injectMocks, renderRoute, OpenAndGetModalParams, openAndGetModal, getSubmitButton, clickCloseButton, clickSubmitButton, mockFunctions, getRefreshButton, clickRefreshButton, queryResources } from "../common/testUtils";
 import { generateConditionalResponseByRoute, generateResponse, generateErrorResponse } from "../api/mockApi";
 import { validJob1, validJob2, validResumeTemplate1, validResumeTemplate2, validResume1, errorMessage, testDataForApiGeneralErrors } from "../api/mockData";
-import { Job, Template, Resume } from '../api/types';
+import { Job, Template, TailoredDocument } from '../api/types';
 
 
 const thisRoute = "/resumes";
@@ -14,7 +14,7 @@ const modalName = "generate resume";
 const openModalButtonText = "generate new resume";
 const openAndGetModalParams: OpenAndGetModalParams = {modalName, openModalButtonText};
 
-const testData: {label: keyof Resume, url: string, required: boolean}[] = [{
+const testData: {label: keyof TailoredDocument, url: string, required: boolean}[] = [{
   label: "job",
   url: "../api/jobs/",
   required: true,
@@ -114,7 +114,7 @@ describe(`submitting the ${modalName} modal with empty values for required input
     test(`submitting the ${modalName} modal with empty ${testDataForInput.label} input shows an error for that input`, async () => {
       await renderRoute(thisRoute);
       const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
-      mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
+      mockFunctions.fetchData.mockImplementationOnce(generateResponse<TailoredDocument>(validResume1));
       await clickSubmitButton(modal);
       const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp(testDataForInput.label, "i")});
       expect(errorAlert).toBeInTheDocument();
@@ -127,7 +127,7 @@ test(`submitting the ${modalName} modal with valid input closes the modal within
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
-  mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse<TailoredDocument>(validResume1));
   await clickSubmitButton(modal);
   await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
 });
@@ -137,7 +137,7 @@ test(`submitting the ${modalName} modal with valid input makes an api call`, asy
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
   const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
-  mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse<TailoredDocument>(validResume1));
   await clickSubmitButton(modal);
   expect(mockFunctions.fetchData.mock.calls.length).toBe(initialFetchDataCalls + 1);
 });
@@ -146,13 +146,14 @@ test(`submitting the ${modalName} modal with valid input makes an api call to ad
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
-  mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse<TailoredDocument>(validResume1));
   await clickSubmitButton(modal);
   expect(mockFunctions.fetchData).toHaveBeenLastCalledWith("../api/tailoredDocuments/", expect.objectContaining({
     method: "POST",
     body: JSON.stringify({
       job: validJob1.id,
       template: validResumeTemplate1.id,
+      type: "resume",
     }),
   }));  
 });
@@ -161,7 +162,7 @@ test(`submitting the ${modalName} modal with valid input adds the ${thisResource
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
-  mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
+  mockFunctions.fetchData.mockImplementationOnce(generateResponse<TailoredDocument>(validResume1));
   await clickSubmitButton(modal);
   const resources: HTMLElement[] = queryResources(thisResourceHeading);
   expect(resources.length).toBe(1);
@@ -193,7 +194,7 @@ describe(`api general errors after submitting the ${modalName} modal can be clea
       testDataForApiGeneralError.mockApiError();
       await clickSubmitButton(modal);
       modal = await openAndGetModal(openAndGetModalParams);
-      mockFunctions.fetchData.mockImplementationOnce(generateResponse<Resume>(validResume1));
+      mockFunctions.fetchData.mockImplementationOnce(generateResponse<TailoredDocument>(validResume1));
       await clickSubmitButton(modal);
       modal = await openAndGetModal(openAndGetModalParams);
       expect(queryByRole(modal, "alert")).not.toBeInTheDocument();

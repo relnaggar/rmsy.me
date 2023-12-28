@@ -2,7 +2,7 @@ from django.db import models
 
 import re
 
-from .documents import DocumentMixin
+from .documents import DocumentMixin, DocumentType
 from ..gpt import Chat
 
 
@@ -42,7 +42,7 @@ class FillField(models.Model):
       raise ValueError(f"FillField with the key `{self.key}` is read-only.")
 
     super().save(*args, **kwargs)
-    for tailored_document in self.template.tailored_documents.all():
+    for tailored_document in self.template.tailoredDocuments.all():
       chat = Chat(tailored_document.chat_messages)
       chat.log(f"""Log: the user has updated the fillField with the key `{self.key}` to have the following description:
   <description>{self.description}</description>.""")
@@ -54,11 +54,7 @@ class Template(models.Model, DocumentMixin):
   png = models.FileField(upload_to="templates/")
   name = models.TextField()
   description = models.TextField(blank=True)
-  
-  class Type(models.TextChoices):
-    RESUME = "resume"
-    COVER_LETTER = "coverLetter"
-  type = models.CharField(max_length=20, choices=Type.choices)
+  type = models.CharField(max_length=20, choices=DocumentType.choices)
 
   class Meta:
     constraints = [
@@ -82,11 +78,12 @@ class Template(models.Model, DocumentMixin):
         description = DEFAULT_FILLFIELDS[key]
       else:
         description = ""
-      FillField.objects.create(
-        key=key,
-        description=description,
-        template=self,
-      )
+      if not FillField.objects.filter(template=self, key=key).exists():
+        FillField.objects.create(
+          key=key,
+          description=description,
+          template=self,
+        )
     self.generate_png()
 
   def __update(self, *args, **kwargs):

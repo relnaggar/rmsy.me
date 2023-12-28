@@ -4,7 +4,7 @@ from django.core import files
 import json
 import io
 
-from .documents import DocumentMixin
+from .documents import DocumentMixin, DocumentType
 from .templates import FillField
 from ..gpt import Chat, ChatException
 
@@ -17,6 +17,7 @@ class TailoredDocument(models.Model, DocumentMixin):
   docx = models.FileField(upload_to='tailoredDocuments/')
   png = models.FileField(upload_to='tailoredDocuments/')
   chat_messages = models.JSONField(blank=True, null=True)
+  type = models.CharField(max_length=20, choices=DocumentType.choices)
 
   class Meta:
     constraints = [
@@ -99,8 +100,9 @@ f"""<fillField>
     # ask GPT to fill in the fillFields
     chat = Chat()
     response = json.loads(
-      chat.ask(prompt_name="fill_resume_template", substitutions={
-        "resume_template_text": template_text,
+      chat.ask(prompt_name="fill_template", substitutions={
+        "template_text": template_text,
+        "document_type": self.get_type_display(),
         "job_posting": self.job.posting,
         "job_title": self.job.title,
         "company": self.job.company,

@@ -45,12 +45,12 @@ export interface FillField extends WithId {
   template: number,
 };
 
-export type TemplateType = "resume" | "coverLetter";
+export type DocumentType = "resume" | "coverLetter";
 
 export interface Template extends Document {
   fillFields: FillField[],
   description?: string,
-  type: TemplateType,
+  type: DocumentType,
 };
 
 export interface TemplateUpload extends Omit<Template,
@@ -65,7 +65,7 @@ export interface TemplateUpload extends Omit<Template,
 export interface Substitution extends WithId {
   key: string,
   value: string,
-  resume: number,
+  tailored_document: number,
 };
 
 export interface ChatMessage {
@@ -73,15 +73,16 @@ export interface ChatMessage {
   content: string,
 };
 
-export interface Resume extends Document {
+export interface TailoredDocument extends Document {
   substitutions: Substitution[],
   version: number,
   chat_messages: ChatMessage[],
   job: Job,
   template: Template,
+  type: DocumentType,
 };
 
-export interface ResumeUpload {
+export interface TailoredDocumentUpload extends Pick<TailoredDocument, "type"> {
   job: number,
   template: number,
 };

@@ -4,18 +4,20 @@ import useInputControl from "../hooks/useInputControl";
 import useFetchResource from "../hooks/useFetchResource";
 import AddModal, { AddResourceModalProps } from "../common/AddModal";
 import SelectInputWithRefresh from "../common/SelectInputWithRefresh";
-import { Job, Template, ResumeUpload } from '../api/types';
+import { Job, Template, TailoredDocumentUpload, DocumentType } from '../api/types';
 
 
-interface AddResumeModalProps extends AddResourceModalProps<ResumeUpload> {
-  templateTypeLabel: string,
+interface AddTailoredDocumentModalProps extends AddResourceModalProps<TailoredDocumentUpload> {
+  documentType: DocumentType,
+  documentTypeLabel: string,
 }
 
-const AddResumeModal = ({  
-  postResource: postResume,
-  templateTypeLabel,
+const AddTailoredDocumentModal = ({  
+  postResource: postTailoredDocument,
+  documentType,
+  documentTypeLabel,
   ...addModal
-}: AddResumeModalProps): React.JSX.Element => {
+}: AddTailoredDocumentModalProps): React.JSX.Element => {
   const modalId = useId();
   const jobInput = useInputControl("");
   const templateInput = useInputControl("");
@@ -35,7 +37,7 @@ const AddResumeModal = ({
     onFail: handleRefreshFail,
   });
 
-  const templateManager = useFetchResource<Template>("templates/?type=resume", {
+  const templateManager = useFetchResource<Template>(`templates/?type=${documentType}`, {
     onSuccess: handleRefreshSuccess,
     onFail: handleRefreshFail,
   });
@@ -59,9 +61,10 @@ const AddResumeModal = ({
   }
 
   const handleValidatedSubmit = (): void => {
-    postResume({
+    postTailoredDocument({
       job: parseInt(jobInput.value),
       template: parseInt(templateInput.value),
+      type: documentType,
     });
     jobInput.stopEditing();
     templateInput.stopEditing();
@@ -69,7 +72,7 @@ const AddResumeModal = ({
 
   return (
     <AddModal modalId={modalId} {...addModal}
-      title="Generate Resume" validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
+      title={`Generate ${documentTypeLabel}`} validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
       <SelectInputWithRefresh {...jobManager}
         value={jobInput.value} editing={jobInput.editing} handleChange={jobInput.handleChange}
@@ -77,10 +80,10 @@ const AddResumeModal = ({
       />
       <SelectInputWithRefresh {...templateManager}
         value={templateInput.value} editing={templateInput.editing} handleChange={templateInput.handleChange}
-        label={`${templateTypeLabel} Template`} optionToString={(template) => template.name} errors={addModal.errors["template"]}
+        label={`${documentTypeLabel} Template`} optionToString={(template) => template.name} errors={addModal.errors["template"]}
       />
     </AddModal>
   );
 };
 
-export default AddResumeModal;
+export default AddTailoredDocumentModal;

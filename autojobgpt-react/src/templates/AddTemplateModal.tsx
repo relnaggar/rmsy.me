@@ -3,18 +3,16 @@ import React, { useId } from "react";
 import useInputControl from "../hooks/useInputControl";
 import AddModal, { AddResourceModalProps } from "../common/AddModal";
 import BaseInput from "../common/BaseInput";
-import { TemplateUpload, TemplateType } from '../api/types';
+import { TemplateUpload } from '../api/types';
+import { DocumentsPageProps } from '../routes/DocumentsPage';
 
 
-interface AddTemplateModalProps extends AddResourceModalProps<TemplateUpload> {
-  templateType: TemplateType,
-  templateTypeLabel: string,
-}
+interface AddTemplateModalProps extends AddResourceModalProps<TemplateUpload>, DocumentsPageProps {};
 
 const AddTemplateModal = ({
   postResource: postTemplate,
-  templateType,
-  templateTypeLabel,
+  documentType,
+  documentTypeLabel,
   ...addModal
 }: AddTemplateModalProps): React.JSX.Element => {
   const nameInput = useInputControl();
@@ -46,13 +44,13 @@ const AddTemplateModal = ({
 
   const handleValidatedSubmit = (): void => {
     const docx: File = (uploadInput.ref.current as HTMLInputElement).files![0];
-    postTemplate({ name: nameInput.value, docx, description: descriptionInput.value, type: templateType });
+    postTemplate({ name: nameInput.value, docx, description: descriptionInput.value, type: documentType });
   };
 
   return (
     <AddModal
       {...addModal} errors={{error: addModal.errors["error"]}}
-      title={`Add ${templateTypeLabel} Template`} modalId={modalId}
+      title={`Add ${documentTypeLabel} Template`} modalId={modalId}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
       <BaseInput ref={nameInput.ref}

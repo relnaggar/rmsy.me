@@ -10,7 +10,8 @@ import ErrorAlert from "../common/ErrorAlert";
 import DocumentList from "../common/DocumentList";
 import EditTemplateModal from "./EditTemplateModal";
 import AddTemplateModal from "./AddTemplateModal";
-import { FillField, Template, TemplateUpload, TemplateType } from "../api/types";
+import { FillField, Template, TemplateUpload } from "../api/types";
+import { DocumentsPageProps } from "../routes/DocumentsPage";
 
 
 const generatePlaceholderTemplate = (templateUpload: TemplateUpload): Template => {
@@ -25,15 +26,10 @@ const generatePlaceholderTemplate = (templateUpload: TemplateUpload): Template =
   };
 };
 
-interface TemplateListProps {
-  templateType: TemplateType,
-  templateTypeLabel: string,
-}
-
 const TemplateList = ({
-  templateType,
-  templateTypeLabel,
-}: TemplateListProps): React.JSX.Element => {
+  documentType,
+  documentTypeLabel,
+}: DocumentsPageProps): React.JSX.Element => {
   const openConfirmationModal = useContext(ConfirmationModalContext);
   const addTemplateModal = useAddModal();
   const editTemplateModal = useEditModal();
@@ -48,7 +44,7 @@ const TemplateList = ({
   };
 
   const templateManager = useResource<Template,TemplateUpload>(`templates/`, generatePlaceholderTemplate, {
-    fetchParamString: `type=${templateType}`,
+    fetchParamString: `type=${documentType}`,
     onFetchFail: errorAlert.showErrors,
     onPostSuccess: handleAddTemplateSuccess,
     onPostFail: addTemplateModal.handleAddFail,
@@ -62,7 +58,7 @@ const TemplateList = ({
 
   const handleClickRemoveTemplate = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     const template: Template = templates.find((template) => template.id === id)!;
-    openConfirmationModal(() => deleteTemplate(id), `delete ${templateTypeLabel} template "${template.name}"`, "Delete");
+    openConfirmationModal(() => deleteTemplate(id), `delete ${documentTypeLabel} template "${template.name}"`, "Delete");
   };
 
   const handleClickAddTemplate = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
@@ -71,13 +67,13 @@ const TemplateList = ({
 
   return(
     <section>
-      <h2 className="mb-3">{templateTypeLabel} Templates</h2>
+      <h2 className="mb-3">{documentTypeLabel} Templates</h2>
       <ErrorAlert {...errorAlert} />
       <DocumentList {...templateManager}
         onClickEditDocument={handleClickEditTemplate}
         onClickRemoveDocument={handleClickRemoveTemplate}
         onClickAddDocument={handleClickAddTemplate}
-        addButtonText={`Upload ${templateTypeLabel.toLowerCase()} template`}
+        addButtonText={`Upload ${documentTypeLabel.toLowerCase()} template`}
       />
       <EditTemplateModal editId={editTemplateModal.editId}
         show={editTemplateModal.show}
@@ -87,12 +83,12 @@ const TemplateList = ({
         setResources={templateManager.setResources}
         fillFields={fillFieldManager.resources}
         setFillFields={fillFieldManager.setResources}
-        templateTypeLabel={templateTypeLabel}
+        documentTypeLabel={documentTypeLabel}
       />
       <AddTemplateModal {...addTemplateModal}
         postResource={templateManager.postResource}
-        templateType={templateType}
-        templateTypeLabel={templateTypeLabel}
+        documentType={documentType}
+        documentTypeLabel={documentTypeLabel}
       />
     </section>
   )

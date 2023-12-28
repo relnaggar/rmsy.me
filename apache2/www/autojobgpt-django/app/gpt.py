@@ -20,12 +20,12 @@ If you fail to extract any of these keys, please provide a single JSON key "erro
 """,
 
 
-"fill_resume_template":
+"fill_template":
 
 """
-Fill in the fillFields in the given resume template, tailoring the resume to the given job details.
+The user wants to tailor their ${document_type} template. Please fill in the fillFields in the given template, tailoring the ${document_type} template to the given job details.
 
-<resume_template>${resume_template_text}</resume_template>
+<template>${template_text}</template>
 
 <job_details>
 <job_title>${job_title}</job_title>
@@ -47,7 +47,7 @@ If you fail for any reason, please provide a single JSON key "error" with a stri
 The user has indicated that they'd like a different value for the fillField with the key `${key}`.
 They haven't provided any feedback, so you should just regenerate the fillField.
 
-Try to make it different from the previous value, but still relevant to the previously supplied job details and resume template.
+Try to make it different from the previous value, but still relevant to the previously supplied job details and template.
 
 ${current_value_message}
 Provide your output in JSON format, with one JSON key for this fillField.
@@ -63,7 +63,7 @@ They have provided feedback, so you should respond directly to the feedback to r
 Here's the feedback that the user provided:
 <feedback>${feedback}</feedback>
 
-Make sure that the new value is still relevant to the previously supplied job details and resume template.
+Make sure that the new value is still relevant to the previously supplied job details and template.
 
 ${current_value_message}
 Provide your output in JSON format, with one JSON key for this fillField.

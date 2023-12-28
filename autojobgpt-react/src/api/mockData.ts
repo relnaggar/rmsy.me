@@ -1,5 +1,5 @@
 import { generateErrorResponse } from "./mockApi";
-import { Job, Resume, Template, Status } from "./types";
+import { Job, TailoredDocument, Template, Status } from "./types";
 import { defaultFillFields } from "./constants";
 
 
@@ -126,24 +126,24 @@ export const validResumeTemplate3: Template = {
   type: "resume",
 };
 
-export const validResume1: Resume = {
+export const validResume1: TailoredDocument = {
   id: 1,
   substitutions: [
     {
       id: 1,
       key: "Test Fill Field Key 1",
       value: "Test Value 1",
-      resume: 1,
+      tailored_document: 1,
     }, {
       id: 2,
       key: "Test Fill Field Key 2",
       value: "Test Value 2",
-      resume: 1,
+      tailored_document: 1,
     }, {
       id: 3,
       key: "Test Fill Field Key 3",
       value: "Test Value 3",
-      resume: 1,
+      tailored_document: 1,
     }
   ],
   version: 1,
@@ -152,27 +152,28 @@ export const validResume1: Resume = {
   chat_messages: [],
   job: validJob1,
   template: validResumeTemplate1,
-  name: validJob1.title + ", " + validJob1.company + ", " + 1
+  name: validJob1.title + ", " + validJob1.company + ", " + 1,
+  type: "resume",
 };
 
-export const validResume2: Resume = {
+export const validResume2: TailoredDocument = {
   id: 2,
   substitutions: [
     {
       id: 4,
       key: defaultFillFields[0],
       value: "Test Value 4",
-      resume: 2,
+      tailored_document: 2,
     }, {
       id: 5,
       key: defaultFillFields[1],
       value: "Test Value 5",
-      resume: 2,
+      tailored_document: 2,
     }, {
       id: 6,
       key: "Test Fill Field Key 6",
       value: "Test Value 6",
-      resume: 2,
+      tailored_document: 2,
     }
   ],
   version: 1,
@@ -181,10 +182,11 @@ export const validResume2: Resume = {
   chat_messages: [],
   job: validJob2,
   template: validResumeTemplate2,
-  name: validJob2.title + ", " + validJob2.company + ", " + 1
+  name: validJob2.title + ", " + validJob2.company + ", " + 1,
+  type: "resume",
 };
 
-export const validResume3: Resume = {
+export const validResume3: TailoredDocument = {
   id: 3,
   substitutions: [],
   version: 1,
@@ -193,5 +195,6 @@ export const validResume3: Resume = {
   chat_messages: [],
   job: validJob3,
   template: validResumeTemplate3,
-  name: validJob3.title + ", " + validJob3.company + ", " + 1
+  name: validJob3.title + ", " + validJob3.company + ", " + 1,
+  type: "resume",
 };

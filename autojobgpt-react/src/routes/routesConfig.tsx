@@ -4,8 +4,8 @@ import { RouteObject } from "react-router-dom";
 import Layout from "./Layout";
 import Home from "../home/Home";
 import Jobs from "./Jobs";
-import Resumes from "./Resumes";
-import CoverLetters from "./CoverLetters";
+import ResumesPage from "./ResumesPage";
+import CoverLettersPage from "./CoverLettersPage";
 import PageNotFound from "./PageNotFound";
 
 
@@ -33,12 +33,12 @@ export const routesConfig: RouteObject[] = [{
   }, {
     path: "/resumes",
     element: (
-      <Resumes />
+      <ResumesPage />
     )
   }, {
     path: "/coverLetters",
     element: (
-      <CoverLetters />
+      <CoverLettersPage />
     )
   }, {
     path: "*",

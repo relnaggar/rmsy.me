@@ -2,12 +2,12 @@ import React, { useId } from "react";
 
 import EditModal, { EditResourceModalProps } from "../common/EditModal";
 import InputWithSave from "../common/InputWithSave";
-import { Status, Job, Resume } from '../api/types';
+import { Status, Job, TailoredDocument } from '../api/types';
 
 
 interface EditJobModalProps extends EditResourceModalProps<Job> {
   statuses: Status[],
-  resumes: Resume[],
+  resumes: TailoredDocument[],
 };
 
 const EditJobModal = ({
@@ -30,8 +30,8 @@ const EditJobModal = ({
       <InputWithSave editId={editId} {...resourceManager} 
         type="select" editableProperty="chosen_resume" labelText="Chosen Resume" defaultOptionLabel="None"
         selectOptions={resumes
-          .filter((resume: Resume) => resume.job.id === editId)
-          .map((resume: Resume) => {
+          .filter((resume: TailoredDocument) => resume.job.id === editId)
+          .map((resume: TailoredDocument) => {
             return { value: resume.id.toString(), label: resume.name };
           })
         }
