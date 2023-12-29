@@ -18,7 +18,7 @@ interface InputWithSaveProps<Resource extends WithId> extends
   editableProperty: keyof Resource & string,
   labelProperty?: keyof Resource,
   labelText?: string,
-  onSaveSuccess?: () => void,
+  onSaveSuccess?: (resource: Resource) => void,
   value?: string,
   setValue?: React.Dispatch<React.SetStateAction<string>>,
 }
@@ -81,10 +81,10 @@ const InputWithSave = <Resource extends WithId>({
     setErrors(errors);
   };
 
-  const handleUpdateSuccess = () => {
+  const handleUpdateSuccess = (resource: Resource) => {
     setErrors({});
     setSaved(true);
-    onSaveSuccess && onSaveSuccess();
+    onSaveSuccess && onSaveSuccess(resource);
   };
 
   const {patchResource: updateResource, idsBeingPatched } = usePatch<Resource>(apiPath, resources, setResources, {

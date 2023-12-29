@@ -54,7 +54,7 @@ class ModelViewSetWithErrorHandling(viewsets.ModelViewSet):
     elif isinstance(error, ValidationError):
       return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
     else:
-      return Response({'error': [str(type(error)) + ":" + str(error)]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+      return Response({'error': [error.__class__.__name__ + ": " + str(error) + "."]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
   def create(self, request, *args, **kwargs):
     try:

@@ -83,20 +83,6 @@ If you fail for any reason, please provide a single JSON key "error" with a stri
         api_key = f.read().strip()
       cls.__client = OpenAI(api_key=api_key)
     return cls.__client
-
-  @staticmethod
-  def ask_again(messages):
-    client = Chat.get_client()
-    completion = client.chat.completions.create(
-      model=Chat.model,
-      response_format=Chat.response_format,
-      messages=messages,
-    )
-    choice = completion.choices[0]
-    if choice.finish_reason != "stop":
-      raise Exception(f"OpenAI API failed with status '{choice.finish_reason}'")
-    else:
-      return {"role": "system", "content": choice.message.content}
     
   def __init__(self, messages=None):
     if messages is None:

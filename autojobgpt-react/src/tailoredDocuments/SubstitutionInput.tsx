@@ -19,7 +19,7 @@ export default function SubstitutionInput({
   substitution: Substitution,
   substitutions: Substitution[],
   setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
-  onSubstitutionSaveSuccess: () => void,
+  onSubstitutionSaveSuccess: (substitution: Substitution) => void,
 }): React.JSX.Element {
   const id = useId();
   const feedbackSwitchId = useId();

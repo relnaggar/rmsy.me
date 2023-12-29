@@ -3,11 +3,15 @@ from django.core import files
 
 import json
 import io
+import os
 
 from .documents import DocumentMixin, DocumentType
 from .templates import FillField
 from ..gpt import Chat, ChatException
 
+
+class NoChosenResumeError(Exception):
+  pass
 
 class TailoredDocument(models.Model, DocumentMixin):
   name = models.TextField(unique=True)
@@ -48,6 +52,12 @@ class TailoredDocument(models.Model, DocumentMixin):
       self.version = TailoredDocument._meta.get_field("version").default
     self.name = f'{self.job.title}, {self.job.company}, v{self.version}'
 
+    if self.type == DocumentType.COVER_LETTER:
+      if self.job.chosen_resume is None:
+        raise NoChosenResumeError("you must choose a resume before you can generate a cover letter")
+      else:
+        self.chat_messages = self.job.chosen_resume.chat_messages
+
     fill = kwargs.pop("fill", True)
     super().save(*args, **kwargs)
     if fill:
@@ -61,6 +71,11 @@ class TailoredDocument(models.Model, DocumentMixin):
 
   def __update(self, *args, **kwargs):
     super().save(*args, **kwargs)
+
+  def delete(self, *args, **kwargs):
+    os.remove(self.docx.path)
+    os.remove(self.png.path)
+    super().delete(*args, **kwargs)
   
   @property
   def default_substitutions(self):
@@ -98,7 +113,7 @@ f"""<fillField>
 </fillField>\n"""
 
     # ask GPT to fill in the fillFields
-    chat = Chat()
+    chat = Chat(self.chat_messages)
     response = json.loads(
       chat.ask(prompt_name="fill_template", substitutions={
         "template_text": template_text,
@@ -132,7 +147,7 @@ f"""<fillField>
       )
       substitution.save()
 
-  def generate_docx(self):
+  def generate_docx(self, replace=False):
     if not self.is_filled:
       raise Exception(
         "you have to fill the tailored document before you can generate a docx file"
@@ -154,10 +169,22 @@ f"""<fillField>
     # save the document to file stream
     file_stream = io.BytesIO()
     template_document.save(file_stream)
+
+    def sanitise_file_name(file_name):
+      return ''.join(c for c in file_name if c.isalnum() or c in ['_', '-'])
     
     # save the file stream to the file field
-    file_name = f"{self.job.title}_{self.job.company}_v{self.version}.docx"    
+    file_name = f"{sanitise_file_name(self.job.title)}_{sanitise_file_name(self.job.company)}_v{self.version}.docx"    
+
+    if replace:
+      # move the old file to a temporary location
+      os.system(f"mv {self.docx.path} {self.docx.path}.tmp")
+      
     self.docx.save(file_name, files.File(file_stream))
+
+    if replace:
+      # remove the old file
+      os.remove(f"{self.docx.path}.tmp")
 
   def duplicate(self):
     new_tailored_document = TailoredDocument(
@@ -202,8 +229,8 @@ class Substitution(models.Model):
   
   def __update(self, *args, **kwargs):
     super().save(*args, **kwargs)
-    self.tailored_document.generate_docx()
-    self.tailored_document.generate_png()
+    self.tailored_document.generate_docx(replace=True)
+    self.tailored_document.generate_png(replace=True)
 
     if self.key not in self.tailored_document.default_substitutions:
       chat = Chat(self.tailored_document.chat_messages)
@@ -248,4 +275,4 @@ class Substitution(models.Model):
 
       return substitution
     except KeyError:
-      raise Exception(response["error"])
+      raise ChatException(response["error"])

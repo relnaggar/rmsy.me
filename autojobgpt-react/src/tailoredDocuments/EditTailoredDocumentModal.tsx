@@ -16,7 +16,7 @@ interface EditTailoredDocumentModalProps extends
 {
   substitutions: Substitution[],
   setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
-  onSubstitutionSaveSuccess: () => void,
+  onSubstitutionSaveSuccess: (substitution: Substitution) => void,
   onClickDuplicate: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
 }
 

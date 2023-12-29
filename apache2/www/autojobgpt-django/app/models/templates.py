@@ -1,6 +1,7 @@
 from django.db import models
 
 import re
+import os
 
 from .documents import DocumentMixin, DocumentType
 from ..gpt import Chat
@@ -88,6 +89,11 @@ class Template(models.Model, DocumentMixin):
 
   def __update(self, *args, **kwargs):
     super().save(*args, **kwargs)
+
+  def delete(self, *args, **kwargs):
+    os.remove(self.docx.path)
+    os.remove(self.png.path)
+    super().delete(*args, **kwargs)
   
   def extract_fillField_keys(self, text=None, include_default=True):
     if text is None:

@@ -7,7 +7,7 @@ import docx
 
 
 class DocumentMixin():
-  def generate_png(self):    
+  def generate_png(self, replace=False):    
     # generate the pdf using libreoffice
     outdir = "/".join(self.docx.path.split("/")[:-1])
     os.system(f"libreoffice --headless --convert-to pdf {self.docx.path} " +
@@ -30,11 +30,19 @@ class DocumentMixin():
     # remove the extra png file
     os.system(f"rm {png_path}")
 
+    if replace:
+      # move the old file to a temporary location
+      os.system(f"mv {self.png.path} {self.png.path}.tmp")
+
     # save the png file stream to the model with the same name as the docx file
     self.png.save(
       png_path.split("/")[-1].replace("-1.png", ".png"),
       files.File(png_file_stream)
     )
+
+    if replace:
+      # remove the old file
+      os.remove(f"{self.png.path}.tmp")
   
   def open_document(self):
     # open the template with docx

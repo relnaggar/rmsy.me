@@ -73,7 +73,11 @@ const TailoredDocumentList = ({
     onPostFail: addTailoredDocumentModal.handleAddFail,
     onDeleteFail: errorAlert.showErrors,
   });
-  const { resources: tailoredDocuments, deleteResource: deleteTailoredDocument, refetch: refetchTailoredDocuments } = tailoredDocumentManager;
+  const {
+    resources: tailoredDocuments,
+    setResources: setTailoredDocuments,
+    deleteResource: deleteTailoredDocument,
+  } = tailoredDocumentManager;
   
   const handleClickEditTailoredDocument = (id: number) => (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     editTailoredDocumentModal.open(id);
@@ -88,8 +92,16 @@ const TailoredDocumentList = ({
     addTailoredDocumentModal.open();
   }
 
-  const handleSubstitutionSaveSuccess = (): void => {
-    refetchTailoredDocuments();
+  const handleSubstitutionSaveSuccess = (substitution: Substitution) => {
+    setTailoredDocuments((tailoredDocuments) => tailoredDocuments.map((tailoredDocument) => {
+      if (tailoredDocument.id === substitution.tailored_document) {
+        const newTailoredDocument = {...tailoredDocument};
+        newTailoredDocument.png = tailoredDocument.png.split("?")[0] + `?${Date.now()}`;
+        return newTailoredDocument;
+      } else {
+        return tailoredDocument;
+      }
+    }));
   };
 
   const { filteredResources: filteredTailoredDocuments, ...filterTailoredDocumentManager} = useFilterResource<TailoredDocument, Job>(tailoredDocuments, "job");
