@@ -8,6 +8,7 @@ export interface CommonInputModalProps extends CommonModalProps {
   modalId: string,
   title: string,
   size?: "sm" | "lg" | "xl",
+  onEntered?: () => void,
 };
 
 export interface CommonModalProps {
@@ -33,11 +34,13 @@ const InputModal = ({
   errors,
   showErrorAlert,
   setShowErrorAlert,
+  onEntered = () => {},
 }: React.PropsWithChildren<InputModalProps>): React.JSX.Element => {
   const hasSubmit: boolean = handleSubmit !== undefined;
   const hasErrorAlert: boolean = errors !== undefined && showErrorAlert !== undefined && setShowErrorAlert !== undefined;
 
   const handleEntered = (): void => {
+    onEntered();
     const firstInputElement: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null =
       document.getElementById(modalId)!.querySelector('input, select, textarea');
     firstInputElement?.focus();

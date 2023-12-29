@@ -83,6 +83,7 @@ const EditTailoredDocumentModal = ({
         </div>
       }
       <hr />
+      <h5 className="mb-3">Fill Field Substitutions</h5>
       { tailoredDocument &&
         tailoredDocument.template_paragraphs.map((paragraph, index) =>
           paragraph === "" ?
@@ -117,8 +118,7 @@ const EditTailoredDocumentModal = ({
             </p>
         )
       }
-      {/* <hr />
-      <h5 className="mb-3">Fill Field Substitutions</h5>
+      {/*
       { substitutions
         .filter((substitution: Substitution) => substitution.tailored_document === editId)
         .map((substitution: Substitution) => {

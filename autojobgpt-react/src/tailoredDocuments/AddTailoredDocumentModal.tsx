@@ -70,8 +70,13 @@ const AddTailoredDocumentModal = ({
     templateInput.stopEditing();
   };
 
+  const handleEntered = (): void => {
+    jobManager.refetch();
+    templateManager.refetch();
+  };
+
   return (
-    <AddModal modalId={modalId} {...addModal}
+    <AddModal modalId={modalId} {...addModal} onEntered={handleEntered}
       title={`Generate ${documentTypeLabel}`} validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
       <SelectInputWithRefresh {...jobManager}

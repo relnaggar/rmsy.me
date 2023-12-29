@@ -25,6 +25,7 @@ const AddModal = ({
   onValidatedSubmit,
   submitDisabled = false,
   validateSubmit,
+  onEntered = () => {},
   children,
 }: React.PropsWithChildren<AddModalProps>): React.JSX.Element => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
@@ -43,7 +44,7 @@ const AddModal = ({
   return (
     <InputModal
       title={title} modalId={modalId} show={show} setShow={setShow} size={size}
-      handleSubmit={handleSubmit} submitDisabled={submitDisabled}
+      handleSubmit={handleSubmit} submitDisabled={submitDisabled} onEntered={onEntered}
       errors={errors} showErrorAlert={showErrorAlert} setShowErrorAlert={setShowErrorAlert}
     >
       {children}
