@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { ReactComponent as FileArrowDownIcon } from "bootstrap-icons/icons/file-arrow-down.svg";
+import { ReactComponent as EyeIcon } from "bootstrap-icons/icons/eye.svg";
 
 import { Document } from '../api/types';
 import EditDeleteButtonGroup, { EditDeleteButtonGroupProps } from "./EditDeleteButtonGroup";
@@ -104,10 +105,20 @@ const DocumentThumbnail = ({
       {/* document footer */}
       {document.docx !== "" && 
         <div className="document-footer pb-4">
-          <a download href={document.docx} className="btn btn-primary" role="button">
-            <FileArrowDownIcon className="me-1" />
-            Download
-          </a>
+          <div className="d-flex">
+            <a download href={document.docx} className="btn btn-primary text-nowrap" role="button">
+              <FileArrowDownIcon className="me-1" />
+              Download
+            </a>
+            { document.png !== "" &&
+              <a href={document.png}
+                className="ms-2 btn btn-primary text-nowrap" role="button" target="_blank" rel="noreferrer"
+              >
+                <EyeIcon className="me-1" />
+                Preview
+              </a>
+            }
+          </div>
         </div>
       }
     </div>

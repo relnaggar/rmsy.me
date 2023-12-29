@@ -2,6 +2,7 @@ import React, { useId } from "react";
 import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
 import { ReactComponent as FileArrowDownIcon } from 'bootstrap-icons/icons/file-arrow-down.svg';
 import { ReactComponent as CopyIcon } from 'bootstrap-icons/icons/copy.svg';
+import { ReactComponent as EyeIcon } from 'bootstrap-icons/icons/eye.svg';
 
 import EditModal, { EditResourceModalProps } from "../common/EditModal";
 import InputWithSave from "../common/InputWithSave";
@@ -68,10 +69,16 @@ const EditTailoredDocumentModal = ({
           </div>
           <div className="mb-3 me-1 flex-fill">
             <span className="form-label">{documentTypeLabel}</span>
-            <a download href={tailoredDocument!.docx} className="form-control link-primary border border-0">
-              Version {tailoredDocument.version}
-              <FileArrowDownIcon className="ms-1" />
-            </a>
+            <div className="form-control border border-0">
+              <a download href={tailoredDocument!.docx} className="link-primary">
+                Version {tailoredDocument.version}
+                <FileArrowDownIcon className="ms-1" />
+              </a>
+              <a href={tailoredDocument!.png} target="_blank" rel="noreferrer" className="link-primary ms-3">
+                Preview
+                <EyeIcon className="ms-1" />
+              </a>
+            </div>
           </div>
         </div>
       }
