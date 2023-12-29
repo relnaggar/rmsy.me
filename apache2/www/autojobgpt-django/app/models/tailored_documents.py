@@ -53,10 +53,19 @@ class TailoredDocument(models.Model, DocumentMixin):
     self.name = f'{self.job.title}, {self.job.company}, v{self.version}'
 
     if self.type == DocumentType.COVER_LETTER:
+      resume_count = self.job.tailoredDocuments.filter(type=DocumentType.RESUME).count()
       if self.job.chosen_resume is None:
-        raise NoChosenResumeError("you must choose a resume before you can generate a cover letter")
+        if resume_count == 0:
+          raise NoChosenResumeError("you must create a resume before you can generate a cover letter")
+        elif resume_count > 1:
+          raise NoChosenResumeError("you must choose a resume before you can generate a cover letter")
+        else: # resume_count == 1
+          chosen_resume = self.job.tailoredDocuments.get(type=DocumentType.RESUME)
+          self.job.chosen_resume = chosen_resume
+          self.job.save()
       else:
-        self.chat_messages = self.job.chosen_resume.chat_messages
+        chosen_resume = self.job.chosen_resume      
+      self.chat_messages = chosen_resume.chat_messages
 
     fill = kwargs.pop("fill", True)
     super().save(*args, **kwargs)

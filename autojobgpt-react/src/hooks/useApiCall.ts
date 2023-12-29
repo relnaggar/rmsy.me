@@ -27,15 +27,15 @@ export interface UseApiCall {
   cancel?: () => void,
 };
 
-const makeErrorMessage = (error: any): string[] => {
+const makeErrorMessage = (error: any): string => {
   if (error instanceof Error) {
     if (error.message === "Failed to fetch") {
-      return ["Failed to connect to server. Please check your internet connection and try again."];
+      return "Failed to connect to server. Please check your internet connection and try again.";
     } else {
-      return [error.message];
+      return error.message;
     }
   } else {
-    return [String(error)];
+    return String(error);
   }
 };
 
@@ -129,15 +129,12 @@ const useApiCall = (
         await onSuccess?.({response, resourceId});
       } else {
         errors = await response.json();
-        if (!String(errors)) {
-          errors = {error: makeErrorMessage(response.statusText)};
-        }
       }
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
         // do nothing
       } else {
-        errors["error"] = makeErrorMessage(error);
+        errors["error"] = [makeErrorMessage(error)];
       }
     } finally {
       if (!cancelable || !abortControllerRef.current.signal.aborted) {
