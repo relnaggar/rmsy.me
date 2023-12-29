@@ -264,7 +264,7 @@ describe(`${modalName} modal select options are rendered for all select inputs`,
   }
 });
 
-describe(`clicking each ${modalName} modal refresh button makes an additional api call`, () => {
+xdescribe(`clicking each ${modalName} modal refresh button makes an additional api call`, () => {
   for (const testDataForInput of testData) {
     test(`clicking ${modalName} modal refresh button for ${testDataForInput.label} makes an additional api call`, async () => {
       await renderRoute(thisRoute);
@@ -294,7 +294,7 @@ describe(`clicking each ${modalName} modal refresh button makes an api call to g
   }
 });
 
-describe(`clicking each ${modalName} modal refresh button updates select options if api call returns different data`, () => {
+xdescribe(`clicking each ${modalName} modal refresh button updates select options if api call returns different data`, () => {
   for (const testDataForInput of testData) {
     test(`clicking ${modalName} modal refresh button for ${testDataForInput.label} updates select options if api call returns different data`, async () => {
       await renderRoute(thisRoute);

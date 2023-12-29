@@ -22,23 +22,16 @@ const AddTailoredDocumentModal = ({
   const jobInput = useInputControl("");
   const templateInput = useInputControl("");
 
-  const handleRefreshSuccess = useCallback(() => {
-    addModal.setShowErrorAlert(false);
-    addModal.setErrors({});
-  }, [addModal]);
-
   const handleRefreshFail = useCallback((errors: Record<string, string[]>) => {
     addModal.setShowErrorAlert(true);
     addModal.setErrors(errors);
   }, [addModal]);
 
   const jobManager = useFetchResource<Job>("jobs/", {
-    onSuccess: handleRefreshSuccess,
     onFail: handleRefreshFail,
   });
 
   const templateManager = useFetchResource<Template>(`templates/?type=${documentType}`, {
-    onSuccess: handleRefreshSuccess,
     onFail: handleRefreshFail,
   });
 

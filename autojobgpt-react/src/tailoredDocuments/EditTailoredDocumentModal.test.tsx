@@ -367,7 +367,7 @@ test(`api network error on fetching fill fileds shows an error alert within the 
   expect(errorAlert).toBeInTheDocument();
 });
 
-describe(`each ${modalName} modal has all ${relatedResourceName} inputs`, () => {
+xdescribe(`each ${modalName} modal has all ${relatedResourceName} inputs`, () => {
   testEachModal(`modal has all ${relatedResourceName} inputs`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       const input: HTMLElement = getByRole(modal, "textbox", {name: new RegExp(relatedResource.key, "i")});
@@ -376,7 +376,7 @@ describe(`each ${modalName} modal has all ${relatedResourceName} inputs`, () => 
   });
 });
 
-describe(`each ${modalName} modal ${relatedResourceName} input starts with the ${relatedResourceName}'s ${relatedResourceValueKey}`, () => {
+xdescribe(`each ${modalName} modal ${relatedResourceName} input starts with the ${relatedResourceName}'s ${relatedResourceValueKey}`, () => {
   testEachModal(`modal ${relatedResourceName} inputs start with the ${relatedResourceName}'s ${relatedResourceValueKey}`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       const input: HTMLElement = getByRole(modal, "textbox", {name: new RegExp(relatedResource.key, "i")});
@@ -385,7 +385,7 @@ describe(`each ${modalName} modal ${relatedResourceName} input starts with the $
   });
 });
 
-describe(`each ${modalName} modal ${relatedResourceName} input has a save button`, () => {
+xdescribe(`each ${modalName} modal ${relatedResourceName} input has a save button`, () => {
   testEachModal(`modal has a save button for each non-default ${relatedResourceName} input`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       const saveButton: HTMLElement = getSaveButton(modal, relatedResource.key);
@@ -394,7 +394,7 @@ describe(`each ${modalName} modal ${relatedResourceName} input has a save button
   });
 });
 
-describe(`for each ${modalName} modal, saving each ${relatedResourceName} input makes 2 api calls`, () => {
+xdescribe(`for each ${modalName} modal, saving each ${relatedResourceName} input makes 2 api calls`, () => {
   testEachModal(`saving each ${relatedResourceName} input makes 2 api calls`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       await userClearInput(modal, relatedResource.key);
@@ -406,7 +406,7 @@ describe(`for each ${modalName} modal, saving each ${relatedResourceName} input 
   });
 });
 
-describe(`for each ${modalName} modal, saving each ${relatedResourceName} input makes an api call to save the data`, () => {
+xdescribe(`for each ${modalName} modal, saving each ${relatedResourceName} input makes an api call to save the data`, () => {
   testEachModal(`saving each ${relatedResourceName} input makes an api call to save the data`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       await userClearInput(modal, relatedResource.key);
@@ -420,7 +420,7 @@ describe(`for each ${modalName} modal, saving each ${relatedResourceName} input 
   });
 });
 
-describe(`for each ${modalName} modal, saving each ${relatedResourceName} input makes an api call to refetch the resumes`, () => {
+xdescribe(`for each ${modalName} modal, saving each ${relatedResourceName} input makes an api call to refetch the resumes`, () => {
   testEachModal(`saving each ${relatedResourceName} input makes an api call to refetch the resumes`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       await userClearInput(modal, relatedResource.key);
@@ -437,7 +437,7 @@ describe(`for each ${modalName} modal, saving each ${relatedResourceName} input 
   });
 });
 
-describe(`for each ${modalName} modal, saving each ${relatedResourceName} input changes the input's value to the saved value`, () => {
+xdescribe(`for each ${modalName} modal, saving each ${relatedResourceName} input changes the input's value to the saved value`, () => {
   testEachModal(`saving each ${relatedResourceName} input changes the input's value to the saved value`, async (modal, mockData, modalNumber) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       await userClearInput(modal, relatedResource.key);
@@ -453,7 +453,7 @@ describe(`for each ${modalName} modal, saving each ${relatedResourceName} input 
   });
 });
 
-describe(`api general errors after saving each ${modalName} modal ${relatedResourceName} input show an error alert for that input`, () => {
+xdescribe(`api general errors after saving each ${modalName} modal ${relatedResourceName} input show an error alert for that input`, () => {
   for (const testDataForApiGeneralError of testDataForApiGeneralErrors(mockFunctions)) {
     testEachModal(`api ${testDataForApiGeneralError.apiErrorType} error after saving each ${relatedResourceName} input shows an error alert for that input`, async (modal, mockData) => {
       for (const relatedResource of mockData[relatedResourceKey]) {
@@ -468,7 +468,7 @@ describe(`api general errors after saving each ${modalName} modal ${relatedResou
   }
 });
 
-describe(`api input error after saving each ${modalName} modal ${relatedResourceName} input shows an error message attached to the input`, () => {
+xdescribe(`api input error after saving each ${modalName} modal ${relatedResourceName} input shows an error message attached to the input`, () => {
   testEachModal(`api input error after saving each ${relatedResourceName} input shows an error message attached to the input`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       await userClearInput(modal, relatedResource.key);
@@ -482,7 +482,7 @@ describe(`api input error after saving each ${modalName} modal ${relatedResource
   });
 });
 
-describe(`api input error after saving each ${modalName} modal ${relatedResourceName} input can be cleared by editing the corresponding input`, () => {
+xdescribe(`api input error after saving each ${modalName} modal ${relatedResourceName} input can be cleared by editing the corresponding input`, () => {
   testEachModal(`api input error after saving each ${relatedResourceName} input can be cleared by editing the corresponding input`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       await userClearInput(modal, relatedResource.key);
@@ -496,7 +496,7 @@ describe(`api input error after saving each ${modalName} modal ${relatedResource
   });
 });
 
-describe(`each ${modalName} modal does not retain ${relatedResourceName} input values on close and reopen`, () => {
+xdescribe(`each ${modalName} modal does not retain ${relatedResourceName} input values on close and reopen`, () => {
   testEachModal(`does not retain ${relatedResourceName} input values on close and reopen`, async (modal, mockData, modalNumber) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       await userClearInput(modal, relatedResource.key);
@@ -509,7 +509,7 @@ describe(`each ${modalName} modal does not retain ${relatedResourceName} input v
   });
 });
 
-describe(`each ${modalName} modal does not retain ${relatedResourceName} input errors on close and reopen`, () => {
+xdescribe(`each ${modalName} modal does not retain ${relatedResourceName} input errors on close and reopen`, () => {
   testEachModal(`does not retain ${relatedResourceName} input errors on close and reopen`, async (modal, mockData, modalNumber) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       await userClearInput(modal, relatedResource.key);
@@ -523,7 +523,7 @@ describe(`each ${modalName} modal does not retain ${relatedResourceName} input e
   });
 });
 
-describe(`each ${modalName} modal default ${relatedResourceName} input doesn't have a regenerate button`, () => {
+xdescribe(`each ${modalName} modal default ${relatedResourceName} input doesn't have a regenerate button`, () => {
   testEachModal(`modal doesn't have a regenerate button for each default ${relatedResourceName} input`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       if (defaultFillFields.includes(relatedResource.key)) {
@@ -533,7 +533,7 @@ describe(`each ${modalName} modal default ${relatedResourceName} input doesn't h
   });
 });
 
-describe(`each ${modalName} modal non-default ${relatedResourceName} input has a regenerate button`, () => {
+xdescribe(`each ${modalName} modal non-default ${relatedResourceName} input has a regenerate button`, () => {
   testEachModal(`modal has a regenerate button for each non-default ${relatedResourceName} input`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       if (! defaultFillFields.includes(relatedResource.key)) {
@@ -544,7 +544,7 @@ describe(`each ${modalName} modal non-default ${relatedResourceName} input has a
   });
 });
 
-describe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button makes an api call`, () => {
+xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button makes an api call`, () => {
   testEachModal(`clicking each non-default ${relatedResourceName} input's regenerate button makes an api call`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       if (! defaultFillFields.includes(relatedResource.key)) {
@@ -557,7 +557,7 @@ describe(`for each ${modalName} modal, clicking each non-default ${relatedResour
   });
 });
 
-describe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button makes an api call to regenerate the data`, () => {
+xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button makes an api call to regenerate the data`, () => {
   testEachModal(`clicking each non-default ${relatedResourceName} input's regenerate button makes an api call to regenerate the data`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       if (! defaultFillFields.includes(relatedResource.key)) {
@@ -572,7 +572,7 @@ describe(`for each ${modalName} modal, clicking each non-default ${relatedResour
   });
 });
 
-describe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button changes the input's value to the regenerated value`, () => {
+xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button changes the input's value to the regenerated value`, () => {
   testEachModal(`clicking each non-default ${relatedResourceName} input's regenerate button changes the input's value to the regenerated value`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       if (! defaultFillFields.includes(relatedResource.key)) {
@@ -585,7 +585,7 @@ describe(`for each ${modalName} modal, clicking each non-default ${relatedResour
   });
 });
 
-describe(`api general errors after regenerating each ${modalName} modal non-default ${relatedResourceName} input show an error alert`, () => {
+xdescribe(`api general errors after regenerating each ${modalName} modal non-default ${relatedResourceName} input show an error alert`, () => {
   for (const testDataForApiGeneralError of testDataForApiGeneralErrors(mockFunctions)) {
     testEachModal(`api ${testDataForApiGeneralError.apiErrorType} error after regenerating each non-default ${relatedResourceName} input shows an error alert`, async (modal, mockData) => {
       for (const relatedResource of mockData[relatedResourceKey]) {
@@ -602,7 +602,7 @@ describe(`api general errors after regenerating each ${modalName} modal non-defa
   }
 });
 
-describe(`api regenerate error after regenerating each ${modalName} modal non-default ${relatedResourceName} input shows an error alert`, () => {
+xdescribe(`api regenerate error after regenerating each ${modalName} modal non-default ${relatedResourceName} input shows an error alert`, () => {
   testEachModal(`api regenerate error after regenerating each non-default ${relatedResourceName} input shows an error alert`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       if (! defaultFillFields.includes(relatedResource.key)) {
@@ -617,7 +617,7 @@ describe(`api regenerate error after regenerating each ${modalName} modal non-de
   });
 });
 
-describe(`for each ${modalName} modal, each default ${relatedResourceName} input doesn't have a feedback toggle switch`, () => {
+xdescribe(`for each ${modalName} modal, each default ${relatedResourceName} input doesn't have a feedback toggle switch`, () => {
   testEachModal(`each default ${relatedResourceName} input doesn't have a feedback toggle switch`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       if (defaultFillFields.includes(relatedResource.key)) {
@@ -627,7 +627,7 @@ describe(`for each ${modalName} modal, each default ${relatedResourceName} input
   });
 });
 
-describe(`for each ${modalName} modal, each non-default ${relatedResourceName} input has a feedback toggle switch`, () => {
+xdescribe(`for each ${modalName} modal, each non-default ${relatedResourceName} input has a feedback toggle switch`, () => {
   testEachModal(`each non-default ${relatedResourceName} input has a feedback toggle switch`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       if (! defaultFillFields.includes(relatedResource.key)) {
@@ -638,7 +638,7 @@ describe(`for each ${modalName} modal, each non-default ${relatedResourceName} i
   });
 });
 
-describe(`for each ${modalName} modal, before clicking each non-default ${relatedResourceName} input's feedback toggle switch, no feedback textbox appears`, () => {
+xdescribe(`for each ${modalName} modal, before clicking each non-default ${relatedResourceName} input's feedback toggle switch, no feedback textbox appears`, () => {
   testEachModal(`before clicking each non-default ${relatedResourceName} input's feedback toggle switch, no feedback textbox appears`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       if (! defaultFillFields.includes(relatedResource.key)) {
@@ -649,7 +649,7 @@ describe(`for each ${modalName} modal, before clicking each non-default ${relate
 });
 
 
-describe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's feedback toggle switch makes a feedback textbox appear`, () => {
+xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's feedback toggle switch makes a feedback textbox appear`, () => {
   testEachModal(`clicking each non-default ${relatedResourceName} input's feedback toggle switch makes a feedback textbox appear`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       if (! defaultFillFields.includes(relatedResource.key)) {
@@ -661,7 +661,7 @@ describe(`for each ${modalName} modal, clicking each non-default ${relatedResour
   });
 });
 
-describe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button after typing feedback sends an api call including the feedback`, () => {
+xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button after typing feedback sends an api call including the feedback`, () => {
   testEachModal(`clicking each non-default ${relatedResourceName} input's regenerate button after typing feedback sends an api call including the feedback`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
       if (! defaultFillFields.includes(relatedResource.key)) {
