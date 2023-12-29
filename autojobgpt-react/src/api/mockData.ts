@@ -154,6 +154,7 @@ export const validResume1: TailoredDocument = {
   template: validResumeTemplate1,
   name: validJob1.title + ", " + validJob1.company + ", " + 1,
   type: "resume",
+  template_paragraphs: [],
 };
 
 export const validResume2: TailoredDocument = {
@@ -184,6 +185,7 @@ export const validResume2: TailoredDocument = {
   template: validResumeTemplate2,
   name: validJob2.title + ", " + validJob2.company + ", " + 1,
   type: "resume",
+  template_paragraphs: [],
 };
 
 export const validResume3: TailoredDocument = {
@@ -197,4 +199,5 @@ export const validResume3: TailoredDocument = {
   template: validResumeTemplate3,
   name: validJob3.title + ", " + validJob3.company + ", " + 1,
   type: "resume",
+  template_paragraphs: [],
 };

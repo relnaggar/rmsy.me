@@ -10,17 +10,19 @@ import { defaultFillFields } from "../api/constants";
 import { Substitution } from '../api/types';
 
 
+export interface SubstitutionInputProps {
+  substitution: Substitution,
+  substitutions: Substitution[],
+  setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
+  onSubstitutionSaveSuccess: (substitution: Substitution) => void,
+}
+
 export default function SubstitutionInput({
   substitution,
   substitutions,
   setSubstitutions,
   onSubstitutionSaveSuccess,
-}: {
-  substitution: Substitution,
-  substitutions: Substitution[],
-  setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
-  onSubstitutionSaveSuccess: (substitution: Substitution) => void,
-}): React.JSX.Element {
+}: SubstitutionInputProps): React.JSX.Element {
   const id = useId();
   const feedbackSwitchId = useId();
   const errorAlert = useErrorAlert();

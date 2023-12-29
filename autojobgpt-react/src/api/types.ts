@@ -80,6 +80,7 @@ export interface TailoredDocument extends Document {
   job: Job,
   template: Template,
   type: DocumentType,
+  template_paragraphs: string[],
 };
 
 export interface TailoredDocumentUpload extends Pick<TailoredDocument, "type"> {

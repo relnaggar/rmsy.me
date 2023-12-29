@@ -5,18 +5,17 @@ import { ReactComponent as CopyIcon } from 'bootstrap-icons/icons/copy.svg';
 
 import EditModal, { EditResourceModalProps } from "../common/EditModal";
 import InputWithSave from "../common/InputWithSave";
-import SubstitutionInput from "./SubstitutionInput";
+import { SubstitutionInputProps } from "./SubstitutionInput";
 import { Job, Substitution, TailoredDocument } from '../api/types';
 import { DocumentsPageProps } from "../routes/DocumentsPage";
+import ToggleSubstitutionInput from "./ToggleSubstitutionInput";
 
 
 interface EditTailoredDocumentModalProps extends
   EditResourceModalProps<TailoredDocument>,
-  Pick<DocumentsPageProps, "documentTypeLabel">
+  Pick<DocumentsPageProps, "documentTypeLabel">,
+  Pick<SubstitutionInputProps, "substitutions" | "setSubstitutions" | "onSubstitutionSaveSuccess">
 {
-  substitutions: Substitution[],
-  setSubstitutions: React.Dispatch<React.SetStateAction<Substitution[]>>,
-  onSubstitutionSaveSuccess: (substitution: Substitution) => void,
   onClickDuplicate: (id: number) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
 }
 
@@ -77,6 +76,41 @@ const EditTailoredDocumentModal = ({
         </div>
       }
       <hr />
+      { tailoredDocument &&
+        tailoredDocument.template_paragraphs.map((paragraph, index) =>
+          paragraph === "" ?
+            <br key={index} />
+          :
+            <p key={index}>
+              {
+                paragraph.split(/{{(.*?)}}/).map((part, partIndex) => {
+                  const isFillField: boolean = partIndex % 2 !== 0;
+                  let substitution: Substitution | undefined = undefined;
+                  if (isFillField) {
+                    substitution = substitutions.find((substitution: Substitution) =>
+                      substitution.tailored_document === editId && substitution.key === part
+                    );
+                  }
+                  return (
+                    <React.Fragment key={partIndex}>
+                      { isFillField ? (
+                        <ToggleSubstitutionInput
+                          substitution={substitution!}
+                          substitutions={substitutions}
+                          setSubstitutions={setSubstitutions}
+                          onSubstitutionSaveSuccess={onSubstitutionSaveSuccess}
+                        />
+                      ) : (
+                        part
+                      )}
+                    </React.Fragment>
+                  );
+                })
+              }
+            </p>
+        )
+      }
+      {/* <hr />
       <h5 className="mb-3">Fill Field Substitutions</h5>
       { substitutions
         .filter((substitution: Substitution) => substitution.tailored_document === editId)
@@ -90,7 +124,7 @@ const EditTailoredDocumentModal = ({
             />
           );
         })
-      }
+      } */}
     </EditModal>
   )
 };

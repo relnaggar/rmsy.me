@@ -69,6 +69,7 @@ class TailoredDocumentSerializer(serializers.ModelSerializer):
   substitutions = serializers.SerializerMethodField()
   job_details = JobSerializer(source='job', read_only=True)
   template_details = TemplateSerializer(source='template', read_only=True)
+  template_paragraphs = serializers.SerializerMethodField()
   
   class Meta:
     model = TailoredDocument
@@ -94,3 +95,7 @@ class TailoredDocumentSerializer(serializers.ModelSerializer):
     representation['job'] = representation.pop('job_details')
     representation['template'] = representation.pop('template_details')
     return representation
+  
+  def get_template_paragraphs(self, obj):
+    text = obj.template.extract_text()
+    return text.split("\n") if text else []
