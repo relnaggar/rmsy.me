@@ -11,7 +11,7 @@ import { WithId } from '../api/types';
 interface InputWithSaveProps<Resource extends WithId> extends
   CommonEditModalProps<Resource>,
   Omit<React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'id' | 'value'>,
-  Pick<BaseInputProps, "selectOptions" | "defaultOptionLabel">
+  Pick<BaseInputProps, "selectOptions" | "defaultOptionLabel" | "helpText">
 {
   type: string,
   id?: string,
@@ -32,6 +32,7 @@ const InputWithSave = <Resource extends WithId>({
   labelText,
   onSaveSuccess,  
   selectOptions,
+  helpText,
   defaultOptionLabel = "Select...",
   value: valueProp,
   setValue: setValueProp,
@@ -141,7 +142,7 @@ const InputWithSave = <Resource extends WithId>({
       value={value} editing={editing} handleChange={handleChange}
       type={type} label={label} loading={updating} errors={Object.values(errors).flat()}      
       handleSubmit={handleSubmit} floatingLabel={labelProperty !== undefined} isValid={saved}
-      selectOptions={selectOptions} {...extraInputProps} defaultOptionLabel={defaultOptionLabel}
+      selectOptions={selectOptions} {...extraInputProps} defaultOptionLabel={defaultOptionLabel} helpText={helpText}
     >
       {saveButton}
       {children}

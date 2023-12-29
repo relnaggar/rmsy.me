@@ -16,7 +16,7 @@ class FillField(models.Model):
   template = models.ForeignKey(
     to="Template",
     on_delete=models.CASCADE,
-    related_name="fillFields",
+    related_name="fill_fields",
   )
   key = models.CharField(max_length=200)
   description = models.TextField(blank=True)
@@ -40,12 +40,12 @@ class FillField(models.Model):
   
   def __update(self, *args, **kwargs):
     if self.key in DEFAULT_FILLFIELDS:
-      raise ValueError(f"FillField with the key `{self.key}` is read-only.")
+      raise ValueError(f"fill field with the key `{self.key}` is read-only.")
 
     super().save(*args, **kwargs)
     for tailored_document in self.template.tailoredDocuments.all():
       chat = Chat(tailored_document.chat_messages)
-      chat.log(f"""Log: the user has updated the fillField with the key `{self.key}` to have the following description:
+      chat.log(f"""Log: the user has updated the fill field with the key `{self.key}` to have the following description:
   <description>{self.description}</description>.""")
       tailored_document.chat_messages = chat.get_messages()
       tailored_document.save()
@@ -54,7 +54,7 @@ class Template(models.Model, DocumentMixin):
   docx = models.FileField(upload_to="templates/")
   png = models.FileField(upload_to="templates/")
   name = models.TextField()
-  description = models.TextField(blank=True)
+  additional_information = models.TextField(blank=True)
   type = models.CharField(max_length=20, choices=DocumentType.choices)
 
   class Meta:
@@ -73,8 +73,8 @@ class Template(models.Model, DocumentMixin):
 
   def __create(self, *args, **kwargs):
     super().save(*args, **kwargs)
-    fillField_keys = self.extract_fillField_keys()
-    for key in fillField_keys:
+    fill_field_keys = self.extract_fill_field_keys()
+    for key in fill_field_keys:
       if key in DEFAULT_FILLFIELDS.keys():
         description = DEFAULT_FILLFIELDS[key]
       else:
@@ -88,22 +88,34 @@ class Template(models.Model, DocumentMixin):
     self.generate_png()
 
   def __update(self, *args, **kwargs):
+    original_additional_information = Template.objects.get(pk=self.pk).additional_information
+
+    # if the additional_information has changed, update the chat messages
+    if self.additional_information != original_additional_information:
+      for tailored_document in self.tailoredDocuments.all():
+        chat = Chat(tailored_document.chat_messages)
+        chat.log(f"""Log: the user has updated their additional information to be:
+<additional_information>{self.additional_information}</additional_information>.""")
+        tailored_document.chat_messages = chat.get_messages()
+        tailored_document.save()
+
     super().save(*args, **kwargs)
+
 
   def delete(self, *args, **kwargs):
     os.remove(self.docx.path)
     os.remove(self.png.path)
     super().delete(*args, **kwargs)
   
-  def extract_fillField_keys(self, text=None, include_default=True):
+  def extract_fill_field_keys(self, text=None, include_default=True):
     if text is None:
       text = self.extract_text()
 
-    # extract all the fillFields from the template text
-    # fillFields must be in the format {{key}}
-    fillField_keys = re.findall(r"{{(.*?)}}", text)
+    # extract all the fill fields from the template text
+    # fill fields must be in the format {{key}}
+    fill_field_keys = re.findall(r"{{(.*?)}}", text)
 
     if include_default:
-      return fillField_keys
+      return fill_field_keys
     else:
-      return [key for key in fillField_keys if key not in DEFAULT_FILLFIELDS]
+      return [key for key in fill_field_keys if key not in DEFAULT_FILLFIELDS]

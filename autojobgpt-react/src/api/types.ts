@@ -48,15 +48,15 @@ export interface FillField extends WithId {
 export type DocumentType = "resume" | "coverLetter";
 
 export interface Template extends Document {
-  fillFields: FillField[],
-  description?: string,
+  fill_fields: FillField[],
+  additional_information?: string,
   type: DocumentType,
 };
 
 export interface TemplateUpload extends Omit<Template,
   "id" |
   "docx" |
-  "fillFields" |
+  "fill_fields" |
   "png"
 > {
     docx: File,

@@ -21,6 +21,7 @@ export interface BaseInputProps extends CommonInputControlProps,
   floatingLabel?: boolean,
   isValid?: boolean,
   selectOptions?: SelectOption[],
+  helpText?: string,
   loadingOptionLabel?: string,
   defaultOptionValue?: string,
   defaultOptionLabel?: string,
@@ -37,6 +38,7 @@ const BaseInput = React.forwardRef(({
   floatingLabel = false,
   isValid = false,
   selectOptions,
+  helpText,
   loadingOptionLabel = "Loading...",
   defaultOptionValue = "",
   defaultOptionLabel = "Select...",
@@ -50,6 +52,7 @@ const BaseInput = React.forwardRef(({
   const autoId = useId();
   const currentId = id ?? autoId;
   const feedbackId = useId();
+  const helpId = useId();
   const isMobile = useResponsive();
 
   const inputProps: React.TextareaHTMLAttributes<HTMLTextAreaElement> | React.InputHTMLAttributes<HTMLInputElement> = {
@@ -99,7 +102,7 @@ const BaseInput = React.forwardRef(({
     );
   }
 
-  const inputWithFeedback = (
+  let inputWithFeedback = (
     <>
       {input}
       {showError &&
@@ -107,6 +110,17 @@ const BaseInput = React.forwardRef(({
           className="invalid-feedback"  role={showError ? "alert": undefined} aria-labelledby={currentId}
         >
           {error}
+        </div>
+      }
+    </>
+  );
+
+  inputWithFeedback = (
+    <>
+      {inputWithFeedback}
+      {helpText &&
+        <div id={helpId} className="form-text">
+          {helpText}
         </div>
       }
     </>

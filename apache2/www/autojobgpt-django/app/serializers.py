@@ -37,7 +37,7 @@ class FillFieldSerializer(serializers.ModelSerializer):
     }
 
 class TemplateSerializer(serializers.ModelSerializer):
-  fillFields = FillFieldSerializer(many=True, read_only=True)
+  fill_fields = FillFieldSerializer(many=True, read_only=True)
 
   class Meta:
     model = Template

@@ -23,7 +23,7 @@ If you fail to extract any of these keys, please provide a single JSON key "erro
 "fill_template":
 
 """
-The user wants to tailor their ${document_type} template. Please fill in the fillFields in the given template, tailoring the ${document_type} template to the given job details.
+The user wants to tailor their ${document_type} template. Please fill in the fill fields in the given template, tailoring the ${document_type} template to the given job details.
 
 <template>${template_text}</template>
 
@@ -33,32 +33,33 @@ The user wants to tailor their ${document_type} template. Please fill in the fil
 <job_posting>${job_posting}</job_posting>
 </job_details>
 
-<fillFields>
-${fillFields_text}
-</fillFields>
+<fill_fields>
+${fill_fields_text}
+</fill_fields>
+${additional_information_text}
 
-Provide your output in JSON format, with a JSON key for each fillField listed.
+Provide your output in JSON format, with a JSON key for each fill field listed.
 
 If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
 """,
 
 "regenerate_substitution_without_feedback":
 """
-The user has indicated that they'd like a different value for the fillField with the key `${key}`.
-They haven't provided any feedback, so you should just regenerate the fillField.
+The user has indicated that they'd like a different value for the fill field with the key `${key}`.
+They haven't provided any feedback, so you should just regenerate the fill field.
 
 Try to make it different from the previous value, but still relevant to the previously supplied job details and template.
 
 ${current_value_message}
-Provide your output in JSON format, with one JSON key for this fillField.
+Provide your output in JSON format, with one JSON key for this fill field.
 
 If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
 """,
 
 "regenerate_substitution_with_feedback":
 """
-The user has indicated that they'd like a different value for the fillField with the key `${key}`.
-They have provided feedback, so you should respond directly to the feedback to regenerate the fillField.
+The user has indicated that they'd like a different value for the fill field with the key `${key}`.
+They have provided feedback, so you should respond directly to the feedback to regenerate the fill field.
 
 Here's the feedback that the user provided:
 <feedback>${feedback}</feedback>
@@ -66,7 +67,7 @@ Here's the feedback that the user provided:
 Make sure that the new value is still relevant to the previously supplied job details and template.
 
 ${current_value_message}
-Provide your output in JSON format, with one JSON key for this fillField.
+Provide your output in JSON format, with one JSON key for this fill field.
 
 If you fail for any reason, please provide a single JSON key "error" with a string value describing the error.
 """,

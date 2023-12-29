@@ -3,8 +3,9 @@ import React, { useId } from "react";
 import useInputControl from "../hooks/useInputControl";
 import AddModal, { AddResourceModalProps } from "../common/AddModal";
 import BaseInput from "../common/BaseInput";
-import { TemplateUpload } from '../api/types';
 import { DocumentsPageProps } from '../routes/DocumentsPage';
+import { TemplateUpload } from '../api/types';
+import { additionalInformationHelpText } from './helpText';
 
 
 interface AddTemplateModalProps extends AddResourceModalProps<TemplateUpload>, DocumentsPageProps {};
@@ -17,7 +18,7 @@ const AddTemplateModal = ({
 }: AddTemplateModalProps): React.JSX.Element => {
   const nameInput = useInputControl();
   const uploadInput = useInputControl();
-  const descriptionInput = useInputControl();
+  const additionalInformationInput = useInputControl();
 
   const modalId = useId();
 
@@ -35,7 +36,7 @@ const AddTemplateModal = ({
     }
 
     addModal.setErrors(newErrors);
-    for (const input of [nameInput, uploadInput, descriptionInput]) {
+    for (const input of [nameInput, uploadInput, additionalInformationInput]) {
       input.stopEditing();
     }
 
@@ -44,13 +45,13 @@ const AddTemplateModal = ({
 
   const handleValidatedSubmit = (): void => {
     const docx: File = (uploadInput.ref.current as HTMLInputElement).files![0];
-    postTemplate({ name: nameInput.value, docx, description: descriptionInput.value, type: documentType });
+    postTemplate({ name: nameInput.value, docx, additional_information: additionalInformationInput.value, type: documentType });
   };
 
   return (
     <AddModal
       {...addModal} errors={{error: addModal.errors["error"]}}
-      title={`Add ${documentTypeLabel} Template`} modalId={modalId}
+      title={`Add ${documentTypeLabel} Template`} modalId={modalId} size="xl"
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
       <BaseInput ref={nameInput.ref}
@@ -62,9 +63,10 @@ const AddTemplateModal = ({
         label="Upload" type="file" errors={addModal.errors["upload"]}
         accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       />
-      <BaseInput ref={descriptionInput.ref}
-        value={descriptionInput.value} editing={descriptionInput.editing} handleChange={descriptionInput.handleChange}
-        label="Description (optional)" type="textarea" errors={addModal.errors["description"]} rows={3}         
+      <BaseInput ref={additionalInformationInput.ref}
+        value={additionalInformationInput.value} editing={additionalInformationInput.editing} handleChange={additionalInformationInput.handleChange}
+        label="Additional Information (optional)" type="textarea" errors={addModal.errors["additional_information"]} rows={3}
+        helpText={additionalInformationHelpText}
       />
     </AddModal>
   )

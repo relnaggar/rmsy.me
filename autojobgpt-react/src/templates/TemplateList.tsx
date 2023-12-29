@@ -20,8 +20,8 @@ const generatePlaceholderTemplate = (templateUpload: TemplateUpload): Template =
     name: templateUpload.name,
     docx: "",
     png: "",
-    description: templateUpload.description,
-    fillFields: [],
+    additional_information: templateUpload.additional_information,
+    fill_fields: [],
     type: templateUpload.type,
   };
 };
@@ -40,7 +40,7 @@ const TemplateList = ({
 
   const handleAddTemplateSuccess = (template: Template) => {
     addTemplateModal.handleAddSuccess();
-    setFillFields([...fillFields, ...template.fillFields]);
+    setFillFields([...fillFields, ...template.fill_fields]);
   };
 
   const templateManager = useResource<Template,TemplateUpload>(`templates/`, generatePlaceholderTemplate, {

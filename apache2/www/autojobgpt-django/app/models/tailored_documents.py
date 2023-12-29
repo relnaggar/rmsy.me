@@ -102,26 +102,32 @@ class TailoredDocument(models.Model, DocumentMixin):
       raise Exception("you can only fill a tailored document once")
     
     template_text = self.template.extract_text(substitutions=self.default_substitutions)
-    fillField_keys = self.template.extract_fillField_keys(text=template_text, include_default=False)
+    fill_field_keys = self.template.extract_fill_field_keys(text=template_text, include_default=False)
     
-    # construct the fillFields_text part of the prompt    
-    fillFields_text = ""
-    for key in fillField_keys:
-      fillField = FillField.objects.get(key=key, template=self.template)
-      if fillField is None:
-        raise Exception(f"fillField {key} not found")
-      if fillField.description == "":
+    # construct the fill_fields_text part of the prompt    
+    fill_fields_text = ""
+    for key in fill_field_keys:
+      fill_field = FillField.objects.get(key=key, template=self.template)
+      if fill_field is None:
+        raise Exception(f"fill field {key} not found")
+      if fill_field.description == "":
         description = key
       else:
-        description = fillField.description
+        description = fill_field.description
 
-      fillFields_text +=\
-f"""<fillField>
+      fill_fields_text +=\
+f"""<fill_field>
 <key>{key}</key>
 <description>{description}</description>
-</fillField>\n"""
+</fill_field>\n"""
+      
+    additional_information_text = ""    
+    if self.template.additional_information != "":
+      additional_information_text += f"""
+The user has provided the following additional information to help you tailor the document:
+<additional_information>{self.template.additional_information}</additional_information>"""
 
-    # ask GPT to fill in the fillFields
+    # ask GPT to fill in the fill fields
     chat = Chat(self.chat_messages)
     response = json.loads(
       chat.ask(prompt_name="fill_template", substitutions={
@@ -130,13 +136,14 @@ f"""<fillField>
         "job_posting": self.job.posting,
         "job_title": self.job.title,
         "company": self.job.company,
-        "fillFields_text": fillFields_text,
+        "fill_fields_text": fill_fields_text,
+        "additional_information_text": additional_information_text,
       })["content"]
     )
 
     substitutions = {}
     try:
-      for key in fillField_keys:
+      for key in fill_field_keys:
         substitutions[key] = response[key]
     except KeyError:
       raise ChatException(response["error"])
@@ -162,12 +169,12 @@ f"""<fillField>
         "you have to fill the tailored document before you can generate a docx file"
       )
 
-    # get all the fillFields
+    # get all the fill fields
     all_substitutions = self.default_substitutions
     for substitution in self.substitutions.all():
       all_substitutions[substitution.key] = substitution.value
 
-    # substitute the fillFields into the template document
+    # substitute the fill fields into the template document
     template_document = self.template.open_document()
     for para in template_document.paragraphs:
       for run in para.runs:
@@ -243,7 +250,7 @@ class Substitution(models.Model):
 
     if self.key not in self.tailored_document.default_substitutions:
       chat = Chat(self.tailored_document.chat_messages)
-      chat.log(f"""Log: the user has updated the fillField with the key `{self.key}` to the following value:
+      chat.log(f"""Log: the user has updated the fill field with the key `{self.key}` to the following value:
   <saved_value>{self.value}</saved_value>.""")
       self.tailored_document.chat_messages = chat.get_messages()
       self.tailored_document.save()
@@ -253,7 +260,7 @@ class Substitution(models.Model):
 
     current_value_message = ""
     if current_value != "":
-      current_value_message = f"""Here is the current value of the fillField when the user pressed the \"regenerate\" button:
+      current_value_message = f"""Here is the current value of the fill field when the user pressed the \"regenerate\" button:
 <current_value>{current_value}</current_value>
 
 """

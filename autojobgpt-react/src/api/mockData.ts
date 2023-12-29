@@ -69,10 +69,10 @@ export const validJob3: Job = {
 export const validResumeTemplate1: Template = {
   id: 1,
   name: "Test Resume Template 1",
-  description: "Test Description 1",
+  additional_information: "Test Additional Information 1",
   docx: "https://www.example.com/test1.docx",
   png: "https://www.example.com/test1.png",
-  fillFields: [{
+  fill_fields: [{
     id: 1,
     key: "Test Fill Field Key 1",
     description: "Test Fill Field Description 1",
@@ -94,10 +94,10 @@ export const validResumeTemplate1: Template = {
 export const validResumeTemplate2: Template = {
   id: 2,
   name: "Test Resume Template 2",
-  description: "Test Description 2",
+  additional_information: "Test Additional Information 2",
   docx: "https://www.example.com/test2.docx",
   png: "https://www.example.com/test2.png",
-  fillFields: [{
+  fill_fields: [{
     id: 4,
     key: defaultFillFields[0],
     description: "Test Fill Field Description 4",
@@ -119,10 +119,10 @@ export const validResumeTemplate2: Template = {
 export const validResumeTemplate3: Template = {
   id: 3,
   name: "Test Resume Template 3",
-  description: "Test Description 3",
+  additional_information: "Test Additional Information 3",
   docx: "https://www.example.com/test3.docx",
   png: "https://www.example.com/test3.png",
-  fillFields: [],
+  fill_fields: [],
   type: "resume",
 };
 

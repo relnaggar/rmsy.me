@@ -36,10 +36,10 @@ const testData: {
   validValue: "test.docx",
   role: "file",
 }, {
-  label: "description",
-  name: "description",
+  label: "additional information",
+  name: "additional_information",
   required: false,
-  validValue: validResumeTemplate1.description!,
+  validValue: validResumeTemplate1.additional_information!,
   role: "textbox",
 }];
 

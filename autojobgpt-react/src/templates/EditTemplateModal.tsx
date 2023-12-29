@@ -2,10 +2,11 @@ import React, { useId } from "react";
 
 import EditModal, { EditResourceModalProps } from "../common/EditModal";
 import InputWithSave from "../common/InputWithSave";
-import { defaultFillFields } from "../api/constants";
-import { FillField, Template } from '../api/types';
 import DefaultFillField from "./DefaultFillField";
 import { DocumentsPageProps } from "../routes/DocumentsPage";
+import { defaultFillFields } from "../api/constants";
+import { FillField, Template } from '../api/types';
+import { additionalInformationHelpText } from './helpText';
 
 
 interface EditTemplateModalProps extends
@@ -31,7 +32,7 @@ const EditTemplateModal = ({
         required
       />
       <InputWithSave editId={editId} {...resourceManager}
-        type="textarea" editableProperty="description" labelText="Description (optional)"
+        type="textarea" editableProperty="additional_information" labelText="Additional Information" helpText={additionalInformationHelpText}
       />
       <hr />
       <h5 className="mb-3">Fill Field Descriptions</h5>

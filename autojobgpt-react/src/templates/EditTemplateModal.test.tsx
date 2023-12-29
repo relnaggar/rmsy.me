@@ -16,7 +16,7 @@ const thisMockData: Template[] = [validResumeTemplate1, validResumeTemplate2];
 const newTemplate = validResumeTemplate3;
 
 const relatedApiPath = "../api/fillFields/";
-const relatedResourceKey = "fillFields";
+const relatedResourceKey = "fill_fields";
 const relatedMockData: FillField[] = thisMockData.reduce((relatedMockData: FillField[], resource: Template) => {
   return relatedMockData.concat(resource[relatedResourceKey]);
 }, []);
@@ -35,10 +35,10 @@ const testData: {
   required: true,
   validValue: newTemplate.name,
 }, {
-  label: "description",
+  label: "additional_information",
   role: "textbox",
   required: false,
-  validValue: newTemplate.description!,
+  validValue: newTemplate.additional_information!,
 }];
 
 const testEachModal = async (testDescription: string, func: (
