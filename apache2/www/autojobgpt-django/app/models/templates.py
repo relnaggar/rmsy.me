@@ -102,10 +102,10 @@ class Template(models.Model, DocumentMixin):
     super().save(*args, **kwargs)
 
 
-  def delete(self, *args, **kwargs):
+  def delete(self, *args, **kwargs):    
+    super().delete(*args, **kwargs)
     os.remove(self.docx.path)
     os.remove(self.png.path)
-    super().delete(*args, **kwargs)
   
   def extract_fill_field_keys(self, text=None, include_default=True):
     if text is None:
