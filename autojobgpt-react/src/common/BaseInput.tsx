@@ -10,7 +10,8 @@ export type SelectOption = {
 };
 
 export interface BaseInputProps extends CommonInputControlProps,
-  Omit<React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'id' | 'value'>
+  Omit<React.InputHTMLAttributes<HTMLInputElement> &
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>, "id" | "value" | "name">
 {
   type: string,
   id?: string,
@@ -31,6 +32,7 @@ const BaseInput = React.forwardRef(({
   value, editing, handleChange,
   type,
   id,
+  name,
   label,
   loading = false,
   errors = [],
@@ -57,7 +59,7 @@ const BaseInput = React.forwardRef(({
 
   const inputProps: React.TextareaHTMLAttributes<HTMLTextAreaElement> | React.InputHTMLAttributes<HTMLInputElement> = {
     id: currentId,
-    name: currentId,
+    name: name,
     className: `${
       type === "select" ? "form-select" : "form-control"}${
       isValid ? " is-valid" : ""}${

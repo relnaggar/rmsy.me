@@ -239,7 +239,7 @@ test(`${modalName} modal retains input values (except for files) on close and re
   }
 });
 
-xtest(`${modalName} modal retains api input errors on close and reopen`, async () => {
+test(`${modalName} modal retains api input errors on close and reopen`, async () => {
   await renderRoute(thisRoute);
   let modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
@@ -249,14 +249,11 @@ xtest(`${modalName} modal retains api input errors on close and reopen`, async (
   }
   mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse(errorResponse));
   await clickSubmitButton(modal);
-  modal = await openAndGetModal(openAndGetModalParams);
+  modal = screen.getByRole("dialog");
   await clickCloseButton(modal);
   modal = await openAndGetModal(openAndGetModalParams);
   for (const testDataForInput of testData) {
-    let errorAlert: HTMLElement | null = queryByRole(modal, "alert", {name: new RegExp(testDataForInput.label, "i")});
-    if  (errorAlert === null) {
-      errorAlert = queryByRole(modal, "alert", {name: new RegExp(testDataForInput.name, "i")});
-    }
+    const errorAlert: HTMLElement = getByRole(modal, "alert", {name: new RegExp(testDataForInput.label, "i")});
     expect(errorAlert).toBeInTheDocument();
     expect(errorAlert).toHaveTextContent(errorMessage);
   }

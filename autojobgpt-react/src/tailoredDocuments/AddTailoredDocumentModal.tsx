@@ -19,8 +19,8 @@ const AddTailoredDocumentModal = ({
   ...addModal
 }: AddTailoredDocumentModalProps): React.JSX.Element => {
   const modalId = useId();
-  const jobInput = useInputControl("");
-  const templateInput = useInputControl("");
+  const jobInput = useInputControl("job", "");
+  const templateInput = useInputControl("template", "");
 
   const handleRefreshFail = useCallback((errors: Record<string, string[]>) => {
     addModal.setShowErrorAlert(true);
@@ -39,10 +39,10 @@ const AddTailoredDocumentModal = ({
     if (jobInput.value === "" || templateInput.value === "") {
       const newErrors: Record<string, string[]> = {};
       if (jobInput.value === "") {
-        newErrors["job"] = ["Job is required."];
+        newErrors[jobInput.name] = ["Job is required."];
       }
       if (templateInput.value === "") {
-        newErrors["template"] = ["Template is required."];
+        newErrors[templateInput.name] = ["Template is required."];
       }
       addModal.setErrors(newErrors);
       jobInput.stopEditing();
@@ -73,12 +73,12 @@ const AddTailoredDocumentModal = ({
       title={`Generate ${documentTypeLabel}`} validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
       <SelectInputWithRefresh {...jobManager}
-        value={jobInput.value} editing={jobInput.editing} handleChange={jobInput.handleChange}
-        label="Job" optionToString={(job) => `${job.title}, ${job.company}`} errors={addModal.errors["job"]}
+        name={jobInput.name} value={jobInput.value} editing={jobInput.editing} handleChange={jobInput.handleChange}
+        label="Job" optionToString={(job) => `${job.title}, ${job.company}`} errors={addModal.errors[jobInput.name]}
       />
       <SelectInputWithRefresh {...templateManager}
-        value={templateInput.value} editing={templateInput.editing} handleChange={templateInput.handleChange}
-        label={`${documentTypeLabel} Template`} optionToString={(template) => template.name} errors={addModal.errors["template"]}
+        name={templateInput.name} value={templateInput.value} editing={templateInput.editing} handleChange={templateInput.handleChange}
+        label={`${documentTypeLabel} Template`} optionToString={(template) => template.name} errors={addModal.errors[templateInput.name]}
       />
     </AddModal>
   );

@@ -4,6 +4,7 @@ import useControlledState from "./useControlledState";
 
 
 export interface CommonInputControlProps {
+  name: string,
   value: string,
   editing: boolean,
   handleChange: (
@@ -20,6 +21,7 @@ export interface UseInputControl extends CommonInputControlProps {
 };
 
 const useInputControl = (
+  name: string,
   initialValue?: string,
   valueProp?: string,
   setValueProp?: React.Dispatch<React.SetStateAction<string>>,
@@ -55,7 +57,7 @@ const useInputControl = (
     setEditing(false);
   }, []);
 
-  return { value, editing, handleChange, edit, stopEditing, ref };
+  return { name, value, editing, handleChange, edit, stopEditing, ref };
 };
 
 export default useInputControl;

@@ -11,14 +11,14 @@ const AddColumnModal = ({
   ...addColumnModal
 }: AddResourceModalProps<StatusUpload>): React.JSX.Element => {
   const modalId = useId();
-  const nameInput = useInputControl();
+  const nameInput = useInputControl("name");
   
   const validateSubmit = (): boolean => {
     let valid = true;
     const newErrors: Record<string,string[]> = {};
 
     if (nameInput.value === "") {
-      newErrors["name"] = ["Column name is required."];
+      newErrors[nameInput.name] = ["Column name is required."];
       valid = false;
     }
 
@@ -38,9 +38,9 @@ const AddColumnModal = ({
       title="Add Column" modalId={modalId}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
-      <BaseInput ref={nameInput.ref}
+      <BaseInput ref={nameInput.ref} name={nameInput.name}
         value={nameInput.value} editing={nameInput.editing} handleChange={nameInput.handleChange}
-        label="Name" type="text" errors={addColumnModal.errors["name"]}
+        label="Name" type="text" errors={addColumnModal.errors[nameInput.name]}
       />
     </AddModal>
   );

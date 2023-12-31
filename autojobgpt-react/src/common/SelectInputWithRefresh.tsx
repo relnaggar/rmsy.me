@@ -17,7 +17,7 @@ interface SelectInputWithRefreshProps<Option extends WithId> extends
 };
 
 const SelectInputWithRefresh = <Option extends WithId>({
-  value, editing, handleChange,
+  value, editing, handleChange, name,
   label, errors,
   fetching, resources, refetch, cancel,
   optionToString,
@@ -40,7 +40,7 @@ const SelectInputWithRefresh = <Option extends WithId>({
   return (
     <BaseInput id={id} type="select" value={value} loadingOptionLabel="Refreshing..."
       label={label} editing={editing} loading={fetching} errors={errors}
-      selectOptions={selectOptions} handleChange={handleChange}    
+      selectOptions={selectOptions} handleChange={handleChange} name={name}  
     >
       <InputActionButton controlsId={id}
         label="Refresh" icon={<ArrowClockwiseIcon />} loading={fetching}

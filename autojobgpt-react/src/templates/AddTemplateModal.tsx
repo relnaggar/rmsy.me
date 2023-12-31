@@ -16,9 +16,9 @@ const AddTemplateModal = ({
   documentTypeLabel,
   ...addModal
 }: AddTemplateModalProps): React.JSX.Element => {
-  const nameInput = useInputControl();
-  const uploadInput = useInputControl();
-  const additionalInformationInput = useInputControl();
+  const nameInput = useInputControl("name");
+  const uploadInput = useInputControl("docx");
+  const additionalInformationInput = useInputControl("additional_information");
 
   const modalId = useId();
 
@@ -27,11 +27,11 @@ const AddTemplateModal = ({
     const newErrors: Record<string,string[]> = {};
 
     if (nameInput.value === "") {
-      newErrors["name"] = ["Template name is required."];
+      newErrors[nameInput.name] = ["Template name is required."];
       valid = false;
     }
     if ((uploadInput.ref.current as HTMLInputElement).files?.length === 0) {
-      newErrors["upload"] = ["Upload is required."];
+      newErrors[uploadInput.name] = ["Upload is required."];
       valid = false;
     }
 
@@ -54,18 +54,18 @@ const AddTemplateModal = ({
       title={`Add ${documentTypeLabel} Template`} modalId={modalId} size="xl"
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >
-      <BaseInput ref={nameInput.ref}
+      <BaseInput ref={nameInput.ref} name={nameInput.name}
         value={nameInput.value} editing={nameInput.editing} handleChange={nameInput.handleChange}
-        label="Template Name" type="text" errors={addModal.errors["name"]}
+        label="Template Name" type="text" errors={addModal.errors[nameInput.name]}
       />
-      <BaseInput ref={uploadInput.ref}
+      <BaseInput ref={uploadInput.ref} name={uploadInput.name}
         value={uploadInput.value} editing={uploadInput.editing} handleChange={uploadInput.handleChange}
-        label="Upload" type="file" errors={addModal.errors["upload"]}
+        label="Upload" type="file" errors={addModal.errors[uploadInput.name]}
         accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       />
-      <BaseInput ref={additionalInformationInput.ref}
+      <BaseInput ref={additionalInformationInput.ref} name={additionalInformationInput.name}
         value={additionalInformationInput.value} editing={additionalInformationInput.editing} handleChange={additionalInformationInput.handleChange}
-        label="Additional Information (optional)" type="textarea" errors={addModal.errors["additional_information"]} rows={3}
+        label="Additional Information (optional)" type="textarea" errors={addModal.errors[additionalInformationInput.name]} rows={3}
         helpText={additionalInformationHelpText}
       />
     </AddModal>

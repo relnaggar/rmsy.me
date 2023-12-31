@@ -43,7 +43,7 @@ const EditTailoredDocumentModal = ({
     <EditModal modalId={modalId}
       title={`Edit ${documentTypeLabel}`} show={show} setShow={setShow} size="xl" footerButton={duplicateButton}
     >
-      <InputWithSave editId={editId}          
+      <InputWithSave editId={editId}
         apiPath={apiPath} resources={resources} setResources={setResources}   
         type="text" editableProperty="name" labelText={`${documentTypeLabel} Name`}
         required

@@ -95,10 +95,20 @@ test(`each ${thisResource} list item is displayed with a download button`, async
   await renderRoute(thisRoute);
   const resourceElements: HTMLElement[] = queryResources(thisResource);
   resourceElements.forEach((resourceElement, index: number) => {
-    const downloadButton: HTMLElement = getByRole(resourceElement, "button", {name: new RegExp("download", "i")});
-    expect(downloadButton).toBeInTheDocument();
-    expect(downloadButton).toHaveAttribute("href", thisMockData[index].docx);
-    expect(downloadButton).toHaveAttribute("download");
+    const button: HTMLElement = getByRole(resourceElement, "button", {name: new RegExp("download", "i")});
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveAttribute("href", thisMockData[index].docx);
+    expect(button).toHaveAttribute("download");
+  });
+});
+
+test(`each ${thisResource} list item is displayed with a preview button`, async () => {
+  await renderRoute(thisRoute);
+  const resourceElements: HTMLElement[] = queryResources(thisResource);
+  resourceElements.forEach((resourceElement, index: number) => {
+    const button: HTMLElement = getByRole(resourceElement, "button", {name: new RegExp("preview", "i")});
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveAttribute("href", thisMockData[index].png);
   });
 });
 

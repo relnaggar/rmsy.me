@@ -10,7 +10,8 @@ import { WithId } from '../api/types';
 
 interface InputWithSaveProps<Resource extends WithId> extends
   CommonEditModalProps<Resource>,
-  Omit<React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'id' | 'value'>,
+  Omit<React.InputHTMLAttributes<HTMLInputElement>
+  & React.TextareaHTMLAttributes<HTMLTextAreaElement>, "id" | "value" | "name">,
   Pick<BaseInputProps, "selectOptions" | "defaultOptionLabel" | "helpText">
 {
   type: string,
@@ -68,7 +69,7 @@ const InputWithSave = <Resource extends WithId>({
 
   const [saved, setSaved] = useState<boolean>(true);
   const [errors, setErrors] = useState<Record<string,string[]>>({});
-  const { editing, value, handleChange, stopEditing, ref } = useInputControl(resourceEditableProperty, valueProp, setValueProp);
+  const { editing, value, handleChange, stopEditing, ref } = useInputControl(editableProperty, resourceEditableProperty, valueProp, setValueProp);
   
   useEffect(() => {
     if (value === resourceEditableProperty) {
@@ -138,7 +139,7 @@ const InputWithSave = <Resource extends WithId>({
   );
   
   return (
-    <BaseInput id={currentId} ref={ref}
+    <BaseInput id={currentId} ref={ref} name={editableProperty}
       value={value} editing={editing} handleChange={handleChange}
       type={type} label={label} loading={updating} errors={Object.values(errors).flat()}      
       handleSubmit={handleSubmit} floatingLabel={labelProperty !== undefined} isValid={saved}

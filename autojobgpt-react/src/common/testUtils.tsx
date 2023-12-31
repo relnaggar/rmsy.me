@@ -269,10 +269,6 @@ export const getRefreshButton = (modal: HTMLElement, label: string): HTMLElement
   return getActionButton(modal, label, "refresh");
 };
 
-export const clickRefreshButton = async (modal: HTMLElement, label: string): Promise<void> => {
-  await clickActionButton(modal, label, "refresh");
-};
-
 export const querySaveButton = (modal: HTMLElement, label: string): HTMLElement | null => {
   return queryActionButton(modal, label, "save");
 };
