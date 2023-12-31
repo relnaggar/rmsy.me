@@ -51,15 +51,11 @@ export interface Template extends Document {
   fill_fields: FillField[],
   additional_information?: string,
   type: DocumentType,
+  paragraphs: string[],
 };
 
-export interface TemplateUpload extends Omit<Template,
-  "id" |
-  "docx" |
-  "fill_fields" |
-  "png"
-> {
-    docx: File,
+export interface TemplateUpload extends Pick<Omit<Template, "docx">, "name" | "additional_information" | "type"> {
+  docx: File,
 };
 
 export interface Substitution extends WithId {
@@ -80,7 +76,6 @@ export interface TailoredDocument extends Document {
   job: Job,
   template: Template,
   type: DocumentType,
-  template_paragraphs: string[],
 };
 
 export interface TailoredDocumentUpload extends Pick<TailoredDocument, "type"> {

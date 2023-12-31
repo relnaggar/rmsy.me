@@ -7,6 +7,7 @@ import { DocumentsPageProps } from "../routes/DocumentsPage";
 import { defaultFillFields } from "../api/constants";
 import { FillField, Template } from '../api/types';
 import { additionalInformationHelpText } from './helpText';
+import ToggleInput from "../common/ToggleInput";
 
 
 interface EditTemplateModalProps extends
@@ -24,6 +25,7 @@ const EditTemplateModal = ({
   ...resourceManager
 }: EditTemplateModalProps): React.JSX.Element => {
   const modalId = useId();
+  const template: Template | undefined = resourceManager.resources.find((template: Template) => template.id === editId);
 
   return (
     <EditModal title={`Edit ${documentTypeLabel} Template`} modalId={modalId} show={show} setShow={setShow} size="xl">
@@ -36,16 +38,42 @@ const EditTemplateModal = ({
       />
       <hr />
       <h5 className="mb-3">Fill Field Descriptions</h5>
-      {fillFields
-        .filter((fillField: FillField) => fillField.template === editId)
-        .map((fillField: FillField) =>
-          defaultFillFields.includes(fillField.key) ?
-            <DefaultFillField key={fillField.id} fillField={fillField} />
+      { template &&
+        template.paragraphs.map((paragraph, index) =>
+          paragraph === "" ?
+            <br key={index} />
           :
-            <InputWithSave key={fillField.id} editId={fillField.id}
-              apiPath="fillFields/" resources={fillFields} setResources={setFillFields}
-              type="textarea" editableProperty="description" labelProperty="key"
-            />
+            <p key={index}>
+              {
+                paragraph.split(/{{(.*?)}}/).map((part, partIndex) => {
+                  const isFillField: boolean = partIndex % 2 !== 0;
+                  let fillField: FillField | undefined = undefined;
+                  if (isFillField) {
+                    fillField = fillFields.find((fillField: FillField) =>
+                      fillField.template === editId && fillField.key === part
+                    );
+                  }
+                  return (
+                    <React.Fragment key={partIndex}>
+                      { isFillField ? (
+                        <ToggleInput label={fillField!.key}>
+                          { defaultFillFields.includes(fillField!.key) ?
+                            <DefaultFillField key={fillField!.id} fillField={fillField!} />
+                            :
+                              <InputWithSave key={fillField!.id} editId={fillField!.id}
+                                apiPath="fillFields/" resources={fillFields} setResources={setFillFields}
+                                type="textarea" editableProperty="description" labelProperty="key"
+                              />
+                          }
+                        </ToggleInput>
+                        ) : (
+                          part
+                        )}                      
+                    </React.Fragment>
+                  );
+                })
+              }
+            </p>
         )
       }
     </EditModal>

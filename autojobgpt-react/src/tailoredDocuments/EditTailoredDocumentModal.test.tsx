@@ -178,11 +178,24 @@ describe(`each ${modalName} modal has a download link to the ${thisResource}`, (
 });
 
 describe(`each ${modalName} modal has a download link to the ${thisResource}'s template`, () => {
-  testEachModal(`modal has a download link to the ${thisResource}`, async (modal, mockData) => {
+  testEachModal(`modal has a download link to the ${thisResource}'s template`, async (modal, mockData) => {
     const links: HTMLElement[] = getAllByRole(modal, "link");
     let hasMatchingUrl = false;
     for (const link of links) {
       if (link.getAttribute("href") === mockData.template.docx && link.getAttribute("download") !== null) {
+        hasMatchingUrl = true;
+      }      
+    }
+    expect(hasMatchingUrl).toBe(true);
+  });
+});
+
+describe(`each ${modalName} modal has a preview link to the ${thisResource}`, () => {
+  testEachModal(`modal has a preview link to the ${thisResource}`, async (modal, mockData) => {
+    const links: HTMLElement[] = getAllByRole(modal, "link");
+    let hasMatchingUrl = false;
+    for (const link of links) {
+      if (link.getAttribute("href") === mockData.template.png) {
         hasMatchingUrl = true;
       }      
     }
@@ -367,48 +380,68 @@ test(`api network error on fetching fill fileds shows an error alert within the 
   expect(errorAlert).toBeInTheDocument();
 });
 
-xdescribe(`each ${modalName} modal has all ${relatedResourceName} inputs`, () => {
+describe(`each ${modalName} modal has all ${relatedResourceName} inputs`, () => {
   testEachModal(`modal has all ${relatedResourceName} inputs`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       const input: HTMLElement = getByRole(modal, "textbox", {name: new RegExp(relatedResource.key, "i")});
       expect(input).toBeInTheDocument();
     }
   });
 });
 
-xdescribe(`each ${modalName} modal ${relatedResourceName} input starts with the ${relatedResourceName}'s ${relatedResourceValueKey}`, () => {
+describe(`each ${modalName} modal ${relatedResourceName} input starts with the ${relatedResourceName}'s ${relatedResourceValueKey}`, () => {
   testEachModal(`modal ${relatedResourceName} inputs start with the ${relatedResourceName}'s ${relatedResourceValueKey}`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       const input: HTMLElement = getByRole(modal, "textbox", {name: new RegExp(relatedResource.key, "i")});
       expect(input).toHaveValue(relatedResource[relatedResourceValueKey]);
     }
   });
 });
 
-xdescribe(`each ${modalName} modal ${relatedResourceName} input has a save button`, () => {
+describe(`each ${modalName} modal ${relatedResourceName} input has a save button`, () => {
   testEachModal(`modal has a save button for each non-default ${relatedResourceName} input`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       const saveButton: HTMLElement = getSaveButton(modal, relatedResource.key);
       expect(saveButton).toBeInTheDocument();
     }
   });
 });
 
-xdescribe(`for each ${modalName} modal, saving each ${relatedResourceName} input makes 2 api calls`, () => {
-  testEachModal(`saving each ${relatedResourceName} input makes 2 api calls`, async (modal, mockData) => {
+describe(`for each ${modalName} modal, saving each ${relatedResourceName} input makes an api call`, () => {
+  testEachModal(`saving each ${relatedResourceName} input makes an api call`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       await userClearInput(modal, relatedResource.key);
       const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
       mockFunctions.fetchData.mockImplementationOnce(generateResponse({...relatedResource, [relatedResourceValueKey]: ""}));
       await clickSaveButton(modal, relatedResource.key);
-      expect(mockFunctions.fetchData.mock.calls.length).toBe(initialFetchDataCalls + 2);
+      expect(mockFunctions.fetchData.mock.calls.length).toBe(initialFetchDataCalls + 1);
     }
   });
 });
 
-xdescribe(`for each ${modalName} modal, saving each ${relatedResourceName} input makes an api call to save the data`, () => {
+describe(`for each ${modalName} modal, saving each ${relatedResourceName} input makes an api call to save the data`, () => {
   testEachModal(`saving each ${relatedResourceName} input makes an api call to save the data`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       await userClearInput(modal, relatedResource.key);
       mockFunctions.fetchData.mockImplementationOnce(generateResponse({...relatedResource, [relatedResourceValueKey]: newRelatedResourceValue}));
       await clickSaveButton(modal, relatedResource.key);
@@ -420,26 +453,13 @@ xdescribe(`for each ${modalName} modal, saving each ${relatedResourceName} input
   });
 });
 
-xdescribe(`for each ${modalName} modal, saving each ${relatedResourceName} input makes an api call to refetch the resumes`, () => {
-  testEachModal(`saving each ${relatedResourceName} input makes an api call to refetch the resumes`, async (modal, mockData) => {
-    for (const relatedResource of mockData[relatedResourceKey]) {
-      await userClearInput(modal, relatedResource.key);
-      await userInput(modal, relatedResource.key, newRelatedResourceValue);
-      mockFunctions.fetchData.mockImplementationOnce(generateResponse({...relatedResource, [relatedResourceValueKey]: newRelatedResourceValue}));
-      await clickSaveButton(modal, relatedResource.key);
-      expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(thisApiPath, expect.objectContaining({
-        method: "GET",
-        headers: expect.objectContaining({
-          "Content-Type": "application/json",
-        }),
-      }));
-    }
-  });
-});
-
-xdescribe(`for each ${modalName} modal, saving each ${relatedResourceName} input changes the input's value to the saved value`, () => {
+describe(`for each ${modalName} modal, saving each ${relatedResourceName} input changes the input's value to the saved value`, () => {
   testEachModal(`saving each ${relatedResourceName} input changes the input's value to the saved value`, async (modal, mockData, modalNumber) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      let toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       await userClearInput(modal, relatedResource.key);
       await userInput(modal, relatedResource.key, newRelatedResourceValue);
       mockFunctions.fetchData.mockImplementationOnce(generateResponse({...relatedResource, [relatedResourceValueKey]: newRelatedResourceValue}));
@@ -447,16 +467,24 @@ xdescribe(`for each ${modalName} modal, saving each ${relatedResourceName} input
       await clickCloseButton(modal);
       const resourceElements: HTMLElement[] = queryResources(thisResourceHeading);
       modal = await openAndGetEditModal(resourceElements[modalNumber]);
+      toggle = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       const input: HTMLElement = getByRole(modal, "textbox", {name: new RegExp(relatedResource.key, "i")});
       expect(input).toHaveValue(newRelatedResourceValue);
     }
   });
 });
 
-xdescribe(`api general errors after saving each ${modalName} modal ${relatedResourceName} input show an error alert for that input`, () => {
+describe(`api general errors after saving each ${modalName} modal ${relatedResourceName} input show an error alert for that input`, () => {
   for (const testDataForApiGeneralError of testDataForApiGeneralErrors(mockFunctions)) {
     testEachModal(`api ${testDataForApiGeneralError.apiErrorType} error after saving each ${relatedResourceName} input shows an error alert for that input`, async (modal, mockData) => {
       for (const relatedResource of mockData[relatedResourceKey]) {
+        const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+        await act(async () => {
+          userEvent.click(toggle);
+        });
         await userClearInput(modal, relatedResource.key);
         testDataForApiGeneralError.mockApiError();
         await clickSaveButton(modal, relatedResource.key);
@@ -468,9 +496,13 @@ xdescribe(`api general errors after saving each ${modalName} modal ${relatedReso
   }
 });
 
-xdescribe(`api input error after saving each ${modalName} modal ${relatedResourceName} input shows an error message attached to the input`, () => {
+describe(`api input error after saving each ${modalName} modal ${relatedResourceName} input shows an error message attached to the input`, () => {
   testEachModal(`api input error after saving each ${relatedResourceName} input shows an error message attached to the input`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       await userClearInput(modal, relatedResource.key);
       await userInput(modal, relatedResource.key, newRelatedResourceValue);
       mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({[relatedResourceValueKey]: [errorMessage]}));
@@ -482,9 +514,13 @@ xdescribe(`api input error after saving each ${modalName} modal ${relatedResourc
   });
 });
 
-xdescribe(`api input error after saving each ${modalName} modal ${relatedResourceName} input can be cleared by editing the corresponding input`, () => {
+describe(`api input error after saving each ${modalName} modal ${relatedResourceName} input can be cleared by editing the corresponding input`, () => {
   testEachModal(`api input error after saving each ${relatedResourceName} input can be cleared by editing the corresponding input`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       await userClearInput(modal, relatedResource.key);
       await userInput(modal, relatedResource.key, newRelatedResourceValue);
       mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({[relatedResourceValueKey]: [errorMessage]}));
@@ -496,36 +532,56 @@ xdescribe(`api input error after saving each ${modalName} modal ${relatedResourc
   });
 });
 
-xdescribe(`each ${modalName} modal does not retain ${relatedResourceName} input values on close and reopen`, () => {
+describe(`each ${modalName} modal does not retain ${relatedResourceName} input values on close and reopen`, () => {
   testEachModal(`does not retain ${relatedResourceName} input values on close and reopen`, async (modal, mockData, modalNumber) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      let toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       await userClearInput(modal, relatedResource.key);
       await clickCloseButton(modal);
       const resourceElements: HTMLElement[] = queryResources(thisResourceHeading);
       modal = await openAndGetEditModal(resourceElements[modalNumber]);
+      toggle = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       const input: HTMLElement = getByRole(modal, "textbox", {name: new RegExp(relatedResource.key, "i")});
       expect(input).toHaveValue(relatedResource[relatedResourceValueKey]);
     }
   });
 });
 
-xdescribe(`each ${modalName} modal does not retain ${relatedResourceName} input errors on close and reopen`, () => {
+describe(`each ${modalName} modal does not retain ${relatedResourceName} input errors on close and reopen`, () => {
   testEachModal(`does not retain ${relatedResourceName} input errors on close and reopen`, async (modal, mockData, modalNumber) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      let toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       await userClearInput(modal, relatedResource.key);
       mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({[relatedResourceValueKey]: [errorMessage]}));
       await clickSaveButton(modal, relatedResource.key);
       await clickCloseButton(modal);
       const resourceElements: HTMLElement[] = queryResources(thisResourceHeading);
       modal =  await openAndGetEditModal(resourceElements[modalNumber]);
+      toggle = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       expect(queryByRole(modal, "alert", {name: new RegExp(relatedResource.key, "i")})).not.toBeInTheDocument();
     }
   });
 });
 
-xdescribe(`each ${modalName} modal default ${relatedResourceName} input doesn't have a regenerate button`, () => {
+describe(`each ${modalName} modal default ${relatedResourceName} input doesn't have a regenerate button`, () => {
   testEachModal(`modal doesn't have a regenerate button for each default ${relatedResourceName} input`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       if (defaultFillFields.includes(relatedResource.key)) {
         expect(queryRegenerateButton(modal, relatedResource.key)).not.toBeInTheDocument();
       }
@@ -533,9 +589,13 @@ xdescribe(`each ${modalName} modal default ${relatedResourceName} input doesn't 
   });
 });
 
-xdescribe(`each ${modalName} modal non-default ${relatedResourceName} input has a regenerate button`, () => {
+describe(`each ${modalName} modal non-default ${relatedResourceName} input has a regenerate button`, () => {
   testEachModal(`modal has a regenerate button for each non-default ${relatedResourceName} input`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       if (! defaultFillFields.includes(relatedResource.key)) {
         const regenerateButton: HTMLElement = getRegenerateButton(modal, relatedResource.key);
         expect(regenerateButton).toBeInTheDocument();
@@ -544,9 +604,13 @@ xdescribe(`each ${modalName} modal non-default ${relatedResourceName} input has 
   });
 });
 
-xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button makes an api call`, () => {
+describe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button makes an api call`, () => {
   testEachModal(`clicking each non-default ${relatedResourceName} input's regenerate button makes an api call`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       if (! defaultFillFields.includes(relatedResource.key)) {
         const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
         mockFunctions.fetchData.mockImplementationOnce(generateResponse({...relatedResource, [relatedResourceValueKey]: newRelatedResourceValue}));
@@ -557,9 +621,13 @@ xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResou
   });
 });
 
-xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button makes an api call to regenerate the data`, () => {
+describe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button makes an api call to regenerate the data`, () => {
   testEachModal(`clicking each non-default ${relatedResourceName} input's regenerate button makes an api call to regenerate the data`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       if (! defaultFillFields.includes(relatedResource.key)) {
         mockFunctions.fetchData.mockImplementationOnce(generateResponse({...relatedResource, [relatedResourceValueKey]: newRelatedResourceValue}));
         await clickRegenerateButton(modal, relatedResource.key);
@@ -572,9 +640,13 @@ xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResou
   });
 });
 
-xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button changes the input's value to the regenerated value`, () => {
+describe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button changes the input's value to the regenerated value`, () => {
   testEachModal(`clicking each non-default ${relatedResourceName} input's regenerate button changes the input's value to the regenerated value`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       if (! defaultFillFields.includes(relatedResource.key)) {
         mockFunctions.fetchData.mockImplementationOnce(generateResponse({...relatedResource, [relatedResourceValueKey]: newRelatedResourceValue}));
         await clickRegenerateButton(modal, relatedResource.key);
@@ -585,10 +657,14 @@ xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResou
   });
 });
 
-xdescribe(`api general errors after regenerating each ${modalName} modal non-default ${relatedResourceName} input show an error alert`, () => {
+describe(`api general errors after regenerating each ${modalName} modal non-default ${relatedResourceName} input show an error alert`, () => {
   for (const testDataForApiGeneralError of testDataForApiGeneralErrors(mockFunctions)) {
     testEachModal(`api ${testDataForApiGeneralError.apiErrorType} error after regenerating each non-default ${relatedResourceName} input shows an error alert`, async (modal, mockData) => {
       for (const relatedResource of mockData[relatedResourceKey]) {
+        const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+        await act(async () => {
+          userEvent.click(toggle);
+        });
         if (! defaultFillFields.includes(relatedResource.key)) {
           testDataForApiGeneralError.mockApiError();
           await clickRegenerateButton(modal, relatedResource.key);
@@ -602,9 +678,13 @@ xdescribe(`api general errors after regenerating each ${modalName} modal non-def
   }
 });
 
-xdescribe(`api regenerate error after regenerating each ${modalName} modal non-default ${relatedResourceName} input shows an error alert`, () => {
+describe(`api regenerate error after regenerating each ${modalName} modal non-default ${relatedResourceName} input shows an error alert`, () => {
   testEachModal(`api regenerate error after regenerating each non-default ${relatedResourceName} input shows an error alert`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       if (! defaultFillFields.includes(relatedResource.key)) {
         mockFunctions.fetchData.mockImplementationOnce(generateErrorResponse({[relatedResourceValueKey]: [errorMessage]}));
         await clickRegenerateButton(modal, relatedResource.key);
@@ -617,9 +697,13 @@ xdescribe(`api regenerate error after regenerating each ${modalName} modal non-d
   });
 });
 
-xdescribe(`for each ${modalName} modal, each default ${relatedResourceName} input doesn't have a feedback toggle switch`, () => {
+describe(`for each ${modalName} modal, each default ${relatedResourceName} input doesn't have a feedback toggle switch`, () => {
   testEachModal(`each default ${relatedResourceName} input doesn't have a feedback toggle switch`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       if (defaultFillFields.includes(relatedResource.key)) {
         expect(queryFeedbackSwitch(modal, relatedResource.key)).not.toBeInTheDocument();
       }
@@ -627,9 +711,13 @@ xdescribe(`for each ${modalName} modal, each default ${relatedResourceName} inpu
   });
 });
 
-xdescribe(`for each ${modalName} modal, each non-default ${relatedResourceName} input has a feedback toggle switch`, () => {
+describe(`for each ${modalName} modal, each non-default ${relatedResourceName} input has a feedback toggle switch`, () => {
   testEachModal(`each non-default ${relatedResourceName} input has a feedback toggle switch`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       if (! defaultFillFields.includes(relatedResource.key)) {
         const toggleSwitch: HTMLElement = getFeedbackSwitch(modal, relatedResource.key);
         expect(toggleSwitch).toBeInTheDocument();
@@ -638,9 +726,13 @@ xdescribe(`for each ${modalName} modal, each non-default ${relatedResourceName} 
   });
 });
 
-xdescribe(`for each ${modalName} modal, before clicking each non-default ${relatedResourceName} input's feedback toggle switch, no feedback textbox appears`, () => {
+describe(`for each ${modalName} modal, before clicking each non-default ${relatedResourceName} input's feedback toggle switch, no feedback textbox appears`, () => {
   testEachModal(`before clicking each non-default ${relatedResourceName} input's feedback toggle switch, no feedback textbox appears`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       if (! defaultFillFields.includes(relatedResource.key)) {
         expect(queryFeedbackInput(modal, relatedResource.key)).not.toBeInTheDocument();
       }
@@ -649,9 +741,13 @@ xdescribe(`for each ${modalName} modal, before clicking each non-default ${relat
 });
 
 
-xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's feedback toggle switch makes a feedback textbox appear`, () => {
+describe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's feedback toggle switch makes a feedback textbox appear`, () => {
   testEachModal(`clicking each non-default ${relatedResourceName} input's feedback toggle switch makes a feedback textbox appear`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       if (! defaultFillFields.includes(relatedResource.key)) {
         await clickFeedbackSwitch(modal, relatedResource.key);
         const feedbackTextbox: HTMLElement = getFeedbackInput(modal, relatedResource.key);
@@ -661,9 +757,13 @@ xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResou
   });
 });
 
-xdescribe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button after typing feedback sends an api call including the feedback`, () => {
+describe(`for each ${modalName} modal, clicking each non-default ${relatedResourceName} input's regenerate button after typing feedback sends an api call including the feedback`, () => {
   testEachModal(`clicking each non-default ${relatedResourceName} input's regenerate button after typing feedback sends an api call including the feedback`, async (modal, mockData) => {
     for (const relatedResource of mockData[relatedResourceKey]) {
+      const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+      await act(async () => {
+        userEvent.click(toggle);
+      });
       if (! defaultFillFields.includes(relatedResource.key)) {
         await clickFeedbackSwitch(modal, relatedResource.key);
         const feedbackTextbox: HTMLElement = getFeedbackInput(modal, relatedResource.key);

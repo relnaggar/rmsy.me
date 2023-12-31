@@ -89,6 +89,7 @@ export const validResumeTemplate1: Template = {
     template: 1,
   }],
   type: "resume",
+  paragraphs: ["{{Test Fill Field Key 1}}", "{{Test Fill Field Key 2}}", "{{Test Fill Field Key 3}}"],
 };
 
 export const validResumeTemplate2: Template = {
@@ -114,6 +115,7 @@ export const validResumeTemplate2: Template = {
     template: 2,
   }],
   type: "resume",
+  paragraphs: [`{{${defaultFillFields[0]}}}`, `{{${defaultFillFields[1]}}}`, "{{Test Fill Field Key 6}}"],
 };
 
 export const validResumeTemplate3: Template = {
@@ -124,6 +126,7 @@ export const validResumeTemplate3: Template = {
   png: "https://www.example.com/test3.png",
   fill_fields: [],
   type: "resume",
+  paragraphs: [],
 };
 
 export const validResume1: TailoredDocument = {
@@ -154,7 +157,6 @@ export const validResume1: TailoredDocument = {
   template: validResumeTemplate1,
   name: validJob1.title + ", " + validJob1.company + ", " + 1,
   type: "resume",
-  template_paragraphs: [],
 };
 
 export const validResume2: TailoredDocument = {
@@ -185,7 +187,6 @@ export const validResume2: TailoredDocument = {
   template: validResumeTemplate2,
   name: validJob2.title + ", " + validJob2.company + ", " + 1,
   type: "resume",
-  template_paragraphs: [],
 };
 
 export const validResume3: TailoredDocument = {
@@ -199,5 +200,4 @@ export const validResume3: TailoredDocument = {
   template: validResumeTemplate3,
   name: validJob3.title + ", " + validJob3.company + ", " + 1,
   type: "resume",
-  template_paragraphs: [],
 };

@@ -6,10 +6,10 @@ import { ReactComponent as EyeIcon } from 'bootstrap-icons/icons/eye.svg';
 
 import EditModal, { EditResourceModalProps } from "../common/EditModal";
 import InputWithSave from "../common/InputWithSave";
-import { SubstitutionInputProps } from "./SubstitutionInput";
-import { Job, Substitution, TailoredDocument } from '../api/types';
+import SubstitutionInput, { SubstitutionInputProps } from "./SubstitutionInput";
+import { Substitution, TailoredDocument } from '../api/types';
 import { DocumentsPageProps } from "../routes/DocumentsPage";
-import ToggleSubstitutionInput from "./ToggleSubstitutionInput";
+import ToggleInput from "../common/ToggleInput";
 
 
 interface EditTailoredDocumentModalProps extends
@@ -53,28 +53,28 @@ const EditTailoredDocumentModal = ({
           <div className="mb-3 me-1 flex-fill">
             <span className="form-label">Job</span>
             <a
-              href={tailoredDocument.job!.url} target="_blank" rel="noreferrer"
+              href={tailoredDocument.job.url} target="_blank" rel="noreferrer"
               className="link-primary form-control border border-0"
             >
-              {tailoredDocument.job!.title + ", " + (tailoredDocument.job as Job).company}
+              {tailoredDocument.job.title + ", " + tailoredDocument.job.company}
               <BoxArrowUpRightIcon className="ms-1" />
             </a>
           </div>
           <div className="mb-3 me-1 flex-fill">
             <span className="form-label">Template</span>
-            <a download href={tailoredDocument.template!.docx} className="form-control link-primary border border-0">
-              {tailoredDocument!.template.name}
+            <a download href={tailoredDocument.template.docx} className="form-control link-primary border border-0">
+              {tailoredDocument.template.name}
               <FileArrowDownIcon className="ms-1" />
             </a>
           </div>
           <div className="mb-3 me-1 flex-fill">
             <span className="form-label">{documentTypeLabel}</span>
             <div className="form-control border border-0">
-              <a download href={tailoredDocument!.docx} className="link-primary">
+              <a download href={tailoredDocument.docx} className="link-primary">
                 Version {tailoredDocument.version}
                 <FileArrowDownIcon className="ms-1" />
               </a>
-              <a href={tailoredDocument!.png} target="_blank" rel="noreferrer" className="link-primary ms-3">
+              <a href={tailoredDocument.png} target="_blank" rel="noreferrer" className="link-primary ms-3">
                 Preview
                 <EyeIcon className="ms-1" />
               </a>
@@ -85,11 +85,11 @@ const EditTailoredDocumentModal = ({
       <hr />
       <h5 className="mb-3">Fill Field Substitutions</h5>
       { tailoredDocument &&
-        tailoredDocument.template_paragraphs.map((paragraph, index) =>
+        tailoredDocument.template.paragraphs.map((paragraph, index) =>
           paragraph === "" ?
             <br key={index} />
           :
-            <p key={index}>
+            <span key={index} className="d-block mb-3">
               {
                 paragraph.split(/{{(.*?)}}/).map((part, partIndex) => {
                   const isFillField: boolean = partIndex % 2 !== 0;
@@ -102,12 +102,14 @@ const EditTailoredDocumentModal = ({
                   return (
                     <React.Fragment key={partIndex}>
                       { isFillField ? (
-                        <ToggleSubstitutionInput
-                          substitution={substitution!}
-                          substitutions={substitutions}
-                          setSubstitutions={setSubstitutions}
-                          onSubstitutionSaveSuccess={onSubstitutionSaveSuccess}
-                        />
+                        <ToggleInput label={substitution!.value} title={substitution!.key}>
+                          <SubstitutionInput
+                            substitution={substitution!}
+                            substitutions={substitutions}
+                            setSubstitutions={setSubstitutions}
+                            onSubstitutionSaveSuccess={onSubstitutionSaveSuccess}
+                          />
+                        </ToggleInput>
                       ) : (
                         part
                       )}
@@ -115,23 +117,9 @@ const EditTailoredDocumentModal = ({
                   );
                 })
               }
-            </p>
+            </span>
         )
       }
-      {/*
-      { substitutions
-        .filter((substitution: Substitution) => substitution.tailored_document === editId)
-        .map((substitution: Substitution) => {
-          return (
-            <SubstitutionInput key={substitution.id}
-              substitution={substitution}
-              substitutions={substitutions}
-              setSubstitutions={setSubstitutions}
-              onSubstitutionSaveSuccess={onSubstitutionSaveSuccess}
-            />
-          );
-        })
-      } */}
     </EditModal>
   )
 };

@@ -23,6 +23,7 @@ const generatePlaceholderTemplate = (templateUpload: TemplateUpload): Template =
     additional_information: templateUpload.additional_information,
     fill_fields: [],
     type: templateUpload.type,
+    paragraphs: [],
   };
 };
 

@@ -41,10 +41,10 @@ const getPlaceholderTailoredDocument = (tailoredDocumentUpload: TailoredDocument
       png: "",
       fill_fields: [],     
       type: tailoredDocumentUpload.type,
+      paragraphs: [],
     },
     name: "",
     type: tailoredDocumentUpload.type,
-    template_paragraphs: [],
   }
 };
 
