@@ -75,12 +75,13 @@ class Job(models.Model):
 
   @staticmethod
   def extract_details_from_url(url):
-    posting = scrape_text(url)
-    message = Chat().ask(prompt_name="extract_job_details", substitutions={"job_posting": posting})
+    scraped_text = scrape_text(url)
+    message = Chat().ask(prompt_name="extract_job_details", substitutions={"scraped_text": scraped_text})
     response = json.loads(message["content"])
     try:
       title = response["job_title"]
       company = response["company"]
+      posting = response["job_posting"]
       return title, company, posting
     except KeyError:
       raise Exception(response["error"])

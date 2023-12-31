@@ -6,15 +6,19 @@ class Chat:
 "extract_job_details":
 
 """
-Extract the job title and company name from the given job posting.
+The user has provided the following text scraped from a website, which is supposed to contain a job posting.
 
-<job_posting>
-${job_posting}
-</job_posting>
+<scraped_text>
+${scraped_text}
+</scraped_text>
+
+Please extract the job title, company name and job posting from the scraped text.
+If the scraped text contains more than one job posting, please extract the details from the first one.
 
 Provide your output in JSON format with the following keys:
 * job_title
 * company
+* job_posting
 
 If you fail to extract any of these keys, please provide a single JSON key "error" with a string value describing the error.
 """,
