@@ -43,7 +43,7 @@ const EditTemplateModal = ({
           paragraph === "" ?
             <br key={index} />
           :
-            <p key={index}>
+            <span key={index} className="d-block mb-3">
               {
                 paragraph.split(/{{(.*?)}}/).map((part, partIndex) => {
                   const isFillField: boolean = partIndex % 2 !== 0;
@@ -73,7 +73,7 @@ const EditTemplateModal = ({
                   );
                 })
               }
-            </p>
+            </span>
         )
       }
     </EditModal>

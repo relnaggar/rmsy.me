@@ -449,6 +449,10 @@ describe(`for each ${modalName} modal, saving each non-default ${relatedResource
         await clickCloseButton(modal);
         const resourceElements: HTMLElement[] = queryResources(thisResource);
         modal = await openAndGetEditModal(resourceElements[modalNumber]);
+        const toggle: HTMLElement = getByRole(modal, "checkbox", {name: new RegExp(relatedResource.key, "i")});
+        await act(async () => {
+          userEvent.click(toggle);
+        });
         const input: HTMLElement = getByRole(modal, "textbox", {name: new RegExp(relatedResource.key, "i")});
         expect(input).toHaveValue(newRelatedResourceValue);
       }
