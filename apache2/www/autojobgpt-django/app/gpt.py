@@ -18,7 +18,7 @@ If the scraped text contains more than one job posting, please extract the detai
 Provide your output in JSON format with the following keys:
 * job_title
 * company
-* job_posting
+* job_posting -- please use \n to preserve the whitespace of the original scraped_text
 
 If you fail to extract any of these keys, please provide a single JSON key "error" with a string value describing the error.
 """,
