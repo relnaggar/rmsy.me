@@ -8,24 +8,31 @@ const Home = (): React.JSX.Element => {
     <>
       <h2 className="mb-3">Home</h2>
       <p className="lead">Welcome to AutoJobGPT!</p>
+      <figure className="figure my-3 ms-3 text-center col-md-5 float-end">
+        <img src="/assets/img/autojobgpt/autojobgpt.png" className="figure-img img-fluid" alt="Futuristic image depicting an AI sewing machine amidst traditional tailoring tools." />
+        <figcaption className="figure-caption text-center">
+          An artist's rendition of AutoJobGPT tailoring your resume.
+          (Okay, the artist was DALL-E 3, but I gave it a really good prompt.)
+        </figcaption>
+      </figure>
       <p>
         This is a demo application (for illustrative purposes only, I swear) that allows you to:
         <ul>
           <li>
             Keep track of and manage your <Link to="/jobs">job applications</Link>.
-            Like a beautiful garden, your job board will grow with each gentle click of the "Add Job" button.
+            Like a beautiful garden, your job board will grow with each gentle click of the "Add job" button.
           </li>
           <li>
             Upload .docx templates for 
             your <Link to="/resumes">resumes</Link> and <Link to="/coverLetters">cover letters</Link> with 
             "fill fields" for job-specific information.
             Fill fields are placeholders denoted by double curly braces, e.g. <code>{"{{SKILL_THAT_MAKES_ME_LOOK_GOOD}}"}</code>,
-            and the special placeholders <code>{"{{JOB_TITLE}}"}</code> and <code>{"{{COMPANY}}"}</code> will automagically link to
+            and the special fill fields <code>{"{{JOB_TITLE}}"}</code> and <code>{"{{COMPANY}}"}</code> will automagically link to
             the info from the job board.
           </li>
           <li>
-            Use AI to tailor your resumes and cover letters to each job you apply for.
-            (Powered by the dark wizardy that is <a href="https://openai.com/product" target="_blank" rel="noreferrer">
+            Use AI to tailor your resumes and cover letters to each job you apply for (powered by the dark wizardy that
+            is <a href="https://openai.com/product" target="_blank" rel="noreferrer">
               the OpenAI API <BoxArrowUpRightIcon className="ms-1" />
             </a>.)
           </li>
@@ -87,6 +94,16 @@ const Home = (): React.JSX.Element => {
           </dd>
         </dl>
       </p>
+      
+      <div className="row">
+        <div className="col-md-4"></div>
+        <figure className="figure my-3 text-center col-md-4">
+          <img src="/assets/img/autojobgpt/job-success.png" className="figure-img img-fluid" alt="Handshake after a successful hire." />
+          <figcaption className="figure-caption text-center">
+            You, after using AutoJobGPT to land your dream job.
+          </figcaption>
+        </figure>
+      </div>
     </>
   );
 };

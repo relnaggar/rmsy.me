@@ -29,8 +29,8 @@
 
 <div class="row">
   <?php foreach ($projects as $project) { ?>
-    <div class="col-sm-6 mb-3">
-      <div class="card">
+    <div class="col-sm-6 mb-3 d-flex">
+      <div class="card flex-column equal-height">
         <a href="<?=$project['path']?>"><img class="card-img-top" src="<?=$project['imagePath']?>" alt="<?=$project['title']?>"></a>
         <div class="card-body">
           <h5 class="card-title"><?=$project['title']?></h5>
@@ -41,7 +41,7 @@
     </div>
   <?php } ?>
   <div class="col-sm-6 mb-3">
-    <div class="card">
+    <div class="card flex-column equal-height">
       <img class="card-img-top" src="/assets/img/coming-soon.jpg" alt="Coming Soon">
       <div class="card-body">
       <h5 class="card-title">Top Secret</h5>

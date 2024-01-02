@@ -20,6 +20,9 @@ class AutoJobGPT extends AbstractProject {
       ], [
         'title' => 'Live Demo',
         'id' => 'demo'
+      ], [
+        'title' => 'Source Code',
+        'id' => 'source'
       ]
     ]);
   }

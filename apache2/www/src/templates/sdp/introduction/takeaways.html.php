@@ -17,6 +17,6 @@
   <dd>Academia is well-structured and predictable -- your task is clear, and the path to solution is illuminated by textbooks and expert advice.
     However, real-world problems are less like a structured piano concierto and more like a jazz improvisation session.
     Throughout the project, we were tossed into the ocean of uncertainty, without an instruction manual or a step-by-step guide.
-    Whether it was rebuilding the robot for the fourth time, decoding a nonsensical sensor reading, or crafting a winning strategy, real-world solutions aren't found -- they're invented.
+    Whether it was rebuilding the robot for the fourth time, decoding a nonsensical sensor reading, or crafting a winning strategy, real-world solutions aren't found, they're invented.
   </dd>
 </dl>

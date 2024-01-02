@@ -29,7 +29,7 @@ class Routes implements \Framework\RoutesInterface {
       'AutoJobGPT' => [
         'title' => 'AutoJobGPT: Applications Made Easy',
         'path' => '/projects/autojobgpt/',
-        'imagePath' => '/assets/img/autojobgpt/autojobgpt.png',
+        'imagePath' => '/assets/img/autojobgpt/thumbnail.png',
         'description' => "1. Upload resume template. 2. ???. 3. Profit!",
         'rootFunctionName' => 'introduction'
       ],
