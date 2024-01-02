@@ -33,6 +33,7 @@ const getPlaceholderTailoredDocument = (tailoredDocumentUpload: TailoredDocument
       posting: "",
       status: 1,
       chosen_resume: null,
+      notes: "",
     },
     template: {
       id: tailoredDocumentUpload.template,

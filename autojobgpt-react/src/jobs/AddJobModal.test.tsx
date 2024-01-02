@@ -30,6 +30,10 @@ const testData: {
   label: "posting",
   required: false,
   validValue: validJob1.posting,
+}, {
+  label: "notes",
+  required: false,
+  validValue: validJob1.notes,
 }];
 
 const fillWithValidValues = async (modal: HTMLElement): Promise<void> => {
@@ -144,6 +148,7 @@ test(`submitting the ${modalName} modal with valid input makes an api call to ad
       "title": validJob1.title,
       "company": validJob1.company,
       "posting": validJob1.posting,
+      "notes": validJob1.notes,
     }),
   }));  
 });

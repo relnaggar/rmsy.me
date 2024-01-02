@@ -18,13 +18,15 @@ export interface Job extends WithId {
   posting: string,
   status: number,
   chosen_resume: number | null,
+  notes: string,
 };
 
 export interface JobUpload extends Pick<Job,
   "url" |
   "title" |
   "company" |
-  "posting"
+  "posting" |
+  "notes"
 > {};
 
 export interface JobDetails extends Pick<JobUpload,

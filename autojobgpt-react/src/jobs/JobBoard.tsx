@@ -35,6 +35,7 @@ const generatePlaceholderJob = (jobUpload: JobUpload): Job => {
     "posting": "",
     "status": -1,
     "chosen_resume": null,
+    "notes": "",
   }
 };
 

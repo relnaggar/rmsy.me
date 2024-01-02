@@ -44,6 +44,7 @@ export const validJob1: Job = {
   posting: "Test Text 1",
   status: 1,
   chosen_resume: 1,
+  notes: "Test Notes 1",
 }
 
 export const validJob2: Job = {
@@ -54,6 +55,7 @@ export const validJob2: Job = {
   posting: "Test Text 2",
   status: 2,
   chosen_resume: 2,
+  notes: "Test Notes 2",
 }
 
 export const validJob3: Job = {
@@ -64,6 +66,7 @@ export const validJob3: Job = {
   posting: "Test Text 3",
   status: 3,
   chosen_resume: null,
+  notes: "Test Notes 3",
 }
 
 export const validResumeTemplate1: Template = {

@@ -64,6 +64,12 @@ const testData: {
   role: "textbox",
   required: true,
   validValue: newJob.posting,
+}, {
+  key: "notes",
+  label: "notes",
+  role: "textbox",
+  required: false,
+  validValue: newJob.notes,
 }];
 
 const testEachModal = async (testDescription: string, func: (

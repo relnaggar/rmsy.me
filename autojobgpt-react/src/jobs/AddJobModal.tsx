@@ -19,6 +19,7 @@ const AddJobModal = ({
   const titleInput = useInputControl("title");
   const companyInput = useInputControl("company");
   const postingInput = useInputControl("posting");
+  const notesInput = useInputControl("notes");
   
   const [fillErrors, setFillErrors] = useState<Record<string,string[]>>({});
   const [showFillErrorAlert, setShowFillErrorAlert] = useState<boolean>(false);  
@@ -92,7 +93,7 @@ const AddJobModal = ({
     }
 
     addModal.setErrors(newErrors);
-    for (const input of [urlInput, titleInput, companyInput, postingInput]) {
+    for (const input of [urlInput, titleInput, companyInput, postingInput, notesInput]) {
       input.stopEditing();
     }
     
@@ -105,6 +106,7 @@ const AddJobModal = ({
       title: titleInput.value,
       company: companyInput.value,
       posting: postingInput.value,
+      notes: notesInput.value,
     });
   };
 
@@ -140,6 +142,10 @@ const AddJobModal = ({
       <BaseInput ref={companyInput.ref} name={companyInput.name}
         value={companyInput.value} editing={companyInput.editing} handleChange={companyInput.handleChange}
         label="Company" type="text" loading={filling} errors={addModal.errors[companyInput.name]}
+      />
+      <BaseInput ref={notesInput.ref} name={notesInput.name}
+        value={notesInput.value} editing={notesInput.editing} handleChange={notesInput.handleChange}
+        label="Notes" type="textarea" errors={addModal.errors[notesInput.name]}
       />
       <BaseInput ref={postingInput.ref} name={postingInput.name}
         value={postingInput.value} editing={postingInput.editing} handleChange={postingInput.handleChange}

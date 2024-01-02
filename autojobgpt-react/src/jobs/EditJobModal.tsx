@@ -48,6 +48,9 @@ const EditJobModal = ({
         required
       />
       <InputWithSave editId={editId} {...resourceManager}
+        type="textarea" editableProperty="notes" labelText="Notes"
+      />
+      <InputWithSave editId={editId} {...resourceManager}
         type="textarea" editableProperty="posting" labelText="Posting"
         required
       />
