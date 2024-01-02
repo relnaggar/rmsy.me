@@ -26,6 +26,13 @@ class Routes implements \Framework\RoutesInterface {
 
   private function getProjects(): array {
     $projects = [
+      'AutoJobGPT' => [
+        'title' => 'AutoJobGPT: Applications Made Easy',
+        'path' => '/projects/autojobgpt/',
+        'imagePath' => '/assets/img/autojobgpt/autojobgpt.png',
+        'description' => "1. Upload resume template. 2. ???. 3. Profit!",
+        'rootFunctionName' => 'introduction'
+      ],
       'Website' => [
         'title' => 'My Mona Lisa: A Personal Website',
         'path' => '/projects/website/',
@@ -60,7 +67,7 @@ class Routes implements \Framework\RoutesInterface {
         'imagePath' => '/assets/img/sdp/hug.jpg',
         'description' => "Robo-Messi wants a hug. Will you give him one?",
         'rootFunctionName' => 'introduction'
-      ]      
+      ]
     ];
     foreach ($projects as &$project) {
       if (isset($project['pages'])) {
