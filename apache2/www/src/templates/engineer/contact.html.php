@@ -123,7 +123,7 @@
       <div class="card-body">
         <?=includeIcon('linkedin')?>
         &nbsp;
-        <a href="/linkedin" target="_blank">rmsy.me/linkedin</a>
+        <a href="/linkedin" target="_blank" rel="noopener noreferrer">rmsy.me/linkedin</a>
         <?=includeIcon('box-arrow-up-right')?>
       </div>
     </div>

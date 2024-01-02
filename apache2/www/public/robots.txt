@@ -1,4 +1,4 @@
 User-agent: *
-Allow: /
+Disallow: /autojobgpt/
 
 Sitemap: https://rmsy.me/sitemap.xml

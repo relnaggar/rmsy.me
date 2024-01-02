@@ -22,7 +22,7 @@
 <p data-nosnippet>
   But wait, there's more to my story.
   You see, I believe that knowledge shared is knowledge multiplied, and I absolutely love sharing my knowledge and passion for programming.
-  As a <a href="https://www.mytutor.co.uk/tutors/24851/" target="_blank">educator</a> <?=includeIcon('box-arrow-up-right')?>, I've had the joy of introducing undergraduate students to the vast world of computer science.
+  As a <a href="https://www.mytutor.co.uk/tutors/24851/" target="_blank" rel="noopener noreferrer">educator</a> <?=includeIcon('box-arrow-up-right')?>, I've had the joy of introducing undergraduate students to the vast world of computer science.
   From the magic of web development, to the elegance of OOP, to the intellectual puzzles in algorithms and data structures: we've journeyed through it all, there and back again.
 </p>
 
@@ -35,7 +35,7 @@
 
 <p data-nosnippet>
   Still curious?
-  Check out <a href="/linkedin" target="_blank">my LinkedIn profile</a> <?=includeIcon('box-arrow-up-right')?>, which offers a treasure trove of highlights and achievements.
+  Check out <a href="/linkedin" target="_blank" rel="noopener noreferrer">my LinkedIn profile</a> <?=includeIcon('box-arrow-up-right')?>, which offers a treasure trove of highlights and achievements.
   It's the story of my professional life in all its glory.
   Or better yet, feel free to <a href="/contact">reach out for a chat</a> -- I'm always game to talk tech, education, or even dung beetles! 
 </p>

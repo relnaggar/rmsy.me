@@ -7,7 +7,7 @@
 </figure>
 
 <p>
-  Pulling off an A+ grade on the <a href="https://observatory.mozilla.org/analyze/rmsy.me" target="_blank">Mozilla Observatory test</a> <?=includeIcon('box-arrow-up-right')?> feels like nailing the final round of <i>Who Wants to Be a Millionaire?</i> (still waiting for my check, Chris Tarrant).
+  Pulling off an A+ grade on the <a href="https://observatory.mozilla.org/analyze/rmsy.me" target="_blank" rel="noopener noreferrer">Mozilla Observatory test</a> <?=includeIcon('box-arrow-up-right')?> feels like nailing the final round of <i>Who Wants to Be a Millionaire?</i> (still waiting for my check, Chris Tarrant).
   This isn't your typical 'color inside the lines' assignment; it's a labyrinth of security configurations aimed at safeguarding my crown jewels: this website.
   With my sleeves rolled up and my toolbox in one hand, I scaled the tower of Apache server configuration, tediously tweaking <code>.conf</code> files by hand.
   My crowning achievement?

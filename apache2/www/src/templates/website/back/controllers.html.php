@@ -14,15 +14,15 @@
   Let's glance at the cast of controllers, as detailed in the diagram stage-left:
   <ul>
     <li>
-      We have the head honcho, the <code><a href="<?=$controllersUrl?>AbstractController.php" target="_blank">AbstractController</a></code> <?=includeIcon('box-arrow-up-right')?>, acting as the base for all other controllers.
+      We have the head honcho, the <code><a href="<?=$controllersUrl?>AbstractController.php" target="_blank" rel="noopener noreferrer">AbstractController</a></code> <?=includeIcon('box-arrow-up-right')?>, acting as the base for all other controllers.
       Picture it as the veteran stage director passing down wisdom to the newbies.
     </li>
     <li>
-      Next up, we have the <code><a href="<?=$controllersUrl?>AbstractProject.php" target="_blank">AbstractProject</a></code> <?=includeIcon('box-arrow-up-right')?>, a base project controller.
+      Next up, we have the <code><a href="<?=$controllersUrl?>AbstractProject.php" target="_blank" rel="noopener noreferrer">AbstractProject</a></code> <?=includeIcon('box-arrow-up-right')?>, a base project controller.
       This savvy maestro provides functionalities common to all project controllers.
     </li>
     <li>
-      Then we have the individual controllers for each project (currently <code><a href="<?=$controllersUrl?>Website.php" target="_blank">Website</a></code> <?=includeIcon('box-arrow-up-right')?>, <code><a href="<?=$controllersUrl?>Beetle.php" target="_blank">Beetle</a></code> <?=includeIcon('box-arrow-up-right')?>, and <code><a href="<?=$controllersUrl?>SDP.php" target="_blank">SDP</a></code> <?=includeIcon('box-arrow-up-right')?>), and each menu (currently just the <code><a href="<?=$controllersUrl?>Engineer.php">Engineer</a></code> <?=includeIcon('box-arrow-up-right')?>).
+      Then we have the individual controllers for each project (currently <code><a href="<?=$controllersUrl?>Website.php" target="_blank" rel="noopener noreferrer">Website</a></code> <?=includeIcon('box-arrow-up-right')?>, <code><a href="<?=$controllersUrl?>Beetle.php" target="_blank" rel="noopener noreferrer">Beetle</a></code> <?=includeIcon('box-arrow-up-right')?>, and <code><a href="<?=$controllersUrl?>SDP.php" target="_blank" rel="noopener noreferrer">SDP</a></code> <?=includeIcon('box-arrow-up-right')?>), and each menu (currently just the <code><a href="<?=$controllersUrl?>Engineer.php">Engineer</a></code> <?=includeIcon('box-arrow-up-right')?>).
       Each one of them is a star in their own right.
     </li>
   </ul>

@@ -29,7 +29,7 @@
   And not just any framework, but one that's more copy-paste friendly than your best friend's homework!
   Thinking of creating another single-page web application in PHP?
   Not a problem!
-  Just grab this super flexible and friendly-as-a-golden-retriever framework, specifically <code><a href="<?=$publicUrl?>index.php" target="_blank">index.php</a></code> <?=includeIcon('box-arrow-up-right')?> and the <code><a href="<?=$frameworkUrl?>" target="_blank">Framework directory</a></code> <?=includeIcon('box-arrow-up-right')?>, insert your application's namespace and voila!
+  Just grab this super flexible and friendly-as-a-golden-retriever framework, specifically <code><a href="<?=$publicUrl?>index.php" target="_blank" rel="noopener noreferrer">index.php</a></code> <?=includeIcon('box-arrow-up-right')?> and the <code><a href="<?=$frameworkUrl?>" target="_blank" rel="noopener noreferrer">Framework directory</a></code> <?=includeIcon('box-arrow-up-right')?>, insert your application's namespace and voila!
   You're set.
   Sure, you'll need to write your own routes-layout-controllers-and-templates, but let's be real, that's the best part!
   Now, get out there and do some coding, you little rascal you!

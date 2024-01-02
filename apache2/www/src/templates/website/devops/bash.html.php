@@ -1,12 +1,12 @@
 <p>
   In a quest to squeeze out every drop of efficiency possible during development, testing, staging, and deployment, I whipped up a tantalising array of Bash scripts to automate our favorite tasks.
-  Feel free to explore this joyful jar of code goodies in the <a href="https://github.com/relnaggar/rmsy.me/tree/master/script" target="_blank"><code>script</code></a> <?=includeIcon('box-arrow-up-right')?> directory, or let your curiosity be quenched by the README file waiting for you in the project's <a href="/projects/website/#source">source code</a>.
+  Feel free to explore this joyful jar of code goodies in the <a href="https://github.com/relnaggar/rmsy.me/tree/master/script" target="_blank" rel="noopener noreferrer"><code>script</code></a> <?=includeIcon('box-arrow-up-right')?> directory, or let your curiosity be quenched by the README file waiting for you in the project's <a href="/projects/website/#source">source code</a>.
 </p>
 
 <p>  
   Ever watched a virtuoso chef effortlessly chop, slice, and dice ingredients at record speed?
-  That was my inspiration while using the <a href="https://github.com/github/scripts-to-rule-them-all" target="_blank">Scripts To Rule Them All guide</a> <?=includeIcon('box-arrow-up-right')?> to design them.
-  I also followed the <a href="https://google.github.io/styleguide/shellguide.html" target="_blank">Google Shell Style Guide</a> <?=includeIcon('box-arrow-up-right')?> to ensure the scripts are as palatable and digestible as a gourmet meal.
+  That was my inspiration while using the <a href="https://github.com/github/scripts-to-rule-them-all" target="_blank" rel="noopener noreferrer">Scripts To Rule Them All guide</a> <?=includeIcon('box-arrow-up-right')?> to design them.
+  I also followed the <a href="https://google.github.io/styleguide/shellguide.html" target="_blank" rel="noopener noreferrer">Google Shell Style Guide</a> <?=includeIcon('box-arrow-up-right')?> to ensure the scripts are as palatable and digestible as a gourmet meal.
   So, let's have a quick gander at some of the Bash hits on the menu:
 </p>
 

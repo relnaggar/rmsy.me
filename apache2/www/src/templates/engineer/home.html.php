@@ -17,7 +17,7 @@
       It was there that I sharpened my skills and grew a thick skin for real-world coding dramas.
     </li>
     <li>
-      Four enlightening years educating the world in computer science and software engineering, during which I earned the rather grand title of the UK's top 'Computing University' tutor on the esteemed platform, <a href="https://www.mytutor.co.uk/tutors/24851/" target="_blank">MyTutor</a> <?=includeIcon('box-arrow-up-right')?>.
+      Four enlightening years educating the world in computer science and software engineering, during which I earned the rather grand title of the UK's top 'Computing University' tutor on the esteemed platform, <a href="https://www.mytutor.co.uk/tutors/24851/" target="_blank" rel="noopener noreferrer">MyTutor</a> <?=includeIcon('box-arrow-up-right')?>.
       No undergrads were harmed in the making of this story.
     </li>
   </ul>  

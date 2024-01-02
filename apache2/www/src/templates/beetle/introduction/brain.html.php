@@ -20,7 +20,7 @@
 </figure>
 
 <p>
-  In the figure here you can see my adaptation of a <a href="https://www.sciencedirect.com/science/article/pii/S0960982217310904" target="_blank">CX model of path integration in bees</a> <?=includeIcon('box-arrow-up-right')?> to straight-line navigation in dung beetles.
+  In the figure here you can see my adaptation of a <a href="https://www.sciencedirect.com/science/article/pii/S0960982217310904" target="_blank" rel="noopener noreferrer">CX model of path integration in bees</a> <?=includeIcon('box-arrow-up-right')?> to straight-line navigation in dung beetles.
   First, let's visit the neighborhood of green neurons.
   These band together to form a ring that works just like a compass.
   They keep a pulse on the beetle's current heading, making sure our little navigator knows which direction its facing at the moment.
