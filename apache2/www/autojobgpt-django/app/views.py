@@ -55,7 +55,7 @@ def media(request, path):
   
   if path.endswith(".docx"):
     get_object_or_404(model, docx=path, user=request.user)
-    content_type = 'application/octet-stream'
+    content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
   elif path.endswith(".png"):
     get_object_or_404(model, png=path, user=request.user)
     content_type = 'image/png'
