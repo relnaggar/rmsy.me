@@ -42,7 +42,7 @@ class FillField(models.Model):
 
     super().save(*args, **kwargs)
     for tailored_document in self.template.tailored_documents.all():
-      chat = Chat(tailored_document.chat_messages)
+      chat = Chat(self.user.username, tailored_document.chat_messages)
       chat.log(f"""Log: the user has updated the fill field with the key `{self.key}` to have the following description:
   <description>{self.description}</description>.""")
       tailored_document.chat_messages = chat.get_messages()
@@ -93,7 +93,7 @@ class Template(models.Model, DocumentMixin):
     # if the additional_information has changed, update the chat messages
     if self.additional_information != original_additional_information:
       for tailored_document in self.tailored_documents.all():
-        chat = Chat(tailored_document.chat_messages)
+        chat = Chat(self.user.username, tailored_document.chat_messages)
         chat.log(f"""Log: the user has updated their additional information to be:
 <additional_information>{self.additional_information}</additional_information>.""")
         tailored_document.chat_messages = chat.get_messages()

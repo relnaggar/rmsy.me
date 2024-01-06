@@ -89,7 +89,8 @@ If you fail for any reason, please provide a single JSON key "error" with a stri
       cls.__client = OpenAI(api_key=api_key)
     return cls.__client
     
-  def __init__(self, messages=None):
+  def __init__(self, username=None, messages=None):
+    self.username = username
     if messages is None:
       self.messages = [
         {"role": "system", "content": self.system_message_content}
@@ -101,11 +102,19 @@ If you fail for any reason, please provide a single JSON key "error" with a stri
     client = Chat.get_client()
     prompt_text = Template(self.prompts[prompt_name]).substitute(substitutions)
     self.messages.append({"role": "user", "content": prompt_text})
-    completion = client.chat.completions.create(
-      model=Chat.model,
-      response_format=Chat.response_format,
-      messages=self.messages,
-    )
+    if self.username is None:
+      completion = client.chat.completions.create(
+        model=Chat.model,
+        response_format=Chat.response_format,
+        messages=self.messages,
+      )
+    else:
+      completion = client.chat.completions.create(
+        model=Chat.model,
+        response_format=Chat.response_format,
+        messages=self.messages,
+        user=self.username,
+      )
     choice = completion.choices[0]
     if choice.finish_reason != "stop":
       raise Exception(f"OpenAI API failed with status '{choice.finish_reason}'")

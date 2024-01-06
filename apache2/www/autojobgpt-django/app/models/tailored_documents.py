@@ -130,7 +130,7 @@ The user has provided the following additional information to help you tailor th
 <additional_information>{self.template.additional_information}</additional_information>"""
 
     # ask GPT to fill in the fill fields
-    chat = Chat(self.chat_messages)
+    chat = Chat(self.user.username, self.chat_messages)
     response = json.loads(
       chat.ask(prompt_name="fill_template", substitutions={
         "template_text": template_text,
@@ -255,14 +255,14 @@ class Substitution(models.Model):
     self.tailored_document.generate_png(replace=True)
 
     if self.key not in self.tailored_document.default_substitutions:
-      chat = Chat(self.tailored_document.chat_messages)
+      chat = Chat(self.user.username, self.tailored_document.chat_messages)
       chat.log(f"""Log: the user has updated the fill field with the key `{self.key}` to the following value:
   <saved_value>{self.value}</saved_value>.""")
       self.tailored_document.chat_messages = chat.get_messages()
       self.tailored_document.save()
   
   def regenerate(self, current_value, feedback=None):
-    chat = Chat(self.tailored_document.chat_messages)
+    chat = Chat(self.user.username, self.tailored_document.chat_messages)
 
     current_value_message = ""
     if current_value != "":
