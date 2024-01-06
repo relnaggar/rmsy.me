@@ -71,6 +71,7 @@ const TemplateList = ({
       <h2 className="mb-3">{documentTypeLabel} Templates</h2>
       <ErrorAlert {...errorAlert} />
       <DocumentList {...templateManager}
+        showErrors={errorAlert.showErrors}
         onClickEditDocument={handleClickEditTemplate}
         onClickRemoveDocument={handleClickRemoveTemplate}
         onClickAddDocument={handleClickAddTemplate}

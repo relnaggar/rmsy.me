@@ -54,20 +54,22 @@ def media(request, path):
     raise Http404
   
   if path.endswith(".docx"):
-    document = get_object_or_404(model, docx=path, user=request.user)
+    get_object_or_404(model, docx=path, user=request.user)
+    content_type = 'application/octet-stream'
   elif path.endswith(".png"):
-    document = get_object_or_404(model, png=path, user=request.user)
+    get_object_or_404(model, png=path, user=request.user)
+    content_type = 'image/png'
+  else:
+    raise Http404
 
   file_path = settings.MEDIA_ROOT + path
 
   try:    
     with open(file_path, 'rb') as file:
-      content = file.read()  # Read file content into memory
-    response = HttpResponse(content, content_type='application/octet-stream')
+      content = file.read()
+    response = HttpResponse(content, content_type=content_type)
     return response
-  except IOError:
-    raise Http404
-  except Exception as e:
+  except:
     raise Http404
 
 

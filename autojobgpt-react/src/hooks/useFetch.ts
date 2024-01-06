@@ -17,6 +17,7 @@ interface UseFetchOptions<ResponseData> {
   initialFetch?: boolean,
   initialData?: ResponseData,
   includeAuthorisationToken?: boolean,
+  responseType?: "json" | "blob",
 };
 
 const useFetch = <Data extends unknown>(
@@ -30,16 +31,22 @@ const useFetch = <Data extends unknown>(
     onSuccess,
     onFail,
     includeAuthorisationToken = true,
+    responseType = "json",
   } = options || {};
 
   const [responseData, setResponseData] = useState<Data>(initialData);
   const [doingInitialFetch, setDoingInitialFetch] = useState<boolean>(initialFetch);
 
   const handleSuccess = useCallback(async ({ response }: OnSuccessParams): Promise<void> => {
-    const responseData: Data = await response.json();
-    setResponseData(responseData);
-    onSuccess?.(responseData, setResponseData);
-  }, [onSuccess]);
+    let theResponseData: Data;
+    if (responseType === "json") {
+      theResponseData = await response.json();
+    } else {
+      theResponseData = (await response.blob()) as Data;
+    }
+    setResponseData(theResponseData);
+    onSuccess?.(theResponseData, setResponseData);
+  }, [onSuccess, responseType]);
 
   const { calling: fetching, call, cancel } = useApiCall("GET", {
     apiPath,
@@ -49,6 +56,7 @@ const useFetch = <Data extends unknown>(
     onFail,
     includeAuthorisationToken,
     extraFetchOptions,
+    responseType,
   });
 
   useEffect(() => {

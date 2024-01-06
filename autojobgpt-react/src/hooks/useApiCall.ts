@@ -50,6 +50,7 @@ const useApiCall = (
     afterCall?: (params : AfterCallParams) => void,
     onFail?: (errors: Record<string,string[]>) => void,
     includeAuthorisationToken?: boolean,
+    responseType?: "json" | "blob",
     extraFetchOptions?: RequestInit,
   },
 ): UseApiCall => {
@@ -62,6 +63,7 @@ const useApiCall = (
     cancelable=false,
     initialFetch=false,
     includeAuthorisationToken=true,
+    responseType="json",
   } = options || {};
 
   const csrfToken: string = useContext(CSRFTokenContext)
@@ -102,8 +104,14 @@ const useApiCall = (
 
     let errors: Record<string,string[]> = {};
     try {
-      let headers: Record<string,string> = body instanceof FormData ? {} : {
-        "Content-Type": "application/json",
+      let contentType = "";
+      if (responseType === "json") {
+        contentType = "application/json";
+      } else if (responseType === "blob") {
+        contentType = "application/octet-stream";
+      }
+      let headers: HeadersInit = body instanceof FormData ? {} : {
+        "Content-Type": contentType,
       };
       if (includeCsrfToken) {
         headers["X-CSRFToken"] = csrfToken;
@@ -161,7 +169,7 @@ const useApiCall = (
         }
       }
     }
-  }, [fetchData, apiRoot, apiPath, method, csrfToken, includeCsrfToken, calling, beforeCall, onSuccess, afterCall, onFail, cancelable, includeAuthorisationToken]);
+  }, [fetchData, apiRoot, apiPath, method, csrfToken, includeCsrfToken, calling, beforeCall, onSuccess, afterCall, onFail, cancelable, includeAuthorisationToken, responseType]);
 
   let cancel = undefined;
   if (cancelable) {

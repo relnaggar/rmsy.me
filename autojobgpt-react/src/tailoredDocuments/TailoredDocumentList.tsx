@@ -132,6 +132,7 @@ const TailoredDocumentList = ({
         filterLabel="Filter by job:" defaultOptionLabel="All Jobs"
       />
       <DocumentList {...{...tailoredDocumentManager, resources: filteredTailoredDocuments }}
+        showErrors={errorAlert.showErrors}
         onClickEditDocument={handleClickEditTailoredDocument}
         onClickRemoveDocument={handleClickRemoveTailoredDocument}
         onClickAddDocument={handleClickAddTailoredDocument}

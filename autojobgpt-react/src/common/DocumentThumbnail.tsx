@@ -1,9 +1,12 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { ReactComponent as FileArrowDownIcon } from "bootstrap-icons/icons/file-arrow-down.svg";
 import { ReactComponent as EyeIcon } from "bootstrap-icons/icons/eye.svg";
 
-import { Document } from '../api/types';
+import useApiCall, { OnSuccessParams } from "../hooks/useApiCall";
+import useFetch from "../hooks/useFetch";
+import { UseErrorAlert } from "../hooks/useErrorAlert";
 import EditDeleteButtonGroup, { EditDeleteButtonGroupProps } from "./EditDeleteButtonGroup";
+import { Document } from '../api/types';
 
 
 const generatePlaceholderWidths = (numberOfRows: number): number[] => {
@@ -32,45 +35,54 @@ const generatePlaceholderWidths = (numberOfRows: number): number[] => {
   return placeHolderWidths;
 };
 
-interface DocumentThumbnailProps extends Partial<EditDeleteButtonGroupProps> {
+interface DocumentThumbnailProps extends
+  Pick<UseErrorAlert, "showErrors">,
+  Partial<EditDeleteButtonGroupProps>, Pick<UseErrorAlert, "showErrors">
+{
   document: Document,
 };
 
 const DocumentThumbnail = ({
+  showErrors,
   document,
   ...editDeleteButtonGroupProps
 }: DocumentThumbnailProps): React.JSX.Element => {
+  const [imageUrl, setImageUrl] = useState<string>("");
   const placeholderWidths = useRef<number[]>([]);
+  
   if (placeholderWidths.current.length === 0) {
     placeholderWidths.current = generatePlaceholderWidths(15);
   }
 
-  const handleClickDownload = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
-    const token = localStorage.getItem("token");
-    const headers: HeadersInit = {};
-    if (token !== null) {
-      headers["Authorization"] = `Token ${token}`;
-    }
-
-    const response = await fetch(document.docx, {
-      method: "GET",
-      headers,
-    });
-
-    if (response.ok) {
-      const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const link = window.document.createElement('a');
-      link.href = downloadUrl;
-      link.download = document.docx.split("/").pop()!;
-      window.document.body.appendChild(link);
-      link.click();
-      window.document.body.removeChild(link);
-    } else {
-      // Handle errors
-      console.error("File download failed!");
-    }
+  const onClickDownloadSuccess = async ({response}: OnSuccessParams) => {
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = window.document.createElement('a');
+    link.href = downloadUrl;
+    link.download = document.docx.split("/").pop()!;
+    window.document.body.appendChild(link);
+    link.click();
+    window.document.body.removeChild(link);
   };
+
+  const { call: download } = useApiCall("GET", {
+    onSuccess: onClickDownloadSuccess,
+    onFail: showErrors,
+  });
+
+  const handleClickDownload = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    download({apiPath: document.docx.split("/api/")[1]});
+  };
+
+  const onLoadImageSuccess = (blob: Blob): void => {
+    setImageUrl(URL.createObjectURL(blob));
+  };
+
+  const { fetching: fetchingImage } = useFetch<Blob>(document.png.split("/api/")[1], {
+    onSuccess: onLoadImageSuccess,
+    onFail: showErrors,
+    responseType: "blob",
+  });
 
   return (
     <div
@@ -80,7 +92,7 @@ const DocumentThumbnail = ({
       aria-busy={document.png === ""}
     >
       {/* document image */}
-      {document.png === "" ?
+      {document.png === "" || fetchingImage ?
         <div className="document-image img-thumbnail">
           <p className="placeholder-glow pt-5 text-start">
             {placeholderWidths.current.map((width, index) => {
@@ -94,7 +106,7 @@ const DocumentThumbnail = ({
           </p>
         </div>
       :
-        <img src={document.png} className="document-image img-thumbnail" alt={document.name} />
+        <img src={imageUrl} className="document-image img-thumbnail" alt={document.name} />
       }
 
       {/* document header */}
