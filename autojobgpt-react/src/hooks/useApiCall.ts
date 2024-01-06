@@ -49,10 +49,20 @@ const useApiCall = (
     onSuccess?: (params: OnSuccessParams) => Promise<void>,
     afterCall?: (params : AfterCallParams) => void,
     onFail?: (errors: Record<string,string[]>) => void,
+    includeAuthorisationToken?: boolean,
     extraFetchOptions?: RequestInit,
   },
 ): UseApiCall => {
-  const { apiPath, beforeCall, onSuccess, afterCall, onFail, cancelable = false, initialFetch = false } = options || {};
+  const {
+    apiPath,
+    beforeCall,
+    onSuccess,
+    afterCall,
+    onFail,
+    cancelable=false,
+    initialFetch=false,
+    includeAuthorisationToken=true,
+  } = options || {};
 
   const csrfToken: string = useContext(CSRFTokenContext)
   const includeCsrfToken: boolean = method === "POST" || method === "PATCH" || method === "DELETE";
@@ -97,6 +107,12 @@ const useApiCall = (
       };
       if (includeCsrfToken) {
         headers["X-CSRFToken"] = csrfToken;
+      }
+      if (includeAuthorisationToken) {
+        const authorisationToken = localStorage.getItem("token");
+        if (authorisationToken !== null) {
+          headers["Authorization"] = `Token ${authorisationToken}`;
+        }
       }
 
       let url: string = apiRoot
@@ -145,7 +161,7 @@ const useApiCall = (
         }
       }
     }
-  }, [fetchData, apiRoot, apiPath, method, csrfToken, includeCsrfToken, calling, beforeCall, onSuccess, afterCall, onFail, cancelable]);
+  }, [fetchData, apiRoot, apiPath, method, csrfToken, includeCsrfToken, calling, beforeCall, onSuccess, afterCall, onFail, cancelable, includeAuthorisationToken]);
 
   let cancel = undefined;
   if (cancelable) {

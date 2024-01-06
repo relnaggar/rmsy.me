@@ -16,6 +16,7 @@ interface UseFetchOptions<ResponseData> {
   onFail?: (errors: Record<string,string[]>) => void,  
   initialFetch?: boolean,
   initialData?: ResponseData,
+  includeAuthorisationToken?: boolean,
 };
 
 const useFetch = <Data extends unknown>(
@@ -23,7 +24,13 @@ const useFetch = <Data extends unknown>(
   options?: UseFetchOptions<Data>,
   extraFetchOptions?: RequestInit,
 ): UseFetch<Data> => {
-  const { initialData = {} as Data, initialFetch = true, onSuccess, onFail } = options || {};
+  const {
+    initialData = {} as Data,
+    initialFetch = true,
+    onSuccess,
+    onFail,
+    includeAuthorisationToken = true,
+  } = options || {};
 
   const [responseData, setResponseData] = useState<Data>(initialData);
   const [doingInitialFetch, setDoingInitialFetch] = useState<boolean>(initialFetch);
@@ -40,6 +47,7 @@ const useFetch = <Data extends unknown>(
     cancelable: true,
     onSuccess: handleSuccess,
     onFail,
+    includeAuthorisationToken,
     extraFetchOptions,
   });
 

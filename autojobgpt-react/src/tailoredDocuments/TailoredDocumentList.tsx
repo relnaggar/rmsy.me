@@ -24,7 +24,6 @@ const getPlaceholderTailoredDocument = (tailoredDocumentUpload: TailoredDocument
     version: -1,
     docx: "",
     png: "",
-    chat_messages: [],
     job: {
       id: tailoredDocumentUpload.job,
       url: "",

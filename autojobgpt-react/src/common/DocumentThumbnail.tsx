@@ -45,6 +45,33 @@ const DocumentThumbnail = ({
     placeholderWidths.current = generatePlaceholderWidths(15);
   }
 
+  const handleClickDownload = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
+    const token = localStorage.getItem("token");
+    const headers: HeadersInit = {};
+    if (token !== null) {
+      headers["Authorization"] = `Token ${token}`;
+    }
+
+    const response = await fetch(document.docx, {
+      method: "GET",
+      headers,
+    });
+
+    if (response.ok) {
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = window.document.createElement('a');
+      link.href = downloadUrl;
+      link.download = document.docx.split("/").pop()!;
+      window.document.body.appendChild(link);
+      link.click();
+      window.document.body.removeChild(link);
+    } else {
+      // Handle errors
+      console.error("File download failed!");
+    }
+  };
+
   return (
     <div
       className="document text-center me-3"
@@ -106,10 +133,10 @@ const DocumentThumbnail = ({
       {document.docx !== "" && 
         <div className="document-footer pb-4">
           <div className="d-flex">
-            <a download href={document.docx} className="btn btn-primary text-nowrap" role="button">
+            <button onClick={handleClickDownload} className="btn btn-primary text-nowrap">
               <FileArrowDownIcon className="me-1" />
               Download
-            </a>
+            </button>
             { document.png !== "" &&
               <a href={document.png}
                 className="ms-2 btn btn-primary text-nowrap" role="button" target="_blank" rel="noreferrer"

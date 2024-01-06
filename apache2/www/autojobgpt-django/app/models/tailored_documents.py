@@ -1,5 +1,6 @@
 from django.db import models
 from django.core import files
+from django.conf import settings
 
 import json
 import io
@@ -14,26 +15,27 @@ class NoChosenResumeError(Exception):
   pass
 
 class TailoredDocument(models.Model, DocumentMixin):
+  user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tailored_documents")
   name = models.TextField(unique=True)
-  job = models.ForeignKey(to="Job", on_delete=models.RESTRICT, related_name="tailoredDocuments")
-  template = models.ForeignKey(to="Template", on_delete=models.RESTRICT, related_name="tailoredDocuments")
+  job = models.ForeignKey(to="Job", on_delete=models.RESTRICT, related_name="tailored_documents")
+  template = models.ForeignKey(to="Template", on_delete=models.RESTRICT, related_name="tailored_documents")
   version = models.IntegerField(default=1)
-  docx = models.FileField(upload_to='tailoredDocuments/')
-  png = models.FileField(upload_to='tailoredDocuments/')
+  docx = models.FileField(upload_to="tailored_documents/")
+  png = models.FileField(upload_to="tailored_documents/")
   chat_messages = models.JSONField(blank=True, null=True)
   type = models.CharField(max_length=20, choices=DocumentType.choices)
 
   class Meta:
     constraints = [
       models.UniqueConstraint(
-        fields=['job', 'version'], name='unique_job_version'
+        fields=["user", "job", "version"], name="unique_job_version"
       )
     ]
 
   @classmethod
-  def get_next_version(cls, job):
-    return cls.objects.filter(job=job).aggregate(
-      models.Max('version')
+  def get_next_version(cls, user, job):
+    return cls.objects.filter(user=user, job=job).aggregate(
+      models.Max("version")
     )["version__max"] + 1
 
   def __str__(self):
@@ -46,21 +48,21 @@ class TailoredDocument(models.Model, DocumentMixin):
       self.__update(*args, **kwargs)
 
   def __create(self, *args, **kwargs):
-    if TailoredDocument.objects.filter(job=self.job).exists():
-      self.version = TailoredDocument.get_next_version(self.job)
+    if TailoredDocument.objects.filter(user=self.user, job=self.job).exists():
+      self.version = TailoredDocument.get_next_version(self.user, self.job)
     else:
       self.version = TailoredDocument._meta.get_field("version").default
-    self.name = f'{self.job.title}, {self.job.company}, v{self.version}'
+    self.name = f"{self.job.title}, {self.job.company}, v{self.version}"
 
     if self.type == DocumentType.COVER_LETTER:
-      resume_count = self.job.tailoredDocuments.filter(type=DocumentType.RESUME).count()
+      resume_count = self.job.tailored_documents.filter(user=self.user, type=DocumentType.RESUME).count()
       if self.job.chosen_resume is None:
         if resume_count == 0:
           raise NoChosenResumeError("you must create a resume before you can generate a cover letter")
         elif resume_count > 1:
           raise NoChosenResumeError("you must choose a resume before you can generate a cover letter")
         else: # resume_count == 1
-          chosen_resume = self.job.tailoredDocuments.get(type=DocumentType.RESUME)
+          chosen_resume = self.job.tailored_documents.get(user=self.user, type=DocumentType.RESUME)
           self.job.chosen_resume = chosen_resume
           self.job.save()
       else:
@@ -107,7 +109,7 @@ class TailoredDocument(models.Model, DocumentMixin):
     # construct the fill_fields_text part of the prompt    
     fill_fields_text = ""
     for key in fill_field_keys:
-      fill_field = FillField.objects.get(key=key, template=self.template)
+      fill_field = FillField.objects.get(user=self.user, key=key, template=self.template)
       if fill_field is None:
         raise Exception(f"fill field {key} not found")
       if fill_field.description == "":
@@ -157,6 +159,7 @@ The user has provided the following additional information to help you tailor th
     # create the substitutions from substitutions
     for key, value in substitutions.items():
       substitution = Substitution(
+        user=self.user,
         tailored_document=self,
         key=key,
         value=value,
@@ -187,7 +190,7 @@ The user has provided the following additional information to help you tailor th
     template_document.save(file_stream)
 
     def sanitise_file_name(file_name):
-      return ''.join(c for c in file_name if c.isalnum() or c in ['_', '-'])
+      return "".join(c for c in file_name if c.isalnum() or c in ["_", "-"])
     
     # save the file stream to the file field
     file_name = f"{sanitise_file_name(self.job.title)}_{sanitise_file_name(self.job.company)}_v{self.version}.docx"    
@@ -204,12 +207,14 @@ The user has provided the following additional information to help you tailor th
 
   def duplicate(self):
     new_tailored_document = TailoredDocument(
+      user=self.user,
       job=self.job,
       template=self.template,
     )
     new_tailored_document.save(fill=False)
     for substitution in self.substitutions.all():
       new_substitution = Substitution(
+        user=substitution.user,
         tailored_document=new_tailored_document,
         key=substitution.key,
         value=substitution.value,
@@ -222,13 +227,14 @@ The user has provided the following additional information to help you tailor th
 
 
 class Substitution(models.Model):
+  user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="substitutions")
   tailored_document = models.ForeignKey(to="TailoredDocument", on_delete=models.CASCADE, related_name="substitutions")
   key = models.TextField()
   value = models.TextField(blank=True)
 
   class Meta:
     constraints = [
-      models.UniqueConstraint(fields=["tailored_document", "key"], name="unique_tailored_document_key"),
+      models.UniqueConstraint(fields=["user", "tailored_document", "key"], name="unique_tailored_document_key"),
     ]
 
   def __str__(self):
@@ -280,6 +286,7 @@ class Substitution(models.Model):
       response_content = response_message["content"]
       response = json.loads(response_content)
       substitution = Substitution(
+        user=self.user,
         id=self.id,
         tailored_document=self.tailored_document,
         key=self.key,

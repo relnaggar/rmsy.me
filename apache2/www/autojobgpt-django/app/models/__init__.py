@@ -1,3 +1,4 @@
+from .users import *
 from .jobs import *
 from .documents import *
 from .templates import *

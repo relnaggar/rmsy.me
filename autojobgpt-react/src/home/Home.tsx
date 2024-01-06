@@ -11,8 +11,7 @@ const Home = (): React.JSX.Element => {
       <figure className="figure my-3 ms-3 text-center col-md-5 float-end">
         <img src="/assets/img/autojobgpt/autojobgpt.png" className="figure-img img-fluid" alt="Futuristic sewing machine amidst traditional tailoring tools." />
         <figcaption className="figure-caption text-center">
-          An artist's rendition of AutoJobGPT tailoring your resume.
-          (Okay, the artist was DALL-E 3, but I gave it a really good prompt.)
+          AutoJobGPT: The future of job applications.
         </figcaption>
       </figure>
       <p>
@@ -36,26 +35,6 @@ const Home = (): React.JSX.Element => {
           is <a href="https://openai.com/product" target="_blank" rel="noreferrer">
             the OpenAI API <BoxArrowUpRightIcon className="ms-1" />
           </a>.)
-        </li>
-      </ul>
-      <p>
-        As you judge my worthiness as a programmer, look out for the current version's known limitations:
-      </p>
-      <ul>
-        <li>
-          There are no user accounts, so anyone can view, edit and delete the jobs and documents.
-          Keep it safe for work, people.
-        </li>
-        <li>
-          All data is reset regularly (aka whenever I feel like it).
-        </li>
-        <li>
-          The app only supports .docx files for the resume and cover letter templates.
-          This was much harder than it sounds so please be impressed.
-        </li>
-        <li>
-          There's a limit on the number of API calls that can be made per day.
-          In other words, there's a limit on my generosity / bank account balance.
         </li>
       </ul>
       <p>

@@ -10,7 +10,7 @@ services:
       - rmsy-me
     volumes:
       - "apache2-logs:/var/log/apache2"
-      - "django-media:/var/www/public/media"
+      - "django-media:/var/www/media"
   postgres:
     container_name: postgres
     init: true

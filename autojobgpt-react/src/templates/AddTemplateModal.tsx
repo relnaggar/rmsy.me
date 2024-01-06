@@ -62,6 +62,7 @@ const AddTemplateModal = ({
         value={uploadInput.value} editing={uploadInput.editing} handleChange={uploadInput.handleChange}
         label="Upload" type="file" errors={addModal.errors[uploadInput.name]}
         accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        helpText="Only .docx files are supported."
       />
       <BaseInput ref={additionalInformationInput.ref} name={additionalInformationInput.name}
         value={additionalInformationInput.value} editing={additionalInformationInput.editing} handleChange={additionalInformationInput.handleChange}

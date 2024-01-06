@@ -79,7 +79,7 @@ RUN chown -R apache2:apache2 /var/run/apache2
 
 ENV WEBSITE_ENV=DEVELOPMENT
 COPY docker-entrypoint /
-VOLUME ["/var/log/apache2", "/var/www", "/etc/apache2", "/etc/php/7.3/apache2", "/var/www/public/media"]
+VOLUME ["/var/log/apache2", "/var/www", "/etc/apache2", "/etc/php/7.3/apache2", "/var/www/media"]
 EXPOSE 8080
 EXPOSE 8443
 ENTRYPOINT ["/docker-entrypoint"]

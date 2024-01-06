@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 import re
 import os
@@ -13,17 +14,14 @@ DEFAULT_FILLFIELDS = {
 }
 
 class FillField(models.Model):
-  template = models.ForeignKey(
-    to="Template",
-    on_delete=models.CASCADE,
-    related_name="fill_fields",
-  )
+  user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="fill_fields")
+  template = models.ForeignKey(to="Template", on_delete=models.CASCADE, related_name="fill_fields")
   key = models.CharField(max_length=200)
   description = models.TextField(blank=True)
 
   class Meta:
     constraints = [
-      models.UniqueConstraint(fields=["template", "key"], name="fill_field_unique_template_key"),
+      models.UniqueConstraint(fields=["user", "template", "key"], name="fill_field_unique_template_key"),
     ]
 
   def __str__(self):
@@ -43,7 +41,7 @@ class FillField(models.Model):
       raise ValueError(f"fill field with the key `{self.key}` is read-only.")
 
     super().save(*args, **kwargs)
-    for tailored_document in self.template.tailoredDocuments.all():
+    for tailored_document in self.template.tailored_documents.all():
       chat = Chat(tailored_document.chat_messages)
       chat.log(f"""Log: the user has updated the fill field with the key `{self.key}` to have the following description:
   <description>{self.description}</description>.""")
@@ -51,6 +49,7 @@ class FillField(models.Model):
       tailored_document.save()
 
 class Template(models.Model, DocumentMixin):  
+  user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="templates")
   docx = models.FileField(upload_to="templates/")
   png = models.FileField(upload_to="templates/")
   name = models.TextField()
@@ -59,7 +58,7 @@ class Template(models.Model, DocumentMixin):
 
   class Meta:
     constraints = [
-      models.UniqueConstraint(fields=["name", "type"], name="template_unique_name_type"),
+      models.UniqueConstraint(fields=["user", "name", "type"], name="template_unique_name_type"),
     ]
 
   def __str__(self):
@@ -81,6 +80,7 @@ class Template(models.Model, DocumentMixin):
         description = ""
       if not FillField.objects.filter(template=self, key=key).exists():
         FillField.objects.create(
+          user=self.user,
           key=key,
           description=description,
           template=self,
@@ -92,7 +92,7 @@ class Template(models.Model, DocumentMixin):
 
     # if the additional_information has changed, update the chat messages
     if self.additional_information != original_additional_information:
-      for tailored_document in self.tailoredDocuments.all():
+      for tailored_document in self.tailored_documents.all():
         chat = Chat(tailored_document.chat_messages)
         chat.log(f"""Log: the user has updated their additional information to be:
 <additional_information>{self.additional_information}</additional_information>.""")

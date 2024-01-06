@@ -23,6 +23,7 @@ const Layout = (): React.JSX.Element => {
   const { responseData, fetching: fetchingCsrfToken} = useFetch<WithCsrfToken>("csrf/", {
     initialData: { csrfToken: ""},
     onFail: errorAlert.showErrors,
+    includeAuthorisationToken: false,
   }, {
     credentials: "include",
   });

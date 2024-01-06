@@ -66,15 +66,9 @@ export interface Substitution extends WithId {
   tailored_document: number,
 };
 
-export interface ChatMessage {
-  role: string,
-  content: string,
-};
-
 export interface TailoredDocument extends Document {
   substitutions: Substitution[],
   version: number,
-  chat_messages: ChatMessage[],
   job: Job,
   template: Template,
   type: DocumentType,
