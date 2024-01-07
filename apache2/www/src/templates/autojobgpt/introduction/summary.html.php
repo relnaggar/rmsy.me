@@ -11,3 +11,10 @@
     </li>
   </ul>
 </p>
+
+<figure class="figure m-3 text-center col-sm-5 float-end">
+  <img src="/assets/img/autojobgpt/demo.png" class="figure-img img-fluid" alt="User in front of a monitor depicting a futuristic road leading into the distance.">
+  <figcaption class="figure-caption text-center">
+    What it feels like to use AutoJobGPT.
+  </figcaption>
+</figure>
