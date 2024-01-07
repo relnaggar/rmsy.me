@@ -79,7 +79,7 @@ const useAuthControl = (params?: UseAuthControlParams): UseAuthControl => {
 
   useEffect(() => {
     reauthenticate();
-  }, [location]);
+  }, [location, reauthenticate]);
 
   const onLogoutSuccess = (): void => {
     localLogout();
