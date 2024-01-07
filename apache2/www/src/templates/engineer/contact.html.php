@@ -3,7 +3,7 @@
 <p>Feel free to ping me an email, submit the beautifully formatted form below, or even send me a LinkedIn invitation. I've never lost a patient!</p>
 
 <div class="row">
-  <div class="col-xl-8 mb-3">
+  <div class="col-xxl-7 mb-3">
     <?php if ($message['sent']) { ?>
       <div class="alert alert-success" role="alert">
         <h4 class="alert-heading">Message sent!</h4>
@@ -68,7 +68,7 @@
         <div class="card-body">
           <script src="/assets/contact-form.js" async defer></script>
           <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback" async defer nonce="<?=$recaptcha['nonce']?>"></script>
-          <form action="/engineer/contact" method="POST" autocomplete="on" class="needs-validation" novalidate>
+          <form action="/contact" method="POST" autocomplete="on" class="needs-validation" novalidate>
             <div class="mb-3">
               <label for="name" class="col-form-label">Name</label>
               <input type="text" class="form-control" id="name" name="message[name]" value="<?=$_POST['message']['name'] ?? ''?>" required>
@@ -105,7 +105,7 @@
       </div>
     <?php } ?>
   </div>
-  <div class="col-xl-4">
+  <div class="col-xxl-5">
     <div class="card mb-3">
       <div class="card-header">
         <h6 class="mb-0">Email</h6>

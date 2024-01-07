@@ -7,6 +7,7 @@ from django.db.models import Case, When, Value, IntegerField
 from django.http import Http404, HttpResponse
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import login as django_login, logout as django_logout
 
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -15,9 +16,12 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import mixins
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 from .models import Template, FillField, Job, TailoredDocument, Substitution, Status, DocumentType
 from .models import DEFAULT_FILLFIELDS
+from .serializers import EmptySerializer
 from .serializers import CustomUserSerializer
 from .serializers import StatusSerializer, JobSerializer
 from .serializers import TemplateSerializer, FillFieldSerializer
@@ -25,10 +29,6 @@ from .serializers import TailoredDocumentSerializer, SubstitutionSerializer
 from .serializers import RegenerateSerializer, JobURLSerializer, JobDetailsSerializer, StatusSerializer
 from .gpt import ChatException
 from .permissions import IsOwner
-
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 def app(request):
@@ -40,6 +40,20 @@ def app(request):
 def csrf(request):
   return JsonResponse({"csrfToken": get_token(request)})
 
+@api_view(["POST"])
+def login(request):
+  serializer = AuthTokenSerializer(data=request.data)
+  serializer.is_valid(raise_exception=True)
+  user = serializer.validated_data['user']
+  django_login(request._request, user)
+  token, _ = Token.objects.get_or_create(user=user)
+  return Response({'token': token.key})
+
+@api_view(["POST"])
+def logout(request):
+  django_logout(request._request)
+  return Response(status=status.HTTP_200_OK)
+
 class CustomUserViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
   serializer_class = CustomUserSerializer
 
@@ -48,7 +62,7 @@ class CustomUserViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 def media(request, path):
   if path.startswith("templates/"):
     model = Template
-  elif path.startswith("tailoredDocuments/"):
+  elif path.startswith("tailored_documents/"):
     model = TailoredDocument
   else:
     raise Http404
@@ -187,6 +201,11 @@ class JobViewSet(ModelViewSet):
 class FillFieldViewSet(ModelViewSet):
   serializer_class = FillFieldSerializer
 
+  def get_serializer_class(self):
+    if self.action == 'create':
+      return EmptySerializer
+    return super().get_serializer_class()
+
   def get_queryset(self):
     queryset = FillField.objects.filter(template__user=self.request.user)
     return queryset
@@ -207,6 +226,11 @@ class TemplateViewSet(ModelViewSet):
 
 class SubstitutionViewSet(ModelViewSet):
   serializer_class = SubstitutionSerializer
+
+  def get_serializer_class(self):
+    if self.action == 'create':
+      return EmptySerializer
+    return super().get_serializer_class()
 
   def get_queryset(self):
     queryset = Substitution.objects.filter(user=self.request.user)

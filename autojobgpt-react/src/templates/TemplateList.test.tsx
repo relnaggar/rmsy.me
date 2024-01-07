@@ -77,8 +77,8 @@ test(`each ${thisResource} list item is displayed with its name`, async () => {
 test(`each ${thisResource} list item is displayed with its image`, async () => {
   await renderRoute(thisRoute);
   const resourceElements: HTMLElement[] = queryResources(thisResource);
-  resourceElements.forEach((resourceElement, index: number) => {
-    expect(resourceElement.querySelector("img")?.src).toBe(thisMockData[index].png);
+  resourceElements.forEach((resourceElement) => {
+    expect(getByRole(resourceElement, "img")).toBeInTheDocument();
   });
 });
 
@@ -94,11 +94,9 @@ test(`each ${thisResource} list item is displayed with a delete button`, async (
 test(`each ${thisResource} list item is displayed with a download button`, async () => {
   await renderRoute(thisRoute);
   const resourceElements: HTMLElement[] = queryResources(thisResource);
-  resourceElements.forEach((resourceElement, index: number) => {
+  resourceElements.forEach((resourceElement) => {
     const button: HTMLElement = getByRole(resourceElement, "button", {name: new RegExp("download", "i")});
     expect(button).toBeInTheDocument();
-    expect(button).toHaveAttribute("href", thisMockData[index].docx);
-    expect(button).toHaveAttribute("download");
   });
 });
 

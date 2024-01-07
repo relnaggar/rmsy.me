@@ -84,8 +84,10 @@ class TailoredDocument(models.Model, DocumentMixin):
     super().save(*args, **kwargs)
 
   def delete(self, *args, **kwargs):
-    os.remove(self.docx.path)
-    os.remove(self.png.path)
+    if self.docx:
+      os.remove(self.docx.path)
+    if self.png:
+      os.remove(self.png.path)
     super().delete(*args, **kwargs)
   
   @property

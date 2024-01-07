@@ -19,7 +19,7 @@
               <?php } ?>
             </ul>
           <?php } else { ?>
-            <a class="nav-link<?php if ($menuItem['text'] === $menu['activeItemText']) { ?> active<?php } ?>"<?php if ($menuItem['text'] === $menu['activeItemText']) { ?> aria-current="location"<?php } ?> href="<?=$menuItem['path']?>" <?php if (isset($menuItem['target'])) { ?>target="<?=$menuItem['target']?>"<?php } ?>>
+            <a class="nav-link<?php if ($menuItem['text'] === $menu['activeItemText']) { ?> active<?php } ?>"<?php if ($menuItem['text'] === $menu['activeItemText']) { ?> aria-current="location"<?php } ?> href="<?=$menuItem['path']?>" <?php if (isset($menuItem['target'])) { ?>target="<?=$menuItem['target']?>"<?php } ?> <?php if (isset($menuItem['target']) && $menuItem['target']==="_blank") { ?>rel="noopener noreferrer"<?php } ?>>
               <?=$menuItem['text']?>
               <?php if (isset($menuItem['target'])) { ?>
                 <?=includeIcon('box-arrow-up-right')?>

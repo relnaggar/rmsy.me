@@ -5,3 +5,13 @@
 import "@testing-library/jest-dom";
 
 jest.setTimeout(10000);
+
+const localStorageMock = {
+  getItem: (_: string) => {
+    return "";
+  },
+};
+
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock
+});

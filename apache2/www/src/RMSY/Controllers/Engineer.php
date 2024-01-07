@@ -121,9 +121,9 @@ class Engineer extends AbstractController {
           // $result['error-codes'] = ['timeout-or-duplicate'];
           if ($result['success']) {
             $message['sent'] = $this->sendEmail(
-              'engineer@rmsy.me',
-              'Ramsey El-Naggar',
-              'engineer@rmsy.me',
+              'contactform@rmsy.me',
+              $_POST['message']['name'],
+              'ramsey.el-naggar@outlook.com',
               'Ramsey El-Naggar',
               $_POST['message']['email'],
               $_POST['message']['name'],

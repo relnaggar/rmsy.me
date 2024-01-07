@@ -78,10 +78,11 @@ const DocumentThumbnail = ({
     setImageUrl(URL.createObjectURL(blob));
   };
 
-  const { fetching: fetchingImage } = useFetch<Blob>(document.png.split("/api/")[1], {
+  const { fetching: fetchingImage } = useFetch<Blob>(document && document.png ? document.png.split("/api/")[1] : "", {
     onSuccess: onLoadImageSuccess,
     onFail: showErrors,
     responseType: "blob",
+    initialFetch: document.png !== "",
   });
 
   return (

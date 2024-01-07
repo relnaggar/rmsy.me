@@ -6,6 +6,10 @@ from .models import DocumentType
 from .models import DEFAULT_FILLFIELDS
 
 
+class EmptySerializer(serializers.Serializer):
+  pass
+
+
 class CustomUserSerializer(serializers.ModelSerializer):
   class Meta:
     model = CustomUser

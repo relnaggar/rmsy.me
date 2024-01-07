@@ -78,3 +78,7 @@ export interface TailoredDocumentUpload extends Pick<TailoredDocument, "type"> {
   job: number,
   template: number,
 };
+
+export interface LoginResponse {
+  token: string,
+};

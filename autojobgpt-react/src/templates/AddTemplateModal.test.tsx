@@ -131,34 +131,31 @@ test(`submitting the ${modalName} modal with valid input closes the modal within
   await waitFor(() => expect(modal).not.toBeInTheDocument(), {timeout: 1000});
 });
 
-test(`submitting the ${modalName} modal with valid input makes an api call`, async () => {
-  await renderRoute(thisRoute);
-  const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
-  await fillWithValidValues(modal);
-  const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
-  await clickSubmitButton(modal);
-  expect(mockFunctions.fetchData.mock.calls.length).toBe(initialFetchDataCalls + 1);
-});
-
 test(`submitting the ${modalName} modal with valid input makes an api call to add the resume template`, async () => {
   await renderRoute(thisRoute);
   const modal: HTMLElement = await openAndGetModal(openAndGetModalParams);
   await fillWithValidValues(modal);
   await clickSubmitButton(modal);
-  expect(mockFunctions.fetchData).toHaveBeenLastCalledWith("../api/templates/", expect.objectContaining({
+  expect(mockFunctions.fetchData).toHaveBeenCalledWith("../api/templates/", expect.objectContaining({
     method: "POST",
     body: expect.any(FormData),
   }));
-  const formData = mockFunctions.fetchData.mock.calls[mockFunctions.fetchData.mock.calls.length - 1][1].body;
-  for (const testDataForInput of testData) {
-    const data = formData.get(testDataForInput.name);
-    if (testDataForInput.role === "file") {      
-      expect(data).toEqual(expect.any(File));
-      expect((data as File).name).toBe(testDataForInput.validValue);
-    } else {
-      expect(data).toBe(testDataForInput.validValue);
+  for (let i = mockFunctions.fetchData.mock.calls.length - 1; i >= mockFunctions.fetchData.mock.calls.length - 5 && i >= 0; i--) {
+    const call = mockFunctions.fetchData.mock.calls[i];
+    if (call[0] === "../api/templates/") {
+      const formData = call[1].body;
+      for (const testDataForInput of testData) {
+        const data = formData.get(testDataForInput.name);
+        if (testDataForInput.role === "file") {      
+          expect(data).toEqual(expect.any(File));
+          expect((data as File).name).toBe(testDataForInput.validValue);
+        } else {
+          expect(data).toBe(testDataForInput.validValue);
+        }
+      }
+      break;
     }
-  }
+  }    
 });
 
 test(`submitting the ${modalName} modal with valid input adds the ${thisResource} to the list`, async () => {

@@ -18,16 +18,20 @@ const usePost = <ResponseData extends unknown>(
   options?: {
     apiPath?: string,
     cancelable?: boolean,
-    onSuccess?: (responseData: ResponseData) => void,
+    onSuccess?: ((responseData: ResponseData) => void) | (() => void),
     onFail?: (errors: Record<string,string[]>) => void,
+    responseType?: "json" | "none",
   },
 ): UsePost => {
-  const { apiPath, onSuccess, onFail, cancelable = false } = options || {};
+  const { apiPath, onSuccess, onFail, cancelable = false, responseType = "json"} = options || {};
 
   const handleSuccess = useCallback(async ({response}: OnSuccessParams): Promise<void> => {
-    const responseData: ResponseData = await response.json();
-    onSuccess?.(responseData);
-  }, [onSuccess]);
+    if (responseType === "none") {
+      onSuccess && (onSuccess as () => void)();
+    } else if (responseType === "json") {
+      onSuccess?.(await response.json());
+    }
+  }, [onSuccess, responseType]);
 
   const { calling: posting, call, cancel } = useApiCall("POST", {
     apiPath,

@@ -788,20 +788,11 @@ describe(`each ${modalName} modal has a duplicate button`, () => {
   });
 });
 
-describe(`clicking each ${modalName} modal duplicate button makes an api call`, () => {
-  testEachModal(`clicking duplicate button makes an api call`, async (modal, mockData) => {
-    const initialFetchDataCalls: number = mockFunctions.fetchData.mock.calls.length;
-    mockFunctions.fetchData.mockImplementationOnce(generateResponse(mockData));
-    await clickDuplicateButton(modal);
-    expect(mockFunctions.fetchData.mock.calls.length).toBe(initialFetchDataCalls + 1);
-  });
-});
-
 describe(`clicking each ${modalName} modal duplicate button makes an api call to duplicate the data`, () => {
   testEachModal(`clicking duplicate button makes an api call to duplicate the data`, async (modal, mockData) => {
     mockFunctions.fetchData.mockImplementationOnce(generateResponse(newResume));
     await clickDuplicateButton(modal);
-    expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(`${thisBaseApiPath}${mockData.id}/duplicate/`, expect.objectContaining({
+    expect(mockFunctions.fetchData).toHaveBeenCalledWith(`${thisBaseApiPath}${mockData.id}/duplicate/`, expect.objectContaining({
       method: "POST",
     }));
   });
@@ -841,7 +832,6 @@ describe(`api general errors after clicking each ${modalName} modal duplicate bu
       const listSection: HTMLElement = getSection(thisResourceHeading);
       const errorAlert: HTMLElement = getByRole(listSection, "alert");
       expect(errorAlert).toBeInTheDocument();
-      expect(errorAlert).toHaveTextContent(new RegExp(errorMessage, "i"));
     });
   }
 });

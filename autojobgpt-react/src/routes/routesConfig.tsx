@@ -2,10 +2,13 @@ import { createContext } from "react";
 import { RouteObject } from "react-router-dom";
 
 import Layout from "./Layout";
-import Home from "../home/Home";
-import Jobs from "./Jobs";
+import HomePage from "./HomePage";
+import JobsPage from "./JobsPage";
 import ResumesPage from "./ResumesPage";
 import CoverLettersPage from "./CoverLettersPage";
+import LoginPage from "./LoginPage";
+import SignupPage from "./SignupPage";
+import LegalPage from "./LegalPage";
 import PageNotFound from "./PageNotFound";
 
 
@@ -24,11 +27,11 @@ export const routesConfig: RouteObject[] = [{
   ),
   children: [{
     path: "/",
-    element: <Home />,
+    element: <HomePage />,
   }, {
     path: "/jobs",
     element: (      
-      <Jobs />      
+      <JobsPage />      
     )
   }, {
     path: "/resumes",
@@ -39,6 +42,21 @@ export const routesConfig: RouteObject[] = [{
     path: "/coverLetters",
     element: (
       <CoverLettersPage />
+    )
+  }, {
+    path: "/login",
+    element: (
+      <LoginPage />
+    )
+  }, {
+    path: "/signup",
+    element: (
+      <SignupPage />
+    )
+  }, {
+    path: "/legal",
+    element: (
+      <LegalPage />
     )
   }, {
     path: "*",
