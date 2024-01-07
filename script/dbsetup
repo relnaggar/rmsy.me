@@ -51,7 +51,7 @@ main() {
     local password="${arg}"
   fi
 
-  script/console apache2 "chown -R apache2:apache2 /var/www/public/media"
+  script/console apache2 "chown -R apache2:apache2 /var/www/media"
   script/dbmigrate
   script/console apache2 "cd /var/www/autojobgpt-django/ && export && export DJANGO_SUPERUSER_PASSWORD="${password}" && python3 manage.py createsuperuser --no-input --username root --email rmsy@rmsy.me"
 
