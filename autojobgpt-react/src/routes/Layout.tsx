@@ -1,5 +1,5 @@
-import React, { createContext, useState } from "react";
-import { Outlet, Link } from "react-router-dom";
+import React, { createContext, useState, useEffect } from "react";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
 
 
@@ -9,6 +9,7 @@ import useErrorAlert from "../hooks/useErrorAlert";
 import ConfirmationModal from "../common/ConfirmationModal";
 import NavLink from "./NavLink";
 import ErrorAlert from "../common/ErrorAlert";
+import { CsrfResponse } from "../api/types";
 
 
 export const ConfirmationModalContext = createContext<
@@ -17,15 +18,11 @@ export const ConfirmationModalContext = createContext<
 
 export const CSRFTokenContext = createContext<string>("");
 
-interface WithCsrfToken {
-  csrfToken: string,
-};
-
 const Layout = (): React.JSX.Element => {
   const errorAlert = useErrorAlert();
-  const { loggedIn, logout, loggingOut } = useAuthControl({...errorAlert});
+  const { loggedIn, username, logout, loggingOut } = useAuthControl({...errorAlert});
 
-  const { responseData, fetching: fetchingCsrfToken} = useFetch<WithCsrfToken>("csrf/", {
+  const { responseData, fetching: fetchingCsrfToken} = useFetch<CsrfResponse>("csrf/", {
     initialData: { csrfToken: ""},
     onFail: errorAlert.showErrors,
     includeAuthorisationToken: false,
@@ -93,16 +90,24 @@ const Layout = (): React.JSX.Element => {
                   </a>
                 </li>
                 { loggedIn ?
-                  <li className="nav-item">
-                    <button className="nav-link" onClick={logout} disabled={loggingOut}>
-                      {loggingOut ? <>
+                  loggingOut ?
+                    <li className="nav-item">
+                      <button className="nav-link" disabled>
                         <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
                         Logging out...
-                      </> : <>
-                        Logout
-                      </>}
-                    </button>
-                  </li>
+                      </button>
+                    </li>
+                  :
+                    <li className="nav-item dropdown">
+                      <button className="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        {username}
+                      </button>
+                      <ul className="dropdown-menu dropdown-menu-end">
+                        <button className="dropdown-item" onClick={logout} disabled={loggingOut}>
+                          Logout
+                        </button>
+                      </ul>
+                    </li>
                 :
                   <li className="nav-item">
                     <NavLink to="/login">

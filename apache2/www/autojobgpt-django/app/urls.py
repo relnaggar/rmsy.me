@@ -2,7 +2,7 @@ from django.urls import include, path
 
 from rest_framework import routers
 
-from .views import app, csrf, media, login, logout
+from .views import app, csrf, media
 from .views import CustomUserViewSet
 from .views import StatusViewSet, TemplateViewSet, FillFieldViewSet, JobViewSet, TailoredDocumentViewSet, SubstitutionViewSet
 
@@ -20,7 +20,5 @@ urlpatterns = [
   path("", app, name="index"),
   path("api/", include(router.urls)),
   path("api/csrf/", csrf),
-  path("api/login/", login),
-  path("api/logout/", logout),
   path("api/media/<path:path>", media, name="media"),
 ] 

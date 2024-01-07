@@ -40,22 +40,29 @@ def app(request):
 def csrf(request):
   return JsonResponse({"csrfToken": get_token(request)})
 
-@api_view(["POST"])
-def login(request):
-  serializer = AuthTokenSerializer(data=request.data)
-  serializer.is_valid(raise_exception=True)
-  user = serializer.validated_data['user']
-  django_login(request._request, user)
-  token, _ = Token.objects.get_or_create(user=user)
-  return Response({'token': token.key})
-
-@api_view(["POST"])
-def logout(request):
-  django_logout(request._request)
-  return Response(status=status.HTTP_200_OK)
-
 class CustomUserViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
   serializer_class = CustomUserSerializer
+
+  @action(detail=False, methods=["GET"], url_path="isLoggedIn")
+  def is_logged_in(self, request):
+    if request.user.is_authenticated:
+      return Response({"loggedIn": True, "username": request.user.username})
+    else:
+      return Response({"loggedIn": False})
+
+  @action(detail=False, methods=["POST"], serializer_class=AuthTokenSerializer)
+  def login(self, request):
+    serializer = AuthTokenSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    user = serializer.validated_data["user"]
+    django_login(request._request, user)
+    token, _ = Token.objects.get_or_create(user=user)
+    return Response({"token": token.key, "username": user.username})
+
+  @action(detail=False, methods=["POST"], serializer_class=EmptySerializer)
+  def logout(self, request):
+    django_logout(request._request)
+    return Response(status=status.HTTP_200_OK)
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -179,7 +186,7 @@ class JobViewSet(ModelViewSet):
     queryset = Job.objects.filter(user=self.request.user)
     return queryset
 
-  @action(detail=False, methods=["get"], url_path="extract-details-from-url")
+  @action(detail=False, methods=["GET"], url_path="extractDetailsFromUrl")
   def extract_details_from_url(self, request):
     url = request.query_params.get("url", None)
     urlSerializer = JobURLSerializer(data={"url": url})
@@ -245,7 +252,7 @@ class SubstitutionViewSet(ModelViewSet):
     ).order_by("priority")
     return prioritized_queryset
 
-  @action(detail=True, methods=["post"], serializer_class=RegenerateSerializer)
+  @action(detail=True, methods=["POST"], serializer_class=RegenerateSerializer)
   def regenerate(self, request, pk=None):    
     regenerate_serializer = RegenerateSerializer(data=request.data)
     regenerate_serializer.is_valid(raise_exception=True)
@@ -279,7 +286,7 @@ class TailoredDocumentViewSet(ModelViewSet):
     else:
       raise ValueError(f"Invalid template type: {document_type}")
 
-  @action(detail=True, methods=["post"])
+  @action(detail=True, methods=["POST"])
   def duplicate(self, request, pk=None):
     tailored_document = self.get_object()
     try:

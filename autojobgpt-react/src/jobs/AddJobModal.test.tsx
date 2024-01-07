@@ -306,7 +306,7 @@ test(`clicking the ${modalName} modal fill button with valid URL makes an api ca
   await fillValidURL(modal);
   await clickFillButton(modal);
   expect(mockFunctions.fetchData).toHaveBeenLastCalledWith(
-    `../api/jobs/extract-details-from-url?url=${validJob1.url}`,
+    `../api/jobs/extractDetailsFromUrl?url=${validJob1.url}`,
     expect.objectContaining({
       method: "GET",
       headers: expect.objectContaining({

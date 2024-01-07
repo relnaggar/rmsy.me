@@ -79,6 +79,17 @@ export interface TailoredDocumentUpload extends Pick<TailoredDocument, "type"> {
   template: number,
 };
 
+
+export interface CsrfResponse {
+  csrfToken: string,
+};
+
 export interface LoginResponse {
   token: string,
+  username: string,
+};
+
+export interface IsLoggedInResponse {
+  loggedIn: boolean,
+  username?: string,
 };

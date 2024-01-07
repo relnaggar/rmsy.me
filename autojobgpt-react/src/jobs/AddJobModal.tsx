@@ -39,7 +39,7 @@ const AddJobModal = ({
   };
 
   const { fetching: filling, refetch: fill, cancel: cancelFill } = useFetch<JobDetails>(
-    `jobs/extract-details-from-url`, {
+    `jobs/extractDetailsFromUrl`, {
     initialFetch: false,
     onSuccess: onFillSuccess,
     onFail: onFillFail,

@@ -1,9 +1,10 @@
 import { useCallback, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
+import useFetch from "./useFetch";
 import usePost from "./usePost";
 import { UseErrorAlert } from "./useErrorAlert";
-import { LoginResponse } from "../api/types";
+import { LoginResponse, IsLoggedInResponse } from "../api/types";
 
 
 const routesRequiringLogin = [
@@ -19,6 +20,7 @@ const routesRequiringLogout = [
 
 interface UseAuthControl {
   loggedIn: boolean,
+  username: string,
   logout: () => void,
   loggingOut: boolean,
   login: (username: string, password: string) => void,
@@ -27,35 +29,74 @@ interface UseAuthControl {
 
 interface UseAuthControlParams extends UseErrorAlert {};
 
+const localLogout = (): void => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("username");
+};
+
+const localLogin = (username: string, token: string): void => {
+  localStorage.setItem("token", token);
+  localStorage.setItem("username", username);
+};
+
+const localIsLoggedIn = (): boolean => {
+  return localStorage.getItem("token") !== null && localStorage.getItem("username") !== null;
+};
+
+const localGetUsername = (): string => {
+  return localStorage.getItem("username") || "";
+}
+
 const useAuthControl = (params?: UseAuthControlParams): UseAuthControl => {
   const navigate = useNavigate();
   const location = useLocation();
-  const loggedIn = localStorage.getItem("token") !== null;
+
+  const onNotLoggedIn = (): void => {
+    localLogout();
+    if (routesRequiringLogin.includes(location.pathname)) {
+      navigate("/login");
+    }
+  };
+
+  const onIsLoggedInSuccess = (responseData: IsLoggedInResponse): void => {
+    const loggedIn = responseData.loggedIn && localIsLoggedIn() && responseData.username === localGetUsername();
+    if (loggedIn) {
+      if (routesRequiringLogout.includes(location.pathname)) {
+        navigate("/jobs");
+      }
+    } else {
+      onNotLoggedIn();
+    }
+  };
+
+  const {refetch: reauthenticate} = useFetch<IsLoggedInResponse>("users/isLoggedIn/", {
+    onSuccess: onIsLoggedInSuccess,
+    onFail: onNotLoggedIn,
+    includeAuthorisationToken: false,
+  }, {
+    credentials: "include",
+  });
 
   useEffect(() => {
-    if (!loggedIn && routesRequiringLogin.includes(location.pathname)) {
-      navigate("/login");
-    } else if (loggedIn && routesRequiringLogout.includes(location.pathname)) {
-      navigate("/jobs");
-    }
-  }, [loggedIn, navigate, location]);
+    reauthenticate();
+  }, [location]);
 
   const onLogoutSuccess = (): void => {
-    localStorage.removeItem("token");
+    localLogout();
     if (location.pathname !== "/") {
       navigate("/");
     }
   };
 
   const { posting: loggingOut, post: logout } = usePost({
-    apiPath: "logout/",
+    apiPath: "users/logout/",
     onSuccess: onLogoutSuccess,
     onFail: params?.showErrors,
     responseType: "none",
   });
 
   const onLoginSuccess = (responseData: LoginResponse): void => {
-    localStorage.setItem("token", responseData.token);
+    localLogin(responseData.username, responseData.token);
     navigate("/jobs");
   };
 
@@ -67,7 +108,7 @@ const useAuthControl = (params?: UseAuthControlParams): UseAuthControl => {
   };
 
   const { posting: loggingIn, post: doLogin } = usePost<LoginResponse>({
-    apiPath: "login/",
+    apiPath: "users/login/",
     onSuccess: onLoginSuccess,
     onFail: handleFail,
   });
@@ -77,7 +118,7 @@ const useAuthControl = (params?: UseAuthControlParams): UseAuthControl => {
     doLogin({postData: {username, password}});
   }, [doLogin, params]);
 
-  return { loggedIn, logout, loggingOut, login, loggingIn};
+  return { loggedIn: localIsLoggedIn(), username: localGetUsername(), logout, loggingOut, login, loggingIn };
 };
 
 export default useAuthControl;
