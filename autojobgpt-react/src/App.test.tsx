@@ -4,7 +4,6 @@ import { routesConfig }  from "./routes/routesConfig";
 beforeEach(() => {
   jest.clearAllMocks();
   injectMocks();
-  window.scrollTo = jest.fn();
 });
 
 

@@ -33,7 +33,7 @@ test(`api call is initially made to fetch the ${thisResource}s`, async () => {
 });
 
 test(`empty api call means no ${thisResource}s are displayed`, async () => {
-  mockFunctions.fetchData.mockImplementation(generateResponse([]));
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([]));
   await renderRoute(thisRoute);
   const resources: HTMLElement[] = queryResources(thisHeadingLabel, "region");
   expect(resources.length).toBe(0);

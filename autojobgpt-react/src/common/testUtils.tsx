@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { fireEvent } from "@testing-library/dom";
 
 import { routesConfig, routesBasename }  from "../routes/routesConfig";
-import { generateResponse } from "../api/mockApi";
+import { generateConditionalResponseByRoute } from "../api/mockApi";
 
 
 const mockRoutesConfig: RouteObject[] = [...routesConfig];
@@ -36,7 +36,7 @@ export const injectMocks = (): void => {
   injectMocksIntoRoutes(mockRoutesConfig);
 
   // default mocks
-  mockFunctions.fetchData.mockImplementation(generateResponse([]));
+  mockFunctions.fetchData.mockImplementation(generateConditionalResponseByRoute([]));
 };
 
 export const renderRoute = async (path: string): Promise<void> => {

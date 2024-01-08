@@ -20,22 +20,34 @@ export const generateErrorResponse = (data: Record<string,string[]>, status: num
   }
 );
 
-interface MockAPIRoute {
+interface MockApiRoute {
   url: string,
   data?: any,
   status?: number,
   reject?: boolean,
 }
 
-export const generateConditionalResponseByRoute = (mockAPIRoutes: MockAPIRoute[], status=200) =>
+export const generateConditionalResponseByRoute = (mockApiRoutes: MockApiRoute[], status=200) =>
     async (input: RequestInfo | URL, _?: RequestInit | undefined) => {
-  const mockAPIRoute: MockAPIRoute | undefined = mockAPIRoutes.find((mockAPIRoute) => mockAPIRoute.url === input.toString());
-  if (mockAPIRoute && mockAPIRoute.reject) {
+  const mockApiRoute: MockApiRoute | undefined = mockApiRoutes.find((mockApiRoute) => mockApiRoute.url === input.toString());
+  if (mockApiRoute && mockApiRoute.reject) {
     return Promise.reject(new Error(errorMessage));
+  } else if (input.toString().includes("isLoggedIn")) {
+    return new Response(
+      JSON.stringify({
+        loggedIn: true,
+        username: "",
+      }), {
+        status: 200,
+        headers: {
+          "Content-type": "application/json",
+        },
+      }
+    );
   } else {
     return new Response(
-      JSON.stringify(mockAPIRoute ? mockAPIRoute.data : []), {
-        status: mockAPIRoute && mockAPIRoute.status ? mockAPIRoute.status : status,
+      JSON.stringify(mockApiRoute ? mockApiRoute.data : []), {
+        status: mockApiRoute && mockApiRoute.status ? mockApiRoute.status : status,
         headers: {
           "Content-type": "application/json",
         },

@@ -78,9 +78,7 @@ const useApiCall = (
     const { data, resourceId, paramString, apiPath: apiPathOverride, ...extraFetchOptions } = params || {};
 
     if (cancelable) {
-      if (calling) {
-        abortControllerRef.current.abort();
-      }
+      abortControllerRef.current.abort();
       abortControllerRef.current = new AbortController();
     }
     setCalling(true);
@@ -169,7 +167,7 @@ const useApiCall = (
         }
       }
     }
-  }, [fetchData, apiRoot, apiPath, method, csrfToken, includeCsrfToken, calling, beforeCall, onSuccess, afterCall, onFail, cancelable, includeAuthorisationToken, responseType]);
+  }, [fetchData, apiRoot, apiPath, method, csrfToken, includeCsrfToken, beforeCall, onSuccess, afterCall, onFail, cancelable, includeAuthorisationToken, responseType]);
 
   let cancel = undefined;
   if (cancelable) {

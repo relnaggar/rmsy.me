@@ -7,8 +7,8 @@ import { injectMocks, renderRoute, testRouteAndAllChildren } from "../common/tes
 beforeEach(() => {
   jest.clearAllMocks();
   injectMocks();
-  window.scrollTo = jest.fn();
 });
+
 
 const MENU_LINKS: string[] = ["Home", "Jobs", "Resumes", "Cover Letters", "API", "Admin"];
 

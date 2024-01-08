@@ -51,14 +51,14 @@ const useAuthControl = (params?: UseAuthControlParams): UseAuthControl => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const onNotLoggedIn = (): void => {
+  const onNotLoggedIn = useCallback((): void => {
     localLogout();
     if (routesRequiringLogin.includes(location.pathname)) {
       navigate("/login");
     }
-  };
+  }, [navigate, location.pathname]);
 
-  const onIsLoggedInSuccess = (responseData: IsLoggedInResponse): void => {
+  const onIsLoggedInSuccess = useCallback((responseData: IsLoggedInResponse): void => {
     const loggedIn = responseData.loggedIn && localIsLoggedIn() && responseData.username === localGetUsername();
     if (loggedIn) {
       if (routesRequiringLogout.includes(location.pathname)) {
@@ -67,9 +67,9 @@ const useAuthControl = (params?: UseAuthControlParams): UseAuthControl => {
     } else {
       onNotLoggedIn();
     }
-  };
+  }, [navigate, location.pathname, onNotLoggedIn]);
 
-  const {refetch: reauthenticate} = useFetch<IsLoggedInResponse>("users/isLoggedIn/", {
+  const { refetch: reauthenticate } = useFetch<IsLoggedInResponse>("users/isLoggedIn/", {
     onSuccess: onIsLoggedInSuccess,
     onFail: onNotLoggedIn,
     includeAuthorisationToken: false,
@@ -79,7 +79,7 @@ const useAuthControl = (params?: UseAuthControlParams): UseAuthControl => {
 
   useEffect(() => {
     reauthenticate();
-  }, [location, reauthenticate]);
+  }, [location.pathname, reauthenticate]);
 
   const onLogoutSuccess = (): void => {
     localLogout();

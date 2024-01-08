@@ -23,7 +23,7 @@ const Layout = (): React.JSX.Element => {
   const { loggedIn, username, logout, loggingOut } = useAuthControl({...errorAlert});
 
   const { responseData, fetching: fetchingCsrfToken} = useFetch<CsrfResponse>("csrf/", {
-    initialData: { csrfToken: ""},
+    initialData: { csrfToken: "" },
     onFail: errorAlert.showErrors,
     includeAuthorisationToken: false,
   }, {
