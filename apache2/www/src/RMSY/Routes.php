@@ -136,7 +136,7 @@ class Routes implements \Framework\RoutesInterface {
           'controller' => $this->engineerController,
           'functionName' => 'home'
         ]
-        ],
+      ],
       '/about' => [
         'GET' => [
           'controller' => $this->engineerController,
