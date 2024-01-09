@@ -44,7 +44,11 @@ const useInputControl = (
     React.ChangeEvent<HTMLTextAreaElement> |
     React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setValue(e.target.value);
+    if (e.target.type === "checkbox") {
+      setValue((e.target as HTMLInputElement).checked.toString());
+    } else {
+      setValue(e.target.value);
+    }
     setEditing(true);
   }, [setValue]);
 

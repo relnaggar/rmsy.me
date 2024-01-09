@@ -20,17 +20,34 @@ const LoginPage = (): React.JSX.Element => {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    const form: HTMLFormElement = e.currentTarget;
-    const username: string = form.username.value;
-    const password: string = form.password.value;
-    login(username, password);
+
+    let valid = true;
+    const newErrors: Record<string,string[]> = {};
+
+    if (usernameInput.value === "") {
+      newErrors[usernameInput.name] = ["Username is required."];
+      valid = false;
+    }
+    if (passwordInput.value === "") {
+      newErrors[passwordInput.name] = ["Password is required."];
+      valid = false;
+    }
+
+    for (const input of [usernameInput, passwordInput]) {
+      input.stopEditing();
+    }
+    errorAlert.setErrors(newErrors);
+
+    if (valid) {
+      login(usernameInput.value, passwordInput.value);
+    }
   };
 
   return (
     <section className="d-flex justify-content-center">
       <div className="col-xxl-3 col-xl-4 col-lg-5 col-md-6 col-sm-8 col-10">
         <h2>Log in</h2>
-        <p className="lead">Log in to AutoJobGPT.</p>        
+        <p className="lead">Log in to AutoJobGPT.</p>
         <form onSubmit={onSubmit}>
           <BaseInput ref={usernameInput.ref} name={usernameInput.name}
             value={usernameInput.value} editing={usernameInput.editing} handleChange={usernameInput.handleChange}

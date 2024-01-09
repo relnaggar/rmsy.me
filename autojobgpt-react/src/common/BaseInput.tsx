@@ -15,7 +15,7 @@ export interface BaseInputProps extends CommonInputControlProps,
 {
   type: string,
   id?: string,
-  label: string,
+  label: string | React.ReactNode,
   loading?: boolean,
   errors?: string[],
   handleSubmit?: (e: React.FormEvent<HTMLFormElement>) => void,
@@ -61,7 +61,7 @@ const BaseInput = React.forwardRef(({
     id: currentId,
     name: name,
     className: `${
-      type === "select" ? "form-select" : "form-control"}${
+      type === "select" ? "form-select" : type ==="checkbox" ? "form-check-input" : "form-control"}${
       isValid ? " is-valid" : ""}${
       showError ? " is-invalid" : ""
     }`,
@@ -104,6 +104,17 @@ const BaseInput = React.forwardRef(({
     );
   }
 
+  if (type === "checkbox") {
+    input = (
+      <>
+        {input}
+        <label className="form-check-label" htmlFor={currentId}>
+          {label}
+        </label>
+      </>
+    );
+  }
+
   let inputWithFeedback = (
     <>
       {input}
@@ -130,7 +141,7 @@ const BaseInput = React.forwardRef(({
 
   const inputContent = (
     <>
-      { !floatingLabel &&
+      {!floatingLabel && type !== "checkbox" &&
         <label className="form-label" htmlFor={currentId}>
           {label}
         </label>
@@ -154,7 +165,12 @@ const BaseInput = React.forwardRef(({
           }
         </div>
       :
-        inputWithFeedback
+        type === "checkbox" ?
+          <div className="form-check">
+            {inputWithFeedback}
+          </div>
+        :
+          inputWithFeedback
       }
     </>
   );
@@ -163,7 +179,7 @@ const BaseInput = React.forwardRef(({
     <>
       <div className="mb-3">
         { handleSubmit ?
-          <form onSubmit={handleSubmit} aria-label={`Form for updating ${label}`}>
+          <form onSubmit={handleSubmit} aria-label={`Form for updating ${name}`}>
             {inputContent}
           </form>
         :

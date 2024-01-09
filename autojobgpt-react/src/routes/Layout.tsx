@@ -78,7 +78,7 @@ const Layout = (): React.JSX.Element => {
                   </>
                 }
               </ul>
-              <ul className="navbar-nav">
+              <ul className="navbar-nav align-items-center">
                 <li className="nav-item">
                   <a href="/autojobgpt/api" className="nav-link" target="_blank" rel="noopener noreferrer">
                     API <BoxArrowUpRightIcon className="ms-1" />
@@ -109,11 +109,18 @@ const Layout = (): React.JSX.Element => {
                       </ul>
                     </li>
                 :
-                  <li className="nav-item">
-                    <NavLink to="/login">
-                      Login
-                    </NavLink>
-                  </li>
+                  <>
+                    <li className="nav-item">
+                      <NavLink to="/login">
+                        Login
+                      </NavLink>
+                    </li>
+                    <li className="nav-item btn btn-success">
+                      <NavLink to="/signup" className="text-light">
+                        Sign up for free
+                      </NavLink>
+                    </li>
+                  </>
                 }
               </ul>
             </div>

@@ -51,27 +51,27 @@ const useAuthControl = (params?: UseAuthControlParams): UseAuthControl => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const onNotLoggedIn = useCallback((): void => {
+  const notLoggedIn = useCallback((): void => {
     localLogout();
     if (routesRequiringLogin.includes(location.pathname)) {
       navigate("/login");
     }
   }, [navigate, location.pathname]);
 
-  const onIsLoggedInSuccess = useCallback((responseData: IsLoggedInResponse): void => {
+  const handleIsLoggedInSuccess = useCallback((responseData: IsLoggedInResponse): void => {
     const loggedIn = responseData.loggedIn && localIsLoggedIn() && responseData.username === localGetUsername();
     if (loggedIn) {
       if (routesRequiringLogout.includes(location.pathname)) {
         navigate("/jobs");
       }
     } else {
-      onNotLoggedIn();
+      notLoggedIn();
     }
-  }, [navigate, location.pathname, onNotLoggedIn]);
+  }, [navigate, location.pathname, notLoggedIn]);
 
   const { refetch: reauthenticate } = useFetch<IsLoggedInResponse>("users/isLoggedIn/", {
-    onSuccess: onIsLoggedInSuccess,
-    onFail: onNotLoggedIn,
+    onSuccess: handleIsLoggedInSuccess,
+    onFail: notLoggedIn,
     includeAuthorisationToken: false,
   }, {
     credentials: "include",
@@ -81,7 +81,7 @@ const useAuthControl = (params?: UseAuthControlParams): UseAuthControl => {
     reauthenticate();
   }, [location.pathname, reauthenticate]);
 
-  const onLogoutSuccess = (): void => {
+  const handleLogoutSuccess = (): void => {
     localLogout();
     if (location.pathname !== "/") {
       navigate("/");
@@ -90,26 +90,26 @@ const useAuthControl = (params?: UseAuthControlParams): UseAuthControl => {
 
   const { posting: loggingOut, post: logout } = usePost({
     apiPath: "users/logout/",
-    onSuccess: onLogoutSuccess,
+    onSuccess: handleLogoutSuccess,
     onFail: params?.showErrors,
     responseType: "none",
   });
 
-  const onLoginSuccess = (responseData: LoginResponse): void => {
+  const handleLoginSuccess = (responseData: LoginResponse): void => {
     localLogin(responseData.username, responseData.token);
     navigate("/jobs");
   };
 
-  const handleFail = (errors: Record<string,string[]>) => {   
+  const handleFail = useCallback((errors: Record<string,string[]>) => {   
     params?.setErrors(errors);
     if (errors["error"]) {
       params?.setShowErrorAlert(true);
     }
-  };
+  }, [params]);
 
   const { posting: loggingIn, post: doLogin } = usePost<LoginResponse>({
     apiPath: "users/login/",
-    onSuccess: onLoginSuccess,
+    onSuccess: handleLoginSuccess,
     onFail: handleFail,
   });
 

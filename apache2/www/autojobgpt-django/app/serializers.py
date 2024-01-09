@@ -11,14 +11,22 @@ class EmptySerializer(serializers.Serializer):
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
+  agree = serializers.BooleanField(write_only=True, required=True)
+
   class Meta:
     model = CustomUser
-    fields = ["username", "password"]
+    fields = ["username", "password", "agree"]
     extra_kwargs = {
       "password": {"write_only": True, "style": {"input_type": "password"}},
     }
 
+  def validate_agree(self, value):
+    if not value:
+      raise serializers.ValidationError("You must agree to proceed.")
+    return value
+
   def create(self, validated_data):
+    del validated_data["agree"]
     return CustomUser.objects.create_user(**validated_data)
 
 

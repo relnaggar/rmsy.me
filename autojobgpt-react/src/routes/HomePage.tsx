@@ -46,7 +46,7 @@ const HomePage = (): React.JSX.Element => {
         </p>
       :        
         <p>
-        <Link to="/login">Log in</Link> or <Link to="/signup">sign up</Link> to get started!
+        <Link to="/login">Log in</Link> or <Link to="/signup">sign up for free</Link> to get started!
       </p>
       }
       
