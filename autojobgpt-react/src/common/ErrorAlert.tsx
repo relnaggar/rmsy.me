@@ -16,7 +16,12 @@ const ErrorAlert = ({
   showErrorAlert,
   setShowErrorAlert,  
 }: ErrorAlertProps): React.JSX.Element => {
-  const numErrors: number = Object.keys(errors).length;
+  if (errors["detail"]) {
+    errors["detail"] = [errors["detail"] as unknown as string];
+  }
+  errors = Object.fromEntries(Object.entries(errors).filter(([_, value]) => value !== undefined));
+
+  const numErrors: number = Object.entries(errors).length;
 
   const handleDismiss = (): void => {
     setShowErrorAlert(false);

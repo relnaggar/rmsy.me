@@ -50,7 +50,11 @@ const AddTemplateModal = ({
 
   return (
     <AddModal
-      {...addModal} errors={{error: addModal.errors["error"]}}
+      {...addModal} errors={{
+        error: addModal.errors["error"],
+        non_field_errors: addModal.errors["non_field_errors"],
+        detail: addModal.errors["detail"],
+      }}
       title={`Add ${documentTypeLabel} Template`} modalId={modalId} size="xl"
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >

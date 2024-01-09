@@ -34,7 +34,11 @@ const AddColumnModal = ({
 
   return (
     <AddModal
-      {...addColumnModal} errors={{error: addColumnModal.errors["error"]}} 
+      {...addColumnModal} errors={{
+        error: addColumnModal.errors["error"],
+        non_field_errors: addColumnModal.errors["non_field_errors"],
+        detail: addColumnModal.errors["detail"],
+      }}
       title="Add Column" modalId={modalId}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
     >

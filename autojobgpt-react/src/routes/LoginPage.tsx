@@ -57,7 +57,11 @@ const LoginPage = (): React.JSX.Element => {
             value={passwordInput.value} editing={passwordInput.editing} handleChange={passwordInput.handleChange}
             label="Password" type="password" errors={errorAlert.errors[passwordInput.name]}
           />
-          <ErrorAlert {...{...errorAlert, errors: {error: errorAlert.errors["error"]}}} />
+          <ErrorAlert {...{...errorAlert, errors: {
+            error: errorAlert.errors["error"],
+            non_field_errors: errorAlert.errors["non_field_errors"],
+            detail: errorAlert.errors["detail"],
+          }}} />
           <button type="submit" className="btn btn-primary" disabled={loggingIn}>
             { loggingIn ? <>
               <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>

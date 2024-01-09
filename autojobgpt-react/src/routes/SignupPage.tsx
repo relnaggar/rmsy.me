@@ -34,7 +34,7 @@ const SignupPage = (): React.JSX.Element => {
 
   const handleFail = useCallback((errors: Record<string,string[]>) => {   
     errorAlert.setErrors(errors);
-    if (errors["error"]) {
+    if (errors["error"] || errors["non_field_errors"] || errors["detail"]) {
       errorAlert.setShowErrorAlert(true);
     }
   }, [errorAlert]);
@@ -103,7 +103,11 @@ const SignupPage = (): React.JSX.Element => {
                 label={<>I agree to the <Link to="/legal" target="_blank" rel="noopener noreferrer">Terms of Service and Privacy Policy</Link> <BoxArrowUpRightIcon className="ms-1" /></>}
                 type="checkbox" errors={errorAlert.errors[agreeInput.name]}
               />
-              <ErrorAlert {...{...errorAlert, errors: {error: errorAlert.errors["error"]}}} />
+              <ErrorAlert {...{...errorAlert, errors: {
+                error: errorAlert.errors["error"],
+                non_field_errors: errorAlert.errors["non_field_errors"],
+                detail: errorAlert.errors["detail"],
+              }}} />
               <button type="submit" className="btn btn-primary" disabled={signingUp}>
                 { signingUp ? <>
                   <span className="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>

@@ -102,7 +102,7 @@ const useAuthControl = (params?: UseAuthControlParams): UseAuthControl => {
 
   const handleFail = useCallback((errors: Record<string,string[]>) => {   
     params?.setErrors(errors);
-    if (errors["error"]) {
+    if (errors["error"] || errors["non_field_errors"] || errors["detail"]) {
       params?.setShowErrorAlert(true);
     }
   }, [params]);

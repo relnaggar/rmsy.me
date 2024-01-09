@@ -21,7 +21,7 @@ const useAddModal = (): UseAddModal => {
 
   const handleAddFail = useCallback((errors: Record<string,string[]>) => {   
     errorAlert.setErrors(errors);
-    if (errors["error"]) {
+    if (errors["error"] || errors["non_field_errors"] || errors["detail"]) {
       errorAlert.setShowErrorAlert(true);
     }
     setShow(true);

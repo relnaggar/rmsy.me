@@ -116,7 +116,11 @@ const AddJobModal = ({
 
   return (
     <AddModal modalId={modalId} {...addModal} 
-      errors={{error: addModal.errors["error"]}}
+      errors={{
+        error: addModal.errors["error"],
+        non_field_errors: addModal.errors["non_field_errors"],
+        detail: addModal.errors["detail"],
+      }}
       title="Add Job" size="lg"
       onSubmit={handleSubmit}
       validateSubmit={validateSubmit} onValidatedSubmit={handleValidatedSubmit}
