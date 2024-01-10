@@ -78,7 +78,7 @@ const LegalPage = (): React.JSX.Element => {
 
         <h4>Data Storage</h4>
         <p>
-          Data entered into this demo application is stored in a database without encryption.
+          Data entered into this demo application is stored in a database without encryption, with the exception of passwords, which are hashed.
           Therefore, the developer has the ability to access, modify, and delete any data submitted by users.
           This will be limited to situations where it is necessary for maintaining the application, such as debugging, fixing errors, or adding features.
           The developer will not intentionally access, modify or delete user data for any other purpose.

@@ -1,6 +1,7 @@
 import React, { createContext, useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
+import { ReactComponent as Gear } from 'bootstrap-icons/icons/gear.svg';
 
 import useAuthenticate from "../hooks/useAuthenticate";
 import useLogout from "../hooks/useLogout";
@@ -19,6 +20,7 @@ export const ConfirmationModalContext = createContext<
 export const CSRFTokenContext = createContext("");
 
 export const LoggedInContext = createContext(false);
+export const UsernameContext = createContext("");
 
 const Layout = (): React.JSX.Element => {
   useAuthenticate();
@@ -101,9 +103,16 @@ const Layout = (): React.JSX.Element => {
                         {username}
                       </button>
                       <ul className="dropdown-menu dropdown-menu-end">
-                        <button className="dropdown-item" onClick={logout} disabled={loggingOut}>
-                          Logout
-                        </button>
+                        <li>
+                          <NavLink to="/account" className="dropdown-item" navLink={false}>
+                            Account <Gear className="ms-1" />
+                          </NavLink>
+                        </li>
+                        <li>
+                          <button className="dropdown-item" onClick={logout} disabled={loggingOut}>
+                            Logout
+                          </button>
+                        </li>
                       </ul>
                     </li>
                 :
@@ -136,11 +145,13 @@ const Layout = (): React.JSX.Element => {
             { Object.keys(errorAlert.errors).length === 0 ?      
               <>
                 <CSRFTokenContext.Provider value={csrfToken}>
-                  <ConfirmationModalContext.Provider value={openConfirmationModal}>
-                    <LoggedInContext.Provider value={loggedIn}>
-                      <Outlet />
-                    </LoggedInContext.Provider>
-                  </ConfirmationModalContext.Provider>
+                <ConfirmationModalContext.Provider value={openConfirmationModal}>
+                <LoggedInContext.Provider value={loggedIn}>
+                <UsernameContext.Provider value={username}>
+                  <Outlet />
+                </UsernameContext.Provider>
+                </LoggedInContext.Provider>
+                </ConfirmationModalContext.Provider>
                 </CSRFTokenContext.Provider>
                 <ConfirmationModal
                   show={showConfirmationModal}

@@ -10,6 +10,7 @@ const routesRequiringLogin = [
   "/jobs",
   "/resumes",
   "/coverLetters",
+  "/account",
 ];
 
 const routesRequiringLogout = [

@@ -17,6 +17,7 @@ const SignupPage = (): React.JSX.Element => {
   const errorAlert = useErrorAlert();
   const usernameInput = useInputControl("username");
   const passwordInput = useInputControl("password");
+  const passwordConfirmInput = useInputControl("passwordConfirm");
   const agreeInput = useInputControl("agree", "false");
 
   const [showSuccessAlert, setShowSuccessAlert] = useState<boolean>(false);
@@ -62,6 +63,14 @@ const SignupPage = (): React.JSX.Element => {
       newErrors[passwordInput.name] = ["Password is required."];
       valid = false;
     }
+    if (passwordConfirmInput.value === "") {
+      newErrors[passwordConfirmInput.name] = ["Password confirmation is required."];
+      valid = false;
+    }
+    if (passwordInput.value !== passwordConfirmInput.value) {
+      newErrors[passwordConfirmInput.name] = ["Passwords must match."];
+      valid = false;
+    }
     if (agreeInput.value === "false") {
       newErrors[agreeInput.name] = ["In order to sign up, you must agree to the Terms of Service and Privacy Policy."];
       valid = false;
@@ -100,6 +109,10 @@ const SignupPage = (): React.JSX.Element => {
               <BaseInput ref={passwordInput.ref} name={passwordInput.name}
                 value={passwordInput.value} editing={passwordInput.editing} handleChange={passwordInput.handleChange}
                 label="Password" type="password" errors={errorAlert.errors[passwordInput.name]}
+              />
+              <BaseInput ref={passwordConfirmInput.ref} name={passwordConfirmInput.name}
+                value={passwordConfirmInput.value} editing={passwordConfirmInput.editing} handleChange={passwordConfirmInput.handleChange}
+                label="Confirm Password" type="password" errors={errorAlert.errors[passwordConfirmInput.name]}
               />
               <BaseInput ref={agreeInput.ref} name={agreeInput.name}
                 value={agreeInput.value} editing={agreeInput.editing} handleChange={agreeInput.handleChange}

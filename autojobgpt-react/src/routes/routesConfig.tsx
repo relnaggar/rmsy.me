@@ -10,6 +10,7 @@ import LoginPage from "./LoginPage";
 import SignupPage from "./SignupPage";
 import LegalPage from "./LegalPage";
 import PageNotFound from "./PageNotFound";
+import AccountPage from "./AccountPage";
 
 
 export const FetchDataContext = createContext(
@@ -52,6 +53,11 @@ export const routesConfig: RouteObject[] = [{
     path: "/signup",
     element: (
       <SignupPage />
+    )
+  }, {
+    path: "/account",
+    element: (
+      <AccountPage />
     )
   }, {
     path: "/legal",
