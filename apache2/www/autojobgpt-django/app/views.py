@@ -19,6 +19,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
+from .models import CustomUser
 from .models import Template, FillField, Job, TailoredDocument, Substitution, Status, DocumentType
 from .models import DEFAULT_FILLFIELDS
 from .serializers import EmptySerializer
@@ -28,7 +29,7 @@ from .serializers import TemplateSerializer, FillFieldSerializer
 from .serializers import TailoredDocumentSerializer, SubstitutionSerializer
 from .serializers import RegenerateSerializer, JobURLSerializer, JobDetailsSerializer, StatusSerializer
 from .gpt import ChatException
-from .permissions import IsOwner
+from .permissions import IsOwner, IsSelf
 
 
 def app(request):
@@ -40,8 +41,23 @@ def app(request):
 def csrf(request):
   return JsonResponse({"csrfToken": get_token(request)})
 
-class CustomUserViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+class CustomUserViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
   serializer_class = CustomUserSerializer
+  lookup_field = "username"
+  
+  def get_queryset(self):
+    queryset = CustomUser.objects.filter(pk=self.request.user.pk)
+    return queryset
+  
+  def get_object(self):
+    username = self.kwargs.get('username')
+    return get_object_or_404(CustomUser, username=username)
+
+  def get_permissions(self):
+    if self.action in ["retrieve", "destroy"]:
+      return [IsAuthenticated(), IsSelf()]
+    else:
+      return []
 
   @action(detail=False, methods=["GET"], url_path="isLoggedIn")
   def is_logged_in(self, request):
