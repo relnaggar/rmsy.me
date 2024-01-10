@@ -1,17 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
 
-import useAuthControl from "../hooks/useAuthControl";
+import { LoggedInContext } from "./Layout";
+import useScrollToTop from "../hooks/useScrollToTop";
 
 
 const HomePage = (): React.JSX.Element => {
-  const { loggedIn } = useAuthControl();
+  useScrollToTop();
+  const loggedIn = useContext(LoggedInContext);
 
   return (
     <section>
       <h2 className="mb-3">Home</h2>
-      <p className="lead">Welcome to AutoJobGPT!</p>
+      <p className="lead">🚀 Welcome to AutoJobGPT, Your Job-Application Superhero!</p>
       <figure className="figure my-3 ms-3 text-center col-md-5 float-end">
         <img src="/assets/img/autojobgpt/autojobgpt.png" className="figure-img img-fluid" alt="Futuristic sewing machine amidst traditional tailoring tools." />
         <figcaption className="figure-caption text-center">
@@ -19,36 +20,49 @@ const HomePage = (): React.JSX.Element => {
         </figcaption>
       </figure>
       <p>
-        This is a demo application (for illustrative purposes only, I swear) that allows you to:
+        Optimise your job-hunting adventure!
+        AutoJobGPT uses cutting-edge AI to help you automate the tedious parts of the job application process.
+        Let the machines lend a hand so you can focus more on what matters: getting hired.
       </p>
-      <ul>
-        <li>
-          Keep track of and manage your job applications.
+      <dl>
+        <dt>🌱 Cultivate Your Job Board</dt>
+        <dd>
+          Keep track of and manage your job applications with ease.
           Like a beautiful garden, your job board will grow with each gentle click of the "Add job" button.
-        </li>
-        <li>
-          Upload .docx templates for your resumes and cover letters with "fill fields" for job-specific information.
-          Fill fields are placeholders denoted by double curly braces, e.g. <code>{"{{SKILL_THAT_MAKES_ME_LOOK_GOOD}}"}</code>,
-          and the special fill fields <code>{"{{JOB_TITLE}}"}</code> and <code>{"{{COMPANY}}"}</code> will automagically link to
-          the info from the job board.
-        </li>
-        <li>
-          Use AI to tailor your resumes and cover letters to each job you apply for (powered by dark magic 
-          and <a href="https://openai.com/product" target="_blank" rel="noreferrer">
-            the OpenAI API <BoxArrowUpRightIcon className="ms-1" />
-          </a>.)
-        </li>
-      </ul>
-
-      { loggedIn ?
-        <p>
-          Check out the <Link to="/jobs">job board</Link> to get started!
-        </p>
-      :        
-        <p>
-        <Link to="/login">Log in</Link> or <Link to="/signup">sign up for free</Link> to get started!
-      </p>
-      }
+        </dd>
+        <dt>📝 Resume & Cover Letter Alchemy</dt>
+        <dd>
+          Spending hours tailoring your application to each job you apply for?
+          Or even worse, spamming the same generic application and hoping for the best?
+          Upload your .docx templates and use our 'fill field' magic to streamline the whole process.
+          Just sprinkle in a few placeholders
+          like <code>{"{{RELEVANT_SKILL}}"}</code> or <code>{"{{QUANTIFIED_ACHIEVEMENT}}"}</code> and
+          our alchemy engine will do the rest.
+        </dd>
+        <dt>🧙‍♂️ AI-Powered Tailoring</dt>
+        <dd>
+          Wave goodbye to application anxiety.
+          Powered by the dark sorcery of OpenAI, AutoJobGPT will generate a unique resume and cover letter for each job you apply for.
+          Never worry about a job application again!
+        </dd>
+        { loggedIn ?
+          <>
+            <dt>🌟 Ready to get started?</dt>
+            <dd>
+              Head over to your <Link to="/jobs">job board</Link> to begin!
+            </dd>
+          </>
+        :  
+          <>
+            <dt>🌟 100% Free, No Email Required</dt>      
+            <dd>
+              <Link to="/signup" className="btn btn-success text-white">
+                Sign up for free
+              </Link> and transform the way you apply for jobs!
+            </dd>
+          </>
+        }
+      </dl>
       
       <div className="row">
         <div className="col-md-4"></div>

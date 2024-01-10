@@ -1,12 +1,14 @@
 import React from "react";
 
 import JobBoard from "../jobs/JobBoard";
+import useScrollToTop from "../hooks/useScrollToTop";
 
 
-const Jobs = (): React.JSX.Element => {
+const JobsPage = (): React.JSX.Element => {
+  useScrollToTop();
   return (
     <JobBoard />
   );
 };
 
-export default Jobs;
+export default JobsPage;

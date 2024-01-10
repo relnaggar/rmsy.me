@@ -18,6 +18,7 @@ interface UseFetchOptions<ResponseData> {
   initialData?: ResponseData,
   includeAuthorisationToken?: boolean,
   responseType?: "json" | "blob",
+  cancelable?: boolean,
 };
 
 const useFetch = <Data extends unknown>(
@@ -32,6 +33,7 @@ const useFetch = <Data extends unknown>(
     onFail,
     includeAuthorisationToken = true,
     responseType = "json",
+    cancelable = true,
   } = options || {};
 
   const [responseData, setResponseData] = useState<Data>(initialData);
@@ -51,7 +53,7 @@ const useFetch = <Data extends unknown>(
   const { calling: fetching, call, cancel } = useApiCall("GET", {
     apiPath,
     initialFetch: initialFetch,
-    cancelable: true,
+    cancelable: cancelable,
     onSuccess: handleSuccess,
     onFail,
     includeAuthorisationToken,

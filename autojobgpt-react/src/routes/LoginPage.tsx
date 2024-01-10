@@ -1,16 +1,18 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-import useAuthControl from '../hooks/useAuthControl';
+import useLogin from '../hooks/useLogin';
 import useInputControl from '../hooks/useInputControl';
 import useErrorAlert from '../hooks/useErrorAlert';
 import BaseInput from '../common/BaseInput';
 import ErrorAlert from '../common/ErrorAlert';
+import useScrollToTop from '../hooks/useScrollToTop';
 
 
 const LoginPage = (): React.JSX.Element => {
+  useScrollToTop();
   const errorAlert = useErrorAlert();
-  const { login, loggingIn } = useAuthControl({...errorAlert});
+  const { login, loggingIn } = useLogin({...errorAlert});
   const usernameInput = useInputControl("username");
   const passwordInput = useInputControl("password");
 

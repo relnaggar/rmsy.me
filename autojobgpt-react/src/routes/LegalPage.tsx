@@ -1,12 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
+
+import useScrollToTop from '../hooks/useScrollToTop';
 
 
 const LegalPage = (): React.JSX.Element => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
+  useScrollToTop();
   return (
     <section>
       <h2>Legal</h2>
@@ -39,7 +38,7 @@ const LegalPage = (): React.JSX.Element => {
 
         <h4>Modifications to Terms</h4>
         <p>
-          These Terms and Conditions may be updated at any time.
+          These Terms and Conditions may be updated from time to time.
           Users are encouraged to review this page periodically for any changes.
         </p>
       </section>
@@ -82,15 +81,15 @@ const LegalPage = (): React.JSX.Element => {
           Data entered into this demo application is stored in a database without encryption.
           Therefore, the developer has the ability to access, modify, and delete any data submitted by users.
           This will be limited to situations where it is necessary for maintaining the application, such as debugging, fixing errors, or adding features.
-          The developer will not access, modify or delete user data for any other purpose.
+          The developer will not intentionally access, modify or delete user data for any other purpose.
         </p>
 
         <h4>API Data Privacy</h4>
         <p>
           Any data entered into this demo application may be sent to OpenAI via their API Platform, and will therefore
           be subject to their API Platform's <a href="https://openai.com/enterprise-privacy" target="_blank" rel="noopener noreferrer">
-            privacy policy <BoxArrowUpRightIcon className="ms-1" />
-          </a>.
+            privacy policy
+          </a> <BoxArrowUpRightIcon className="ms-1" />.
         </p>
 
         <h4>Changes to Privacy Policy</h4>

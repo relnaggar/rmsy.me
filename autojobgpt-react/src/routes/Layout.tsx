@@ -2,33 +2,31 @@ import React, { createContext, useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
 
-
-import useAuthControl from "../hooks/useAuthControl";
-import useFetch from "../hooks/useFetch";
+import useAuthenticate from "../hooks/useAuthenticate";
+import useLogout from "../hooks/useLogout";
+import useCsrf from "../hooks/useCsrf";
 import useErrorAlert from "../hooks/useErrorAlert";
 import ConfirmationModal from "../common/ConfirmationModal";
 import NavLink from "./NavLink";
 import ErrorAlert from "../common/ErrorAlert";
-import { CsrfResponse } from "../api/types";
+import { localIsLoggedIn, localGetUsername } from "../common/localStorage";
 
 
 export const ConfirmationModalContext = createContext<
   (action: () => void, actionDescription: string, actionVerb: string) => void
 >(() => {});
 
-export const CSRFTokenContext = createContext<string>("");
+export const CSRFTokenContext = createContext("");
+
+export const LoggedInContext = createContext(false);
 
 const Layout = (): React.JSX.Element => {
-  const errorAlert = useErrorAlert();
-  const { loggedIn, username, logout, loggingOut } = useAuthControl({...errorAlert});
-
-  const { responseData, fetching: fetchingCsrfToken} = useFetch<CsrfResponse>("csrf/", {
-    initialData: { csrfToken: "" },
-    onFail: errorAlert.showErrors,
-    includeAuthorisationToken: false,
-  }, {
-    credentials: "include",
-  });
+  useAuthenticate();
+  const loggedIn = localIsLoggedIn();
+  const username = localGetUsername();
+  const errorAlert = useErrorAlert();  
+  const { logout, loggingOut } = useLogout({...errorAlert});
+  const { csrfToken, fetchingCsrfToken } = useCsrf({...errorAlert});
 
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
   const [confirmationAction, setConfirmationAction] = useState<() => void>(() => () => {});
@@ -137,9 +135,11 @@ const Layout = (): React.JSX.Element => {
           <main className="mt-3">
             { Object.keys(errorAlert.errors).length === 0 ?      
               <>
-                <CSRFTokenContext.Provider value={responseData.csrfToken}>
+                <CSRFTokenContext.Provider value={csrfToken}>
                   <ConfirmationModalContext.Provider value={openConfirmationModal}>
-                    <Outlet />
+                    <LoggedInContext.Provider value={loggedIn}>
+                      <Outlet />
+                    </LoggedInContext.Provider>
                   </ConfirmationModalContext.Provider>
                 </CSRFTokenContext.Provider>
                 <ConfirmationModal

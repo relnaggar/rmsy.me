@@ -5,12 +5,15 @@ import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box
 
 import useInputControl from '../hooks/useInputControl';
 import useErrorAlert from '../hooks/useErrorAlert';
+import usePost from '../hooks/usePost';
+import useScrollToTop from '../hooks/useScrollToTop';
 import BaseInput from '../common/BaseInput';
 import ErrorAlert from '../common/ErrorAlert';
-import usePost from '../hooks/usePost';
 
 
 const SignupPage = (): React.JSX.Element => {
+  useScrollToTop();
+
   const errorAlert = useErrorAlert();
   const usernameInput = useInputControl("username");
   const passwordInput = useInputControl("password");
