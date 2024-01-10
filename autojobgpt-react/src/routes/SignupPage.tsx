@@ -34,7 +34,9 @@ const SignupPage = (): React.JSX.Element => {
     setShowSuccessAlert(true);
     usernameInput.edit("");
     passwordInput.edit("");
-  }, [usernameInput, passwordInput]);
+    passwordConfirmInput.edit("");
+    agreeInput.edit("false");
+  }, [usernameInput, passwordInput, passwordConfirmInput, agreeInput]);
 
   const handleFail = useCallback((errors: Record<string,string[]>) => {   
     errorAlert.setErrors(errors);
@@ -63,10 +65,6 @@ const SignupPage = (): React.JSX.Element => {
       newErrors[passwordInput.name] = ["Password is required."];
       valid = false;
     }
-    if (passwordConfirmInput.value === "") {
-      newErrors[passwordConfirmInput.name] = ["Password confirmation is required."];
-      valid = false;
-    }
     if (passwordInput.value !== passwordConfirmInput.value) {
       newErrors[passwordConfirmInput.name] = ["Passwords must match."];
       valid = false;
@@ -76,7 +74,7 @@ const SignupPage = (): React.JSX.Element => {
       valid = false;
     }
 
-    for (const input of [usernameInput, passwordInput, agreeInput]) {
+    for (const input of [usernameInput, passwordInput, passwordConfirmInput, agreeInput]) {
       input.stopEditing();
     }
     errorAlert.setErrors(newErrors);

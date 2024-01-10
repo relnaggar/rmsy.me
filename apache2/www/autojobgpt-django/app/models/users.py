@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.admin.models import LogEntry
 
 from rest_framework.authtoken.models import Token
 
@@ -16,3 +17,11 @@ class CustomUser(AbstractUser):
   
   def __update(self, *args, **kwargs):
     super().save(*args, **kwargs)
+
+  def delete(self, *args, **kwargs):
+    logs = LogEntry.objects.filter(user_id=self.pk)
+    for log in logs:
+      log.change_message = f"Action by deleted user: {self.username}"
+      log.user = CustomUser.objects.get(pk=1)
+      log.save()
+    super().delete(*args, **kwargs)

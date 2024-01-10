@@ -1,7 +1,7 @@
 import React, { createContext, useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 import { ReactComponent as BoxArrowUpRightIcon } from 'bootstrap-icons/icons/box-arrow-up-right.svg';
-import { ReactComponent as Gear } from 'bootstrap-icons/icons/gear.svg';
+import { ReactComponent as GearIcon } from 'bootstrap-icons/icons/gear.svg';
 
 import useAuthenticate from "../hooks/useAuthenticate";
 import useLogout from "../hooks/useLogout";
@@ -27,7 +27,7 @@ const Layout = (): React.JSX.Element => {
   const loggedIn = localIsLoggedIn();
   const username = localGetUsername();
   const errorAlert = useErrorAlert();  
-  const { logout, loggingOut } = useLogout({...errorAlert});
+  const { logout, loggingOut } = useLogout();
   const { csrfToken, fetchingCsrfToken } = useCsrf({...errorAlert});
 
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
@@ -105,7 +105,7 @@ const Layout = (): React.JSX.Element => {
                       <ul className="dropdown-menu dropdown-menu-end">
                         <li>
                           <NavLink to="/account" className="dropdown-item" navLink={false}>
-                            Account <Gear className="ms-1" />
+                            Account <GearIcon className="ms-1" />
                           </NavLink>
                         </li>
                         <li>
