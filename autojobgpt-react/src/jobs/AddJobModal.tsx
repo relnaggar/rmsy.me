@@ -56,7 +56,7 @@ const AddJobModal = ({
     const newFillErrors: Record<string,string[]> = {};
 
     if (urlInput.value === "") {
-      newFillErrors[urlInput.name] = ["Enter a URL."];
+      newFillErrors[urlInput.name] = ["Enter a URL to autofill job details."];
       valid = false;
     }
 

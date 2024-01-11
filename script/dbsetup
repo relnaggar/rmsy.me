@@ -19,19 +19,15 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
 
 usage() {
   die "$(cat <<END
-usage: ${SCRIPT_NAME} [-d | password]
-  where -d is a flag to use the default password
-  you must provide a password if you do not use the -d flag
+usage: ${SCRIPT_NAME} [-d]
+  where -d is a flag to use the development password
 END
   )"
 }
 
 parse_args() {
-  # required arguments
+  # optional arguments
   arg="${1:-}"
-  if [[ -z "${arg}" ]]; then
-    usage
-  fi
 
   log "arguments (\
 arg: ${arg}, \
@@ -48,12 +44,12 @@ main() {
   if [[ "${arg}" == "-d" ]]; then
     local password="m2y74EAt26dz5t#W"
   else
-    local password="${arg}"
+    local password="$(sudo cat /etc/django/DJANGO_SUPERUSER_PASSWORD)"
   fi
 
   script/console apache2 "chown -R apache2:apache2 /var/www/media"
   script/dbmigrate
-  script/console apache2 "cd /var/www/autojobgpt-django/ && export && export DJANGO_SUPERUSER_PASSWORD="${password}" && python3 manage.py createsuperuser --no-input --username root --email rmsy@rmsy.me"
+  script/console apache2 "cd /var/www/autojobgpt-django/ && export && export DJANGO_SUPERUSER_PASSWORD="${password}" && python3 manage.py createsuperuser --no-input --username root --email root@rmsy.me"
 
   log "end"
 }

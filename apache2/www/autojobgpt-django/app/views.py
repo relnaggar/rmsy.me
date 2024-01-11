@@ -44,6 +44,9 @@ def csrf(request):
 class CustomUserViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
   serializer_class = CustomUserSerializer
   lookup_field = "username"
+
+  def get_view_name(self):
+    return super().get_view_name().replace("Custom User", "User")
   
   def get_queryset(self):
     queryset = CustomUser.objects.filter(pk=self.request.user.pk)

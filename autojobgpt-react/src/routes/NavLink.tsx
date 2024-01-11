@@ -3,16 +3,16 @@ import { Link, LinkProps, useLocation } from "react-router-dom";
 
 
 interface NavLinkProps extends Omit<LinkProps, "className" | "aria-current"> {
-  to: string,
   navLink?: boolean,
+  to: string,  
   className?: string,
 };
 
-const NavLink = ({
-  children, ...props
+const NavLink = ({  
+  navLink = true,
+  children,
+  ...props
 }: React.PropsWithChildren<NavLinkProps>) => {
-  const { navLink = true } = props;
-
   const { pathname } = useLocation();
   const isActive = pathname === props.to;
 
