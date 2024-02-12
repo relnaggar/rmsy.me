@@ -2,6 +2,7 @@ from django.db import models
 from django.core import files
 from django.conf import settings
 
+import logging
 import json
 import io
 import os
@@ -11,12 +12,14 @@ from .templates import FillField
 from ..gpt import Chat, ChatException
 
 
+logger = logging.getLogger(__name__)
+
 class NoChosenResumeError(Exception):
   pass
 
 class TailoredDocument(models.Model, DocumentMixin):
   user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tailored_documents")
-  name = models.TextField(unique=True)
+  name = models.TextField()
   job = models.ForeignKey(to="Job", on_delete=models.RESTRICT, related_name="tailored_documents")
   template = models.ForeignKey(to="Template", on_delete=models.RESTRICT, related_name="tailored_documents")
   version = models.IntegerField(default=1)
@@ -28,13 +31,16 @@ class TailoredDocument(models.Model, DocumentMixin):
   class Meta:
     constraints = [
       models.UniqueConstraint(
-        fields=["user", "job", "version"], name="unique_job_version"
-      )
+        fields=["user", "job", "version", "type"], name="tailored_document_unique_job_version_type"
+      ),
+      models.UniqueConstraint(
+        fields=["user", "name", "type"], name="tailored_document_unique_name_type"
+      ),
     ]
 
   @classmethod
-  def get_next_version(cls, user, job):
-    return cls.objects.filter(user=user, job=job).aggregate(
+  def get_next_version(cls, user, type, job):
+    return cls.objects.filter(user=user, type=type, job=job).aggregate(
       models.Max("version")
     )["version__max"] + 1
 
@@ -48,11 +54,11 @@ class TailoredDocument(models.Model, DocumentMixin):
       self.__update(*args, **kwargs)
 
   def __create(self, *args, **kwargs):
-    if TailoredDocument.objects.filter(user=self.user, job=self.job).exists():
-      self.version = TailoredDocument.get_next_version(self.user, self.job)
+    if TailoredDocument.objects.filter(user=self.user, type=self.type, job=self.job).exists():
+      self.version = TailoredDocument.get_next_version(self.user, self.type, self.job)
     else:
       self.version = TailoredDocument._meta.get_field("version").default
-    self.name = f"{self.job.title}, {self.job.company}, v{self.version}"
+    self.name = f"{self.type}, {self.job.title}, {self.job.company}, v{self.version}"
 
     if self.type == DocumentType.COVER_LETTER:
       resume_count = self.job.tailored_documents.filter(user=self.user, type=DocumentType.RESUME).count()
@@ -181,21 +187,43 @@ The user has provided the following additional information to help you tailor th
 
     # substitute the fill fields into the template document
     template_document = self.template.open_document()
+    inRun = False
+    keySoFar = ""
     for para in template_document.paragraphs:
       for run in para.runs:
+        if inRun:
+          logger.debug(f"run.text: {run.text}")
+          logger.debug(f"keySoFar: {keySoFar}")
         for key, value in all_substitutions.items():
           if "{{" + key + "}}" in run.text:
             run.text = run.text.replace("{{" + key + "}}", value)
+        if inRun:
+          if "}}" in run.text:
+            split = run.text.split("}}")
+            keySoFar += split[0]
+            for key, value in all_substitutions.items():
+              if keySoFar == key:
+                run.text = value + "".join(split[1:])
+            inRun = False
+            keySoFar = ""
+          else:
+            keySoFar += run.text
+            run.text = ""
+        if "{{" in run.text:
+          split = run.text.split("{{")
+          run.text = split[0]
+          keySoFar = "".join(split[1:])
+          inRun = True
 
     # save the document to file stream
     file_stream = io.BytesIO()
     template_document.save(file_stream)
 
     def sanitise_file_name(file_name):
-      return "".join(c for c in file_name if c.isalnum() or c in ["_", "-"])
+      return "".join(c for c in file_name if c.isascii() and (c.isalnum() or c in ["_", "-"]))
     
     # save the file stream to the file field
-    file_name = f"{sanitise_file_name(self.job.title)}_{sanitise_file_name(self.job.company)}_v{self.version}.docx"    
+    file_name = f"{self.type}_{sanitise_file_name(self.job.title)}_{sanitise_file_name(self.job.company)}_v{self.version}.docx"    
 
     if replace:
       # move the old file to a temporary location
@@ -236,7 +264,7 @@ class Substitution(models.Model):
 
   class Meta:
     constraints = [
-      models.UniqueConstraint(fields=["user", "tailored_document", "key"], name="unique_tailored_document_key"),
+      models.UniqueConstraint(fields=["user", "tailored_document", "key"], name="substitution_unique_tailored_document_key"),
     ]
 
   def __str__(self):
