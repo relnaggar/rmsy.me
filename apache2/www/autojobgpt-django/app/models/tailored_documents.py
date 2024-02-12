@@ -58,7 +58,7 @@ class TailoredDocument(models.Model, DocumentMixin):
       self.version = TailoredDocument.get_next_version(self.user, self.type, self.job)
     else:
       self.version = TailoredDocument._meta.get_field("version").default
-    self.name = f"{self.type}, {self.job.title}, {self.job.company}, v{self.version}"
+    self.name = f"{self.job.title}, {self.job.company}, v{self.version}"
 
     if self.type == DocumentType.COVER_LETTER:
       resume_count = self.job.tailored_documents.filter(user=self.user, type=DocumentType.RESUME).count()

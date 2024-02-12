@@ -11,6 +11,7 @@ services:
     volumes:
       - "apache2-logs:/var/log/apache2"
       - "django-media:/var/www/media"
+      - "django-migrations:/var/www/autojobgpt-django/app/migrations"
   postgres:
     container_name: postgres
     init: true
@@ -28,4 +29,6 @@ volumes:
   apache2-logs:
     external: true
   django-media:
+    external: true
+  django-migrations:
     external: true

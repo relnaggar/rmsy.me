@@ -44,9 +44,11 @@ main() {
   set +e
     logfun docker volume rm db
     logfun docker volume rm django-media
+    logfun docker volume rm django-migrations
   set -e
   logfun docker volume create db
   logfun docker volume create django-media
+  logfun docker volume create django-migrations
 
   log "end"
 }
