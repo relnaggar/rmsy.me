@@ -104,8 +104,9 @@ const BaseInput = React.forwardRef(({
     );
   }
 
+  let inputMaybeWithLabel: React.JSX.Element;
   if (type === "checkbox") {
-    input = (
+    inputMaybeWithLabel = (
       <>
         {input}
         <label className="form-check-label" htmlFor={currentId}>
@@ -113,11 +114,13 @@ const BaseInput = React.forwardRef(({
         </label>
       </>
     );
+  } else {
+    inputMaybeWithLabel = input;
   }
 
   let inputWithFeedback = (
     <>
-      {input}
+      {inputMaybeWithLabel}
       {showError &&
         <div id={feedbackId}
           className="invalid-feedback"  role={showError ? "alert": undefined} aria-labelledby={currentId}
@@ -128,7 +131,7 @@ const BaseInput = React.forwardRef(({
     </>
   );
 
-  inputWithFeedback = (
+  let inputWithHelp = (
     <>
       {inputWithFeedback}
       {helpText &&
@@ -151,11 +154,11 @@ const BaseInput = React.forwardRef(({
           <div className="flex-grow-1">
             { floatingLabel ?
               <div className="form-floating">        
-                {inputWithFeedback}
+                {inputWithHelp}
                 <label htmlFor={currentId}>{label}</label>              
               </div>
             :
-              inputWithFeedback
+              inputWithHelp
             }
           </div>
           { !isMobile &&
@@ -167,10 +170,10 @@ const BaseInput = React.forwardRef(({
       :
         type === "checkbox" ?
           <div className="form-check">
-            {inputWithFeedback}
+            {inputWithHelp}
           </div>
         :
-          inputWithFeedback
+          inputWithHelp
       }
     </>
   );

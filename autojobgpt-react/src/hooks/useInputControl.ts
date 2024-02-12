@@ -27,15 +27,16 @@ const useInputControl = (
   setValueProp?: React.Dispatch<React.SetStateAction<string>>,
 ): UseInputControl => {
   const ref = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(null);
-  
+  const cursorPositionRef = useRef<number | null>(null);
   const [value, setValue] = useControlledState<string>(initialValue || "", valueProp, setValueProp);
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     if (ref.current && ref.current.nodeName === "TEXTAREA") {
       const textarea = ref.current as HTMLTextAreaElement;
-      textarea.style.height = 'auto'; // Reset height
-      textarea.style.height = `${textarea.scrollHeight}px`; // Set to scrollHeight
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+      textarea.setSelectionRange(cursorPositionRef.current, cursorPositionRef.current);
     }
   }, [value]);
 
@@ -43,9 +44,12 @@ const useInputControl = (
     React.ChangeEvent<HTMLInputElement> |
     React.ChangeEvent<HTMLTextAreaElement> |
     React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  ) => {    
     if (e.target.type === "checkbox") {
       setValue((e.target as HTMLInputElement).checked.toString());
+    } else if (e.target.nodeName === "TEXTAREA") {
+      cursorPositionRef.current = (e as React.ChangeEvent<HTMLTextAreaElement>).target.selectionStart;
+      setValue(e.target.value);
     } else {
       setValue(e.target.value);
     }
