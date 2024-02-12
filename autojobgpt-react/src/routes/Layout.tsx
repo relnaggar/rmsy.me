@@ -52,7 +52,7 @@ const Layout = (): React.JSX.Element => {
               <span className="navbar-toggler-icon"></span>
             </button>
             <div className="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
-              <ul className="navbar-nav">
+              <ul className="navbar-nav align-items-center">
                 <li className="nav-item">
                   <NavLink to="/">
                     Home
