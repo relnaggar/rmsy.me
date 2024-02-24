@@ -4,12 +4,13 @@ from rest_framework import routers
 
 from .views import app, csrf, media
 from .views import CustomUserViewSet
-from .views import StatusViewSet, TemplateViewSet, FillFieldViewSet, JobViewSet, TailoredDocumentViewSet, SubstitutionViewSet
+from .views import StatusViewSet, TechnologyViewSet, TemplateViewSet, FillFieldViewSet, JobViewSet, TailoredDocumentViewSet, SubstitutionViewSet
 
 
 router = routers.DefaultRouter()
 router.register("users", CustomUserViewSet, basename="users")
 router.register("statuses", StatusViewSet, basename="statuses")
+router.register("technologies", TechnologyViewSet, basename="technologies")
 router.register("jobs", JobViewSet, basename="jobs")
 router.register("templates", TemplateViewSet, basename="templates")
 router.register("fillFields", FillFieldViewSet, basename="fillFields")

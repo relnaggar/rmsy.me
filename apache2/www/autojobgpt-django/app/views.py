@@ -20,14 +20,14 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 from .models import CustomUser
-from .models import Template, FillField, Job, TailoredDocument, Substitution, Status, DocumentType
+from .models import Template, FillField, Job, TailoredDocument, Substitution, Status, DocumentType, Technology
 from .models import DEFAULT_FILLFIELDS
 from .serializers import EmptySerializer
 from .serializers import CustomUserSerializer
-from .serializers import StatusSerializer, JobSerializer
+from .serializers import StatusSerializer, TechnologySerializer, JobSerializer
 from .serializers import TemplateSerializer, FillFieldSerializer
 from .serializers import TailoredDocumentSerializer, SubstitutionSerializer
-from .serializers import RegenerateSerializer, JobURLSerializer, JobDetailsSerializer, StatusSerializer
+from .serializers import RegenerateSerializer, JobURLSerializer, JobDetailsSerializer, StatusSerializer, JobPostingSerializer, JobTechnologiesSerializer
 from .gpt import ChatException
 from .permissions import IsOwner, IsSelf
 
@@ -197,6 +197,14 @@ class StatusViewSet(ModelViewSet):
   def get_queryset(self):
     queryset = Status.objects.filter(user=self.request.user)
     return queryset
+  
+class TechnologyViewSet(ModelViewSet):
+  permission_classes = [IsAuthenticated]
+  serializer_class = TechnologySerializer
+
+  def get_queryset(self):
+    queryset = Technology.objects.filter(user=self.request.user)
+    return queryset
     
 class JobViewSet(ModelViewSet):
   permission_classes = [IsAuthenticated]
@@ -209,20 +217,38 @@ class JobViewSet(ModelViewSet):
   @action(detail=False, methods=["GET"], url_path="extractDetailsFromUrl")
   def extract_details_from_url(self, request):
     url = request.query_params.get("url", None)
-    urlSerializer = JobURLSerializer(data={"url": url})
-    urlSerializer.is_valid(raise_exception=True)
+    url_serializer = JobURLSerializer(data={"url": url})
+    url_serializer.is_valid(raise_exception=True)
     try:
       title, company, posting = self.serializer_class.Meta.model.extract_details_from_url(
-        urlSerializer.validated_data["url"]
+        url_serializer.validated_data["url"]
       )
     except Exception as e:
       return Response(
         {"error": str(e)},
         status=status.HTTP_400_BAD_REQUEST
       )    
-    jobDetailsSerializer = JobDetailsSerializer(data={"title": title, "company": company, "posting": posting})
-    jobDetailsSerializer.is_valid(raise_exception=True)
-    return Response(jobDetailsSerializer.data)
+    job_details_serializer = JobDetailsSerializer(data={"title": title, "company": company, "posting": posting})
+    job_details_serializer.is_valid(raise_exception=True)
+    return Response(job_details_serializer.data)
+  
+  @action(detail=False, methods=["GET"], url_path="extractTechnologiesFromPosting")
+  def extract_technologies_from_posting(self, request):
+    posting = request.query_params.get("posting", None)
+    posting_serializer = JobPostingSerializer(data={"posting": posting})
+    posting_serializer.is_valid(raise_exception=True)
+    try:
+      required_technologies, nice_to_have_technologies = self.serializer_class.Meta.model.extract_technologies_from_posting(
+        posting_serializer.validated_data["posting"]
+      )
+    except Exception as e:
+      return Response(
+        {"error": str(e)},
+        status=status.HTTP_400_BAD_REQUEST
+      )
+    jobt_technologies_serializer = JobTechnologiesSerializer(data={"required_technologies": required_technologies, "nice_to_have_technologies": nice_to_have_technologies})
+    jobt_technologies_serializer.is_valid(raise_exception=True)
+    return Response(jobt_technologies_serializer.data)
 
 
 class FillFieldViewSet(ModelViewSet):

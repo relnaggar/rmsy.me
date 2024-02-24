@@ -23,6 +23,34 @@ Provide your output in JSON format with the following keys:
 If you fail to extract any of these keys, please provide a single JSON key "error" with a string value describing the error.
 """,
 
+"extract_job_technologies":
+
+"""
+The user has provided the following job posting:
+<job_posting>
+${job_posting}
+</job_posting>
+
+Please extract the "required" and "nice-to-have technologies" from the job posting.
+The "required" technologies are the ones that are mandatory for the person performing the job, while the "nice-to-have" technologies are the ones that are not mandatory, but would be beneficial to have.
+Often, the job posting will explicitly mention these technologies, but sometimes you may need to infer them from the job description.
+If in doubt about whether a technology is required or nice-to-have, please include it in the "required" technologies.
+If in doubt about whether to include a technology or not, please include it in the "nice-to-have" technologies.
+
+Note by "technology" I mean the kind of technology that a software developer would list on their resume, such as a programming language, framework, library, platform, tool, or similar.
+Please don't include technologies not related to software development, such as "Microsoft Word", "Excel", "PowerPoint", etc.
+Also, please don't include areas of expertise, such as "machine learning", "web development", "cloud computing", etc.
+
+Provide your output in JSON format with the following keys:
+* required_technologies -- a list of strings which may be empty
+* nice_to_have_technologies -- a list of strings which may be empty
+There should be no overlap between the two lists.
+
+Please use the exact names of the technologies as they are commonly referred to in the industry, including with respect to capitalization and punctuation.
+For example, use "React" instead of "React.js", "Node.js" instead of "Node", "AWS" instead of "Amazon Web Services", "C#" instead of "C Sharp", "TypeScript" instead of "Typescript", etc.
+
+If you fail to extract any of these keys, please provide a single JSON key "error" with a string value describing the error.
+""",
 
 "fill_template":
 
@@ -77,7 +105,6 @@ If you fail for any reason, please provide a single JSON key "error" with a stri
 """,
 }
   __client = None
-  model = "gpt-4-1106-preview"
   response_format = { "type": "json_object" }
 
   @classmethod
@@ -89,7 +116,8 @@ If you fail for any reason, please provide a single JSON key "error" with a stri
       cls.__client = OpenAI(api_key=api_key)
     return cls.__client
     
-  def __init__(self, username=None, messages=None):
+  def __init__(self, username=None, messages=None, model_version="4-turbo-preview"):
+    self.model = f"gpt-{model_version}"
     self.username = username
     if messages is None:
       self.messages = [
@@ -104,13 +132,13 @@ If you fail for any reason, please provide a single JSON key "error" with a stri
     self.messages.append({"role": "user", "content": prompt_text})
     if self.username is None:
       completion = client.chat.completions.create(
-        model=Chat.model,
+        model=self.model,
         response_format=Chat.response_format,
         messages=self.messages,
       )
     else:
       completion = client.chat.completions.create(
-        model=Chat.model,
+        model=self.model,
         response_format=Chat.response_format,
         messages=self.messages,
         user=self.username,

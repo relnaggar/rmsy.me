@@ -58,17 +58,58 @@ class Status(models.Model):
       higher_order_statuses.update(order=models.F("order") - 1)
       super().delete(*args, **kwargs)
 
+class Technology(models.Model):
+  user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="technologies")
+  name = models.TextField()
+  proficient = models.BooleanField(default=False)
+
+  class Meta:
+    constraints = [
+      models.UniqueConstraint(
+        fields=["user", "name"],
+        name="technology_unique_name"),
+    ]
+
+  def __str__(self):
+    return self.name
+  
+class TechnologyForJob(models.Model):
+  job = models.ForeignKey(to="Job", on_delete=models.CASCADE, related_name="technologies_for_job")
+  technology = models.ForeignKey(to="Technology", on_delete=models.CASCADE, related_name="jobs_with_technology")
+  required = models.BooleanField(default=False)
+
+  class Meta:
+    constraints = [
+      models.UniqueConstraint(
+        fields=["job", "technology"],
+        name="technology_for_job_unique_job_technology"),
+    ]
+
+  def __str__(self):
+    return f"{self.job}, {self.technology}"
+
 class Job(models.Model):
   @staticmethod
   def extract_details_from_url(url):
     scraped_text = scrape_text(url)
-    message = Chat().ask(prompt_name="extract_job_details", substitutions={"scraped_text": scraped_text})
+    message = Chat(model_version="3.5-turbo").ask(prompt_name="extract_job_details", substitutions={"scraped_text": scraped_text})
     response = json.loads(message["content"])
     try:
       title = response["job_title"]
       company = response["company"]
       posting = response["job_posting"]
       return title, company, posting
+    except KeyError:
+      raise Exception(response["error"])
+    
+  @staticmethod
+  def extract_technologies_from_posting(posting):
+    message = Chat().ask(prompt_name="extract_job_technologies", substitutions={"job_posting": posting})
+    response = json.loads(message["content"])
+    try:
+      required_technologies = response["required_technologies"]
+      nice_to_have_technologies = response["nice_to_have_technologies"]
+      return required_technologies, nice_to_have_technologies
     except KeyError:
       raise Exception(response["error"])
   
@@ -80,6 +121,7 @@ class Job(models.Model):
   status = models.ForeignKey(to="Status", on_delete=models.RESTRICT, related_name="jobs")
   chosen_resume = models.ForeignKey(to="TailoredDocument", on_delete=models.SET_NULL, related_name="jobs", null=True, blank=True)
   notes = models.TextField(blank=True)
+  technologies = models.ManyToManyField(to="Technology", through="TechnologyForJob", related_name="jobs")
 
   class Meta:
     constraints = [
