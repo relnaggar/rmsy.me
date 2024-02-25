@@ -13,11 +13,11 @@
   <ul>
     <li>Five transformative years at the University of Edinburgh, resulting in a Master of Informatics with First Class Honours and a newfound appreciation for the sanctity of sleep.</li>
     <li>
-      A thrilling tenure as a full stack developer at a leading IT service management provider: I laughed, I cried, I debugged.
+      A thrilling experience as a full stack developer interning at a leading IT service management provider: I laughed, I cried, I debugged.
       It was there that I sharpened my skills and grew a thick skin for real-world coding dramas.
     </li>
     <li>
-      Four enlightening years educating the world in computer science and software engineering, during which I earned the rather grand title of the UK's top 'Computing University' tutor on the esteemed platform, <a href="https://www.mytutor.co.uk/tutors/24851/" target="_blank" rel="noopener noreferrer">MyTutor</a> <?=includeIcon('box-arrow-up-right')?>.
+      <?= $numberOfYearsTutoring ?> enlightening years educating the world in computer science and software engineering, during which I earned the rather grand title of the UK's top 'Computing University' tutor on the esteemed platform, <a href="https://www.mytutor.co.uk/tutors/24851/" target="_blank" rel="noopener noreferrer">MyTutor</a> <?=includeIcon('box-arrow-up-right')?>.
       No undergrads were harmed in the making of this story.
     </li>
   </ul>  

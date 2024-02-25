@@ -20,9 +20,30 @@ class Engineer extends AbstractController {
     return $this->basic(__FUNCTION__);
   }
 
+  private function digitToWord(int $number): string {
+    $words = [
+      0 => 'zero',
+      1 => 'one',
+      2 => 'two',
+      3 => 'three',
+      4 => 'four',
+      5 => 'five',
+      6 => 'six',
+      7 => 'seven',
+      8 => 'eight',
+      9 => 'nine',
+    ];
+    return $words[$number];
+  }
+
   public function home(): array {
+    $currentDate = new \DateTime();
+    $numberOfYearsTutoring = $currentDate->diff(new \DateTime('2018-07-01'))->y;
+    if ($numberOfYearsTutoring <= 9) {
+      $numberOfYearsTutoring = ucfirst($this->digitToWord($numberOfYearsTutoring));
+    }
     $description = "Hello there, I'm Ramsey -- not just your average software engineer, but a virtuoso conducting symphonies of syntax and semicolons.";
-    return $this->basic(__FUNCTION__, $meta=['description' => $description], $vars=['projects' => $this->projects]);
+    return $this->basic(__FUNCTION__, $meta=['description' => $description], $vars=['projects' => $this->projects, 'numberOfYearsTutoring' => $numberOfYearsTutoring]);
   }
 
   public function about(): array {

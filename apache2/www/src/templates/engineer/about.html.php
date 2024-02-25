@@ -29,7 +29,7 @@
 <p data-nosnippet>
   Don't worry though, it's not all work and no play.
   I've also embraced the thrill of the unknown by hitchhiking from London to Vienna in 4 days, and honed my warrior spirit through 3 months of intense Muay Thai training in Thailand.
-  Plus, as a singer, I led my a capella group of 9 to the semi-finals of the national competition Voice Festival UK -- it was Pitch Perfect!
+  Plus, my university a capella group reached the semi-final of national competition Voice Festival UK -- it was Pitch Perfect!
   Currently, I'm mixing syntax with salsa, living a spicy adventure in Valencia where my Spanish is improving one bachata beat at a time.
 </p>
 
