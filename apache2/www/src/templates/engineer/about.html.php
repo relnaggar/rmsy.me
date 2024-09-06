@@ -1,6 +1,6 @@
 <figure class="figure w-25 float-end m-3">
   <img src="/assets/img/profile.jpg" class="figure-img img-fluid" alt="Ramsey El-Naggar">
-  <figcaption class="figure-caption text-center">The fake graduation scroll prop was well worth the five-year wait!</figcaption>
+  <figcaption class="figure-caption text-center"></figcaption>
 </figure>
 
 <p class="lead">
