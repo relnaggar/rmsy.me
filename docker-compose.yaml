@@ -1,0 +1,12 @@
+services:
+  app:
+    init: true
+    build: .
+    container_name: apache2
+    ports:
+      - "80:80"
+    volumes:
+      - ./app:/var/www/html
+    environment:
+      - APP_ENVIRONMENT_MODE=DEVELOPMENT
+    
