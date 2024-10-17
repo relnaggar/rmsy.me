@@ -5,6 +5,7 @@ services:
     container_name: apache2
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./app:/var/www/html
       - ./apache-config:/etc/apache2
