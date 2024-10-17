@@ -10,6 +10,13 @@ Access the development server:
   
     $ curl http://localhost
 
+Access the development server via HTTPS:
+
+```bash
+script/trust-self-signed-certificate-locally.sh
+curl https://localhost
+```
+
 Modifiable folders
 * `app`: files placed in this directory are served to users who access the server via a web browser (maps to `/var/www/html/`)
 * `apache-config`: files placed in this directory are used to configure the Apache server (maps to `/etc/apache2`)
