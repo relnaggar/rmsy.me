@@ -6,7 +6,7 @@ IFS=$'\n\t'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
   pwd)"
 readonly SCRIPT_DIR
-. "${SCRIPT_DIR}/lib/shared.sh"
+. "${SCRIPT_DIR}/lib/utils.sh"
 
 main() {
   local DOCKER_COMPOSE_FILE="docker-compose.yml"

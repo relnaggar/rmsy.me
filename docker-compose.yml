@@ -1,13 +1,11 @@
 services:
   app:
     init: true
-    build: .
-    container_name: apache2
     ports:
       - "80:80"
       - "443:443"
+    container_name: apache2
+    build: .
     volumes:
       - ./app:/var/www/html
       - ./apache-config:/etc/apache2
-    environment:
-      - APP_ENVIRONMENT_MODE=DEVELOPMENT
