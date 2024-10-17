@@ -1,14 +1,18 @@
 # apache2
 
-## Quickstart
+## Quick Start
 
 Start the development server:
 
-    $ docker compose up -d
+```bash
+docker compose up -d
+```
 
 Access the development server:
-  
-    $ curl http://localhost
+
+```bash
+curl http://localhost
+```
 
 Access the development server via HTTPS:
 
@@ -24,24 +28,34 @@ Modifiable folders
 
 Stop the development server:
 
-    $ docker compose down
+```bash
+docker compose down
+```
 
 # Debugging
 
 Get a shell inside the running container:
 
-    $ docker compose exec app bash
+```bash
+docker compose exec app bash
+```
 
 This is often preceeded by the following command to keep the container running if it fails on start:
 
-    $ docker compose run -d app tail -f /dev/null
+```bash
+docker compose run -d app tail -f /dev/null
+```
 
 # Advanced
 
 If you want to view the default apache configuration files:
 
-    $ script/get-default-apache-config
+```bash
+script/get-default-apache-config
+```
 
 If you need to make changes to the `Dockerfile` or `docker-compose.yml` files, you will need to rebuild the Docker image:
 
-    $ docker compose up -d --build
+```bash
+docker compose up -d --build
+```
