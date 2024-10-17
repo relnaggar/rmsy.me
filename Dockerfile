@@ -30,7 +30,7 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["apache2"]
 
 # volumes
-VOLUME ["/var/www/html"]
+VOLUME ["/var/www/html", "/etc/apache2"]
 
 # ports
 EXPOSE 80

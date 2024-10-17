@@ -7,6 +7,6 @@ services:
       - "80:80"
     volumes:
       - ./app:/var/www/html
+      - ./apache-config:/etc/apache2
     environment:
       - APP_ENVIRONMENT_MODE=DEVELOPMENT
-    
