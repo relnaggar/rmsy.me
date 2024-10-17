@@ -26,9 +26,9 @@ jobs:
         echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
 
     # Build the Docker image with the timestamp tag
-    - name: Build the Docker image
+    - name: Build the Docker image with Dockerfile.prod
       run: >
-        docker build . --tag
+        docker build . -f Dockerfile.prod --tag
         ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:${{ env.IMAGE_TAG }}
 
     # Tag the image as 'latest'
