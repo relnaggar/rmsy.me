@@ -1,17 +1,33 @@
 #!/bin/bash
 # This script is used to get the default Apache configuration files.
+set -euo pipefail
+IFS=$'\n\t'
 
-# comment out the mounting of the apache-config volume to prevent the default Apache configuration files from being overwritten
-sed -i '' '/\.\/apache-config:.*/s/^ /#/' docker-compose.yaml
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && \
+  pwd)"
+readonly SCRIPT_DIR
+. "${SCRIPT_DIR}/lib/shared.sh"
 
-# start the container
-docker compose up -d
+main() {
+  local DOCKER_COMPOSE_FILE="docker-compose.yaml"
+  local APACHE_CONFIG_DIR="apache-config"
 
-# get the default Apache configuration files
-docker cp apache2:/etc/apache2 default-apache-config
+  # comment out the mounting of the apache-config volume
+  # to prevent the default Apache configuration files from being overwritten
+  logfun sed -i '' "/\.\/${APACHE_CONFIG_DIR}:.*/s/^ /#/" "${DOCKER_COMPOSE_FILE}"
 
-# stop the container
-docker compose down
+  # start the container
+  logfun docker compose up -d
 
-# uncomment the mounting of the apache-config volume
-sed -i '' '/\.\/apache-config:.*/s/#/ /' docker-compose.yaml
+  # get the default Apache configuration files
+  logfun docker cp apache2:/etc/apache2 default-apache-config
+
+  # cleanup: uncomment the mounting of the apache-config volume
+  logfun sed -i '' "/\.\/${APACHE_CONFIG_DIR}:.*/s/#/ /" "${DOCKER_COMPOSE_FILE}"
+}
+
+if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
+  log "start"
+  main "$@"
+  log "end"
+fi
