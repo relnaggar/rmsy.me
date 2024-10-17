@@ -9,7 +9,7 @@ readonly SCRIPT_DIR
 . "${SCRIPT_DIR}/lib/shared.sh"
 
 main() {
-  local DOCKER_COMPOSE_FILE="docker-compose.yaml"
+  local DOCKER_COMPOSE_FILE="docker-compose.yml"
   local APACHE_CONFIG_DIR="apache-config"
 
   # comment out the mounting of the apache-config volume
