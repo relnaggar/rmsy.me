@@ -46,4 +46,10 @@ logfun() {
   { local result="$?"; set +x; } 2>/dev/null
   exec 2>&3
   return "${result}"
-} 
+}
+
+# function to get the value of a variable from the .env file
+
+get_env_value() {
+  grep "^export $1=" .env | cut -d '=' -f2
+}

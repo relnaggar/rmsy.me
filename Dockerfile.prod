@@ -1,18 +1,13 @@
 FROM debian:12.7-slim
 ENV DEBIAN_FRONTEND=noninteractive
 
-# install apache
+
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends \
   # for docker-entrypoint.sh
   gosu \
-  # apache
+  # install apache
   apache2 \
-  # cleanup
-  && apt autoremove -y \
-  && apt clean \
-  && rm -rf /var/lib/apt/lists/* \
-  \
   # make apache run as custom user for better permission control
   && groupadd -r -g 999 apache2 && useradd -r -m -g apache2 -u 999 apache2 \
   && mkdir -p /var/run/apache2 \
@@ -21,22 +16,24 @@ RUN apt-get update -y \
   && sed -i 's/^Group .*/Group apache2/' /etc/apache2/apache2.conf \
   && sed -i 's/^export APACHE_RUN_USER=.*/export APACHE_RUN_USER=apache2/' /etc/apache2/envvars \
   && sed -i 's/^export APACHE_RUN_GROUP=.*/export APACHE_RUN_GROUP=apache2/' /etc/apache2/envvars \
-  \
   # enable HTTPS
   && a2enmod ssl \
   && a2ensite default-ssl \
-  # install ssl-cert for snakeoil cert
+  # SSL certificates
   && apt-get update -y \
-  && apt-get install -y --no-install-recommends ssl-cert \
-  # cleanup
-  && apt autoremove -y \
-  && apt clean \
-  && rm -rf /var/lib/apt/lists/* \
-  # fix permissions
+  && apt-get install -y --no-install-recommends \
+  ssl-cert \
+  certbot \
+  python3-certbot-apache \
+  # fix ssl-cert permissions
   && chown root:apache2 /etc/ssl/private \
   && chmod 750 /etc/ssl/private \
   && chown root:apache2 /etc/ssl/private/ssl-cert-snakeoil.key \
-  && chmod 640 /etc/ssl/private/ssl-cert-snakeoil.key
+  && chmod 640 /etc/ssl/private/ssl-cert-snakeoil.key \
+  # cleanup
+  && apt autoremove -y \
+  && apt clean \
+  && rm -rf /var/lib/apt/lists/*
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="PRODUCTION"
@@ -53,3 +50,5 @@ COPY apache-config/ /etc/apache2
 
 # copy contents of app folder to /var/www/html
 COPY app/ /var/www/html
+
+VOLUME ["/etc/apache2/sites-available", "/etc/letsencrypt"]
