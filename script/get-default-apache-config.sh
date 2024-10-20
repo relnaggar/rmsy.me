@@ -21,6 +21,8 @@ main() {
   logfun sed -i '' "/${apache_config_dir}:.*/s/^ /#/" "${docker_compose_file}"
 
   # start the container
+  logfun docker compose down
+  logfun docker compose build
   logfun docker compose up -d
 
   # get the default Apache configuration files
@@ -28,6 +30,18 @@ main() {
 
   # cleanup: uncomment the mounting of the apache-config volume
   logfun sed -i '' "/${apache_config_dir}:.*/s/#/ /" "${docker_compose_file}"
+
+  if [[ ! -d "${apache_config_dir}" ]]; then
+    logfun mv default-apache-config "${apache_config_dir}"
+  else
+    # ask the user if they want to overwrite the existing Apache configuration files
+    log "Do you want to overwrite the existing Apache configuration files? [y/N]"
+    read -r response
+    if [[ "${response}" =~ ^[Yy]$ ]]; then
+      logfun rm -rf "${apache_config_dir}"
+      logfun mv default-apache-config "${apache_config_dir}"
+    fi    
+  fi
 }
 
 if [[ "${#BASH_SOURCE[@]}" -eq 1 ]]; then
