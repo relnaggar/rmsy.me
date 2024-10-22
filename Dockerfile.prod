@@ -42,5 +42,5 @@ VOLUME ["/etc/apache2/sites-available", "/etc/letsencrypt"]
 # copy contents of apache-config folder to /etc/apache2
 COPY apache-config/ /etc/apache2
 
-# copy contents of app folder to /var/www/html
-COPY app/ /var/www/html
+# copy contents of public folder to /var/www
+COPY www/ /var/www

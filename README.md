@@ -22,7 +22,8 @@ curl https://localhost
 ```
 
 Modifiable folders
-* `app`: files placed in this directory are served to users who access the server via a web browser (maps to `/var/www/html/`)
+* `www`: files placed in this directory are copied to the development server (maps to `/var/www/`)
+* `www/html`: files placed in this directory are served to users who access the server via a web browser (maps to `/var/www/html/`)
 * `apache-config`: files placed in this directory are used to configure the Apache server (maps to `/etc/apache2`)
     * changes to these files require a restart of the development server
 

@@ -105,4 +105,4 @@ CMD ["apache2"]
 EXPOSE 80 443
 
 # volumes
-VOLUME ["/var/www/html", "/etc/apache2"]
+VOLUME ["/var/www", "/etc/apache2"]

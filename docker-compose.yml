@@ -7,5 +7,5 @@ services:
     container_name: apache2
     build: .
     volumes:
-      - ./app:/var/www/html
+      - ./www:/var/www
       - ./apache-config:/etc/apache2
