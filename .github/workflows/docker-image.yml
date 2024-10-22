@@ -12,38 +12,39 @@ jobs:
     # Checkout the code
     - uses: actions/checkout@v4
 
-    # Log in to Docker Hub
     - name: Log in to Docker Hub
       run: >
         echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u
         "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-    # Set the timestamp as an environment variable
     - name: Set up environment
       run: >
         echo "IMAGE_TAG=$(date +%s)" >> $GITHUB_ENV;
         REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2);
         echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
 
-    # Build the Docker image with the timestamp tag
+    - name: Build and run the bundler
+      run: >
+        docker build ./bundler -f bundler/Dockerfile.prod --tag
+        ${{ secrets.DOCKERHUB_USERNAME }}/bundler:${{ env.IMAGE_TAG }};
+        docker run --rm -v "$(pwd)/www/html/css:/bundler/dist/css"
+        ${{ secrets.DOCKERHUB_USERNAME }}/bundler:${{ env.IMAGE_TAG }};
+
     - name: Build the Docker image with Dockerfile.prod
       run: >
         docker build . -f Dockerfile.prod --tag
         ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:${{ env.IMAGE_TAG }}
 
-    # Tag the image as 'latest'
     - name: Tag the Docker image as latest
       run: >
         docker tag
         ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:${{ env.IMAGE_TAG }}
         ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:latest
 
-    # Push the Docker image with the timestamp tag
     - name: Push the Docker image with timestamp tag
       run: >
         docker push
         ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:${{ env.IMAGE_TAG }}
 
-    # Push the Docker image with the 'latest' tag
     - name: Push the Docker image with latest tag
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/$REPO_NAME:latest

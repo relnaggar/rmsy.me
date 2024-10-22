@@ -9,3 +9,10 @@ services:
     volumes:
       - ./www:/var/www
       - ./apache-config:/etc/apache2
+  bundler:
+    init: true
+    container_name: bundler
+    build: ./bundler
+    volumes:
+      - ./bundler/src:/bundler/src
+      - ./www/html/css:/bundler/dist/css
