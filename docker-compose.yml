@@ -17,3 +17,4 @@ services:
       - ./bundler/src:/bundler/src
       - ./www/html/css:/bundler/dist/css
       - ./www/html/js:/bundler/dist/js
+      - ./www/html/fonts:/bundler/dist/fonts

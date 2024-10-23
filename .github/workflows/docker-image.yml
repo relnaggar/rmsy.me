@@ -29,6 +29,7 @@ jobs:
         ${{ secrets.DOCKERHUB_USERNAME }}/bundler:${{ env.IMAGE_TAG }};
         docker run --rm -v "$(pwd)/www/html/css:/bundler/dist/css"
         -v "$(pwd)/www/html/js:/bundler/dist/js"
+        -v "$(pwd)/www/html/fonts:/bundler/dist/fonts"
         ${{ secrets.DOCKERHUB_USERNAME }}/bundler:${{ env.IMAGE_TAG }};
 
     - name: Build the Docker image with Dockerfile.prod

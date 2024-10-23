@@ -1,17 +1,19 @@
 {
   "scripts": {    
-    "css-compile": "sass --style compressed --source-map --embed-sources --no-error-css --load-path=node_modules src/scss/:dist/css/",
+    "css-compile": "sass --style compressed --source-map --embed-sources --no-error-css --quiet-deps --load-path=node_modules src/scss/:dist/css/",
     "css-prefix": "postcss --replace dist/css/styles.css --use autoprefixer --map",
     "css": "npm-run-all css-compile css-prefix",
     "watch:css": "nodemon -e scss --watch src/scss -x \"npm run css\"",
     "build:css": "npm run css",
 
+    "build:fonts": "cp -r node_modules/bootstrap-icons/font/fonts/* dist/fonts",
+
     "watch:js": "esbuild src/js/*.js --bundle --minify --sourcemap --outfile=dist/js/main.js --watch=forever",
     "build:js": "esbuild src/js/*.js --bundle --minify --sourcemap --outfile=dist/js/main.js",
 
-    "build": "npm-run-all build:css build:js",
+    "build": "npm-run-all build:fonts build:css build:js",
     "watch": "npm-run-all --parallel watch:css watch:js",
-    "start": "npm run watch"
+    "start": "npm-run-all build:fonts watch"
   },
   "devDependencies": {
     "sass": "^1.79.4",
@@ -21,5 +23,10 @@
     "npm-run-all": "^4.1.5",
     "nodemon": "^3.1.7",
     "esbuild": "^0.24.0"
+  },
+  "dependencies": {    
+    "bootstrap": "^5.3.3",
+    "@popperjs/core": "^2.11.8",
+    "bootstrap-icons": "^1.11.3"
   }
 }
