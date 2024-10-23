@@ -24,12 +24,14 @@ curl https://localhost
 Modifiable folders
 * `www`: files placed in this directory are copied to the development server (maps to `/var/www/`)
 * `www/html`: files placed in this directory are served to users who access the server via a web browser (maps to `/var/www/html/`)
-* `apache-config`: files placed in this directory are used to configure the Apache server (maps to `/etc/apache2`)
+* `config/apache2`: files placed in this directory are used to configure the Apache server (maps to `/etc/apache2`)
     * changes to these files require a restart of the development server
 * `bundler/src/scss`: files placed in this directory are compiled to CSS and copied to the development server (`/var/www/html/css`)
     * changes to these files are detected automatically
 * `bundler/src/js`: files placed in this directory are bundled to `/var/www/html/js`
     * changes to these files are detected automatically
+* `config/php`: files placed in this directory are used to configure PHP (maps to `/etc/php`)
+  * * changes to these files require a restart of the development server
 
 Stop the development server:
 
@@ -53,10 +55,10 @@ docker compose run -d app tail -f /dev/null
 
 # Advanced
 
-If you want to view the default apache configuration files:
+If you want to fetch the default configuration files for apache or php:
 
 ```bash
-script/get-default-apache-config
+script/get-default-config.sh
 ```
 
 Changes to the following files require rebuilding with `docker compose build`:

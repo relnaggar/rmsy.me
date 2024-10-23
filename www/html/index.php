@@ -11,7 +11,7 @@
   </head>
   <body>
     <div class="container">
-      Hello World!
+      <?= "Hello World!" ?>
       <i class="bi bi-bootstrap"></i>
     </div>
     <script type="module" src="js/main.js" defer></script>

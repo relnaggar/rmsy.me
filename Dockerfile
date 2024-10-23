@@ -94,6 +94,18 @@ RUN a2enmod headers \
   && echo "Header always set X-Content-Type-Options: \"nosniff\"" \
     >> /etc/apache2/conf-available/security.conf
 
+# install php for apache
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends \
+  # php (8.2 with debian:12.7)
+  php php-mbstring php-xml php-curl php-zip \
+  # apache2 php module
+  libapache2-mod-php \
+  # cleanup
+  && apt autoremove -y \
+  && apt clean \
+  && rm -rf /var/lib/apt/lists/*
+
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"
 COPY docker-entrypoint.sh /
@@ -105,4 +117,4 @@ CMD ["apache2"]
 EXPOSE 80 443
 
 # volumes
-VOLUME ["/var/www", "/etc/apache2"]
+VOLUME ["/var/www", "/etc/apache2", "/etc/php"]

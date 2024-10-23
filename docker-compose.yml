@@ -8,7 +8,8 @@ services:
     build: .
     volumes:
       - ./www:/var/www
-      - ./apache-config:/etc/apache2
+      - ./config/apache2:/etc/apache2
+      - ./config/php:/etc/php
   bundler:
     init: true
     container_name: bundler

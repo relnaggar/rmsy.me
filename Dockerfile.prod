@@ -21,6 +21,11 @@ RUN apt-get update -y \
   && chmod 750 /etc/ssl/private \
   && chown root:apache2 /etc/ssl/private/ssl-cert-snakeoil.key \
   && chmod 640 /etc/ssl/private/ssl-cert-snakeoil.key \
+  # php (8.2 with debian:12.7)
+  && apt-get install -y --no-install-recommends \
+  php php-mbstring php-xml php-curl php-zip \
+  # apache2 php module
+  libapache2-mod-php \
   # cleanup
   && apt autoremove -y \
   && apt clean \
@@ -39,8 +44,16 @@ EXPOSE 80 443
 # volumes
 VOLUME ["/etc/apache2/sites-available", "/etc/letsencrypt"]
 
-# copy contents of apache-config folder to /etc/apache2
-COPY apache-config/ /etc/apache2
+# remove default files
+RUN rm -rf /etc/php/* \
+  && rm -rf /etc/apache2/* \
+  && rm -rf /var/www/*
+
+# copy contents of php-config folder
+COPY config/php/ /etc/php
+
+# copy contents of apache-config folder
+COPY config/apache2/ /etc/apache2
 
 # copy contents of public folder to /var/www
 COPY www/ /var/www
