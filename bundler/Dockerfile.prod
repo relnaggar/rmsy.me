@@ -12,4 +12,4 @@ CMD ["npm", "run", "build"]
 COPY src/ /bundler/src
 
 # volumes
-VOLUME ["/bundler/dist/css"]
+VOLUME ["/bundler/dist/css", "/bundler/dist/js"]

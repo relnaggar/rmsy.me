@@ -27,7 +27,9 @@ Modifiable folders
 * `apache-config`: files placed in this directory are used to configure the Apache server (maps to `/etc/apache2`)
     * changes to these files require a restart of the development server
 * `bundler/src/scss`: files placed in this directory are compiled to CSS and copied to the development server (`/var/www/html/css`)
-    * changes to these files are detected automatically and trigger the build process
+    * changes to these files are detected automatically
+* `bundler/src/js`: files placed in this directory are bundled to `/var/www/html/js`
+    * changes to these files are detected automatically
 
 Stop the development server:
 

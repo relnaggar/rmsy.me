@@ -1,2 +1,3 @@
 default-apache-config
 www/html/css/*.css*
+www/html/js/*.js*

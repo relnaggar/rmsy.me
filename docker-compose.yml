@@ -16,3 +16,4 @@ services:
     volumes:
       - ./bundler/src:/bundler/src
       - ./www/html/css:/bundler/dist/css
+      - ./www/html/js:/bundler/dist/js
