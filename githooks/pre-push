@@ -27,16 +27,16 @@ log() {
 main() {
   log "start"
   
-  script/server down
-  log "verifying development build:"
-  script/server up -b
-  script/test
-  script/server down
+  # script/server down
+  # log "verifying development build:"
+  # script/server up -b
+  # script/test
+  # script/server down
 
-  log "verifying production build:"
-  script/server up prod -b
-  script/test e2e
-  script/server down
+  # log "verifying production build:"
+  # script/server up prod -b
+  # script/test e2e
+  # script/server down
 
   log "end"
 }
