@@ -106,6 +106,21 @@ RUN apt-get update -y \
   && apt clean \
   && rm -rf /var/lib/apt/lists/*
 
+# set php config for development
+RUN PHP_VERSION=$(php -r "echo PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;") \
+  && sed -i \
+  "s/^auto_prepend_file.*/auto_prepend_file = \
+\/etc\/php\/${PHP_VERSION}\/apache2\/development_ini.php/" \
+  "/etc/php/${PHP_VERSION}/apache2/php.ini" \
+  && cat <<EOF > "/etc/php/${PHP_VERSION}/apache2/development_ini.php"
+<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+ini_set('zend.exception_ignore_args', 0);
+ini_set('zend.exception_string_param_max_len', 15);
+EOF
+
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"
 COPY docker-entrypoint.sh /

@@ -52,6 +52,13 @@ RUN rm -rf /etc/php/* \
 # copy contents of php-config folder
 COPY config/php/ /etc/php
 
+# remove development_ini.php
+RUN PHP_VERSION=$(php -r "echo PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;") \
+  && sed -i \
+  "s/^auto_prepend_file.*/auto_prepend_file = /" \
+  "/etc/php/${PHP_VERSION}/apache2/php.ini" \
+  && rm "/etc/php/${PHP_VERSION}/apache2/development_ini.php"
+
 # copy contents of apache-config folder
 COPY config/apache2/ /etc/apache2
 
