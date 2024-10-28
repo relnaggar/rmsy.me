@@ -17,8 +17,6 @@ abstract class AbstractController {
    * 
    *   Example: 'folder/file' if the file is located at
    *   project_root/templates/ControlleraName/folder/file.html.php.
-   * @param string $title The title of the page
-   * @param string $metaDescription The meta description of the page
    * @param string $layoutTemplatePath The path to the layout template file,
    *   relative to the templates directory. Given without the file extension,
    *   which must be '.html.php'. The templates directory is assumed to be
@@ -32,16 +30,12 @@ abstract class AbstractController {
    */
   public function get_controller_page_with_layout(
     string $bodyTemplatePath,
-    string $title='',
-    string $metaDescription='',
     array $templateVars=[],
     string $layoutTemplatePath='layout'
   ): Page {
     $controllerName = (new \ReflectionClass($this))->getShortName();
     return Page::with_layout(
       $controllerName . '/' . $bodyTemplatePath,
-      $title=$title,
-      $metaDescription=$metaDescription,
       $templateVars=$templateVars,
       $layoutTemplatePath=$layoutTemplatePath
     );

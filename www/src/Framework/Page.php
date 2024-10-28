@@ -64,8 +64,6 @@ class Page {
    * 
    *   Example: 'folder/file' if the file is located at
    *   project_root/templates/folder/file.html.php.
-   * @param string $title The title of the page.
-   * @param string $metaDescription The meta description of the page.
    * @param array $templateVars The variables to pass to the default template
    *   file and/or the body template file. Must be in the format
    *   ['variableName' => 'variableValue', ...].
@@ -82,16 +80,12 @@ class Page {
    */
   public static function with_layout(
     string $bodyTemplatePath,
-    string $title='',
-    string $metaDescription='',
     array $templateVars=[],
     string $layoutTemplatePath='layout'
   ): Page {
     $obj = new Page();
 
     $obj->htmlContent = TemplateEngine::load_template($layoutTemplatePath, [
-      'title' => $title,
-      'metaDescription' => $metaDescription,
       'bodyContent' => TemplateEngine::load_template(
         $bodyTemplatePath,
         $templateVars
