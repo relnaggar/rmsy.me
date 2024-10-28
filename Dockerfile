@@ -126,6 +126,20 @@ ini_set('zend.exception_ignore_args', 0);
 ini_set('zend.exception_string_param_max_len', 15);
 EOF
 
+RUN a2enmod rewrite \
+  && cat <<'EOF' >> /etc/apache2/apache2.conf
+
+# Redirect all requests to index.php (for Framework)
+<Directory /var/www/html>
+	RewriteEngine on
+	# unless the file exists
+	RewriteCond %{REQUEST_FILENAME} !-f
+	# or the directory exists
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule ^(.*)$ /index.php?path=$1 [NC,L,QSA]
+</Directory>
+EOF
+
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"
 COPY docker-entrypoint.sh /
