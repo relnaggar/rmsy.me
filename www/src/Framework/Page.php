@@ -47,4 +47,42 @@ class Page {
     );
     return $obj;
   }
+
+  /**
+   * Create a new Page instance with the HTML content loaded from the default
+   * template file, templates/layout.html.php. The content of the body must be
+   * injected by specifying a body template file. Variables can then be injected
+   * into either the default template or the given body template.
+   * 
+   * @param string $bodyTemplatePath The path to the body template file,
+   *   relative to the templates directory. Given without the file extension,
+   *   which must be '.html.php'. The templates directory is assumed to be
+   *   located at the root of the project and named 'templates'.
+   * @param string $title The title of the page.
+   * @param string $metaDescription The meta description of the page.
+   * @param array $templateVars The variables to pass to the default template
+   *   file and/or the body template file. Must be in the format
+   *   'variableName' => 'variableValue'.
+   * @return Page A new Page instance with the HTML content loaded from the
+   *   default template file and the specified variables injected.
+   */
+  public static function with_layout(
+    string $bodyTemplatePath,
+    string $title='',
+    string $metaDescription='',
+    array $templateVars=[]
+  ): Page {
+    $obj = new Page();
+
+    $obj->htmlContent = TemplateEngine::load_template('layout', [
+      'title' => $title,
+      'metaDescription' => $metaDescription,
+      'bodyContent' => TemplateEngine::load_template(
+        $bodyTemplatePath,
+        $templateVars
+      ),
+      ...$templateVars
+    ]);
+    return $obj;
+  }
 }
