@@ -6,6 +6,9 @@
     <?php if (isset($metaDescription)): ?>
       <meta name="description" content="<?= $metaDescription ?>">
     <?php endif ?>
+    <?php if (isset($metaRobots)): ?>
+      <meta name="robots" content="<?= $metaRobots ?>">
+    <?php endif ?>
     <link rel="stylesheet" href="/css/styles.css">
     <link
       rel="preload"
