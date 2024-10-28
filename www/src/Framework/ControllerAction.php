@@ -2,11 +2,11 @@
 namespace Framework;
 
 class ControllerAction {
-    public readonly ControllerInterface $controller;
+    public readonly AbstractController $controller;
     public readonly string $action;
 
     public function __construct(
-        ControllerInterface $controller,
+        AbstractController $controller,
         string $action
     ) {
         $this->controller = $controller;

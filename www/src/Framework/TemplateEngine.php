@@ -10,8 +10,11 @@ class TemplateEngine {
     *   templates directory. Given without the file extension. The templates
     *   directory is assumed to be located at the root of the project and named
     *   'templates'. 
+    *
+    *   Example: 'folder/file' if the file is located at
+    *   project_root/templates/folder/file.html.php.
     * @param array $templateVars Must be in the format
-    *   'variableName' => 'variableValue'.
+    *   ['variableName' => 'variableValue', ...].
     * @param string $fileExtension
     * @return string The contents of the template file with the variables
     *   injected.
