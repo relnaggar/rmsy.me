@@ -30,11 +30,21 @@ class Site extends AbstractBase {
   }
 
   public function about(): \Framework\Page {
+    global $sourceDirectory;
+
+    $controllerName = (new \ReflectionClass($this))->getShortName();
+    $templateFilePath = "{$sourceDirectory}templates/{$controllerName}/" .
+      __FUNCTION__ . '.html.php';
+    $lastModifiedTimestamp = filemtime($templateFilePath);
+    $lastModifiedDate = (new \DateTime())->setTimestamp($lastModifiedTimestamp);
+    $lastModifiedDateFormatted = $lastModifiedDate->format('F Y');
+
     return $this->get_controller_page_with_layout(
       __FUNCTION__,
       [
         'title' => 'About',
-        'metaDescription' => 'This is the about page.'
+        'metaDescription' => 'This is the about page.',
+        'lastModifiedDateFormatted' => $lastModifiedDateFormatted
       ]
     );
   }
