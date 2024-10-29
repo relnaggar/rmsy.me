@@ -26,6 +26,8 @@ RUN apt-get update -y \
   php php-mbstring php-xml php-curl php-zip \
   # apache2 php module
   libapache2-mod-php \
+  # rmsy.me
+  php-intl \
   # cleanup
   && apt autoremove -y \
   && apt clean \

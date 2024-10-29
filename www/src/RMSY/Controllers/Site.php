@@ -9,11 +9,22 @@ class Site extends AbstractBase {
   }
 
   public function index(): \Framework\Page {
+    $currentDate = new \DateTime();
+    $tutoringStartDate = new \DateTime('2019-01-01');
+    $numberOfYearsTutoring = $currentDate->diff($tutoringStartDate)->y;
+    $formatter = new \NumberFormatter("en", \NumberFormatter::SPELLOUT);
+    $numberOfYearsTutoringAsWord = ucfirst(
+      $formatter->format($numberOfYearsTutoring)
+    );
+
     return $this->get_controller_page_with_layout(
       __FUNCTION__,
       [
         'title' => 'Home',
-        'metaDescription' => 'This is the home page.'
+        'metaDescription' => 'Hello there, I\'m Ramsey -- not just your ' .
+          'average software engineer, but a virtuoso conducting symphonies ' .
+          'of syntax and semicolons.',
+        'numberOfYearsTutoringAsWord' => $numberOfYearsTutoringAsWord
       ]
     );
   }

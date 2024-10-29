@@ -140,6 +140,14 @@ RUN a2enmod rewrite \
 </Directory>
 EOF
 
+# add php-intl
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends php-intl \
+  # cleanup
+  && apt autoremove -y \
+  && apt clean \
+  && rm -rf /var/lib/apt/lists/*
+
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"
 COPY docker-entrypoint.sh /

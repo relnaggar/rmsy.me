@@ -17,7 +17,8 @@ abstract class AbstractBase extends \Framework\AbstractController {
       );
     }
     if (isset($templateVars['title'])) {
-      $templateVars['title'] .= ' | Ramsey El-Naggar';
+      $templateVars['h1'] = $templateVars['title'];
+      $templateVars['title'] .= ' | Ramsey El-Naggar';      
     }
     return parent::get_controller_page_with_layout(
       $bodyTemplatePath,

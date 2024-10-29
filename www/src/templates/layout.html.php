@@ -28,12 +28,12 @@
       <?php require 'layout/header.html.php'; ?>
       <?php require 'layout/nav.html.php'; ?>    
       <?php // require 'layout/sidebarCollapsable.html.php'; ?>
-      <!-- <div class="d-flex flex-row"> -->
+      <div class="d-flex flex-row">
         <?php // require 'layout/sidebarFixed.html.php'; ?>
-        <?php // require 'layout/main.html.php'; ?>
+        <?php require 'layout/main.html.php'; ?>
         <!-- <a href="#" class="btn btn-primary position-fixed bottom-0 end-0 display-none-lg-up">^</a> -->
         <?php // require 'layout/onThisPageSide.html.php'; ?>
-      <!-- </div> -->
+      </div>
       <?php // require 'layout/footer.html.php'; ?>
     </div>
 
