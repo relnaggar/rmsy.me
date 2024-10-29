@@ -1,0 +1,59 @@
+@include media-breakpoint-up(xl) {
+  .display-none-xl-up {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-up(md) {
+  .display-none-md-up {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-up(sm) {
+  .display-none-sm-up {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .display-none-lg-up {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-down(xxl) {
+  .display-none-xxl-down {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-down(xl) {
+  .display-none-xl-down {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-down(lg) {
+  .display-none-lg-down {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .display-none-md-down {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  .display-none-sm-down {
+    display: none !important;
+  }
+}
+
+@include media-breakpoint-only(xs) {
+  .display-none-xs-only {
+    display: none !important;
+  }
+}

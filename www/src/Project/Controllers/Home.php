@@ -7,7 +7,11 @@ class Home extends \Framework\AbstractController {
       __FUNCTION__,
       [
         'title' => 'Home',
-        'metaDescription' => 'This is the home page.'
+        'metaDescription' => 'This is the home page.',
+        'menu' => [
+          'homePath' => '/',
+          'title' => 'software engineer',
+        ]
       ]
     );
   }
