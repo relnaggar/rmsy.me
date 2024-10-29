@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace Project\Services;
+namespace RMSY\Services;
 
 class Menu {
   public function get_template_vars(string $activeItemText): array {

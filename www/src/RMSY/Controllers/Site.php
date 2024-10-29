@@ -1,11 +1,9 @@
 <?php declare(strict_types=1);
-namespace Project\Controllers;
+namespace RMSY\Controllers;
 
-use Project\Services\Menu;
+use RMSY\Services\Menu;
 
-class Home extends \Framework\AbstractController {
-  private Menu $menu;
-
+class Site extends AbstractBase {
   public function __construct(Menu $menu) {
     $this->menu = $menu;
   }
@@ -15,8 +13,7 @@ class Home extends \Framework\AbstractController {
       __FUNCTION__,
       [
         'title' => 'Home',
-        'metaDescription' => 'This is the home page.',
-        'menu' => $this->menu->get_template_vars('Home')
+        'metaDescription' => 'This is the home page.'
       ]
     );
   }
@@ -26,8 +23,7 @@ class Home extends \Framework\AbstractController {
       __FUNCTION__,
       [
         'title' => 'About',
-        'metaDescription' => 'This is the about page.',
-        'menu' => $this->menu->get_template_vars('About')
+        'metaDescription' => 'This is the about page.'
       ]
     );
   }
@@ -37,8 +33,17 @@ class Home extends \Framework\AbstractController {
       __FUNCTION__,
       [
         'title' => 'Contact',
-        'metaDescription' => 'This is the contact page.',
-        'menu' => $this->menu->get_template_vars('Contact')
+        'metaDescription' => 'This is the contact page.'
+      ]
+    );
+  }
+
+  public function pageNotFound(): \Framework\Page {
+    return $this->get_controller_page_with_layout(
+      __FUNCTION__,
+      [
+        'title' => 'Page Not Found',
+        'metaRobots' => 'noindex, nofollow'
       ]
     );
   }
