@@ -9,6 +9,10 @@
     <?php if (isset($metaRobots)): ?>
       <meta name="robots" content="<?= $metaRobots ?>">
     <?php endif ?>
+
+    <title><?= $title ?? 'Untitled' ?></title>
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="/css/styles.css">
     <link
       rel="preload"
@@ -16,11 +20,11 @@
       as="font"
       type="font/woff2"
       crossorigin="anonymous"
-    >
-    <title><?= $title ?? 'Untitled' ?></title>
+    >    
   </head>
   <body>
     <?= $bodyContent ?>
+    
     <script type="module" src="/js/main.js" defer></script>
   </body>
 </html>
