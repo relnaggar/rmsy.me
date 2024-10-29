@@ -7,7 +7,10 @@ class Routes implements \Framework\RoutesInterface {
     string $method
   ): \Framework\ControllerAction {
     $menuService = new Services\Menu();
-    $siteController = new Controllers\Site($menuService);
+    $mediaService = new Services\Media();
+
+    $siteController = new Controllers\Site($menuService, $mediaService);
+
     if ($path === '/') {
       return new \Framework\ControllerAction($siteController, 'index');
     } else if ($path === '/about') {

@@ -2,10 +2,12 @@
 namespace RMSY\Controllers;
 
 use RMSY\Services\Menu;
+use RMSY\Services\Media;
 
 class Site extends AbstractBase {
-  public function __construct(Menu $menu) {
+  public function __construct(Menu $menu, Media $media) {
     $this->menu = $menu;
+    $this->media = $media;
   }
 
   public function index(): \Framework\Page {

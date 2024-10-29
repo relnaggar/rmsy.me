@@ -1,3 +1,12 @@
+<figure class="figure w-25 float-end m-3">
+  <img
+    src="<?= $mediaRoot ?>/img/profile.jpg"
+    class="figure-img img-fluid"
+    alt="Ramsey El-Naggar"
+  >
+  <figcaption class="figure-caption text-center"></figcaption>
+</figure>
+
 <p class="lead">
   I'm a software engineer.
 </p>
