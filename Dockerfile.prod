@@ -26,12 +26,17 @@ RUN apt-get update -y \
   php php-mbstring php-xml php-curl php-zip \
   # apache2 php module
   libapache2-mod-php \
+  # composer dependencies
+  ca-certificates \
   # rmsy.me
   php-intl \
   # cleanup
   && apt autoremove -y \
   && apt clean \
   && rm -rf /var/lib/apt/lists/*
+
+# install composer
+COPY --from=composer/composer:2.2-bin /composer /usr/bin/composer
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="PRODUCTION"

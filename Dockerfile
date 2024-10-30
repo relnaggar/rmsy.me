@@ -140,6 +140,19 @@ RUN a2enmod rewrite \
 </Directory>
 EOF
 
+# install composer dependencies
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends \
+  # composer dependencies
+  ca-certificates \
+  # cleanup
+  && apt autoremove -y \
+  && apt clean \
+  && rm -rf /var/lib/apt/lists/*
+
+# install composer
+COPY --from=composer/composer:2.2-bin /composer /usr/bin/composer
+
 # add php-intl
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends php-intl \
