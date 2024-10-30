@@ -10,11 +10,23 @@ class Router implements \Framework\RouterInterface {
     $navDecorator = new Decorators\Nav();
     $mediaRootDecorator = new Decorators\MediaRoot();    
 
-    $siteController = new Controllers\Site([
-      $extendedTitleDecorator,
-      $navDecorator,      
-      $mediaRootDecorator,      
-    ]);
+    // controllers
+    $siteController = new Controllers\Site(
+      $decorators=[
+        $extendedTitleDecorator,
+        $navDecorator,      
+        $mediaRootDecorator,      
+      ],
+    );
+    $contactFormController = new Controllers\ContactForm(
+      $decorators=[
+        $extendedTitleDecorator,
+        $navDecorator,
+      ],
+      $services=[
+        'mailer' => $mailerService,
+      ],
+    );
 
     if ($path === '/') {
       return new \Framework\ControllerAction($siteController, 'index');

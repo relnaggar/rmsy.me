@@ -3,14 +3,16 @@ namespace Framework;
 
 abstract class AbstractController {
   private array $decorators;
+  protected array $services;
 
-  /**
-   * Create a new AbstractController instance with the given decorators.
-   * 
+  /** 
    * @param array $decorators An optional array of decorators to apply to the
    *   controller. Each decorator must implement the DecoratorInterface.
+   * @param array $services An optional array of services to apply to the
+   *  controller. Each service must implement the ServiceInterface.
    */
-  public function __construct(array $decorators=[]) {
+  public function __construct(array $decorators=[], array $services=[]) {
+    // validate decorators
     foreach ($decorators as $decorator) {
       if (!($decorator instanceof DecoratorInterface)) {
         throw new \InvalidArgumentException(
@@ -19,6 +21,16 @@ abstract class AbstractController {
       }
     }
     $this->decorators = $decorators;
+
+    // validate services
+    foreach ($services as $service) {
+      if (!($service instanceof ServiceInterface)) {
+        throw new \InvalidArgumentException(
+          'All services must implement the ServiceInterface.'
+        );
+      }
+    }
+    $this->services = $services;
   }
 
   /**
@@ -74,6 +86,11 @@ abstract class AbstractController {
     );
   }
 
+  /**
+   * Redirect the user to the specified path.
+   * 
+   * @param string $path The path to redirect the user to.
+   */
   public function redirect(string $path): void {
     header('Location: ' . $path);
     exit();
