@@ -27,21 +27,16 @@ class Page {
    * Create a new Page instance with the HTML content loaded from a template
    * file, and inject the specified variables into the template.
    *
-   * @param string $templatePath The path to the template file, relative to the
-   *   templates directory. Given without the file extension, which must be
-   *   '.html.php'. The templates directory is assumed to be located at the root
-   *   of the project and named 'templates'.
-   *   
-   *   Example: 'folder/file' if the file is located at
-   *   project_root/templates/folder/file.html.php.
-   * @param array $templateVars The variables to pass to the template file. Must
-   *   be in the format ['variableName' => 'variableValue', ...].
+   * @param string $templatePath The path to the template file, relative to
+   *   $templateRootDirectory. Given without the file extension.
+   * @param array $templateVars The variables to inject to the template file.
+   *   Must be in the format ['variableName' => 'variableValue', ...].
    * @return Page A new Page instance with the HTML content loaded from the
    * template file and the specified variables injected.
    */
   public static function with_template(
     string $templatePath,
-    array $templateVars
+    array $templateVars=[]
   ): Page {
     $obj = new Page();
     $obj->htmlContent = TemplateEngine::load_template(
@@ -52,46 +47,47 @@ class Page {
   }
 
   /**
-   * Create a new Page instance with the HTML content loaded from the
-   * layout file, templates/layout.html.php. The content of the body must be
-   * injected by specifying a body template file. Variables can then be injected
-   * into the layout template and the given body template.
+   * Create a new Page instance with the HTML content loaded from the layout
+   * template. The $bodyContent template variable is injected by
+   * specifying the body template. Additional variables can then be
+   * injected which will be available to both the layout and body templates.
    * 
    * @param string $bodyTemplatePath The path to the body template file,
-   *   relative to the templates directory. Given without the file extension,
-   *   which must be '.html.php'. The templates directory is assumed to be
-   *   located at the root of the project and named 'templates'.
-   * 
-   *   Example: 'folder/file' if the file is located at
-   *   project_root/templates/folder/file.html.php.
-   * @param array $templateVars The variables to pass to the default template
-   *   file and/or the body template file. Must be in the format
+   *   relative to the configured template root directory. Given without the
+   *   file extension.
+   * @param array $templateVars The variables to inject to the layout template
+   *   and/or the body template. Must be in the format
    *   ['variableName' => 'variableValue', ...].
    * @param string $layoutTemplatePath The path to the layout template file,
-   *   relative to the templates directory. Given without the file extension,
-   *   which must be '.html.php'. The templates directory is assumed to be
-   *   located at the root of the project and named 'templates'.
-   * 
-   *   Example: 'folder/file' if the file is located at
-   *   project_root/templates/folder/file.html.php.
+   *   relative to the configured template root directory. Given without the
+   *   file extension. If empty, the configured layout template path is used.
    * @return Page A new Page instance with the HTML content loaded from the
-   *   layout file and the specified variables injected, including the body
-   *   content loaded from the body template file.
+   *   layout file, the body content injected, and the specified variables
+   *   injected.
    */
   public static function with_layout(
     string $bodyTemplatePath,
     array $templateVars=[],
-    string $layoutTemplatePath='layout'
+    string $layoutTemplatePath='',
   ): Page {
+    global $frameworkConfig;
+
     $obj = new Page();
 
-    $obj->htmlContent = TemplateEngine::load_template($layoutTemplatePath, [
-      'bodyContent' => TemplateEngine::load_template(
-        $bodyTemplatePath,
-        $templateVars
-      ),
-      ...$templateVars
-    ]);
+    if (empty($layoutTemplatePath)) {
+      $layoutTemplatePath = $frameworkConfig['layoutTemplatePath'];
+    }
+
+    $obj->htmlContent = TemplateEngine::load_template(
+      $layoutTemplatePath,
+      [
+        'bodyContent' => TemplateEngine::load_template(
+          $bodyTemplatePath,
+          $templateVars
+        ),
+        ...$templateVars
+      ]
+    );
     return $obj;
   }
 }

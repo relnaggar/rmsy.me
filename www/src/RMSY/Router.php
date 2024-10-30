@@ -1,15 +1,20 @@
 <?php declare(strict_types=1);
 namespace RMSY;
 
-class Routes implements \Framework\RoutesInterface {
-  public function get_controller_action(
+class Router implements \Framework\RouterInterface {
+  public function route(
     string $path,
     string $method
   ): \Framework\ControllerAction {
-    $menuService = new Services\Menu();
-    $mediaService = new Services\Media();
+    $extendedTitleDecorator = new Decorators\ExtendedTitle();
+    $navDecorator = new Decorators\Nav();
+    $mediaRootDecorator = new Decorators\MediaRoot();    
 
-    $siteController = new Controllers\Site($menuService, $mediaService);
+    $siteController = new Controllers\Site([
+      $extendedTitleDecorator,
+      $navDecorator,      
+      $mediaRootDecorator,      
+    ]);
 
     if ($path === '/') {
       return new \Framework\ControllerAction($siteController, 'index');

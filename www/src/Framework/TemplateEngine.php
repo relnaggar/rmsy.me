@@ -6,30 +6,37 @@ class TemplateEngine {
   /**
     * Load a template file, inject variables into it, and return the result.
     *
-    * @param string $templatePath The path to the template file, relative to the
-    *   templates directory. Given without the file extension. The templates
-    *   directory is assumed to be located at the root of the project and named
-    *   'templates'. 
-    *
-    *   Example: 'folder/file' if the file is located at
-    *   project_root/templates/folder/file.html.php.
-    * @param array $templateVars Must be in the format
+    * @param string $templatePath The path to the template file, relative to
+    *   the configured template root directory. Given without the file
+    *   extension.
+    * @param array $templateVars The variables to inject. Must be in the format
     *   ['variableName' => 'variableValue', ...].
-    * @param string $fileExtension
+    * @param string $templateDirectory The directory of the template file. If
+    *   empty, the configured template root directory is used.
     * @return string The contents of the template file with the variables
     *   injected.
     */
   public static function load_template(
     string $templatePath,
     array $templateVars=[],
-    string $fileExtension='.html.php')
-  : string {
-    global $sourceDirectory;
-    $templateDirectory = $sourceDirectory . 'templates';
+    string $templateDirectory=''
+  ): string {
+    global $frameworkConfig;
+
+    // use the configured template root directory if none is given
+    if (empty($templateDirectory)) {
+      $templateDirectory = $frameworkConfig['templateRootDirectory'];
+    }
+    
+    // extract the variables to be injected
     extract($templateVars);
+
+    // start output buffering to capture the template contents
     ob_start();
-    require $templateDirectory . '/' . $templatePath . $fileExtension;
-    $contents = ob_get_clean();
-    return $contents;
+    // load the template file
+    require $frameworkConfig['sourceDirectory'] . '/' . $templateDirectory .
+      '/' . $templatePath . $frameworkConfig['templateFileExtension'];
+    // return the contents of the output buffer
+    return ob_get_clean();
   }
 }

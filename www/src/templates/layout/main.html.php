@@ -1,5 +1,5 @@
 <main class="flex-grow-1 m-5 d-flex flex-column min-vh-100">
-  <h1><?= $h1 ?></h1>
+  <h1><?= $title ?></h1>
   <?php // require 'main/previousNextButtonsTop.html.php'; ?>
   <?php if (isset($sections)): ?>
     <div data-nosnippet>

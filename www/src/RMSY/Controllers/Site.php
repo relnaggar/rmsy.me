@@ -1,15 +1,7 @@
 <?php declare(strict_types=1);
 namespace RMSY\Controllers;
 
-use RMSY\Services\Menu;
-use RMSY\Services\Media;
-
-class Site extends AbstractBase {
-  public function __construct(Menu $menu, Media $media) {
-    $this->menu = $menu;
-    $this->media = $media;
-  }
-
+class Site extends \Framework\AbstractController {
   public function index(): \Framework\Page {
     $currentDate = new \DateTime();
     $tutoringStartDate = new \DateTime('2019-01-01');
@@ -19,7 +11,7 @@ class Site extends AbstractBase {
       $formatter->format($numberOfYearsTutoring)
     );
 
-    return $this->get_controller_page_with_layout(
+    return $this->get_page(
       __FUNCTION__,
       [
         'title' => 'Home',
@@ -32,16 +24,17 @@ class Site extends AbstractBase {
   }
 
   public function about(): \Framework\Page {
-    global $sourceDirectory;
+    global $frameworkConfig;
 
     $controllerName = (new \ReflectionClass($this))->getShortName();
-    $templateFilePath = "{$sourceDirectory}templates/{$controllerName}/" .
+    $templateFilePath = $frameworkConfig['sourceDirectory'] . '/' . 
+      $frameworkConfig['templateRootDirectory'] . '/' . $controllerName . '/' .
       __FUNCTION__ . '.html.php';
     $lastModifiedTimestamp = filemtime($templateFilePath);
     $lastModifiedDate = (new \DateTime())->setTimestamp($lastModifiedTimestamp);
     $lastModifiedDateFormatted = $lastModifiedDate->format('F Y');
 
-    return $this->get_controller_page_with_layout(
+    return $this->get_page(
       __FUNCTION__,
       [
         'title' => 'About',
@@ -52,7 +45,7 @@ class Site extends AbstractBase {
   }
 
   public function contact(): \Framework\Page {
-    return $this->get_controller_page_with_layout(
+    return $this->get_page(
       __FUNCTION__,
       [
         'title' => 'Contact',
@@ -62,7 +55,7 @@ class Site extends AbstractBase {
   }
 
   public function pageNotFound(): \Framework\Page {
-    return $this->get_controller_page_with_layout(
+    return $this->get_page(
       __FUNCTION__,
       [
         'title' => 'Page Not Found',

@@ -8,9 +8,9 @@
 ">
   <a
     class="navbar-brand-custom navbar-brand-right-banner"
-    href="<?= $menu['homePath'] ?>"
+    href="<?= $nav['homePath'] ?>"
   >
-    <?= $menu['title'] ?>
+    <?= $nav['title'] ?>
   </a>
   <button
     class="navbar-toggler-custom"
@@ -27,34 +27,34 @@
   </button>
   <div class="collapse navbar-collapse" id="navbar">
     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-      <?php foreach ($menu['items'] as $menuItem): ?>
+      <?php foreach ($nav['items'] as $navItem): ?>
         <li class="
           nav-item
-          <?= isset($menuItem['dropdown']) ? 'dropdown' : '' ?>
+          <?= isset($navItem['dropdown']) ? 'dropdown' : '' ?>
         ">
-        <?php if (isset($menuItem['dropdown'])): ?>
+        <?php if (isset($navItem['dropdown'])): ?>
             <a
               class="
                 nav-link
                 dropdown-toggle
-                <?= ($menuItem['text'] === $menu['activeItemText']) 
+                <?= ($navItem['text'] === $nav['activeItemText']) 
                   ? 'active'
                   : ''
                 ?>
               "
               href="#"
-              id="<?= $menuItem['id'] ?>Dropdown"
+              id="<?= $navItem['id'] ?>Dropdown"
               role="button"
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <?= $menuItem['text'] ?>
+              <?= $navItem['text'] ?>
             </a>
             <ul
               class="dropdown-menu dropdown-menu-dark"
-              aria-labelledby="<?= $menuItem['id'] ?>Dropdown"
+              aria-labelledby="<?= $navItem['id'] ?>Dropdown"
             >
-              <?php foreach ($menuItem['dropdown'] as $dropdownItem): ?>
+              <?php foreach ($navItem['dropdown'] as $dropdownItem): ?>
                 <li>
                   <a class="dropdown-item" href="<?= $dropdownItem['path'] ?>">
                     <?= $dropdownItem['text'] ?>
@@ -66,29 +66,29 @@
             <a
             class="
                 nav-link
-                <?= ($menuItem['text'] === $menu['activeItemText'])
+                <?= ($navItem['text'] === $nav['activeItemText'])
                   ? 'active'
                   : ''
                 ?>
               "
-              href="<?= $menuItem['path'] ?>"
-              <?php if ($menuItem['text'] === $menu['activeItemText']): ?>
-                <?php if (isset($menuItem['dropdown'])): ?>
+              href="<?= $navItem['path'] ?>"
+              <?php if ($navItem['text'] === $nav['activeItemText']): ?>
+                <?php if (isset($navItem['dropdown'])): ?>
                   aria-current="location"
                 <?php else: ?>
                   aria-current="page"
                 <?php endif; ?>
               <?php endif; ?>              
-              <?php if (isset($menuItem['target'])): ?>
-                target="<?= $menuItem['target'] ?>"
+              <?php if (isset($navItem['target'])): ?>
+                target="<?= $navItem['target'] ?>"
               <?php endif; ?>
-              <?php if (isset($menuItem['target'])
-                  && $menuItem['target'] === "_blank"): ?>
+              <?php if (isset($navItem['target'])
+                  && $navItem['target'] === "_blank"): ?>
                 rel="noopener noreferrer"
               <?php endif; ?>
             >
-              <?=$menuItem['text']?>
-              <?php if (isset($menuItem['target'])): ?>
+              <?=$navItem['text']?>
+              <?php if (isset($navItem['target'])): ?>
                 <i class="bi bi-box-arrow-up-right"></i>
               <?php endif; ?>
             </a>

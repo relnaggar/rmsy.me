@@ -2,22 +2,22 @@
 namespace Framework;
 
 class EntryPoint {
-  private readonly RoutesInterface $routes;
+  private readonly RouterInterface $router;
 
   public function __construct(string $projectNamespace) {
-    $routesClass = '\\' . $projectNamespace . '\\Routes';
-    $this->routes = new $routesClass();
+    $routerClass = '\\' . $projectNamespace . '\\Router';
+    $this->router = new $routerClass();
   }
 
   public function run(): void {
     // get the URL path, not including the query string
-    $path = explode('?', $_SERVER['REQUEST_URI'])[0];
+    $serverRequestPath = explode('?', $_SERVER['REQUEST_URI'])[0];
 
     // get the HTTP method e.g. GET, POST, PUT, DELETE
-    $method = $_SERVER['REQUEST_METHOD'];
+    $httpMethod = $_SERVER['REQUEST_METHOD'];
 
     // get the controller and action as defined in the project's Routes.php
-    $controllerAction = $this->routes->get_controller_action($path,$method);
+    $controllerAction = $this->router->route($serverRequestPath, $httpMethod);
     $controller = $controllerAction->controller;
     $action = $controllerAction->action;
 

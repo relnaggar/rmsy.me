@@ -1,4 +1,6 @@
 <?php declare(strict_types=1);
 
-$projectNamespace = "RMSY"; // global variable required by framework.php
+$frameworkConfig = [
+  'projectNamespace' => 'RMSY',
+];
 require('../src/Framework/framework.php');

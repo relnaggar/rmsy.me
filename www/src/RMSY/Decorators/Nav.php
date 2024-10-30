@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
-namespace RMSY\Services;
+namespace RMSY\Decorators;
 
-class Menu {
-  public function get_template_vars(string $activeItemText): array {
-    return [
+class Nav implements \Framework\DecoratorInterface {
+  public function get_new_template_vars(array $templateVars): array {
+    $newTemplateVars['nav'] = [
       'homePath' => '/',
       'title' => 'software engineer',
       'items' => [
@@ -11,7 +11,8 @@ class Menu {
         ['text' => 'About', 'path' => '/about'],
         ['text' => 'Contact', 'path' => '/contact']
       ],
-      'activeItemText' => $activeItemText
+      'activeItemText' => $templateVars['title'] ?? ''
     ];
+    return $newTemplateVars;
   }
 }

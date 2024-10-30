@@ -10,7 +10,7 @@
       <meta name="robots" content="<?= $metaRobots ?>">
     <?php endif ?>
 
-    <title><?= $title ?? 'Untitled' ?></title>
+    <title><?= $extendedTitle ?? $title ?? 'Untitled' ?></title>
 
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="/css/styles.css">
@@ -26,7 +26,7 @@
   <body data-bs-spy="scroll" data-bs-target="#sidebarMenu" data-bs-offset="56" tabindex="0" class="position-relative">
     <div class="container-fluid d-flex flex-column p-0">
       <?php require 'layout/header.html.php'; ?>
-      <?php require 'layout/nav.html.php'; ?>    
+      <?php isset($nav) && require 'layout/nav.html.php'; ?>
       <?php // require 'layout/sidebarCollapsable.html.php'; ?>
       <div class="d-flex flex-row">
         <?php // require 'layout/sidebarFixed.html.php'; ?>
