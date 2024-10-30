@@ -53,5 +53,4 @@
     'Message send failure!', 
     $errorMessages[$errorCode ?? 'default']
   ))->render() ?>
-  </div>
 <?php endif; ?>
