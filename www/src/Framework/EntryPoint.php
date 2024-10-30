@@ -25,8 +25,9 @@ class EntryPoint {
     $page = $controller?->$action();
     // make sure the controller action returns a Page object
     if (! $page instanceof \Framework\Page) {
-      throw new \Error("Controller action TODO->$action must return an 
-        instance of \\Framework\\Page");
+      $controllerClass = get_class($controller);
+      throw new \Error("Controller action $controllerClass->$action must return
+        an instance of \\Framework\\Page");
     }
     // output the page content
     echo $page->get_html_content();
