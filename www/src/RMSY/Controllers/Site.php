@@ -49,7 +49,24 @@ class Site extends \Framework\AbstractController {
       __FUNCTION__,
       [
         'title' => 'Contact',
-        'metaDescription' => 'This is the contact page.'
+        'metaDescription' => 'This is the contact page.',
+        'contactMethods' => [
+          [
+            'title' => 'Email',
+            'icon' => 'envelope',
+            'href' => 'mailto:ramsey.el-naggar@outlook.com',
+            'html' => <<<HTML
+              ramsey.el&#8209;naggar@outlook.com
+            HTML,
+          ], [
+            'title' => 'LinkedIn',
+            'icon' => 'linkedin',
+            'href' => '/linkedin',
+            'html' => 'rmsy.me/linkedin',
+            'target' => '_blank',
+            'rel' => 'noopener noreferrer'
+          ]
+        ]
       ]
     );
   }
