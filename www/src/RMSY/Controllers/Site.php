@@ -38,43 +38,10 @@ class Site extends \Framework\AbstractController {
       __FUNCTION__,
       [
         'title' => 'About',
-        'metaDescription' => 'This is the about page.',
+        'metaDescription' => 'My specialty? Well, I dive into the depths of ' .
+          'full-stack web application development.',
         'lastModifiedDateFormatted' => $lastModifiedDateFormatted
       ]
-    );
-  }
-
-  public function contact(): \Framework\Page {
-    return $this->get_page(
-      __FUNCTION__,
-      [
-        'title' => 'Contact',
-        'metaDescription' => 'This is the contact page.',
-        'contactMethods' => [
-          [
-            'title' => 'Email',
-            'icon' => 'envelope',
-            'href' => 'mailto:ramsey.el-naggar@outlook.com',
-            'html' => <<<HTML
-              ramsey.el&#8209;naggar@outlook.com
-            HTML,
-          ], [
-            'title' => 'LinkedIn',
-            'icon' => 'linkedin',
-            'href' => '/linkedin',
-            'html' => 'rmsy.me/linkedin',
-            'target' => '_blank',
-            'rel' => 'noopener noreferrer',
-          ], [
-            'title' => 'GitHub',
-            'icon' => 'github',
-            'href' => '/github',
-            'html' => 'rmsy.me/github',
-            'target' => '_blank',
-            'rel' => 'noopener noreferrer',
-          ],
-        ],
-      ],
     );
   }
 

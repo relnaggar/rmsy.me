@@ -71,7 +71,7 @@ class ContactForm extends \Framework\AbstractController {
     }
 
     // try to send email
-    $emailSent = $this->services['mailer']->sendEmail(
+      $emailSent = $this->services['mailer']->sendEmail(
       $fromEmail='contactform@rmsy.me',
       $fromName=$contactFormData->name,
       $toEmail='ramsey.el-naggar@outlook.com',

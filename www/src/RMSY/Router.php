@@ -6,9 +6,13 @@ class Router implements \Framework\RouterInterface {
     string $path,
     string $method
   ): \Framework\ControllerAction {
+    // decorators
     $extendedTitleDecorator = new Decorators\ExtendedTitle();
     $navDecorator = new Decorators\Nav();
-    $mediaRootDecorator = new Decorators\MediaRoot();    
+    $mediaRootDecorator = new Decorators\MediaRoot();
+    
+    // services
+    $mailerService = new Services\Mailer();
 
     // controllers
     $siteController = new Controllers\Site(
@@ -28,18 +32,31 @@ class Router implements \Framework\RouterInterface {
       ],
     );
 
-    if ($path === '/') {
-      return new \Framework\ControllerAction($siteController, 'index');
-    } else if ($path === '/about') {
-      return new \Framework\ControllerAction($siteController, 'about');
-    } else if ($path === '/contact') {
-      return new \Framework\ControllerAction($siteController, 'contact');
-    } else if ($path === '/linkedin') {
-      return new \Framework\ControllerAction($siteController, 'linkedin');
-    } else if ($path === '/github') {
-      return new \Framework\ControllerAction($siteController, 'github');
-    } else {
-      return new \Framework\ControllerAction($siteController, 'pageNotFound');
+    // routes
+    switch($path) {
+      case '/':
+        return new \Framework\ControllerAction($siteController, 'index');
+      case '/about':
+        return new \Framework\ControllerAction($siteController, 'about');
+      case '/contact':
+        switch ($method) {
+          case 'GET':
+            return new \Framework\ControllerAction(
+              $contactFormController,
+              'contact'
+            );
+          case 'POST':
+            return new \Framework\ControllerAction(
+              $contactFormController,
+              'contactSubmit'
+            );
+        }
+      case '/linkedin':
+        return new \Framework\ControllerAction($siteController, 'linkedin');
+      case '/github':
+        return new \Framework\ControllerAction($siteController, 'github');
+      default:
+        return new \Framework\ControllerAction($siteController, 'pageNotFound');
     }
   }
 }

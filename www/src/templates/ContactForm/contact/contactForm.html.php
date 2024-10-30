@@ -5,12 +5,20 @@
     <h6 class="mb-0">Contact form</h6>
   </div>
   <div class="card-body">
-    <form action="/contact" method="POST" class="needs-validation" novalidate>
+    <?php
+      $formName = 'contactForm';
+    ?>
+    <form
+      action="/contact"
+      method="POST"
+      class="needs-validation"
+      novalidate
+    >
       <?= (new FormInput(
         $name='name',
         $label='Name',
         $type='text',
-        $formName='message',
+        $formName=$formName,
         $autocomplete="on",
         $validationAttributes="required",
         $invalidFeedback='This field cannot be blank.'
@@ -19,7 +27,7 @@
         $name='email',
         $label='Email',
         $type='email',
-        $formName='message',
+        $formName=$formName,
         $autocomplete="on",
         $validationAttributes=<<<HTML
           maxlength="254"        
@@ -37,7 +45,7 @@
         $name='message',
         $label='Message',
         $type='textarea',
-        $formName='message',
+        $formName=$formName,
         $autocomplete="off",
         $validationAttributes="required",
         $invalidFeedback='This field cannot be blank.'
