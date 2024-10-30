@@ -8,8 +8,8 @@
 
     "build:fonts": "cp -r node_modules/bootstrap-icons/font/fonts/* dist/fonts",
 
-    "watch:js": "esbuild src/js/*.js --bundle --minify --sourcemap --outfile=dist/js/main.js --watch=forever",
-    "build:js": "esbuild src/js/*.js --bundle --minify --sourcemap --outfile=dist/js/main.js",
+    "watch:js": "esbuild src/js/main.js --bundle --minify --sourcemap --outfile=dist/js/main.js --watch=forever",
+    "build:js": "esbuild src/js/main.js --bundle --minify --sourcemap --outfile=dist/js/main.js",
 
     "build": "npm-run-all build:fonts build:css build:js",
     "watch": "npm-run-all --parallel watch:css watch:js",
