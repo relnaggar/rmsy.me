@@ -22,6 +22,10 @@ class Router implements \Framework\RouterInterface {
       return new \Framework\ControllerAction($siteController, 'about');
     } else if ($path === '/contact') {
       return new \Framework\ControllerAction($siteController, 'contact');
+    } else if ($path === '/linkedin') {
+      return new \Framework\ControllerAction($siteController, 'linkedin');
+    } else if ($path === '/github') {
+      return new \Framework\ControllerAction($siteController, 'github');
     } else {
       return new \Framework\ControllerAction($siteController, 'pageNotFound');
     }

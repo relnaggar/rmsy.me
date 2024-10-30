@@ -7,9 +7,29 @@ class Nav implements \Framework\DecoratorInterface {
       'homePath' => '/',
       'title' => 'software engineer',
       'items' => [
-        ['text' => 'Home', 'path' => '/'],
-        ['text' => 'About', 'path' => '/about'],
-        ['text' => 'Contact', 'path' => '/contact']
+        [
+          'text' => 'Home',
+          'path' => '/'
+        ], [
+          'text' => 'About',
+          'path' => '/about'
+        ], [
+          'text' => 'Projects',
+          'path' => '/projects'
+        ], [
+          'text' => 'Linkedin',
+          'path' => '/linkedin',
+          'target' => '_blank',
+          'rel' => 'noopener noreferrer',
+        ], [
+          'text' => 'GitHub',
+          'path' => '/github',
+          'target' => '_blank',
+          'rel' => 'noopener noreferrer',
+        ], [
+          'text' => 'Contact',
+          'path' => '/contact',
+        ],        
       ],
       'activeItemText' => $templateVars['title'] ?? ''
     ];

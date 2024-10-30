@@ -82,11 +82,13 @@
               <?php if (isset($navItem['target'])): ?>
                 target="<?= $navItem['target'] ?>"
               <?php endif; ?>
-              <?php if (isset($navItem['target'])
-                  && $navItem['target'] === "_blank"): ?>
-                rel="noopener noreferrer"
+              <?php if (isset($navItem['rel'])): ?>
+                rel="<?= $navItem['rel'] ?>"
               <?php endif; ?>
             >
+              <?php if ((isset($navItem['icon']))): ?>
+                <i class ="bi bi-<?= $navItem['icon'] ?>"></i>
+              <?php endif; ?>
               <?=$navItem['text']?>
               <?php if (isset($navItem['target'])): ?>
                 <i class="bi bi-box-arrow-up-right"></i>

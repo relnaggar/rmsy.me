@@ -64,11 +64,26 @@ class Site extends \Framework\AbstractController {
             'href' => '/linkedin',
             'html' => 'rmsy.me/linkedin',
             'target' => '_blank',
-            'rel' => 'noopener noreferrer'
-          ]
-        ]
-      ]
+            'rel' => 'noopener noreferrer',
+          ], [
+            'title' => 'GitHub',
+            'icon' => 'github',
+            'href' => '/github',
+            'html' => 'rmsy.me/github',
+            'target' => '_blank',
+            'rel' => 'noopener noreferrer',
+          ],
+        ],
+      ],
     );
+  }
+
+  public function linkedin(): void {
+    $this->redirect('https://www.linkedin.com/in/relnaggar/');
+  }
+
+  public function github(): void {
+    $this->redirect('https://github.com/relnaggar');
   }
 
   public function pageNotFound(): \Framework\Page {
