@@ -73,4 +73,9 @@ abstract class AbstractController {
       $layoutTemplatePath
     );
   }
+
+  public function redirect(string $path): void {
+    header('Location: ' . $path);
+    exit();
+  }
 }
