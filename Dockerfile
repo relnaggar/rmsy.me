@@ -161,6 +161,9 @@ RUN apt-get update -y \
   && apt clean \
   && rm -rf /var/lib/apt/lists/*
 
+# add PHPMailer
+RUN composer require phpmailer/phpmailer
+
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"
 COPY docker-entrypoint.sh /

@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
 namespace RMSY\Services;
 
+use PHPMailer\PHPMailer\PHPMailer;
+
 class Mailer implements \Framework\ServiceInterface {
   public function sendEmail(
     string $fromEmail,
@@ -12,6 +14,7 @@ class Mailer implements \Framework\ServiceInterface {
     string $subject,
     string $htmlBody
   ): bool {
+    $phpMailer = new PHPMailer(true);
     return false;
   }
 }
