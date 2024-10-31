@@ -1,36 +1,20 @@
 <?php declare(strict_types=1);
-namespace Framework;
+namespace Framework\Controllers;
 
-abstract class AbstractController {
+use Framework\Services\AbstractServiceUser;
+use Framework\Decorators\AbstractDecorator;
+use Framework\Views\Page;
+
+abstract class AbstractController extends AbstractServiceUser {
   private array $decorators;
-  protected array $services;
 
-  /** 
-   * @param array $decorators An optional array of decorators to apply to the
-   *   controller. Each decorator must implement the DecoratorInterface.
-   * @param array $services An optional array of services to apply to the
-   *  controller. Each service must implement the ServiceInterface.
+  /**
+   * Add a new decorator to the controller.
+   * 
+   * @param AbstractDecorator $decorator The decorator to register
    */
-  public function __construct(array $decorators=[], array $services=[]) {
-    // validate decorators
-    foreach ($decorators as $decorator) {
-      if (!($decorator instanceof DecoratorInterface)) {
-        throw new \InvalidArgumentException(
-          'All decorators must implement the DecoratorInterface.'
-        );
-      }
-    }
-    $this->decorators = $decorators;
-
-    // validate services
-    foreach ($services as $service) {
-      if (!($service instanceof ServiceInterface)) {
-        throw new \InvalidArgumentException(
-          'All services must implement the ServiceInterface.'
-        );
-      }
-    }
-    $this->services = $services;
+  public function addDecorator(AbstractDecorator $decorator): void {
+    $this->decorators[] = $decorator;
   }
 
   /**
@@ -59,7 +43,7 @@ abstract class AbstractController {
    *   layout file, the body content injected, and the specified variables
    *   injected.
    */
-  public function get_page(
+  public function getPage(
     string $bodyTemplatePath,
     array $templateVars=[],
     string $layoutTemplatePath=''
@@ -68,7 +52,7 @@ abstract class AbstractController {
 
     // apply decorators
     foreach ($this->decorators as $decorator) {
-      $newTemplateVars = $decorator->get_new_template_vars($templateVars);
+      $newTemplateVars = $decorator->getNewTemplateVars($templateVars);
       foreach ($newTemplateVars as $key => $value) {
         if (array_key_exists($key, $templateVars)) {
           throw new \Error(
@@ -79,7 +63,7 @@ abstract class AbstractController {
       }
     }
 
-    return Page::with_layout(
+    return Page::withLayout(
       $controllerName . '/' . $bodyTemplatePath,
       $templateVars,
       $layoutTemplatePath

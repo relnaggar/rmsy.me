@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace Framework;
+namespace Framework\Components;
 
 interface ComponentInterface {
   /**

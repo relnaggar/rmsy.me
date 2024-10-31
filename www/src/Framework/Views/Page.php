@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace Framework;
+namespace Framework\Views;
 
 class Page {
   private string $htmlContent;
@@ -7,7 +7,7 @@ class Page {
   // factory pattern used since PHP doesn't support method overloading
   private function __construct() {}
 
-  public function get_html_content(): string {
+  public function getHtmlContent(): string {
     return $this->htmlContent;
   }
 
@@ -17,7 +17,7 @@ class Page {
    * @param string $htmlContent The HTML content for the Page.
    * @return Page A new Page instance with the specified HTML content.
    */
-  public static function with_html_content(string $htmlContent): Page {
+  public static function withHtmlContent(string $htmlContent): Page {
     $obj = new Page();
     $obj->htmlContent = $htmlContent;
     return $obj;
@@ -34,12 +34,12 @@ class Page {
    * @return Page A new Page instance with the HTML content loaded from the
    * template file and the specified variables injected.
    */
-  public static function with_template(
+  public static function withTemplate(
     string $templatePath,
     array $templateVars=[]
   ): Page {
     $obj = new Page();
-    $obj->htmlContent = TemplateEngine::load_template(
+    $obj->htmlContent = TemplateEngine::loadTemplate(
       $templatePath,
       $templateVars
     );
@@ -65,7 +65,7 @@ class Page {
    *   layout file, the body content injected, and the specified variables
    *   injected.
    */
-  public static function with_layout(
+  public static function withLayout(
     string $bodyTemplatePath,
     array $templateVars=[],
     string $layoutTemplatePath='',
@@ -78,10 +78,10 @@ class Page {
       $layoutTemplatePath = $frameworkConfig['layoutTemplatePath'];
     }
 
-    $obj->htmlContent = TemplateEngine::load_template(
+    $obj->htmlContent = TemplateEngine::loadTemplate(
       $layoutTemplatePath,
       [
-        'bodyContent' => TemplateEngine::load_template(
+        'bodyContent' => TemplateEngine::loadTemplate(
           $bodyTemplatePath,
           $templateVars
         ),

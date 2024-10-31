@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
-namespace Framework;
+namespace Framework\Decorators;
 
-interface DecoratorInterface {
+use Framework\Services\AbstractServiceUser;
+
+abstract class AbstractDecorator extends AbstractServiceUser {
   /**
    * This method should return an array of new template variables that will be
    * added to the template variables array that is passed to the template
@@ -12,5 +14,5 @@ interface DecoratorInterface {
    *   template variables. Must not contain any keys that are already present in
    *   the existing template variables.
    */
-  public function get_new_template_vars(array $templateVars): array;  
+  public abstract function getNewTemplateVars(array $templateVars): array;  
 }

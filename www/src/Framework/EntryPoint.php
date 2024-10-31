@@ -2,7 +2,7 @@
 namespace Framework;
 
 class EntryPoint {
-  private readonly RouterInterface $router;
+  private readonly Routing\RouterInterface $router;
 
   public function __construct(string $projectNamespace) {
     $routerClass = '\\' . $projectNamespace . '\\Router';
@@ -24,12 +24,12 @@ class EntryPoint {
     // call the controller action
     $page = $controller?->$action();
     // make sure the controller action returns a Page object
-    if (! $page instanceof \Framework\Page) {
+    if (! $page instanceof \Framework\Views\Page) {
       $controllerClass = get_class($controller);
       throw new \Error("Controller action $controllerClass->$action must return
-        an instance of \\Framework\\Page");
+        an instance of \\Framework\\Views\\Page");
     }
     // output the page content
-    echo $page->get_html_content();
+    echo $page->getHtmlContent();
   }
 }

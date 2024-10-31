@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace Framework;
+namespace Framework\Views;
 
 class TemplateEngine {
 
@@ -16,7 +16,7 @@ class TemplateEngine {
     * @return string The contents of the template file with the variables
     *   injected.
     */
-  public static function load_template(
+  public static function loadTemplate(
     string $templatePath,
     array $templateVars=[],
     string $templateDirectory=''
