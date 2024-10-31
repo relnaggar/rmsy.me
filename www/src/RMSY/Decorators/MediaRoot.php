@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 namespace RMSY\Decorators;
 
-class MediaRoot implements \Framework\DecoratorInterface {
-  public function get_new_template_vars(array $templateVars): array {
-    $newTemplateVars['mediaRoot'] = 'https://media.rmsy.me';
+class MediaRoot extends \Framework\Decorators\AbstractDecorator {
+  public function getNewTemplateVars(array $templateVars): array {
+    $newTemplateVars['mediaRoot'] = $this->services['Media']->getMediaRoot();
     return $newTemplateVars;
   }
 }

@@ -1,8 +1,10 @@
 <?php declare(strict_types=1);
 namespace RMSY\Controllers;
 
-class Site extends \Framework\AbstractController {
-  public function index(): \Framework\Page {
+use Framework\Views\Page;
+
+class Site extends \Framework\Controllers\AbstractController {
+  public function index(): Page {
     $currentDate = new \DateTime();
     $tutoringStartDate = new \DateTime('2019-01-01');
     $numberOfYearsTutoring = $currentDate->diff($tutoringStartDate)->y;
@@ -11,7 +13,7 @@ class Site extends \Framework\AbstractController {
       $formatter->format($numberOfYearsTutoring)
     );
 
-    return $this->get_page(
+    return $this->getPage(
       __FUNCTION__,
       [
         'title' => 'Home',
@@ -23,7 +25,7 @@ class Site extends \Framework\AbstractController {
     );
   }
 
-  public function about(): \Framework\Page {
+  public function about(): Page {
     global $frameworkConfig;
 
     $controllerName = (new \ReflectionClass($this))->getShortName();
@@ -34,7 +36,7 @@ class Site extends \Framework\AbstractController {
     $lastModifiedDate = (new \DateTime())->setTimestamp($lastModifiedTimestamp);
     $lastModifiedDateFormatted = $lastModifiedDate->format('F Y');
 
-    return $this->get_page(
+    return $this->getPage(
       __FUNCTION__,
       [
         'title' => 'About',
@@ -45,16 +47,18 @@ class Site extends \Framework\AbstractController {
     );
   }
 
-  public function linkedin(): void {
-    $this->redirect('https://www.linkedin.com/in/relnaggar/');
+  public function tutoring(): Page {
+    return $this->getPage(
+      __FUNCTION__,
+      [
+        'title' => 'Tutoring',
+        'metaDescription' => '',
+      ]
+    );
   }
 
-  public function github(): void {
-    $this->redirect('https://github.com/relnaggar');
-  }
-
-  public function pageNotFound(): \Framework\Page {
-    return $this->get_page(
+  public function pageNotFound(): Page {
+    return $this->getPage(
       __FUNCTION__,
       [
         'title' => 'Page Not Found',

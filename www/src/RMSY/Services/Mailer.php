@@ -5,7 +5,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-class Mailer implements \Framework\ServiceInterface {
+class Mailer extends \Framework\Services\AbstractService {
   public function sendEmail(
     string $fromEmail,    
     string $toEmail,    
@@ -25,9 +25,13 @@ class Mailer implements \Framework\ServiceInterface {
       $phpMailer->SMTPDebug = SMTP::DEBUG_SERVER;
       $phpMailer->isSMTP();
       $phpMailer->SMTPAuth = true;
-      $phpMailer->Host = rtrim(file_get_contents('/run/secrets/SMTP_HOST'));      
-      $phpMailer->Username = rtrim(file_get_contents('/run/secrets/SMTP_USERNAME'));
-      $phpMailer->Password = rtrim(file_get_contents('/run/secrets/SMTP_PASSWORD'));
+      $phpMailer->Host = $this->services['Secrets']->getSecret('SMTP_HOST');
+      $phpMailer->Username = $this->services['Secrets']->getSecret(
+        'SMTP_USERNAME'
+      );
+      $phpMailer->Password = $this->services['Secrets']->getSecret(
+        'SMTP_PASSWORD'
+      );
       $phpMailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
       $phpMailer->Port = 465;
 

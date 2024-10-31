@@ -1,62 +1,90 @@
 <?php declare(strict_types=1);
 namespace RMSY;
 
-class Router implements \Framework\RouterInterface {
+use \Framework\Routing\ControllerAction;
+use \Framework\Routing\Redirect;
+
+class Router implements \Framework\Routing\RouterInterface {
   public function route(
     string $path,
     string $method
-  ): \Framework\ControllerAction {
-    // decorators
-    $extendedTitleDecorator = new Decorators\ExtendedTitle();
-    $navDecorator = new Decorators\Nav();
-    $mediaRootDecorator = new Decorators\MediaRoot();
-    
+  ): ControllerAction {
     // services
+    $menuService = new Services\Menu();
+    $projectsService = new Services\Projects();
+    $mediaService = new Services\Media();
+    $secretsService = new Services\Secrets();
     $mailerService = new Services\Mailer();
+    $mailerService->registerService($secretsService);
+
+    // decorators
+
+    $extendedTitleDecorator = new Decorators\ExtendedTitle();
+
+    $navDecorator = new Decorators\Nav();
+    $navDecorator->registerService($menuService);
+    $navDecorator->registerService($projectsService);
+
+    $mediaRootDecorator = new Decorators\MediaRoot();
+    $mediaRootDecorator->registerService($mediaService);
 
     // controllers
-    $siteController = new Controllers\Site(
-      $decorators=[
-        $extendedTitleDecorator,
-        $navDecorator,      
-        $mediaRootDecorator,      
-      ],
-    );
-    $contactFormController = new Controllers\ContactForm(
-      $decorators=[
-        $extendedTitleDecorator,
-        $navDecorator,
-      ],
-      $services=[
-        'mailer' => $mailerService,
-      ],
-    );
+
+    $siteController = new Controllers\Site();
+    $siteController->registerService($mediaService);
+    $siteController->addDecorator($extendedTitleDecorator);
+    $siteController->addDecorator($navDecorator);
+    $siteController->addDecorator($mediaRootDecorator);
+
+    $contactFormController = new Controllers\ContactForm();
+    $contactFormController->registerService($mailerService);
+    $contactFormController->addDecorator($extendedTitleDecorator);
+    $contactFormController->addDecorator($navDecorator);
+
+    $projectsController = new Controllers\Projects();
+    $projectsController->registerService($projectsService);
+    $projectsController->addDecorator($extendedTitleDecorator);
+    $projectsController->addDecorator($navDecorator);
 
     // routes
     switch($path) {
       case '/':
-        return new \Framework\ControllerAction($siteController, 'index');
+        return new ControllerAction($siteController, 'index');
       case '/about':
-        return new \Framework\ControllerAction($siteController, 'about');
+        return new ControllerAction($siteController, 'about');
+      case '/tutoring':
+        return new ControllerAction($siteController, 'tutoring');
+      case '/resumes/full-stack-developer':
+        return new Redirect(
+          $mediaService->getMediaRoot() .
+          '/resumes/ramsey-el-naggar-full-stack-developer.pdf'
+        );
+      case '/resumes/tutor':
+        return new Redirect(
+          $mediaService->getMediaRoot() . '/resumes/ramsey-el-naggar-tutor.pdf'
+        );
+      case '/github':
+        return new Redirect('https://github.com/relnaggar');
+      case '/linkedin':
+        return new Redirect('https://www.linkedin.com/in/relnaggar/');
       case '/contact':
         switch ($method) {
           case 'GET':
-            return new \Framework\ControllerAction(
-              $contactFormController,
-              'contact'
-            );
+            return new ControllerAction($contactFormController, 'contact');
           case 'POST':
-            return new \Framework\ControllerAction(
+            return new ControllerAction(
               $contactFormController,
-              'contactSubmit'
+              'contactSubmit',
             );
         }
-      case '/linkedin':
-        return new \Framework\ControllerAction($siteController, 'linkedin');
-      case '/github':
-        return new \Framework\ControllerAction($siteController, 'github');
+      case '/projects':
+        return new ControllerAction($projectsController, 'summary');
+      case '/projects/beetle':
+        return new ControllerAction($projectsController, 'beetle');
+      case '/projects/sdp':
+        return new ControllerAction($projectsController, 'sdp');
       default:
-        return new \Framework\ControllerAction($siteController, 'pageNotFound');
+        return new ControllerAction($siteController, 'pageNotFound');
     }
   }
 }

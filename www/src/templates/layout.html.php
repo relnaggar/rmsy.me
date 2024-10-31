@@ -23,7 +23,13 @@
     >    
   </head>
   <!-- offest of 56 pixels for the unexpanded navbar height -->
-  <body data-bs-spy="scroll" data-bs-target="#sidebarMenu" data-bs-offset="56" tabindex="0" class="position-relative">
+  <body
+    data-bs-spy="scroll"
+    data-bs-target="#sidebarMenu"
+    data-bs-offset="56"
+    tabindex="0"
+    class="position-relative"
+  >
     <div class="container-fluid d-flex flex-column p-0">
       <?php require 'layout/header.html.php'; ?>
       <?php isset($nav) && require 'layout/nav.html.php'; ?>
@@ -31,10 +37,10 @@
       <div class="d-flex flex-row">
         <?php // require 'layout/sidebarFixed.html.php'; ?>
         <?php require 'layout/main.html.php'; ?>
-        <!-- <a href="#" class="btn btn-primary position-fixed bottom-0 end-0 display-none-lg-up">^</a> -->
+        <?php require 'layout/backToTop.html.php'; ?>
         <?php // require 'layout/onThisPageSide.html.php'; ?>
       </div>
-      <?php // require 'layout/footer.html.php'; ?>
+      <?php require 'layout/footer.html.php'; ?>
     </div>
 
     <script type="module" src="/js/main.js" defer></script>

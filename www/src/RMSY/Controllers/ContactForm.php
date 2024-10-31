@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
 namespace RMSY\Controllers;
 
+use Framework\Views\Page;
 use RMSY\Data\ContactFormData;
 
-class ContactForm extends \Framework\AbstractController {
-  private function get_contact_template_vars(): array {
+class ContactForm extends \Framework\Controllers\AbstractController {
+  private function getContactTemplateVars(): array {
     return [
       'title' => 'Contact',
       'metaDescription' => 'I\'m always game to talk tech, tutoring, or ' . 
@@ -38,17 +39,17 @@ class ContactForm extends \Framework\AbstractController {
     ];
   }
 
-  public function contact(): \Framework\Page {
-    return $this->get_page(
+  public function contact(): Page {
+    return $this->getPage(
       __FUNCTION__,
-      $this->get_contact_template_vars()
+      $this->getContactTemplateVars()
     );
   }
 
-  public function contactSubmit(): \Framework\Page {
+  public function contactSubmit(): Page {
     // set template path and vars same as contact method
     $templatePath = 'contact';
-    $templateVars = $this->get_contact_template_vars();
+    $templateVars = $this->getContactTemplateVars();
 
     // display error alert by default
     $templateVars['displayAlert'] = true;
@@ -56,7 +57,7 @@ class ContactForm extends \Framework\AbstractController {
 
     // display error alert if form not submitted
     if (!isset($_POST['submit']) || !isset($_POST['contactForm'])) {
-      return $this->get_page($templatePath, $templateVars);
+      return $this->getPage($templatePath, $templateVars);
     }    
 
     // validate form data
@@ -67,11 +68,11 @@ class ContactForm extends \Framework\AbstractController {
     if (!empty($errorCodes)) {
       // pass error code to template
       $templateVars['errorCode'] = $errorCodes[0];
-      return $this->get_page($templatePath, $templateVars);
+      return $this->getPage($templatePath, $templateVars);
     }
 
     // try to send email
-    $emailSent = $this->services['mailer']->sendEmail(
+    $emailSent = $this->services['Mailer']->sendEmail(
       $fromEmail='contactform@rmsy.me',
       $toEmail='ramsey.el-naggar@outlook.com',
       $subject="From $contactFormData->name <$contactFormData->email>",
@@ -84,13 +85,13 @@ class ContactForm extends \Framework\AbstractController {
 
     // display error alert if email not sent
     if (!$emailSent) {
-      return $this->get_page($templatePath, $templateVars);
+      return $this->getPage($templatePath, $templateVars);
     }
 
     // display success alert if email sent
     $templateVars['displayForm'] = false;
     $templateVars['success'] = true;
     $templateVars['contactFormData'] = $contactFormData;
-    return $this->get_page($templatePath, $templateVars);
+    return $this->getPage($templatePath, $templateVars);
   }
 }

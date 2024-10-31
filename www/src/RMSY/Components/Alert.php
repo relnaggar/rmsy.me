@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 namespace RMSY\Components;
 
-class Alert implements \Framework\ComponentInterface {
+class Alert implements \Framework\Components\ComponentInterface {
   private readonly string $type;
   private readonly string $title;
   private readonly string $message;

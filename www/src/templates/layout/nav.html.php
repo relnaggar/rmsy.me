@@ -1,6 +1,6 @@
 <nav class="
   navbar
-  navbar-expand-md
+  navbar-expand-lg
   sticky-top
   navbar-dark
   bg-dark
@@ -27,37 +27,66 @@
   </button>
   <div class="collapse navbar-collapse" id="navbar">
     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-      <?php foreach ($nav['items'] as $navItem): ?>
+      <?php foreach ($nav['items'] as $navKey => $navItem): ?>
         <li class="
           nav-item
           <?= isset($navItem['dropdown']) ? 'dropdown' : '' ?>
         ">
-        <?php if (isset($navItem['dropdown'])): ?>
+          <?php if (isset($navItem['dropdown'])): ?>
             <a
               class="
                 nav-link
                 dropdown-toggle
-                <?= ($navItem['text'] === $nav['activeItemText']) 
+                <?= ($navItem['text'] === $nav['activeDropdownText'])
                   ? 'active'
                   : ''
                 ?>
               "
               href="#"
-              id="<?= $navItem['id'] ?>Dropdown"
+              id="<?= $navKey ?>Dropdown"
               role="button"
               data-bs-toggle="dropdown"
               aria-expanded="false"
+              <?php if ($navItem['text'] === $nav['activeDropdownText']): ?>
+                aria-current="location"
+              <?php endif; ?>
             >
               <?= $navItem['text'] ?>
             </a>
             <ul
               class="dropdown-menu dropdown-menu-dark"
-              aria-labelledby="<?= $navItem['id'] ?>Dropdown"
+              aria-labelledby="<?= $navKey ?>Dropdown"
             >
               <?php foreach ($navItem['dropdown'] as $dropdownItem): ?>
                 <li>
-                  <a class="dropdown-item" href="<?= $dropdownItem['path'] ?>">
+                  <a
+                    class="
+                      dropdown-item
+                      <?= ($dropdownItem['text'] === $nav['activeItemText'])
+                        ? 'active'
+                        : ''
+                      ?>
+                    "
+                    href="<?= $dropdownItem['path'] ?>"
+                    <?php if (
+                      $dropdownItem['text'] === $nav['activeItemText']
+                    ): ?>
+                      aria-current="page"
+                    <?php endif; ?>
+                    <?php if (isset($dropdownItem['target'])): ?>
+                      target="<?= $dropdownItem['target'] ?>"
+                    <?php endif; ?>
+                    <?php if (isset($dropdownItem['rel'])): ?>
+                      rel="<?= $dropdownItem['rel'] ?>"
+                    <?php endif; ?>
+                  >
                     <?= $dropdownItem['text'] ?>
+                    <?php if (
+                      isset($dropdownItem['target']) &&
+                      ($dropdownItem['target'] === "_blank")
+                    ): ?>
+                      <i class="bi bi-box-arrow-up-right"></i>
+                    <?php endif; ?>
                   </a>
                 </li>
               <?php endforeach; ?>
@@ -73,11 +102,7 @@
               "
               href="<?= $navItem['path'] ?>"
               <?php if ($navItem['text'] === $nav['activeItemText']): ?>
-                <?php if (isset($navItem['dropdown'])): ?>
-                  aria-current="location"
-                <?php else: ?>
-                  aria-current="page"
-                <?php endif; ?>
+                aria-current="page"
               <?php endif; ?>              
               <?php if (isset($navItem['target'])): ?>
                 target="<?= $navItem['target'] ?>"
@@ -86,11 +111,13 @@
                 rel="<?= $navItem['rel'] ?>"
               <?php endif; ?>
             >
-              <?php if ((isset($navItem['icon']))): ?>
-                <i class ="bi bi-<?= $navItem['icon'] ?>"></i>
+              <?php if ((isset($navItem['menuIcon']))): ?>
+                <i class ="bi bi-<?= $navItem['menuIcon'] ?>"></i>
               <?php endif; ?>
               <?=$navItem['text']?>
-              <?php if (isset($navItem['target'])): ?>
+              <?php if (
+                isset($navItem['target']) && ($navItem['target'] === "_blank")
+              ): ?>
                 <i class="bi bi-box-arrow-up-right"></i>
               <?php endif; ?>
             </a>

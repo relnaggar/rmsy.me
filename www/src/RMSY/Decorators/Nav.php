@@ -1,38 +1,37 @@
 <?php declare(strict_types=1);
 namespace RMSY\Decorators;
 
-class Nav implements \Framework\DecoratorInterface {
-  public function get_new_template_vars(array $templateVars): array {
-    $newTemplateVars['nav'] = [
-      'homePath' => '/',
-      'title' => 'software engineer',
-      'items' => [
-        [
-          'text' => 'Home',
-          'path' => '/'
-        ], [
-          'text' => 'About',
-          'path' => '/about'
-        ], [
-          'text' => 'Projects',
-          'path' => '/projects'
-        ], [
-          'text' => 'Linkedin',
-          'path' => '/linkedin',
-          'target' => '_blank',
-          'rel' => 'noopener noreferrer',
-        ], [
-          'text' => 'GitHub',
-          'path' => '/github',
-          'target' => '_blank',
-          'rel' => 'noopener noreferrer',
-        ], [
-          'text' => 'Contact',
-          'path' => '/contact',
-        ],        
-      ],
-      'activeItemText' => $templateVars['title'] ?? ''
-    ];
+class Nav extends \Framework\Decorators\AbstractDecorator {
+  public function getNewTemplateVars(array $templateVars): array {
+    // add menu items
+    $newTemplateVars['nav'] = $this->services['Menu']->getMenuData();
+    
+    // add projects dropdown items
+    if (isset($newTemplateVars['nav']['items']['projects'])) {
+      $newTemplateVars['nav']['items']['projects']['dropdown'] = 
+        $this->services['Projects']->getProjectsData();
+    }
+
+    // set the active item text
+    $newTemplateVars['nav']['activeItemText'] = $templateVars['title'] ?? '';
+
+    // if the active item is a dropdown item, set the active dropdown text
+    $newTemplateVars['nav']['activeDropdownText'] = '';    
+    if (isset($templateVars['title'])) {      
+      foreach ($newTemplateVars['nav']['items'] as $navKey => $navItem) {
+        if (isset($navItem['dropdown'])) {
+          foreach ($navItem['dropdown'] as $dropdownItem) {
+            if (
+              $dropdownItem['text'] ===
+              $newTemplateVars['nav']['activeItemText']
+            ) {
+              $newTemplateVars['nav']['activeDropdownText'] = $navItem['text'];
+            }
+          }
+        }
+      }
+    }
+
     return $newTemplateVars;
   }
 }
