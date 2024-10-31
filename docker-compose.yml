@@ -10,6 +10,10 @@ services:
       - ./www:/var/www
       - ./config/apache2:/etc/apache2
       - ./config/php:/etc/php
+    secrets:
+      - SMTP_HOST
+      - SMTP_USERNAME
+      - SMTP_PASSWORD
   bundler:
     init: true
     container_name: bundler
@@ -19,3 +23,10 @@ services:
       - ./www/html/css:/bundler/dist/css
       - ./www/html/js:/bundler/dist/js
       - ./www/html/fonts:/bundler/dist/fonts
+secrets:
+  SMTP_HOST:
+    file: ./secrets/SMTP_HOST
+  SMTP_USERNAME:
+    file: ./secrets/SMTP_USERNAME
+  SMTP_PASSWORD:
+    file: ./secrets/SMTP_PASSWORD

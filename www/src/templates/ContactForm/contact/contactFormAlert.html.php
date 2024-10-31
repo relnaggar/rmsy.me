@@ -5,12 +5,20 @@
     'success',
     'Message sent!',
     <<<HTML
-      Whoosh!
-      Your message is now being hand-delivered by our nimble webgnomes,
-      zip-lining straight into my inbox.
-      For an encore, they've backflipped a copy to the same email address
-      you provided.
-      High-five!
+      <p>
+        Whoosh!
+        Your message is now being hand-delivered by our nimble webgnomes,
+        zip-lining straight into my inbox.
+        High-five!
+      </p>
+      <p>
+        Here's what you sent:
+        <ul>
+          <li><strong>Name:</strong> $contactFormData->name</li>
+          <li><strong>Email:</strong> $contactFormData->email</li>
+          <li><strong>Message:</strong> $contactFormData->message</li>
+        </ul>
+      </p>
     HTML
   ))->render() ?>
 <?php else: ?>

@@ -57,7 +57,7 @@ class ContactForm extends \Framework\AbstractController {
     // display error alert if form not submitted
     if (!isset($_POST['submit']) || !isset($_POST['contactForm'])) {
       return $this->get_page($templatePath, $templateVars);
-    }
+    }    
 
     // validate form data
     $contactFormData = new ContactFormData($_POST['contactForm']);
@@ -71,15 +71,15 @@ class ContactForm extends \Framework\AbstractController {
     }
 
     // try to send email
-      $emailSent = $this->services['mailer']->sendEmail(
+    $emailSent = $this->services['mailer']->sendEmail(
       $fromEmail='contactform@rmsy.me',
-      $fromName=$contactFormData->name,
       $toEmail='ramsey.el-naggar@outlook.com',
-      $toName='Ramsey El-Naggar',
-      $ccEmail=$contactFormData->email,
-      $ccName=$contactFormData->name,
-      $subject='rmsy.me engineer contact form message',
-      $htmlBody=nl2br($contactFormData->message, false)
+      $subject="From $contactFormData->name <$contactFormData->email>",
+      $htmlBody=nl2br($contactFormData->message, false),
+      $fromName='rmsy.me contact form',
+      $toName='Ramsey El-Naggar',      
+      $replyToEmail=$contactFormData->email,
+      $replyToName=$contactFormData->name,
     );
 
     // display error alert if email not sent
@@ -90,6 +90,7 @@ class ContactForm extends \Framework\AbstractController {
     // display success alert if email sent
     $templateVars['displayForm'] = false;
     $templateVars['success'] = true;
+    $templateVars['contactFormData'] = $contactFormData;
     return $this->get_page($templatePath, $templateVars);
   }
 }
