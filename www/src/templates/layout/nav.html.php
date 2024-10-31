@@ -57,7 +57,7 @@
               class="dropdown-menu dropdown-menu-dark"
               aria-labelledby="<?= $navKey ?>Dropdown"
             >
-              <?php foreach ($navItem['dropdown'] as $dropdownItem): ?>
+              <?php foreach ($navItem['dropdown']['items'] as $dropdownItem): ?>
                 <li>
                   <a
                     class="
@@ -67,7 +67,9 @@
                         : ''
                       ?>
                     "
-                    href="<?= $dropdownItem['path'] ?>"
+                    href="<?=
+                      $navItem['dropdown']['basePath'] . $dropdownItem['path']
+                    ?>"
                     <?php if (
                       $dropdownItem['text'] === $nav['activeItemText']
                     ): ?>

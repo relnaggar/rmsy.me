@@ -77,7 +77,7 @@ class Router implements \Framework\Routing\RouterInterface {
               'contactSubmit',
             );
         }
-      case '/projects':
+      case '/projects/':
         return new ControllerAction($projectsController, 'summary');
       case '/projects/beetle':
         return new ControllerAction($projectsController, 'beetle');

@@ -8,7 +8,7 @@ class Projects extends \Framework\Controllers\AbstractController {
     return $this->getPage(
       __FUNCTION__,
       [
-        'title' => 'Summary',
+        'title' => 'Project Summary',
         'metaDescription' => '',
       ]
     );

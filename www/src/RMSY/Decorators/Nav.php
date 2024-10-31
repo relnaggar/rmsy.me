@@ -8,8 +8,13 @@ class Nav extends \Framework\Decorators\AbstractDecorator {
     
     // add projects dropdown items
     if (isset($newTemplateVars['nav']['items']['projects'])) {
-      $newTemplateVars['nav']['items']['projects']['dropdown'] = 
-        $this->services['Projects']->getProjectsData();
+      $projectsData = $this->services['Projects']->getProjectsData();
+      foreach ($projectsData as $projectData) {
+        $newTemplateVars['nav']['items']['projects']['dropdown']['items'][] = [
+          'text' => $projectData['text'],
+          'path' => $projectData['path'],
+        ];
+      }
     }
 
     // set the active item text
@@ -19,8 +24,10 @@ class Nav extends \Framework\Decorators\AbstractDecorator {
     $newTemplateVars['nav']['activeDropdownText'] = '';    
     if (isset($templateVars['title'])) {      
       foreach ($newTemplateVars['nav']['items'] as $navKey => $navItem) {
-        if (isset($navItem['dropdown'])) {
-          foreach ($navItem['dropdown'] as $dropdownItem) {
+        if (
+          isset($navItem['dropdown']) && isset($navItem['dropdown']['items'])
+        ) {
+          foreach ($navItem['dropdown']['items'] as $dropdownItem) {
             if (
               $dropdownItem['text'] ===
               $newTemplateVars['nav']['activeItemText']

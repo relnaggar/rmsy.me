@@ -9,21 +9,35 @@ class Menu extends \Framework\Services\AbstractService {
       'items' => [
         'home' => ['text' => 'Home', 'path' => '/'],
         'about' => ['text' => 'About', 'path' => '/about'],
-        'projects' => ['text' => 'Projects'],
+        'projects' => [
+          'text' => 'Projects',
+          'dropdown' => [
+            'basePath' => '/projects',
+            'items' => [
+              [
+                'text' => 'Project Summary',
+                'path' => '/',
+              ],
+            ],
+          ],
+        ],
         // 'tutoring' => ['text' => 'Tutoring', 'path' => '/tutoring'],
         'resumes' => [
           'text' => 'Resumes',
           'dropdown' => [
-            [
-              'text' => 'Full Stack Developer',
-              'path' => '/resumes/full-stack-developer',
-              'target' => '_blank',
-              'rel' => 'noopener noreferrer',
-            ], [
-              'text' => 'Tutor',
-              'path' => '/resumes/tutor',
-              'target' => '_blank',
-              'rel' => 'noopener noreferrer',
+            'basePath' => '/resumes',
+            'items' => [
+              [
+                'text' => 'Full Stack Developer',
+                'path' => '/full-stack-developer',
+                'target' => '_blank',
+                'rel' => 'noopener noreferrer',
+              ], [
+                'text' => 'Tutor',
+                'path' => '/tutor',
+                'target' => '_blank',
+                'rel' => 'noopener noreferrer',
+              ]
             ],
           ],
         ],
