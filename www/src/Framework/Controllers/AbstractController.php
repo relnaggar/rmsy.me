@@ -51,6 +51,9 @@ abstract class AbstractController extends AbstractServiceUser {
     $controllerName = (new \ReflectionClass($this))->getShortName();
 
     // apply decorators
+    if (!isset($this->decorators)) {
+      $this->decorators = [];
+    }
     foreach ($this->decorators as $decorator) {
       $newTemplateVars = $decorator->getNewTemplateVars($templateVars);
       foreach ($newTemplateVars as $key => $value) {
