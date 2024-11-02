@@ -3,14 +3,16 @@
   <?php // require 'main/previousNextButtonsTop.html.php'; ?>
   <?php if (isset($sections)): ?>
     <div data-nosnippet>
-      <?php // require 'main/onThisPageFixed.html.php'; ?>
-      <?php foreach ($sections as $section): ?>
-        <section id="<?= $section['id'] ?>">
-          <h2><?= $section['title'] ?></h2>
+      <?php $onThisPage && require 'main/onThisPageFixed.html.php'; ?>
+      <?php foreach ($sections as $sectionId => $section): ?>
+        <section id="<?= $sectionId ?>">
+          <?php if (isset($section['title'])): ?>
+            <h2><?= $section['title'] ?></h2>
+          <?php endif; ?>
           <?= $section['html'] ?? '' ?>
           <?php if (isset($section['subsections'])): ?>
             <?php foreach ($section['subsections'] as $subsection): ?>
-              <section id="<?= $section['id'] ?>-<?= $subsection['id'] ?>">
+              <section id="<?= $sectionId ?>-<?= $subsection['id'] ?>">
                 <h3><?= $subsection['title'] ?></h3>
                 <?= $subsection['html'] ?>
               </section>

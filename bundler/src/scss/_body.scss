@@ -1,3 +1,15 @@
 :root {
   --nav-height: 56px;
 }
+
+.sidebar {
+  position: sticky;
+  align-self: flex-start; // for sticky to work within flexbox
+  top: var(--nav-height);
+  height: calc(100vh - var(--nav-height));
+  overflow-y: scroll;
+}
+
+section {
+  scroll-margin-top: var(--nav-height);
+}

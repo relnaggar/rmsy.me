@@ -2,7 +2,7 @@
   <div class="display-none-xl-down d-flex">
     <a
       href="/"
-      class="display-5 flex-fill text-reset bg-contrast-primary banner-tag"
+      class="display-5 flex-fill text-reset banner-tag"
     >
       &lt;<b>r</b>a<b>ms</b>e<b>y</b><b class="banner-link">.me</b>&gt;
     </a>
@@ -11,7 +11,7 @@
     </span>
     <a
       href="/"
-      class="display-5 flex-fill text-reset bg-contrast-primary banner-tag"
+      class="display-5 flex-fill text-reset banner-tag"
     >
       &lt;/<b>r</b>a<b>ms</b>e<b>y</b><b class="banner-link">.me</b>&gt;
     </a>

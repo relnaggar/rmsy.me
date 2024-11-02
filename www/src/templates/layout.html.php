@@ -38,7 +38,11 @@
         <?php require 'layout/sidebarFixed.html.php'; ?>
         <?php require 'layout/main.html.php'; ?>
         <?php require 'layout/backToTop.html.php'; ?>
-        <?php // require 'layout/onThisPageSide.html.php'; ?>
+        <div class="col-2 display-none-lg-down" data-nosnippet>
+          <?php
+            $onThisPage && require 'layout/onThisPageSide.html.php';
+          ?>
+        </div>
       </div>
       <?php require 'layout/footer.html.php'; ?>
     </div>
