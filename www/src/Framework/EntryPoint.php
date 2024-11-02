@@ -20,9 +20,10 @@ class EntryPoint {
     $controllerAction = $this->router->route($serverRequestPath, $httpMethod);
     $controller = $controllerAction->controller;
     $action = $controllerAction->action;
+    $params = $controllerAction->params;
 
     // call the controller action
-    $page = $controller?->$action();
+    $page = $controller?->$action(...$params);
     // make sure the controller action returns a Page object
     if (! $page instanceof \Framework\Views\Page) {
       $controllerClass = get_class($controller);

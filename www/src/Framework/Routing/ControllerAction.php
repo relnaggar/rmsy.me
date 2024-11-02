@@ -6,6 +6,7 @@ use Framework\Controllers\AbstractController;
 class ControllerAction {
   public readonly AbstractController $controller;
   public readonly string $action;
+  public readonly array $params;
 
   /**
    * Constructs a ControllerAction object, which is a simple pair of a
@@ -16,9 +17,11 @@ class ControllerAction {
    */
   public function __construct(
     AbstractController $controller,
-    string $action
+    string $action,
+    array $params = []
   ) {
     $this->controller = $controller;
     $this->action = $action;
+    $this->params = $params;
   }
 }
