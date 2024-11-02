@@ -3,8 +3,7 @@
 </p>
 
 <p>
-  Hello there, I'm Ramsey -- not just your average software engineer, but a
-  virtuoso conducting symphonies of syntax and semicolons. Without exaggerating
+  Hi, I'm Ramsey 👋 I'm a software engineer, and without exaggerating
   in the slightest, this website is
   <a href="/projects/website/">my Mona Lisa</a>.
   My digital masterpiece, constructed brick by binary brick with the sweat from
@@ -30,7 +29,7 @@
     <li>
       <?= $numberOfYearsTutoringAsWord ?> enlightening years educating the world
       in computer science and software engineering, during which I earned the
-      rather grand title of the UK's top 'Computing University' tutor on the
+      title of the UK's top 'Computing University' tutor on the
       esteemed platform,
       <a
         href="https://www.mytutor.co.uk/tutors/24851/"

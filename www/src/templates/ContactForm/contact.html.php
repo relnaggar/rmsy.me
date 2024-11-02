@@ -5,8 +5,8 @@
 </p>
 
 <p>
-  Feel free to ping me an email, submit the beautifully formatted form below, or
-  even send me a LinkedIn invitation.
+  Feel free to ping me an email, submit the form below, or you can even send me
+  a LinkedIn invitation.
   I've never lost a patient!
 </p>
 
@@ -26,18 +26,13 @@
           &nbsp;
           <a
             href="<?= $contactMethod['href'] ?>"
-            <?php if ($contactMethod['target'] ?? false): ?>
-              target="<?= $contactMethod['target'] ?>"
-            <?php endif; ?>
-            <?php if ($contactMethod['rel'] ?? false): ?>
-              rel="<?= $contactMethod['rel'] ?>"
+            <?php if ($contactMethod['external'] ?? false): ?>
+              target="_blank"
+              rel="noopener noreferrer"
             <?php endif; ?>
           >
             <?= $contactMethod['html'] ?></a>
-          <?php if (
-            isset($contactMethod['target'])
-            && $contactMethod['target'] === '_blank'
-          ): ?>
+          <?php if ($contactMethod['external'] ?? false): ?>
             <i class="bi bi-box-arrow-up-right"></i>
           <?php endif; ?>
         </div>

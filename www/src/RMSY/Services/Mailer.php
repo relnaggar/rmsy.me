@@ -7,14 +7,14 @@ use PHPMailer\PHPMailer\Exception;
 
 class Mailer extends \Framework\Services\AbstractService {
   public function sendEmail(
-    string $fromEmail,    
-    string $toEmail,    
+    string $fromEmail,
+    string $toEmail,
     string $subject,
     string $htmlBody,
     string $fromName="",
     string $toName="",
     string $replyToEmail="",
-    string $replyToName=""    
+    string $replyToName=""
   ): bool {
     return false; // currently disabled
 

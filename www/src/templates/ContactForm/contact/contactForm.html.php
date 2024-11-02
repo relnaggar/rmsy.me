@@ -36,8 +36,7 @@
         $invalidFeedback='This field cannot be blank and must be a valid email
           address 254 characters or under.',
         $formText=<<<HTML
-          This will only be used to forward you a copy of your message and so I
-          can reply to your message.
+          This will only be used so I can reply to your message.
           I'll never share your email with anyone.
         HTML
       ))->render(); ?>

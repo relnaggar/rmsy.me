@@ -58,6 +58,7 @@ class Site extends \Framework\Controllers\AbstractController {
   }
 
   public function pageNotFound(): Page {
+    http_response_code(404);
     return $this->getPage(
       __FUNCTION__,
       [

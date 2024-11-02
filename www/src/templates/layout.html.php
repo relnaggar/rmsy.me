@@ -35,7 +35,7 @@
       <?php isset($nav) && require 'layout/nav.html.php'; ?>
       <?php // require 'layout/sidebarCollapsable.html.php'; ?>
       <div class="d-flex flex-row">
-        <?php // require 'layout/sidebarFixed.html.php'; ?>
+        <?php require 'layout/sidebarFixed.html.php'; ?>
         <?php require 'layout/main.html.php'; ?>
         <?php require 'layout/backToTop.html.php'; ?>
         <?php // require 'layout/onThisPageSide.html.php'; ?>

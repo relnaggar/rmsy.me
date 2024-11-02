@@ -2,14 +2,15 @@
 namespace RMSY\Services;
 
 class Projects extends \Framework\Services\AbstractService {
-  public function getProjectsData(): array {
+  public function getData(): array {
     return [
-      [
-        'text' => 'Pooptimus Prime: The World\'s First Dung Beetle Biorobot',
-        'path' => '/beetle',
-      ], [
-        'text' => 'Robo-Messi: When Silicon Met Soccer',
-        'path' => '/sdp',
+      'beetle' => [
+        'title' => 'Pooptimus Prime: The World\'s First Dung Beetle Biorobot',
+        'description' => '',
+      ],
+      'sdp' => [
+        'title' => 'Robo-Messi: When Silicon Met Soccer',
+        'description' => '',
       ],
     ];
   }
