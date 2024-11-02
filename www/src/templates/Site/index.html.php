@@ -1,3 +1,5 @@
+<?php use RMSY\Components\ExternalLink; ?>
+
 <p class="lead">
   Welcome to my slice of the internet pie!
 </p>
@@ -5,7 +7,7 @@
 <p>
   Hi, I'm Ramsey 👋 I'm a software engineer, and without exaggerating
   in the slightest, this website is
-  <a href="/projects/website/">my Mona Lisa</a>.
+  <a href="/projects/rmsy-me/">my Mona Lisa</a>.
   My digital masterpiece, constructed brick by binary brick with the sweat from
   my brow as its everlasting mortar.
   I carved this space with my raw and bleeding fingers to serve as a testament
@@ -31,13 +33,12 @@
       in computer science and software engineering, during which I earned the
       title of the UK's top 'Computing University' tutor on the
       esteemed platform,
-      <a
-        href="https://www.mytutor.co.uk/tutors/24851/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        MyTutor</a>
-      <i class="bi bi-box-arrow-up-right"></i>.
+      <?=
+        (new ExternalLink(
+          "https://www.mytutor.co.uk/tutors/24851/",
+          "MyTutor",
+        ))->render()
+      ?>.
       No undergrads were harmed in the making of this story.
     </li>
   </ul>  
@@ -45,7 +46,7 @@
 
 <p>
   Feel free to explore and discover more <a href="/about">about me</a>,
-  <a href="/projects">my projects</a>, and my passion for software engineering.
+  <a href="/projects/">my projects</a>, and my passion for software engineering.
 </p>
 
 <?php if (isset($projects)): ?>

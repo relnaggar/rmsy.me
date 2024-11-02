@@ -1,10 +1,11 @@
-<figure class="figure w-25 float-end m-3">
+<?php use RMSY\Components\ExternalLink; ?>
+
+<figure class="figure w-50 float-end m-3 w-100-sm-down">
   <img
     src="<?= $mediaRoot ?>/img/profile.jpg"
     class="figure-img img-fluid"
     alt="Ramsey El-Naggar"
   >
-  <figcaption class="figure-caption text-center"></figcaption>
 </figure>
 
 <p class="lead">
@@ -35,13 +36,12 @@
   You see, I believe that knowledge shared is knowledge multiplied, and I
   absolutely love sharing my knowledge and passion for programming.
   As an
-  <a
-    href="https://www.mytutor.co.uk/tutors/24851/"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    educator</a>
-  <i class="bi bi-box-arrow-up-right"></i>,
+  <?=
+    (new ExternalLink(
+      "https://www.mytutor.co.uk/tutors/24851/",
+      "educator",
+    ))->render()
+  ?>,
   I've had the joy of introducing undergraduate students to the vast world of
   computer science.
   From the magic of web development, to the elegance of OOP, to the intellectual
@@ -62,9 +62,14 @@
 
 <p data-nosnippet>
   Still curious?
-  Check out <a href="/linkedin" target="_blank" rel="noopener noreferrer">
-    my LinkedIn profile</a>
-  <i class="bi bi-box-arrow-up-right"></i>,
+  Check out
+  <?=
+    (new ExternalLink(
+      "/linkedin",
+      "my LinkedIn",
+    ))->render()
+  ?>
+  ,
   which is the story of my professional life in all its glory.
   Or better yet, feel free to <a href="/contact">reach out for a chat</a> -- I'm
   always game to talk tech, education, or even dung beetles! 

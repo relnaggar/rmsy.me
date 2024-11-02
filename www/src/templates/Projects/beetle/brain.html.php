@@ -1,3 +1,5 @@
+<?php use RMSY\Components\ExternalLink; ?>
+
 <p>
   As beautiful as Pooptimus is on the outside, we all know it's what's on the
   inside that counts.
