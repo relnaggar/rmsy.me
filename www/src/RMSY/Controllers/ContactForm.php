@@ -10,30 +10,7 @@ class ContactForm extends \Framework\Controllers\AbstractController {
       'title' => 'Contact',
       'metaDescription' => 'I\'m always game to talk tech, tutoring, or ' . 
         'even dung beetles!',
-      'contactMethods' => [
-        [
-          'title' => 'Email',
-          'icon' => 'envelope',
-          'href' => 'mailto:ramsey.el-naggar@outlook.com',
-          'html' => <<<HTML
-            ramsey.el&#8209;naggar@outlook.com
-          HTML,
-        ], [
-          'title' => 'LinkedIn',
-          'icon' => 'linkedin',
-          'href' => '/linkedin',
-          'html' => 'rmsy.me/linkedin',
-          'target' => '_blank',
-          'rel' => 'noopener noreferrer',
-        ], [
-          'title' => 'GitHub',
-          'icon' => 'github',
-          'href' => '/github',
-          'html' => 'rmsy.me/github',
-          'target' => '_blank',
-          'rel' => 'noopener noreferrer',
-        ],
-      ],
+      'contactMethods' => $this->services['ContactMethods']->getData(),
       'displayAlert' => false,
       'displayForm' => true,
     ];
@@ -73,14 +50,14 @@ class ContactForm extends \Framework\Controllers\AbstractController {
 
     // try to send email
     $emailSent = $this->services['Mailer']->sendEmail(
-      $fromEmail='contactform@rmsy.me',
-      $toEmail='ramsey.el-naggar@outlook.com',
-      $subject="From $contactFormData->name <$contactFormData->email>",
-      $htmlBody=nl2br($contactFormData->message, false),
-      $fromName='rmsy.me contact form',
-      $toName='Ramsey El-Naggar',      
-      $replyToEmail=$contactFormData->email,
-      $replyToName=$contactFormData->name,
+      fromEmail: 'contactform@rmsy.me',
+      toEmail: 'ramsey.el-naggar@outlook.com',
+      subject: "From $contactFormData->name <$contactFormData->email>",
+      htmlBody: nl2br($contactFormData->message, false),
+      fromName: 'rmsy.me contact form',
+      toName: 'Ramsey El-Naggar',      
+      replyToEmail: $contactFormData->email,
+      replyToName: $contactFormData->name,
     );
 
     // display error alert if email not sent
