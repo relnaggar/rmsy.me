@@ -4,7 +4,7 @@ namespace Framework\Services;
 use Framework\Services\AbstractService;
 
 abstract class AbstractServiceUser {
-  protected $services;
+  protected $services=[];
 
   /**
    * Register a service. This service will be available via

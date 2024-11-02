@@ -6,7 +6,7 @@ use Framework\Decorators\AbstractDecorator;
 use Framework\Views\Page;
 
 abstract class AbstractController extends AbstractServiceUser {
-  private array $decorators;
+  private array $decorators=[];
 
   /**
    * Add a new decorator to the controller.
@@ -51,9 +51,6 @@ abstract class AbstractController extends AbstractServiceUser {
     $controllerName = (new \ReflectionClass($this))->getShortName();
 
     // apply decorators
-    if (!isset($this->decorators)) {
-      $this->decorators = [];
-    }
     foreach ($this->decorators as $decorator) {
       $newTemplateVars = $decorator->getNewTemplateVars($templateVars);
       foreach ($newTemplateVars as $key => $value) {
