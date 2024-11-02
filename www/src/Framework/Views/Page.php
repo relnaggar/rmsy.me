@@ -66,7 +66,7 @@ class Page {
    *   injected.
    */
   public static function withLayout(
-    string $bodyTemplatePath,
+    string $bodyTemplatePath='',
     array $templateVars=[],
     string $layoutTemplatePath='',
   ): Page {
@@ -78,13 +78,19 @@ class Page {
       $layoutTemplatePath = $frameworkConfig['layoutTemplatePath'];
     }
 
+    try {
+      $bodyContent = TemplateEngine::loadTemplate(
+        $bodyTemplatePath,
+        $templateVars
+      );
+    } catch (\Error $e) {
+      $bodyContent = '';
+    }
+
     $obj->htmlContent = TemplateEngine::loadTemplate(
       $layoutTemplatePath,
       [
-        'bodyContent' => TemplateEngine::loadTemplate(
-          $bodyTemplatePath,
-          $templateVars
-        ),
+        'bodyContent' => $bodyContent,
         ...$templateVars
       ]
     );

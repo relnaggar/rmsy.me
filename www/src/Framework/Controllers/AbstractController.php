@@ -44,7 +44,7 @@ abstract class AbstractController extends AbstractServiceUser {
    *   injected.
    */
   public function getPage(
-    string $bodyTemplatePath,
+    string $bodyTemplatePath='',
     array $templateVars=[],
     string $layoutTemplatePath=''
   ): Page {

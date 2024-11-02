@@ -34,7 +34,7 @@ class TemplateEngine {
     // start output buffering to capture the template contents
     ob_start();
     // load the template file
-    require $frameworkConfig['sourceDirectory'] . '/' . $templateDirectory .
+    @require $frameworkConfig['sourceDirectory'] . '/' . $templateDirectory .
       '/' . $templatePath . $frameworkConfig['templateFileExtension'];
     // return the contents of the output buffer
     return ob_get_clean();
