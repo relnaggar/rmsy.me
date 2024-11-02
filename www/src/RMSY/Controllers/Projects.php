@@ -14,13 +14,22 @@ class Projects extends \Framework\Controllers\AbstractController {
     );
   }
 
-  public function show(string $projectSlug, array $projectData): Page {
+  public function show(string $projectSlug, array $project): Page {
+    $className = (new \ReflectionClass($this))->getShortName();
+
+    if (isset($project['sections'])) {
+      foreach (($project['sections']) as &$section) {
+        $section['templateDirectory'] = "$className/$projectSlug";
+      }
+    }
+
     return $this->getPage(
-      $projectSlug,
-      [
-        'title' => $projectData['title'],
-        'metaDescription' => $projectData['description'],
-      ]
+      templateVars: [
+        'title' => $project['title'],
+        'metaDescription' => $project['description'],
+        'onThisPage' => true,
+      ],
+      sections: $project['sections']
     );
   }
 }
