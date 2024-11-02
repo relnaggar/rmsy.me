@@ -3,12 +3,17 @@ namespace Framework\Views;
 
 class Page {
   private string $htmlContent;
+  private array $templateVars = [];
 
   // factory pattern used since PHP doesn't support method overloading
   private function __construct() {}
 
   public function getHtmlContent(): string {
     return $this->htmlContent;
+  }
+
+  public function getTemplateVars(): array {
+    return $this->templateVars;
   }
 
   /**
@@ -20,6 +25,7 @@ class Page {
   public static function withHtmlContent(string $htmlContent): Page {
     $obj = new Page();
     $obj->htmlContent = $htmlContent;
+    $obj->templateVars = [];
     return $obj;
   }
 
@@ -43,6 +49,7 @@ class Page {
       $templatePath,
       $templateVars
     );
+    $obj->templateVars = $templateVars;
     return $obj;
   }
 
@@ -94,6 +101,7 @@ class Page {
         ...$templateVars
       ]
     );
+    $obj->templateVars = $templateVars;
     return $obj;
   }
 }
