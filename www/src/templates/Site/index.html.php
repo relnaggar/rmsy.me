@@ -45,8 +45,8 @@
 </p>
 
 <p>
-  Feel free to explore and discover more <a href="/about">about me</a>, my
-  projects, and my passion for software engineering.
+  Feel free to explore and discover more <a href="/about">about me</a>,
+  <a href="/projects">my projects</a>, and my passion for software engineering.
 </p>
 
 <?php if (isset($projects)): ?>

@@ -22,7 +22,7 @@
 
 <p data-nosnippet>
   Not too long ago, my curiosity and drive for innovation led me to build a
-  <a href="/projects/beetle/">dung beetle biorobot</a> -- yes, you read that
+  <a href="/projects/beetle">dung beetle biorobot</a> -- yes, you read that
   right!
   It was a fascinating adventure that took me from plumbing the profound depths
   of the insect neuroscience literature to stretching the concept of "playing
