@@ -31,6 +31,29 @@ class Projects extends \Framework\Services\AbstractService {
       'sdp' => [
         'title' => 'Robo-Messi: When Silicon Met Soccer',
         'description' => '',
+        'sections' => [
+          'summary' => [
+            'title' => 'Executive Summary',
+          ],
+          'introduction' => [
+            'title' => 'SDP: The Third-Year Frontier',
+          ],
+          'construction' => [
+            'title' => "The Building Blocks of Victory",
+          ],
+          'communication' => [
+            'title' => 'A Robo-mantic Comedy: The LEGO That Wouldn\'t Listen',
+          ],
+          'sensing' => [
+            'title' => 'Sense and Sensibility',
+          ],
+          'strategy' => [
+            'title' => 'Strategising with Silicon: Robo-Messi\'s Robo-Brain',
+          ],
+          'takeaways' => [
+            'title' => 'How I Learned to Love the Chaos',
+          ],
+        ],
       ],
     ];
   }
