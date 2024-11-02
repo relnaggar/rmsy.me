@@ -5,7 +5,7 @@ header {
   color: color-contrast($light);
 }
 
-.left-banner {
+.banner-tag {
   padding: 0 12px 12px;
   text-decoration: none;
   &:hover, &:focus {
@@ -22,6 +22,7 @@ header {
 
 #center-banner {
   border-left: 1px solid $gray-300;
+  border-right: 1px solid $gray-300;
 }
 
 .banner-link {
