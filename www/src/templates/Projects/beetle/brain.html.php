@@ -25,7 +25,7 @@
 
 <figure class="figure m-3 text-center col-lg-5 float-start w-100-lg-down">
   <img
-    src="/assets/img/beetle/cx-full.png"
+    src="<?= $mediaRoot ?>/img/beetle/cx-full.png"
     class="figure-img img-fluid"
     alt="Central Complex model adapted for dung beetle navigation.">
   <figcaption class="figure-caption text-center">

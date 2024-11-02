@@ -70,3 +70,4 @@ $theme-colors: map.merge($theme-colors, $custom-colors);
 @import 'display-breakpoints';
 @import 'header';
 @import 'nav';
+@import 'img-breakpoints';

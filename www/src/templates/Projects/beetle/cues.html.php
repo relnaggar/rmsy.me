@@ -1,6 +1,6 @@
 <figure class="figure m-3 text-center w-100">
   <img
-    src="/assets/img/beetle/sa-skies.jpg"
+    src="<?= $mediaRoot ?>/img/beetle/sa-skies.jpg"
     class="figure-img img-fluid"
     alt="
       Screenshots from the robot's camera looking up at the South African sky.
@@ -31,7 +31,7 @@
 
 <figure class="figure m-3 text-center col-lg-5 float-end w-100-lg-down">
   <img
-    src="/assets/img/beetle/cx-path.jpg"
+    src="<?= $mediaRoot ?>/img/beetle/cx-path.jpg"
     class="figure-img img-fluid"
     alt="
       CX model extensions, including polarisation flip decision and weighted
@@ -99,7 +99,7 @@
 
 <figure class="figure m-3 text-center col-lg-5 float-start w-100-lg-down">
   <img
-    src="/assets/img/beetle/sa-posing.jpg"
+    src="<?= $mediaRoot ?>/img/beetle/sa-posing.jpg"
     class="figure-img img-fluid"
     alt="The robot, outside in South Africa, posing for a camera."
   >

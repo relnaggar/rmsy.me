@@ -26,7 +26,7 @@
 
 <figure class="figure m-3 text-center col-lg-5 float-end w-100-lg-down">
   <img
-    src="/assets/img/beetle/sa-raincoat.jpg"
+    src="<?= $mediaRoot ?>/img/beetle/sa-raincoat.jpg"
     class="figure-img img-fluid"
     alt="The robot with a makeshift plastic cover duct-taped on top."
   >
