@@ -4,6 +4,8 @@ function autoload(string $className): void {
     global $frameworkConfig;
     $fileName = str_replace('\\', '/', $className) . '.php';
     $file = $frameworkConfig['sourceDirectory'] . '/' . $fileName; 
-    require $file;
+    if (file_exists($file)) {
+        require $file;
+    }
 }
 spl_autoload_register('autoload');
