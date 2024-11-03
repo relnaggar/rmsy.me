@@ -1,4 +1,4 @@
-<?php use RMSY\Components\FormInput; ?>
+<?php use RmsyMe\Components\FormInput; ?>
 
 <div class="card">
   <div class="card-header">

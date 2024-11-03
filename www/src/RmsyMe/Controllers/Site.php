@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace RMSY\Controllers;
+namespace RmsyMe\Controllers;
 
+use Framework\Controllers\AbstractController;
 use Framework\Views\Page;
 
-class Site extends \Framework\Controllers\AbstractController {
+class Site extends AbstractController {
   public function index(): Page {
     $currentDate = new \DateTime();
     $tutoringStartDate = new \DateTime('2019-01-01');

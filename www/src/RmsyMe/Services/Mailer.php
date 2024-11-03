@@ -1,11 +1,13 @@
 <?php declare(strict_types=1);
-namespace RMSY\Services;
+namespace RmsyMe\Services;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-class Mailer extends \Framework\Services\AbstractService {
+use Framework\Services\AbstractService;
+
+class Mailer extends AbstractService {
   public function sendEmail(
     string $fromEmail,
     string $toEmail,

@@ -1,10 +1,12 @@
 <?php declare(strict_types=1);
-namespace RMSY;
+namespace RmsyMe;
 
+use Framework\AbstractApp;
 use Framework\Routing\ControllerAction;
 use Framework\Routing\Redirect;
+use Framework\Routing\Router;
 
-class App implements \Framework\AppInterface {
+class App extends AbstractApp {
   public function route(
     string $path,
     string $method
@@ -44,6 +46,7 @@ class App implements \Framework\AppInterface {
     $contactFormController->addDecorator($navDecorator);
 
     $projectsController = new Controllers\Projects();
+    $projectsController->registerService($projectsService);
     $projectsController->addDecorator($extendedTitleDecorator);
     $projectsController->addDecorator($navDecorator);
     $projectsController->addDecorator($mediaRootDecorator);
@@ -88,7 +91,7 @@ class App implements \Framework\AppInterface {
       ],
     ];
 
-    return \Framework\Routing\Router::route(
+    return Router::route(
       $path,
       $method,
       $routes,

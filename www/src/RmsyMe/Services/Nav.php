@@ -1,10 +1,13 @@
 <?php declare(strict_types=1);
-namespace RMSY\Services;
+namespace RmsyMe\Services;
 
-use RMSY\Data\NavItem;
+use Framework\Services\AbstractService;
 
-class Nav extends \Framework\Services\AbstractService {
-  public function getNav(): \RMSY\Data\Nav {
+use RmsyMe\Data\Nav as NavData;
+use RmsyMe\Data\NavItem;
+
+class Nav extends AbstractService {
+  public function getNav(): NavData {
     // projects dropdown
     $projectsItem = new NavItem(text: 'Projects', path: '/projects');
     $projectsItem->addDropdownItem(new NavItem(
@@ -60,7 +63,7 @@ class Nav extends \Framework\Services\AbstractService {
     );
 
     // nav
-    return new \RMSY\Data\Nav(
+    return new NavData(
       homePath: '/',
       title: 'software engineer',
       items: $navItems,

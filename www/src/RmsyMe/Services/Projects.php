@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
-namespace RMSY\Services;
+namespace RmsyMe\Services;
 
-class Projects extends \Framework\Services\AbstractService {
+use Framework\Services\AbstractService;
+
+class Projects extends AbstractService {
   public function getData(): array {
     return [
       'beetle' => [

@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace RMSY\Data;
+namespace RmsyMe\Data;
 
 class NavItem {
   public readonly string $text;

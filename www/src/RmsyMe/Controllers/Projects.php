@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace RMSY\Controllers;
+namespace RmsyMe\Controllers;
 
+use Framework\Controllers\AbstractController;
 use Framework\Views\Page;
 
-class Projects extends \Framework\Controllers\AbstractController {
+class Projects extends AbstractController {
   public function index(): Page {
     return $this->getPage(
       __FUNCTION__,

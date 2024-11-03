@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
-namespace RMSY\Decorators;
+namespace RmsyMe\Decorators;
 
-class MediaRoot extends \Framework\Decorators\AbstractDecorator {
+use Framework\Decorators\AbstractDecorator;
+
+class MediaRoot extends AbstractDecorator {
   public function getNewTemplateVars(array $templateVars): array {
     $newTemplateVars['mediaRoot'] = $this->services['Media']->getMediaRoot();
     return $newTemplateVars;

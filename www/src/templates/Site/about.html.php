@@ -1,4 +1,4 @@
-<?php use RMSY\Components\ExternalLink; ?>
+<?php use RmsyMe\Components\ExternalLink; ?>
 
 <figure class="figure w-50 float-end m-3 w-100-sm-down">
   <img

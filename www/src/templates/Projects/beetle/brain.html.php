@@ -1,4 +1,4 @@
-<?php use RMSY\Components\ExternalLink; ?>
+<?php use RmsyMe\Components\ExternalLink; ?>
 
 <p>
   As beautiful as Pooptimus is on the outside, we all know it's what's on the

@@ -1,4 +1,4 @@
-<?php use RMSY\Components\ExternalLink; ?>
+<?php use RmsyMe\Components\ExternalLink; ?>
 
 <p class="lead">
   Welcome to my slice of the internet pie!

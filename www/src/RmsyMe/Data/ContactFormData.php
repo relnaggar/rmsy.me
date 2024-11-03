@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
-namespace RMSY\Data;
+namespace RmsyMe\Data;
+
+use Framework\Data\AbstractFormData;
 
 class ContactFormData extends AbstractFormData {
   public string $name;

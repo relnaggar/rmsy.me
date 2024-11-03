@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
-namespace RMSY\Components;
+namespace RmsyMe\Components;
 
-class FormInput implements \Framework\Components\ComponentInterface {
+use Framework\Components\ComponentInterface;
+
+class FormInput implements ComponentInterface {
   private readonly string $name;
   private readonly string $label;
   private readonly string $type;

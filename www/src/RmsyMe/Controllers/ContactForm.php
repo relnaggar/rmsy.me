@@ -1,10 +1,12 @@
 <?php declare(strict_types=1);
-namespace RMSY\Controllers;
+namespace RmsyMe\Controllers;
 
+use Framework\Controllers\AbstractController;
 use Framework\Views\Page;
-use RMSY\Data\ContactFormData;
 
-class ContactForm extends \Framework\Controllers\AbstractController {
+use RmsyMe\Data\ContactFormData;
+
+class ContactForm extends AbstractController {
   private function getContactTemplateVars(): array {
     return [
       'title' => 'Contact',

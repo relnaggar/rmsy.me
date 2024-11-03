@@ -32,7 +32,7 @@
   >
     <div class="container-fluid d-flex flex-column p-0">
       <?php require 'layout/header.html.php'; ?>
-      <?php isset($nav) && require 'layout/nav.html.php'; ?>
+      <?php !empty($nav) && require 'layout/nav.html.php'; ?>
       <?php // require 'layout/sidebarCollapsable.html.php'; ?>
       <div class="d-flex flex-row">
         <?php require 'layout/sidebarFixed.html.php'; ?>
@@ -40,7 +40,7 @@
         <?php require 'layout/backToTop.html.php'; ?>
         <div class="col-2 display-none-lg-down" data-nosnippet>
           <?php
-            $onThisPage && require 'layout/onThisPageSide.html.php';
+            !empty($onThisPage) && require 'layout/onThisPageSide.html.php';
           ?>
         </div>
       </div>
