@@ -14,9 +14,10 @@ class Projects extends \Framework\Controllers\AbstractController {
     );
   }
 
-  public function show(string $projectSlug, array $project): Page {
-    $className = (new \ReflectionClass($this))->getShortName();
+  public function show(string $projectSlug): Page {
+    $project = $this->services['Projects']->getData()[$projectSlug];
 
+    $className = (new \ReflectionClass($this))->getShortName();
     if (isset($project['sections'])) {
       foreach (($project['sections']) as &$section) {
         $section['templateDirectory'] = "$className/$projectSlug";
