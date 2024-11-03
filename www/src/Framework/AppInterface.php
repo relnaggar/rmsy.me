@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
-namespace Framework\Routing;
+namespace Framework;
 
-interface RouterInterface {
+use Framework\Routing\ControllerAction;
+
+interface AppInterface {
   
   /**
    * Routes to a \Framework\ControllerAction object, which contains the

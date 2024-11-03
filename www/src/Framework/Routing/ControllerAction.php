@@ -14,6 +14,7 @@ class ControllerAction {
    * 
    * @param AbstractController $controller The controller to be called.
    * @param string $action The action to be called on the controller.
+   * @param array $params The parameters to be passed to the action.
    */
   public function __construct(
     AbstractController $controller,
