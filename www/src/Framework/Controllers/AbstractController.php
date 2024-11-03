@@ -18,6 +18,37 @@ abstract class AbstractController extends AbstractServiceUser {
   }
 
   /**
+   * Apply the decorators to the template variables.
+   * 
+   * @param array $templateVars The template variables to apply the decorators
+   *   to.
+   * @return array The template variables with the decorators applied.
+   */
+  public function applyDecorators(array $templateVars): array {
+    foreach ($this->decorators as $decorator) {
+      $newTemplateVars = $decorator->getNewTemplateVars($templateVars);
+      foreach ($newTemplateVars as $key => $value) {
+        if (array_key_exists($key, $templateVars)) {
+          throw new \Error(
+            'Decorators cannot modify existing template variables.'
+          );
+        }
+        $templateVars[$key] = $value;
+      }
+    }
+    return $templateVars;
+  }
+
+  /**
+   * Get the name of the controller class.
+   * 
+   * @return string The name of the controller class.
+   */
+  public function getControllerName(): string {
+    return (new \ReflectionClass($this))->getShortName();
+  }
+
+  /**
    * Create a new Page instance with the HTML content loaded from the
    * layout template. The $bodyContent template variable is injected by
    * specifying the body template in this controller's template directory.
@@ -46,25 +77,24 @@ abstract class AbstractController extends AbstractServiceUser {
   public function getPage(
     string $bodyTemplatePath='',
     array $templateVars=[],
-    string $layoutTemplatePath=''
+    string $layoutTemplatePath='',
+    array $sections=[]
   ): Page {
-    $controllerName = (new \ReflectionClass($this))->getShortName();
+    $templateVars = $this->applyDecorators($templateVars);
 
-    // apply decorators
-    foreach ($this->decorators as $decorator) {
-      $newTemplateVars = $decorator->getNewTemplateVars($templateVars);
-      foreach ($newTemplateVars as $key => $value) {
-        if (array_key_exists($key, $templateVars)) {
-          throw new \Error(
-            'Decorators cannot modify existing template variables.'
-          );
-        }
-        $templateVars[$key] = $value;
-      }
+    foreach ($sections as $sectionId => &$section) {
+      $section['html'] =
+        \Framework\Views\TemplateEngine::loadTemplate(
+          "{$section['templateDirectory']}/$sectionId",
+          $templateVars
+        );
+    }
+    if (!empty($sections)) {
+      $templateVars['sections'] = $sections;
     }
 
     return Page::withLayout(
-      $controllerName . '/' . $bodyTemplatePath,
+      "{$this->getControllerName()}/$bodyTemplatePath",
       $templateVars,
       $layoutTemplatePath
     );
