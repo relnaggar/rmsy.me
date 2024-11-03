@@ -3,6 +3,7 @@ namespace Framework\Controllers;
 
 use Framework\Services\AbstractServiceUser;
 use Framework\Decorators\AbstractDecorator;
+use Framework\Config;
 use Framework\Views\Page;
 use Framework\Views\TemplateEngine;
 
@@ -18,14 +19,7 @@ abstract class AbstractController extends AbstractServiceUser {
     $this->decorators[] = $decorator;
   }
 
-  /**
-   * Apply the decorators to the template variables.
-   * 
-   * @param array $templateVars The template variables to apply the decorators
-   *   to.
-   * @return array The template variables with the decorators applied.
-   */
-  public function applyDecorators(array $templateVars): array {
+  private function applyDecorators(array $templateVars): array {
     foreach ($this->decorators as $decorator) {
       $newTemplateVars = $decorator->getNewTemplateVars($templateVars);
       foreach ($newTemplateVars as $key => $value) {
@@ -47,6 +41,25 @@ abstract class AbstractController extends AbstractServiceUser {
    */
   public function getControllerName(): string {
     return (new \ReflectionClass($this))->getShortName();
+  }
+
+  /**
+   * Get the full path to the template file for the given controller.
+   * 
+   * @param string $relativeTemplatePath The path to the template file,
+   *   relative to the controller's template directory. Given without the file
+   *   extension.
+   * @return string The full path to the template file.
+   */
+  public function getFullTemplateFilePath($relativeTemplatePath): string {
+    $config = Config::getInstance();
+    $sourceDirectory = $config->get('sourceDirectory');
+    $templateRootDirectory = $config->get('templateRootDirectory');
+    $templateFileExtension = $config->get('templateFileExtension');
+    $controllerName = $this->getControllerName();
+    $templateFilePath = "$sourceDirectory/$templateRootDirectory/" .
+      "$controllerName/$relativeTemplatePath{$templateFileExtension}";
+    return $templateFilePath;
   }
 
   /**

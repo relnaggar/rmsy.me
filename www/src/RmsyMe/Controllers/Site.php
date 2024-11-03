@@ -3,6 +3,7 @@ namespace RmsyMe\Controllers;
 
 use Framework\Controllers\AbstractController;
 use Framework\Views\Page;
+use Framework\Views\TemplateEngine;
 
 class Site extends AbstractController {
   public function index(): Page {
@@ -18,14 +19,12 @@ class Site extends AbstractController {
       __FUNCTION__,
       [
         'title' => 'Home',
-        'metaDescription' => 'Hello there, I\'m Ramsey -- not just your ' .
-          'average software engineer, but a virtuoso conducting symphonies ' .
-          'of syntax and semicolons.',
+        'metaDescription' => "Hi, I'm Ramsey 👋 I'm a software engineer",
         'numberOfYearsTutoringAsWord' => $numberOfYearsTutoringAsWord,
         'snippets' => [
           [
             'title' => 'About',
-            'html' => \Framework\Views\TemplateEngine::getSnippet('Site/about'),
+            'html' => TemplateEngine::getSnippet('Site/about'),
             'href' => '/about',
           ],
         ],
@@ -34,18 +33,16 @@ class Site extends AbstractController {
   }
 
   public function about(): Page {
-    global $frameworkConfig;
-
-    $controllerName = (new \ReflectionClass($this))->getShortName();
-    $templateFilePath = $frameworkConfig['sourceDirectory'] . '/' . 
-      $frameworkConfig['templateRootDirectory'] . '/' . $controllerName . '/' .
-      __FUNCTION__ . '.html.php';
-    $lastModifiedTimestamp = filemtime($templateFilePath);
+    $relativeTemplatePath = __FUNCTION__;
+    $fullTemplateFilePath = $this->getFullTemplateFilePath(
+      $relativeTemplatePath
+    );
+    $lastModifiedTimestamp = filemtime($fullTemplateFilePath);
     $lastModifiedDate = (new \DateTime())->setTimestamp($lastModifiedTimestamp);
     $lastModifiedDateFormatted = $lastModifiedDate->format('F Y');
 
     return $this->getPage(
-      __FUNCTION__,
+      $relativeTemplatePath,
       [
         'title' => 'About',
         'metaDescription' => 'My specialty? Well, I dive into the depths of ' .

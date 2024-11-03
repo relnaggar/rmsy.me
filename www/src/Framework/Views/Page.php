@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
 namespace Framework\Views;
 
+use Framework\Config;
+
 class Page {
   private string $htmlContent;
   private array $templateVars = [];
@@ -77,12 +79,10 @@ class Page {
     array $templateVars=[],
     string $layoutTemplatePath='',
   ): Page {
-    global $frameworkConfig;
-
     $obj = new Page();
 
     if (empty($layoutTemplatePath)) {
-      $layoutTemplatePath = $frameworkConfig['layoutTemplatePath'];
+      $layoutTemplatePath = Config::getInstance()->get('layoutTemplatePath');
     }
 
     try {

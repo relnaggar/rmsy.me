@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
 namespace Framework\Views;
 
+use Framework\Config;
+
 class TemplateEngine {
   /**
     * Load a template file, inject variables into it, and return the result.
@@ -20,18 +22,18 @@ class TemplateEngine {
     array $templateVars=[],
     string $templateDirectory=''
   ): string {
-    global $frameworkConfig;
+    $config = Config::getInstance();
 
     // use the configured template root directory if none is given
     if (empty($templateDirectory)) {
-      $templateDirectory = $frameworkConfig['templateRootDirectory'];
+      $templateDirectory = $config->get('templateRootDirectory');
     }
     
     // extract the variables to be injected
     extract($templateVars);
 
-    $filePath = $frameworkConfig['sourceDirectory'] . '/' . $templateDirectory .
-      '/' . $templatePath . $frameworkConfig['templateFileExtension'];
+    $filePath = $config->get('sourceDirectory') . '/' . $templateDirectory .
+      '/' . $templatePath . $config->get('templateFileExtension');
 
     if (file_exists($filePath)) {
       // start output buffering to capture the template contents
@@ -40,9 +42,9 @@ class TemplateEngine {
       require $filePath;
       // return the contents of the output buffer
       return ob_get_clean();
-    } else {
-      return '';
     }
+
+    return '';
   }
 
   /*
@@ -64,8 +66,13 @@ class TemplateEngine {
   ): string {
     $html = self::loadTemplate($templatePath, $templateVars);
     $text = strip_tags($html);
+
+    // remove extra whitespace
     $squashedText = trim(preg_replace('/\s+/', ' ', $text));
+
+    // get the first $numberOfCharacters characters
     $snippet = substr($squashedText, 0, $numberOfCharacters);
+
     return $snippet;
   }
 }

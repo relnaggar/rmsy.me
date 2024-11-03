@@ -1,10 +1,14 @@
 <?php declare(strict_types=1);
 
+require_once 'Config.php';
+
+use Framework\Config;
+
 spl_autoload_register(function (string $className): void {
-    global $frameworkConfig;
+    $sourceDirectory = Config::getInstance()->get('sourceDirectory');
     $fileName = str_replace('\\', '/', $className) . '.php';
-    $file = $frameworkConfig['sourceDirectory'] . '/' . $fileName; 
+    $file = "$sourceDirectory/$fileName"; 
     if (file_exists($file)) {
-        require $file;
+        require_once $file;
     }
 });
