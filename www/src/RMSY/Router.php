@@ -31,8 +31,6 @@ class Router implements \Framework\Routing\RouterInterface {
     $mediaRootDecorator = new Decorators\MediaRoot();
     $mediaRootDecorator->registerService($mediaService);
 
-    $renderSectionsDecorator = new Decorators\RenderSections();
-
     // controllers
 
     $siteController = new Controllers\Site();
@@ -48,6 +46,7 @@ class Router implements \Framework\Routing\RouterInterface {
     $contactFormController->addDecorator($navDecorator);
 
     $projectsController = new Controllers\Projects();
+    $projectsController->registerService($mediaService);
     $projectsController->addDecorator($extendedTitleDecorator);
     $projectsController->addDecorator($navDecorator);
     $projectsController->addDecorator($mediaRootDecorator);

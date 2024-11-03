@@ -39,4 +39,28 @@ class TemplateEngine {
     // return the contents of the output buffer
     return ob_get_clean();
   }
+
+  /*
+    * Get a snippet of text from a HTML template.
+    *
+    * @param string $templatePath The path to the template file, relative to
+    *   the configured template root directory. Given without the file
+    *   extension.
+    * @param array $templateVars The variables to inject. Must be in the format
+    *   ['variableName' => 'variableValue', ...].
+    * @param int $numberOfCharacters The number of characters to include in the
+    *   snippet.
+    * @return string The snippet of text.
+    */
+  public static function getSnippet(
+    string $templatePath,
+    array $templateVars=[],
+    int $numberOfCharacters=200,
+  ): string {
+    $html = self::loadTemplate($templatePath, $templateVars);
+    $text = strip_tags($html);
+    $squashedText = trim(preg_replace('/\s+/', ' ', $text));
+    $snippet = substr($squashedText, 0, $numberOfCharacters);
+    return $snippet;
+  }
 }

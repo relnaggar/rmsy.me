@@ -20,7 +20,14 @@ class Site extends \Framework\Controllers\AbstractController {
         'metaDescription' => 'Hello there, I\'m Ramsey -- not just your ' .
           'average software engineer, but a virtuoso conducting symphonies ' .
           'of syntax and semicolons.',
-        'numberOfYearsTutoringAsWord' => $numberOfYearsTutoringAsWord
+        'numberOfYearsTutoringAsWord' => $numberOfYearsTutoringAsWord,
+        'snippets' => [
+          [
+            'title' => 'About',
+            'html' => \Framework\Views\TemplateEngine::getSnippet('Site/about'),
+            'href' => '/about',
+          ],
+        ],
       ]
     );
   }
