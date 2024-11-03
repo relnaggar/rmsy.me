@@ -1,55 +1,54 @@
 <?php declare(strict_types=1);
 namespace RmsyMe;
 
+use DI\ContainerBuilder;
+
 use Framework\AbstractApp;
 use Framework\Routing\ControllerAction;
 use Framework\Routing\Redirect;
 use Framework\Routing\Router;
 
 class App extends AbstractApp {
+  public function __construct() {
+    $containerBuilder = new ContainerBuilder();
+    // configure autowiring of decorators to controllers
+    
+    $containerBuilder->addDefinitions([
+      Controllers\Site::class => \DI\autowire()
+        ->constructorParameter('decorators', [
+          \DI\get(Decorators\ExtendedTitle::class),
+          \DI\get(Decorators\Nav::class),
+          \DI\get(Decorators\MediaRoot::class),
+        ]),
+      Controllers\ContactForm::class => \DI\autowire()
+        ->constructorParameter('decorators', [
+          \DI\get(Decorators\ExtendedTitle::class),
+          \DI\get(Decorators\Nav::class),
+        ]),
+      Controllers\Projects::class => \DI\autowire()
+        ->constructorParameter('decorators', [
+          \DI\get(Decorators\ExtendedTitle::class),
+          \DI\get(Decorators\Nav::class),
+          \DI\get(Decorators\MediaRoot::class),
+        ]),
+    ]);
+
+    $this->container = $containerBuilder->build();
+  }
+
   public function route(
     string $path,
     string $method
   ): ControllerAction {
     // services
-    $contactMethodsService = new Services\ContactMethods();
-    $projectsService = new Services\Projects();
-    $navService = new Services\Nav();
-    $navService->registerService($projectsService);
-    $navService->registerService($contactMethodsService);
-    $mediaService = new Services\Media();
-    $secretsService = new Services\Secrets();
-    $mailerService = new Services\Mailer();
-    $mailerService->registerService($secretsService);
-
-    // decorators
-
-    $extendedTitleDecorator = new Decorators\ExtendedTitle();
-
-    $navDecorator = new Decorators\Nav();
-    $navDecorator->registerService($navService);
-
-    $mediaRootDecorator = new Decorators\MediaRoot();
-    $mediaRootDecorator->registerService($mediaService);
+    $mediaService = $this->container->get(Services\Media::class);
 
     // controllers
-
-    $siteController = new Controllers\Site();
-    $siteController->addDecorator($extendedTitleDecorator);
-    $siteController->addDecorator($navDecorator);
-    $siteController->addDecorator($mediaRootDecorator);
-
-    $contactFormController = new Controllers\ContactForm();
-    $contactFormController->registerService($contactMethodsService);
-    $contactFormController->registerService($mailerService);
-    $contactFormController->addDecorator($extendedTitleDecorator);
-    $contactFormController->addDecorator($navDecorator);
-
-    $projectsController = new Controllers\Projects();
-    $projectsController->registerService($projectsService);
-    $projectsController->addDecorator($extendedTitleDecorator);
-    $projectsController->addDecorator($navDecorator);
-    $projectsController->addDecorator($mediaRootDecorator);
+    $siteController = $this->container->get(Controllers\Site::class);
+    $contactFormController = $this->container->get(
+      Controllers\ContactForm::class
+    );
+    $projectsController = $this->container->get(Controllers\Projects::class);
 
     // routes
     $routes = [

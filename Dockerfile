@@ -153,6 +153,9 @@ RUN apt-get update -y \
 # install composer
 COPY --from=composer/composer:2.2-bin /composer /usr/bin/composer
 
+# add composer dependencies for framework
+RUN composer require php-di/php-di
+
 # add php-intl
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends php-intl \
@@ -161,7 +164,7 @@ RUN apt-get update -y \
   && apt clean \
   && rm -rf /var/lib/apt/lists/*
 
-# add PHPMailer
+# add composer dependencies for rmsy.me
 RUN composer require phpmailer/phpmailer
 
 # entrypoint

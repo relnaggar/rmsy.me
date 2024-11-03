@@ -1,22 +1,23 @@
 <?php declare(strict_types=1);
 namespace Framework\Controllers;
 
-use Framework\Services\AbstractServiceUser;
-use Framework\Decorators\AbstractDecorator;
+use Framework\Decorators\DecoratorInterface;
 use Framework\Config;
 use Framework\Views\Page;
 use Framework\Views\TemplateEngine;
 
-abstract class AbstractController extends AbstractServiceUser {
-  private array $decorators=[];
+abstract class AbstractController {
+  private array $decorators;
 
-  /**
-   * Add a new decorator to the controller.
-   * 
-   * @param AbstractDecorator $decorator The decorator to register
-   */
-  public function addDecorator(AbstractDecorator $decorator): void {
-    $this->decorators[] = $decorator;
+  public function __construct(array $decorators=[]) {
+    $this->decorators = $decorators;
+    foreach ($this->decorators as $decorator) {
+      if (!$decorator instanceof DecoratorInterface) {
+        throw new \Error(
+          'All decorators must implement the DecoratorInterface.'
+        );
+      }
+    }
   }
 
   private function applyDecorators(array $templateVars): array {

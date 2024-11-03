@@ -1,12 +1,22 @@
 <?php declare(strict_types=1);
 namespace RmsyMe\Services;
 
-use Framework\Services\AbstractService;
-
 use RmsyMe\Data\Nav as NavData;
 use RmsyMe\Data\NavItem;
+use RmsyMe\Services\Projects;
 
-class Nav extends AbstractService {
+class Nav {
+  private Projects $projectsService;
+  private ContactMethods $contactMethodsService;
+
+  public function __construct(
+    Projects $projectsService,
+    ContactMethods $contactMethodsService
+  ) {
+    $this->projectsService = $projectsService;
+    $this->contactMethodsService = $contactMethodsService;
+  }
+
   public function getNav(): NavData {
     // projects dropdown
     $projectsItem = new NavItem(text: 'Projects', path: '/projects');
@@ -15,7 +25,7 @@ class Nav extends AbstractService {
       path: '/',
     ));
     // add each project to the projects dropdown
-    $projectsData = $this->services['Projects']->getData();
+    $projectsData = $this->projectsService->getData();
     foreach ($projectsData as $projectSlug => $projectData) {
       $projectsItem->addDropdownItem(new NavItem(
         text: $projectData['title'],
@@ -44,7 +54,7 @@ class Nav extends AbstractService {
     // $navItems[] = new NavItem(text: 'Tutoring', path: '/tutoring');
     $navItems[] = $resumesItem;
     // add each contact method to the nav
-    foreach ($this->services['ContactMethods']->getData() as $contactMethod) {
+    foreach ($this->contactMethodsService->getData() as $contactMethod) {
       if ($contactMethod['inNav']) {
         $navItems[] = new NavItem(
           text: $contactMethod['title'],

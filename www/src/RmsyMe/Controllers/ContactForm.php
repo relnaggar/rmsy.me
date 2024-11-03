@@ -4,15 +4,30 @@ namespace RmsyMe\Controllers;
 use Framework\Controllers\AbstractController;
 use Framework\Views\Page;
 
+use RmsyMe\Services\ContactMethods;
+use RmsyMe\Services\Mailer;
 use RmsyMe\Data\ContactFormData;
 
 class ContactForm extends AbstractController {
+  private ContactMethods $contactMethodsService;
+  private Mailer $mailerService;
+
+  public function __construct(
+    array $decorators,
+    ContactMethods $contactMethodsService,
+    Mailer $mailerService
+  ) {
+    parent::__construct($decorators);
+    $this->contactMethodsService = $contactMethodsService;
+    $this->mailerService = $mailerService;
+  }
+  
   private function getContactTemplateVars(): array {
     return [
       'title' => 'Contact',
       'metaDescription' => 'I\'m always game to talk tech, tutoring, or ' . 
         'even dung beetles!',
-      'contactMethods' => $this->services['ContactMethods']->getData(),
+      'contactMethods' => $this->contactMethodsService->getData(),
       'displayAlert' => false,
       'displayForm' => true,
     ];
@@ -51,7 +66,7 @@ class ContactForm extends AbstractController {
     }
 
     // try to send email
-    $emailSent = $this->services['Mailer']->sendEmail(
+    $emailSent = $this->mailerService->sendEmail(
       fromEmail: 'contactform@rmsy.me',
       toEmail: 'ramsey.el-naggar@outlook.com',
       subject: "From $contactFormData->name <$contactFormData->email>",

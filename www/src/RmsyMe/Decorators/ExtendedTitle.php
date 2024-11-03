@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 namespace RmsyMe\Decorators;
 
-use Framework\Decorators\AbstractDecorator;
+use Framework\Decorators\DecoratorInterface;
 
-class ExtendedTitle extends AbstractDecorator {
+class ExtendedTitle implements DecoratorInterface {
   public function getNewTemplateVars(array $templateVars): array {
     $newTemplateVars['extendedTitle'] = $templateVars['title']
       . ' | Ramsey El-Naggar';

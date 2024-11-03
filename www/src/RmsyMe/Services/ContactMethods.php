@@ -1,9 +1,7 @@
 <?php declare(strict_types=1);
 namespace RmsyMe\Services;
 
-use Framework\Services\AbstractService;
-
-class ContactMethods extends AbstractService {
+class ContactMethods {
   public function getData(): array {
     return [
       [

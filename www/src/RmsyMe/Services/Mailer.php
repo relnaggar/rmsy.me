@@ -5,9 +5,15 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-use Framework\Services\AbstractService;
+use RmsyMe\Services\Secrets;
 
-class Mailer extends AbstractService {
+class Mailer {
+  private Secrets $secretsService;
+
+  public function __construct(Secrets $secretsService) {
+    $this->secretsService = $secretsService;
+  }
+
   public function sendEmail(
     string $fromEmail,
     string $toEmail,
@@ -27,13 +33,9 @@ class Mailer extends AbstractService {
       $phpMailer->SMTPDebug = SMTP::DEBUG_SERVER;
       $phpMailer->isSMTP();
       $phpMailer->SMTPAuth = true;
-      $phpMailer->Host = $this->services['Secrets']->getSecret('SMTP_HOST');
-      $phpMailer->Username = $this->services['Secrets']->getSecret(
-        'SMTP_USERNAME'
-      );
-      $phpMailer->Password = $this->services['Secrets']->getSecret(
-        'SMTP_PASSWORD'
-      );
+      $phpMailer->Host = $this->secretsService->getSecret('SMTP_HOST');
+      $phpMailer->Username = $this->secretsService->getSecret('SMTP_USERNAME');
+      $phpMailer->Password = $this->secretsService->getSecret('SMTP_PASSWORD');
       $phpMailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
       $phpMailer->Port = 465;
 

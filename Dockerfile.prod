@@ -38,8 +38,12 @@ RUN apt-get update -y \
 # install composer
 COPY --from=composer/composer:2.2-bin /composer /usr/bin/composer
 
-# add PHPMailer
-RUN composer require phpmailer/phpmailer
+# add composer dependencies
+RUN \
+  # framework
+  composer require php-di/php-di \
+  # rmsy.me
+  && composer require phpmailer/phpmailer
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="PRODUCTION"

@@ -1,10 +1,18 @@
 <?php declare(strict_types=1);
 namespace Framework;
 
+use DI\Container;
+
 use Framework\Routing\ControllerAction;
 use Framework\Views\Page;
 
 abstract class AbstractApp {
+  protected Container $container;
+
+  public function __construct() {
+    $this->container = new Container();
+  }
+
   public final function run(): void {
     // get the URL path, not including the query string
     $serverRequestPath = explode('?', $_SERVER['REQUEST_URI'])[0];
