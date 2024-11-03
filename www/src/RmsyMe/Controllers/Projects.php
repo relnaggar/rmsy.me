@@ -11,6 +11,7 @@ class Projects extends AbstractController {
       [
         'title' => 'Projects Summary',
         'metaDescription' => '',
+        'projects' => $this->services['Projects']->getData(),
       ]
     );
   }

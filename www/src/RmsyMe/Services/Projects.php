@@ -8,7 +8,9 @@ class Projects extends AbstractService {
     return [
       'beetle' => [
         'title' => 'Pooptimus Prime: The World\'s First Dung Beetle Biorobot',
-        'description' => '',
+        'description' => 'Robot vs beetle: who will be the ultimate fighting ' .
+          'champion?',
+        'image' => 'vs-robot.jpg',
         'sections' => [
           'summary' => [
             'title' => 'Executive Summary',
@@ -32,7 +34,8 @@ class Projects extends AbstractService {
       ],
       'sdp' => [
         'title' => 'Robo-Messi: When Silicon Met Soccer',
-        'description' => '',
+        'description' => 'Robo-Messi wants a hug. Will you give him one?',
+        'image' => 'hug.jpg',
         'sections' => [
           'summary' => [
             'title' => 'Executive Summary',
