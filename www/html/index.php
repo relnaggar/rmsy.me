@@ -1,10 +1,7 @@
 <?php declare(strict_types=1);
 
-// composer
-require '/vendor/autoload.php';
+require '/vendor/autoload.php'; // composer
+require('../src/Framework/framework.php'); // framework
 
-// framework
-$frameworkConfig = [
-  'projectNamespace' => 'RMSY',
-];
-require('../src/Framework/framework.php');
+$app = new RmsyMe\App();
+$app->run();

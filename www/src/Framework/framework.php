@@ -1,16 +1,5 @@
 <?php declare(strict_types=1);
 
-use Framework\EntryPoint;
-
-// make sure the project namespace is defined
-if (!isset($frameworkConfig['projectNamespace'])) {
-  throw new Error(
-    'Before importing framework.php you must define a global
-    array \$frameworkConfig that contains a key \'projectNamespace\' with
-    the name of your project folder'
-  );
-}
-
 // set the default source directory
 if (!isset($frameworkConfig['sourceDirectory'])) {
   $frameworkConfig['sourceDirectory'] = '../src';
@@ -34,7 +23,3 @@ if (!isset($frameworkConfig['layoutTemplatePath'])) {
 
 // autoloader
 require($frameworkConfig['sourceDirectory'] . '/Framework' . '/autoload.php');
-
-// run the application
-$entryPoint = new EntryPoint($frameworkConfig['projectNamespace']);
-$entryPoint->run();

@@ -2,7 +2,6 @@
 namespace Framework\Views;
 
 class TemplateEngine {
-
   /**
     * Load a template file, inject variables into it, and return the result.
     *
@@ -31,13 +30,19 @@ class TemplateEngine {
     // extract the variables to be injected
     extract($templateVars);
 
-    // start output buffering to capture the template contents
-    ob_start();
-    // load the template file
-    @require $frameworkConfig['sourceDirectory'] . '/' . $templateDirectory .
+    $filePath = $frameworkConfig['sourceDirectory'] . '/' . $templateDirectory .
       '/' . $templatePath . $frameworkConfig['templateFileExtension'];
-    // return the contents of the output buffer
-    return ob_get_clean();
+
+    if (file_exists($filePath)) {
+      // start output buffering to capture the template contents
+      ob_start();
+      // load the template file
+      require $filePath;
+      // return the contents of the output buffer
+      return ob_get_clean();
+    } else {
+      return '';
+    }
   }
 
   /*

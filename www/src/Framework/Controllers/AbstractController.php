@@ -4,6 +4,7 @@ namespace Framework\Controllers;
 use Framework\Services\AbstractServiceUser;
 use Framework\Decorators\AbstractDecorator;
 use Framework\Views\Page;
+use Framework\Views\TemplateEngine;
 
 abstract class AbstractController extends AbstractServiceUser {
   private array $decorators=[];
@@ -84,7 +85,7 @@ abstract class AbstractController extends AbstractServiceUser {
 
     foreach ($sections as $sectionId => &$section) {
       $section['html'] =
-        \Framework\Views\TemplateEngine::loadTemplate(
+        TemplateEngine::loadTemplate(
           "{$section['templateDirectory']}/$sectionId",
           $templateVars
         );
