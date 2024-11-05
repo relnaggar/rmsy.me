@@ -23,9 +23,9 @@ class Nav {
     $this->items = $items;
   }
 
-  public function setActiveItem(string $activeItemText): void {
+  public function setActiveItem(string $activePath): void {
     foreach ($this->items as $item) {
-      $item->setActiveItem($activeItemText);
+      $item->setActiveItem($activePath);
     }
   }
 }

@@ -38,12 +38,12 @@ class NavItem {
     return $this->active;
   }
 
-  public function setActiveItem(string $activeItemText): void {
-    if ($this->text === $activeItemText) {
+  public function setActiveItem(string $activePath): void {
+    if ($this->path === $activePath) {
       $this->active = true;
     }
     foreach ($this->dropdownItems as $item) {
-      $item->setActiveItem($activeItemText);
+      $item->setActiveItem($activePath);
       if ($item->isActive()) {
         $this->active = true;
       }
