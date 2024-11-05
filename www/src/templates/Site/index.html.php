@@ -7,7 +7,8 @@
 <p>
   Hi, I'm Ramsey 👋 I'm a software engineer, and without exaggerating
   in the slightest, this website is
-  <a href="/projects/rmsy-me/">my Mona Lisa</a>.
+  <!-- <a href="/projects/rmsy-me/">my Mona Lisa</a>. -->
+  my Mona Lisa.
   My digital masterpiece, constructed brick by binary brick with the sweat from
   my brow as its everlasting mortar.
   I carved this space with my raw and bleeding fingers to serve as a testament
@@ -44,7 +45,72 @@
   </ul>  
 </p>
 
-<p>
-  Feel free to explore and discover more <a href="/about">about me</a>,
-  <a href="/projects/">my projects</a>, and my passion for software engineering.
-</p>
+<?php foreach ($snippets as $snippet): ?>
+  <section>
+    <h2><?= $snippet['title'] ?></h2>
+    <p>
+      <?= $snippet['text'] ?>
+      <a href="<?= $snippet['href'] ?>" class="btn btn-primary">
+        <?= $snippet['callToAction']?>
+      </a>
+    </p>
+  </section>
+<?php endforeach; ?>
+
+<section>
+  <h2>Projects</h2>
+  <div id="carouselExampleCaptions" class="carousel slide">
+    <div class="carousel-indicators">
+      <?php for ($i = 0; $i < count($projects); $i++): ?>
+        <button
+          type="button"
+          data-bs-target="#carouselExampleCaptions"
+          data-bs-slide-to="<?= $i ?>"
+          <?php if ($i === 0): ?>
+            class="active"
+            aria-current="true"
+          <?php endif; ?>
+          aria-label="Slide <?= $i + 1 ?>"
+        ></button>
+      <?php endfor; ?>
+    </div>
+    <div class="carousel-inner">
+      <?php $index = 0; ?>
+      <?php foreach ($projects as $projectSlug => $project): ?>
+        <div class="carousel-item <?= ($index === 0) ? 'active' : '' ?>">
+          <a href="<?= "/projects/$projectSlug" ?>">
+            <img
+              src="<?= "$mediaRoot/img/{$project['thumbnail']->href}" ?>"
+              class="d-block w-100 rounded"
+              alt="<?= $project['title'] ?>"
+              height="500"
+            >
+            <div class="carousel-caption d-none d-md-block">
+              <h5><?= $project['title'] ?></h5>
+              <p><?= $project['description'] ?></p>
+            </div>
+          </a>
+        </div>
+        <?php $index = $index + 1; ?>
+      <?php endforeach; ?>
+    </div>
+    <button
+      class="carousel-control-prev"
+      type="button"
+      data-bs-target="#carouselExampleCaptions"
+      data-bs-slide="prev"
+    >
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button
+      class="carousel-control-next"
+      type="button"
+      data-bs-target="#carouselExampleCaptions"
+      data-bs-slide="next"
+    >
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</section>

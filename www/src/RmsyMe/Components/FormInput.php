@@ -47,8 +47,8 @@ class FormInput implements ComponentInterface {
             name="<?= $this->formName ?>[<?= $this->name ?>]"
             autocomplete="<?= $this->autocomplete ?>"
             <?= $this->validationAttributes ?>
-          ><?= $_POST[$this->formName][$this->name] ?? '' ?></textarea>        
-        <?php else: ?>
+          ><?= $_POST[$this->formName][$this->name] ?? '' ?></textarea>
+        <?php else: // input ?>
           <input
             type="<?= $this->type ?>"
             class="form-control"

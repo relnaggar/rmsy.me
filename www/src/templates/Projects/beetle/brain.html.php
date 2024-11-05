@@ -27,7 +27,8 @@
   <img
     src="<?= $mediaRoot ?>/img/beetle/cx-full.png"
     class="figure-img img-fluid"
-    alt="Central Complex model adapted for dung beetle navigation.">
+    alt="Central Complex model adapted for dung beetle navigation."
+  >
   <figcaption class="figure-caption text-center">
     Traffic lights of the bug brain: Green for going this way, orange for
     remember this way, and blue for 'oops, not that way'.

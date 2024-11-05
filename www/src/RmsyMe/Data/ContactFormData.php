@@ -14,20 +14,21 @@ class ContactFormData extends AbstractFormData {
       empty($this->name)
       // || strlen($this->name) > 254
     ) {
-      $errorCodes[] = 'name';
+      $errorCodes['name'] = 'Name is required';
     }
     if (
       empty($this->email)
       || !filter_var($this->email, FILTER_VALIDATE_EMAIL)
       || strlen($this->email) > 254
     ) {
-      $errorCodes[] = 'email';
+      $errorCodes['email'] = 'Email is required and must be a valid email ' . 
+        'address (up to 254 characters)';
     }
     if (
       empty($this->message)
       // || strlen($this->message) > 65534
     ) {
-      $errorCodes[] = 'message';
+      $errorCodes['message'] = 'Message is required';
     }
     return $errorCodes;
   }

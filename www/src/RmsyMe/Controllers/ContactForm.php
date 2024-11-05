@@ -61,7 +61,7 @@ class ContactForm extends AbstractController {
     // display error alert if form data is invalid
     if (!empty($errorCodes)) {
       // pass error code to template
-      $templateVars['errorCode'] = $errorCodes[0];
+      $templateVars['errorCode'] = array_keys($errorCodes)[0];
       return $this->getPage($templatePath, $templateVars);
     }
 

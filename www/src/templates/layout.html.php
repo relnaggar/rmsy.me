@@ -20,7 +20,17 @@
       as="font"
       type="font/woff2"
       crossorigin="anonymous"
-    >    
+    >
+    <?php if (isset($preloadImages)): ?>
+      <?php foreach ($preloadImages as $preloadImage): ?>
+        <link
+          rel="preload"
+          href="<?= "$mediaRoot/img/{$preloadImage->href}" ?>"
+          as="image"
+          type="<?= $preloadImage->getType() ?>"
+        >
+      <?php endforeach; ?>
+    <?php endif ?>
   </head>
   <!-- offest of 56 pixels for the unexpanded navbar height -->
   <body

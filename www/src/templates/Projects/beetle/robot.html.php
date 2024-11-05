@@ -25,6 +25,7 @@
           View of the robot from below, showing two wheels, gearchains, and a
           ball bearing.
         "
+        crossorigin="anonymous"
       >
       <figcaption class="figure-caption text-center">
         Looks like someone skipped leg day.

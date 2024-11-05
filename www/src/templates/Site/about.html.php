@@ -16,8 +16,10 @@
   My specialty? Well, I dive into the depths of full-stack web application
   development.
   My journey has taken me from sprucing up hefty existing codebases, to crafting
-  a reusable <a href="/projects/website/back">back-end framework</a> from
-  scratch -- and all the nitty-gritty coding challenges in between.
+  a reusable
+  <!-- <a href="/projects/website/back">back-end framework</a> -->
+  back-end framework
+  from scratch -- and all the nitty-gritty coding challenges in between.
 </p>
 
 <p data-nosnippet>

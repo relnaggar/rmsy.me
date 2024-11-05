@@ -14,7 +14,7 @@ class Nav implements DecoratorInterface {
 
   public function getNewTemplateVars(array $templateVars): array {
     // set the active item in the nav data to whatever the title is
-    $nav = $this->navService->getNav();
+    $nav = $this->navService->getData();
     $nav->setActiveItem($templateVars['title'] ?? '');
 
     // add nav data to the template vars

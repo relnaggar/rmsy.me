@@ -5,13 +5,13 @@
         <a href="<?= $projectSlug ?>">
           <img
             class="card-img-top"
-            src="<?= "$mediaRoot/img/$projectSlug/{$project['image']}" ?>"
+            src="<?= "$mediaRoot/img/{$project['thumbnail']->href}" ?>"
             alt="<?= $project['title'] ?>"
           >
         </a>
         <div class="card-body">
           <h5 class="card-title">
-            <a href="<?= $projectSlug ?>">
+            <a href="<?= "/projects/$projectSlug" ?>">
               <?= $project['title'] ?>
             </a>
           </h5>

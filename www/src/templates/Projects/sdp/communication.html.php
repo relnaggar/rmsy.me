@@ -2,7 +2,8 @@
   <img
     src="<?= $mediaRoot ?>/img/sdp/final-wheels-gears.jpg"
     class="figure-img img-fluid"
-    alt="Close-up of the final wheelbase and gearchain design.">
+    alt="Close-up of the final wheelbase and gearchain design."
+  >
   <figcaption class="figure-caption text-center">
     Moving up a gear: the redesigned wheelbase and gearchain.
   </figcaption>

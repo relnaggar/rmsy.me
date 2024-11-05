@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
 namespace RmsyMe\Services;
 
+use RmsyMe\Data\Image;
+
 class Projects {
   public function getData(): array {
     return [
@@ -8,7 +10,8 @@ class Projects {
         'title' => 'Pooptimus Prime: The World\'s First Dung Beetle Biorobot',
         'description' => 'Robot vs beetle: who will be the ultimate fighting ' .
           'champion?',
-        'image' => 'vs-robot.jpg',
+        'thumbnail' => new Image('beetle/vs-robot.jpg'),
+        'preloadImage' => new Image('beetle/beetles-fighting.jpg'),
         'sections' => [
           'summary' => [
             'title' => 'Executive Summary',
@@ -33,7 +36,8 @@ class Projects {
       'sdp' => [
         'title' => 'Robo-Messi: When Silicon Met Soccer',
         'description' => 'Robo-Messi wants a hug. Will you give him one?',
-        'image' => 'hug.jpg',
+        'thumbnail' => new Image('sdp/hug.jpg'),
+        'preloadImage' => new Image('sdp/initial-front.jpg'),
         'sections' => [
           'summary' => [
             'title' => 'Executive Summary',

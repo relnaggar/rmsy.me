@@ -18,12 +18,17 @@ class Projects extends AbstractController {
   }
 
   public function index(): Page {
+    $projects = $this->projectsService->getData();
     return $this->getPage(
       __FUNCTION__,
       [
         'title' => 'Projects Summary',
         'metaDescription' => '',
-        'projects' => $this->projectsService->getData(),
+        'projects' => $projects,
+        'preloadImages' => array_map(
+          fn($project) => $project['thumbnail'],
+          $projects
+        ),
       ]
     );
   }
@@ -31,10 +36,10 @@ class Projects extends AbstractController {
   public function show(string $projectSlug): Page {
     $project = $this->projectsService->getData()[$projectSlug];
 
-    $className = (new \ReflectionClass($this))->getShortName();
     if (isset($project['sections'])) {
       foreach (($project['sections']) as &$section) {
-        $section['templateDirectory'] = "$className/$projectSlug";
+        $section['templateDirectory'] = $this->getControllerName() .
+          '/' . $projectSlug;
       }
     }
 
@@ -43,8 +48,9 @@ class Projects extends AbstractController {
         'title' => $project['title'],
         'metaDescription' => $project['description'],
         'onThisPage' => true,
+        'preloadImages' => [$project['preloadImage']],
       ],
-      sections: $project['sections']
+      sections: $project['sections'],
     );
   }
 }

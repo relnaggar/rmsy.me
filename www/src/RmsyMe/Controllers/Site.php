@@ -2,10 +2,27 @@
 namespace RmsyMe\Controllers;
 
 use Framework\Controllers\AbstractController;
+use Framework\Routing\RouterInterface;
 use Framework\Views\Page;
 use Framework\Views\TemplateEngine;
 
+use RmsyMe\Services\Projects;
+use RmsyMe\Data\Image;
+
 class Site extends AbstractController {
+  private RouterInterface $router;
+  private Projects $projectsService;  
+
+  public function __construct(
+    array $decorators,
+    RouterInterface $router,
+    Projects $projectsService,
+  ) {
+    parent::__construct($decorators);
+    $this->router = $router;
+    $this->projectsService = $projectsService;
+  }
+
   public function index(): Page {
     $currentDate = new \DateTime();
     $tutoringStartDate = new \DateTime('2019-01-01');
@@ -15,19 +32,29 @@ class Site extends AbstractController {
       $formatter->format($numberOfYearsTutoring)
     );
 
+    $snippets = [
+      [
+        'title' => 'About',
+        'text' => TemplateEngine::getSnippet('Site/about', 50),
+        'href' => '/about',
+        'callToAction' => 'Read more about me',
+      ],
+    ];
+
+    foreach ($snippets as $i => $snippet) {
+      if (!$this->router->hasPath($snippet['href'])) {
+        unset($snippets[$i]);
+      }
+    }
+
     return $this->getPage(
       __FUNCTION__,
       [
         'title' => 'Home',
         'metaDescription' => "Hi, I'm Ramsey 👋 I'm a software engineer",
         'numberOfYearsTutoringAsWord' => $numberOfYearsTutoringAsWord,
-        'snippets' => [
-          [
-            'title' => 'About',
-            'html' => TemplateEngine::getSnippet('Site/about'),
-            'href' => '/about',
-          ],
-        ],
+        'snippets' => $snippets,
+        'projects' => $this->projectsService->getData(),
       ]
     );
   }
@@ -47,6 +74,7 @@ class Site extends AbstractController {
         'title' => 'About',
         'metaDescription' => 'My specialty? Well, I dive into the depths of ' .
           'full-stack web application development.',
+        'preloadImages' => [new Image('profile.jpg')],
         'lastModifiedDateFormatted' => $lastModifiedDateFormatted
       ]
     );

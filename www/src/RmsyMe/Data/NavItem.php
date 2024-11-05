@@ -65,4 +65,9 @@ class NavItem {
     $item->addBasePath($this->path);
     $this->dropdownItems[] = $item;
   }
+
+  public function removeDropdownItem(NavItem $item): void {
+    $index = array_search($item, $this->dropdownItems, true);
+    unset($this->dropdownItems[$index]);
+  }
 }

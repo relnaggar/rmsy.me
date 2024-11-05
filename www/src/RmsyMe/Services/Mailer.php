@@ -24,7 +24,7 @@ class Mailer {
     string $replyToEmail="",
     string $replyToName=""
   ): bool {
-    return false; // currently disabled
+    // return false; // currently disabled
 
     $phpMailer = new PHPMailer(true);
     $phpMailer->Debugoutput = 'error_log';
