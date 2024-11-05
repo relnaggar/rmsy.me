@@ -4,7 +4,7 @@ namespace Framework\Routing;
 use Framework\Controllers\AbstractController;
 
 class ControllerAction {
-  public readonly AbstractController $controller;
+  public readonly string $controllerClass;
   public readonly string $action;
   public readonly array $params;
 
@@ -12,16 +12,22 @@ class ControllerAction {
    * Constructs a ControllerAction object, which is a simple pair of a
    * controller and an action.
    * 
-   * @param AbstractController $controller The controller to be called.
+   * @param string $controllerClass The class of the controller to be called,
+   *  which must extend AbstractController. Can be provided via the ::class.
    * @param string $action The action to be called on the controller.
    * @param array $params The parameters to be passed to the action.
    */
   public function __construct(
-    AbstractController $controller,
+    string $controllerClass,
     string $action,
     array $params = []
   ) {
-    $this->controller = $controller;
+    if (!is_subclass_of($controllerClass, AbstractController::class)) {
+      throw new \InvalidArgumentException(
+        'Controller class must extend AbstractController'
+      );
+    }
+    $this->controllerClass = $controllerClass;
     $this->action = $action;
     $this->params = $params;
   }

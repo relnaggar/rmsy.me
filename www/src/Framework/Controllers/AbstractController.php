@@ -20,21 +20,6 @@ abstract class AbstractController {
     }
   }
 
-  private function applyDecorators(array $templateVars): array {
-    foreach ($this->decorators as $decorator) {
-      $newTemplateVars = $decorator->getNewTemplateVars($templateVars);
-      foreach ($newTemplateVars as $key => $value) {
-        if (array_key_exists($key, $templateVars)) {
-          throw new \Error(
-            'Decorators cannot modify existing template variables.'
-          );
-        }
-        $templateVars[$key] = $value;
-      }
-    }
-    return $templateVars;
-  }
-
   /**
    * Get the name of the controller class.
    * 
@@ -123,5 +108,20 @@ abstract class AbstractController {
   public function redirect(string $path): void {
     header('Location: ' . $path);
     exit();
+  }
+
+  private function applyDecorators(array $templateVars): array {
+    foreach ($this->decorators as $decorator) {
+      $newTemplateVars = $decorator->getNewTemplateVars($templateVars);
+      foreach ($newTemplateVars as $key => $value) {
+        if (array_key_exists($key, $templateVars)) {
+          throw new \Error(
+            'Decorators cannot modify existing template variables.'
+          );
+        }
+        $templateVars[$key] = $value;
+      }
+    }
+    return $templateVars;
   }
 }

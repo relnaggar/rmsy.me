@@ -10,6 +10,6 @@ class Redirect extends ControllerAction {
    * @param string $url The URL to redirect to.
    */
   public function __construct(string $url) {
-    parent::__construct(new RedirectController($url), 'doRedirect');
+    parent::__construct(RedirectController::class, 'doRedirect', [$url]);
   }
 }
