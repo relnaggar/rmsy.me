@@ -104,9 +104,18 @@ abstract class AbstractApp {
     return $router->route($serverRequestPath, $httpMethod);
   }
 
+  /**
+   * Returns the current path.
+   * 
+   * @return string The current path
+   */
+  public static function getCurrentPath(): string {
+    return explode('?', $_SERVER['REQUEST_URI'])[0];
+  }
+
   public final function run(): void {
     // get the URL path, not including the query string
-    $serverRequestPath = explode('?', $_SERVER['REQUEST_URI'])[0];
+    $serverRequestPath = self::getCurrentPath();
 
     // get the HTTP method e.g. GET, POST, PUT, DELETE
     $httpMethod = $_SERVER['REQUEST_METHOD'];
