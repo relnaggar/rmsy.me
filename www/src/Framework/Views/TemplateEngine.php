@@ -48,30 +48,40 @@ class TemplateEngine {
   }
 
   /*
-    * Get a snippet of text from a HTML template.
+    * Get a snippet of the initial text from a HTML template.
     *
     * @param string $templatePath The path to the template file, relative to
     *   the configured template root directory. Given without the file
     *   extension.
+    * @param int $numberOfWords The number of words to include in the snippet.
+    *   If -1, the full text is returned.
     * @param array $templateVars The variables to inject. Must be in the format
     *   ['variableName' => 'variableValue', ...].
-    * @param int $numberOfCharacters The number of characters to include in the
-    *   snippet.
-    * @return string The snippet of text.
+    * @return string The snippet of text with ... appended if the snippet is
+    *   shorter than the full text.
     */
   public static function getSnippet(
     string $templatePath,
+    int $numberOfWords=-1,
     array $templateVars=[],
-    int $numberOfCharacters=200,
   ): string {
     $html = self::loadTemplate($templatePath, $templateVars);
     $text = strip_tags($html);
 
     // remove extra whitespace
     $squashedText = trim(preg_replace('/\s+/', ' ', $text));
+    
+    // return the full text if the number of words is -1
+    if ($numberOfWords === -1) {
+      return $squashedText;
+    }
 
-    // get the first $numberOfCharacters characters
-    $snippet = substr($squashedText, 0, $numberOfCharacters);
+    // get the first $numberOfWords words
+    $words = explode(' ', $squashedText);
+    $snippet = implode(' ', array_slice($words, 0, $numberOfWords));
+
+    // add an ellipsis
+    $snippet .= '...';
 
     return $snippet;
   }
