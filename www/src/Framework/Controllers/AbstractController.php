@@ -4,6 +4,7 @@ namespace Framework\Controllers;
 use Framework\Decorators\DecoratorInterface;
 use Framework\Config;
 use Framework\Views\Page;
+use Framework\Data\SectionInterface;
 use Framework\Views\TemplateEngine;
 
 abstract class AbstractController {
@@ -70,6 +71,9 @@ abstract class AbstractController {
    * @param string $layoutTemplatePath The path to the layout template file,
    *   relative to the configured template root directory. Given without the
    *   file extension. If empty, the configured layout template path is used.
+   * @param array $sections An array of SectionInterface instances to inject
+   *   into the template. Each section will have its HTML content loaded from
+   *   the template file specified by the SectionInterface implementation.
    * @return Page A new Page instance with the HTML content loaded from the
    *   layout file, the body content injected, and the specified variables
    *   injected.
@@ -78,23 +82,28 @@ abstract class AbstractController {
     string $bodyTemplatePath='',
     array $templateVars=[],
     string $layoutTemplatePath='',
-    array $sections=[]
+    array $sections=[],
   ): Page {
     $templateVars = $this->applyDecorators($templateVars);
 
-    foreach ($sections as $sectionId => &$section) {
-      $section['html'] =
+    $controllerName = $this->getControllerName();
+    foreach ($sections as $section) {
+      if (!$section instanceof SectionInterface) {
+        throw new \Error('All sections must implement the SectionInterface.');
+      }
+      $section->setHtmlContent(
         TemplateEngine::loadTemplate(
-          "{$section['templateDirectory']}/$sectionId",
-          $templateVars
-        );
+          $section->getTemplatePath($controllerName),
+          $templateVars,
+        )
+      );
     }
     if (!empty($sections)) {
       $templateVars['sections'] = $sections;
     }
 
     return Page::withLayout(
-      "{$this->getControllerName()}/$bodyTemplatePath",
+      "$controllerName/$bodyTemplatePath",
       $templateVars,
       $layoutTemplatePath
     );
