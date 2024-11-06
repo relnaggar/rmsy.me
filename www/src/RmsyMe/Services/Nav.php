@@ -32,11 +32,10 @@ class Nav {
       path: '/',
     ));
     // add each project to the projects dropdown
-    $projectsData = $this->projectsService->getData();
-    foreach ($projectsData as $projectSlug => $projectData) {
+    foreach ($this->projectsService->getProjects() as $project) {
       $projectsItem->addDropdownItem(new NavItem(
-        text: $projectData['title'],
-        path: "/$projectSlug",
+        text: $project->title,
+        path: "/$project->slug",
       ));
     }
 
@@ -48,7 +47,7 @@ class Nav {
       external: true,
     ));
     $resumesItem->addDropdownItem(new NavItem(
-      text: 'Tutor',
+      text: 'CS & SE Tutor',
       path: '/tutor',
       external: true,
     ));
@@ -60,7 +59,8 @@ class Nav {
     $this->addNavItem(new NavItem(text: 'Tutoring', path: '/tutoring'));
     $this->addNavItem($resumesItem);
     // add each contact method to the nav
-    foreach ($this->contactMethodsService->getData() as $contactMethod) {
+    $contactMethods = $this->contactMethodsService->getContactMethods();
+    foreach ($contactMethods as $contactMethod) {
       if ($contactMethod['inNav']) {
         $this->addNavItem(new NavItem(
           text: $contactMethod['title'],

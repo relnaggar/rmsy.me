@@ -27,7 +27,7 @@ class ContactForm extends AbstractController {
       'title' => 'Contact',
       'metaDescription' => 'I\'m always game to talk tech, tutoring, or ' . 
         'even dung beetles!',
-      'contactMethods' => $this->contactMethodsService->getData(),
+      'contactMethods' => $this->contactMethodsService->getContactMethods(),
       'displayAlert' => false,
       'displayForm' => true,
     ];

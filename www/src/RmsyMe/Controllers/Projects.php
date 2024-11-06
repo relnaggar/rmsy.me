@@ -17,40 +17,17 @@ class Projects extends AbstractController {
     $this->projectsService = $projectsService;
   }
 
-  public function index(): Page {
-    $projects = $this->projectsService->getData();
-    return $this->getPage(
-      __FUNCTION__,
-      [
-        'title' => 'Projects Summary',
-        'metaDescription' => '',
-        'projects' => $projects,
-        'preloadImages' => array_map(
-          fn($project) => $project['thumbnail'],
-          $projects
-        ),
-      ]
-    );
-  }
-
   public function show(string $projectSlug): Page {
-    $project = $this->projectsService->getData()[$projectSlug];
-
-    if (isset($project['sections'])) {
-      foreach (($project['sections']) as &$section) {
-        $section['templateDirectory'] = $this->getControllerName() .
-          '/' . $projectSlug;
-      }
-    }
+    $project = $this->projectsService->getProject($projectSlug);
 
     return $this->getPage(
       templateVars: [
-        'title' => $project['title'],
-        'metaDescription' => $project['description'],
+        'title' => $project->title,
+        'metaDescription' => $project->description,
         'onThisPage' => true,
-        'preloadImages' => [$project['preloadImage']],
+        'preloadImages' => [$project->preloadImage],
       ],
-      sections: $project['sections'],
+      sections: $project->getSections(),
     );
   }
 }

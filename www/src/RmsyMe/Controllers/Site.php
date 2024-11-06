@@ -2,24 +2,17 @@
 namespace RmsyMe\Controllers;
 
 use Framework\Controllers\AbstractController;
-use Framework\Routing\RouterInterface;
 use Framework\Views\Page;
-use Framework\Views\TemplateEngine;
 
+use RmsyMe\Data\Section;
 use RmsyMe\Services\Projects;
 use RmsyMe\Data\Image;
 
 class Site extends AbstractController {
-  private RouterInterface $router;
-  private Projects $projectsService;  
+  private Projects $projectsService;
 
-  public function __construct(
-    array $decorators,
-    RouterInterface $router,
-    Projects $projectsService,
-  ) {
+  public function __construct(array $decorators, Projects $projectsService) {
     parent::__construct($decorators);
-    $this->router = $router;
     $this->projectsService = $projectsService;
   }
 
@@ -32,30 +25,35 @@ class Site extends AbstractController {
       $formatter->format($numberOfYearsTutoring)
     );
 
-    $snippets = [
-      [
-        'title' => 'About',
-        'text' => TemplateEngine::getSnippet('Site/about', 50),
-        'href' => '/about',
-        'callToAction' => 'Read more about me',
-      ],
-    ];
-
-    foreach ($snippets as $i => $snippet) {
-      if (!$this->router->hasPath($snippet['href'])) {
-        unset($snippets[$i]);
-      }
-    }
+    $projects = $this->projectsService->getProjects();
+    $thumbnails = array_map(fn($project) => $project->thumbnail, $projects);
+    $preloadImages = array_slice($thumbnails, 0, 2);
 
     return $this->getPage(
-      __FUNCTION__,
-      [
-        'title' => 'Home',
-        'metaDescription' => "Hi, I'm Ramsey 👋 I'm a software engineer",
+      bodyTemplatePath: __FUNCTION__,
+      templateVars: [
+        'title' => 'Ramsey El-Naggar',
+        'subtitle' => 'Software Engineer & Educator',
+        'metaDescription' => "Hi, I'm Ramsey 👋." .
+          "Welcome to my slice of the internet pie!",
         'numberOfYearsTutoringAsWord' => $numberOfYearsTutoringAsWord,
-        'snippets' => $snippets,
-        'projects' => $this->projectsService->getData(),
-      ]
+        'projects' => $projects,
+        'preloadImages' => $preloadImages,
+      ],
+      sections: [
+        new Section(
+          id: 'intro',          
+          templateDirectory: __FUNCTION__,
+        ),
+        new Section(
+          id: 'callToAction',          
+          templateDirectory: __FUNCTION__,
+        ),
+        new Section(
+          id: 'projects',          
+          templateDirectory: __FUNCTION__,
+        ),
+      ],
     );
   }
 
@@ -72,7 +70,8 @@ class Site extends AbstractController {
       $relativeTemplatePath,
       [
         'title' => 'About',
-        'metaDescription' => 'My specialty? Well, I dive into the depths of ' .
+        'metaDescription' => 'I\'m a software engineer. My specialty? ' .
+          'Well, I dive into the depths of ' .
           'full-stack web application development.',
         'preloadImages' => [new Image('profile.jpg')],
         'lastModifiedDateFormatted' => $lastModifiedDateFormatted
