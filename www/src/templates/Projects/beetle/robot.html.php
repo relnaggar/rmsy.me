@@ -15,38 +15,36 @@
    LEGO, some electronics, and the special ingredient that brought him to
    life... ❤️ ...that's right, programming!
 </p>
-<div class="container">
-  <div class="row">
-    <figure class="figure m-3 text-center col-lg-5 float-start w-100-lg-down">
-      <img
-        src="<?= $mediaRoot ?>/img/beetle/robot-below.jpg"
-        class="figure-img img-fluid"
-        alt="
-          View of the robot from below, showing two wheels, gearchains, and a
-          ball bearing.
-        "
-        crossorigin="anonymous"
-      >
-      <figcaption class="figure-caption text-center">
-        Looks like someone skipped leg day.
-      </figcaption>
-    </figure>
-    <figure class="figure m-3 text-center col-lg-5 w-100-lg-down">
-      <img
-        src="<?= $mediaRoot ?>/img/beetle/robot-above.jpg"
-        class="figure-img img-fluid"
-        alt="
-          View of the robot from above, showing a camera with a fish-eye lens
-          and a custom-built array of four light sensors with polarisation
-          filters.
-        "
-      >
-      <figcaption class="figure-caption text-center">
-        Smile! You're on dung beetle cam.
-      </figcaption>
-    </figure>
-  </div>
-</div>
+
+<figure class="figure m-3 text-center float-start col-lg-5 w-100-lg-down">
+  <img
+    src="<?= $mediaRoot ?>/img/beetle/robot-below.jpg"
+    class="figure-img img-fluid"
+    alt="
+      View of the robot from below, showing two wheels, gearchains, and a
+      ball bearing.
+    "
+    crossorigin="anonymous"
+  >
+  <figcaption class="figure-caption text-center">
+    Looks like someone skipped leg day.
+  </figcaption>
+</figure>
+
+<figure class="figure m-3 text-center col-lg-5 w-100-lg-down">
+  <img
+    src="<?= $mediaRoot ?>/img/beetle/robot-above.jpg"
+    class="figure-img img-fluid"
+    alt="
+      View of the robot from above, showing a camera with a fish-eye lens
+      and a custom-built array of four light sensors with polarisation
+      filters.
+    "
+  >
+  <figcaption class="figure-caption text-center">
+    Smile! You're on dung beetle cam.
+  </figcaption>
+</figure>
 
 <p>
   But Pooptimus needs more than just movement to be a true dung beetle.
@@ -60,7 +58,7 @@
   coming from the sky, just like his dung beetle brethren.
 </p>
 
-<figure class="figure m-3 text-center col-lg-3 float-end w-100-lg-down">
+<figure class="figure m-3 text-center float-end col-lg-3 w-100-lg-down">
   <img
     src="<?= $mediaRoot ?>/img/beetle/robot-polarisation.jpg"
     class="figure-img img-fluid"

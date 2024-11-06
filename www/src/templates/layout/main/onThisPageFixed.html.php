@@ -1,34 +1,37 @@
-<nav class="
-  navbar
-  flex-column
-  justify-content-start
-  navbar-light
-  bg-light
-  display-none-lg-up
-  border
-  m-3
-  navbar-vertical
-">
+<nav
+  class="
+    navbar
+    flex-column
+    justify-content-start
+    navbar-light
+    bg-light
+    display-none-lg-up
+    border
+    m-3
+    navbar-vertical
+  "
+  data-nosnippet
+>
   <span class="border-bottom text-muted p-3">On this page</span>
   <ul class="navbar-nav">
-    <?php foreach ($sections as $sectionId => $section): ?>
+    <?php foreach ($sections as $section): ?>
       <li class="nav-item">
         <a
           class="nav-link"
-          href="#<?= $sectionId ?>"
+          href="#<?= $section->id ?>"
         >
-          <?= $section['title'] ?>
+          <?= $section->title ?>
         </a>
       </li>
-      <?php if (isset($section['subsections'])): ?>
+      <?php if (!empty($section->subsections)): ?>
         <ul class="nav navbar-nav">
-          <?php foreach ($section['subsections'] as $subsection): ?>
+          <?php foreach ($section->subsections as $subsection): ?>
             <li class="nav-item">
               <a
                 class="nav-link ms-3"
-                href="#<?= $sectionId ?>-<?= $subsection['id'] ?>"
+                href="#<?= $section->id ?>-<?= $subsection->id ?>"
               >
-                <?= $subsection['title'] ?>
+                <?= $subsection->title ?>
               </a>
             </li>
           <?php endforeach; ?>

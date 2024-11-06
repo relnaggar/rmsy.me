@@ -37,15 +37,15 @@ class App extends AbstractApp {
         '/about' => [
           'GET' => new ControllerAction(Controllers\Site::class, 'about'),
         ],
-        '/projects/' => [
-          'GET' => new ControllerAction(Controllers\Projects::class, 'index'),
-        ],
         '/projects/<projectSlug>' => [
           'GET' => new ControllerAction(Controllers\Projects::class, 'show'),
         ],
         // '/tutoring' => [
         //   'GET' => new ControllerAction(Controllers\Site::class, 'tutoring'),
         // ],
+        '/free-meeting' => [
+          'GET' => new Redirect("https://calendly.com/relnaggar/free-meeting"),
+        ],
         '/resumes/full-stack-developer' => [
           'GET' => new Redirect(
             $mediaService->getMediaRoot() .

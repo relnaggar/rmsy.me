@@ -6,7 +6,10 @@
     >
       &lt;<b>r</b>a<b>ms</b>e<b>y</b><b class="banner-link">.me</b>&gt;
     </a>
-    <span class="display-none-md-down display-5 flex-fill" id="center-banner">
+    <span
+      class="display-none-md-down display-5 flex-fill fw-bold"
+      id="center-banner"
+    >
       Ramsey El&#8209;Naggar
     </span>
     <a

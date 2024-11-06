@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php if (isset($metaDescription)): ?>
+    <?php if (!empty($metaDescription)): ?>
       <meta name="description" content="<?= $metaDescription ?>">
     <?php endif ?>
-    <?php if (isset($metaRobots)): ?>
+    <?php if (!empty($metaRobots)): ?>
       <meta name="robots" content="<?= $metaRobots ?>">
     <?php endif ?>
 
@@ -21,7 +21,7 @@
       type="font/woff2"
       crossorigin="anonymous"
     >
-    <?php if (isset($preloadImages)): ?>
+    <?php if (!empty($preloadImages)): ?>
       <?php foreach ($preloadImages as $preloadImage): ?>
         <link
           rel="preload"
@@ -45,10 +45,12 @@
       <?php !empty($nav) && require 'layout/nav.html.php'; ?>
       <?php // require 'layout/sidebarCollapsable.html.php'; ?>
       <div class="d-flex flex-row">
-        <?php require 'layout/sidebarFixed.html.php'; ?>
+        <div class="col-lg-2 col-md-1">
+          <?php // require 'layout/sidebarFixed.html.php'; ?>
+        </div>
         <?php require 'layout/main.html.php'; ?>
         <?php require 'layout/backToTop.html.php'; ?>
-        <div class="col-2 display-none-lg-down" data-nosnippet>
+        <div class="col-lg-2 col-md-1 d-none d-lg-block">
           <?php
             !empty($onThisPage) && require 'layout/onThisPageSide.html.php';
           ?>
