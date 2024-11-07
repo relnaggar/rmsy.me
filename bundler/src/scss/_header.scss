@@ -1,30 +1,25 @@
 header {
   z-index: 1021; // for box-shadow to appear over navbar
   box-shadow: 0 0 1rem rgba(0,0,0,0.2);
-  background-color: $light;
+  // background-color: $light;
+  background-image: linear-gradient(to right, $primary, $white 80%);
   color: color-contrast($light);
 }
 
 .banner-tag {
-  padding: 0 12px 12px;
-  text-decoration: none;
   &:hover, &:focus {
     // banner-link color changes when hover/focus on parent as well
     .banner-link {
       color: color-contrast($light) !important;
     }
   }
-
-  b {
-    font-weight: 900;
-  }
-}
-
-#center-banner {
-  border-left: 1px solid $gray-300;
-  border-right: 1px solid $gray-300;
 }
 
 .banner-link {
   color: $primary;
 }
+
+.extra-bold {
+  font-weight: 1000;
+}
+

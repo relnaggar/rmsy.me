@@ -20,11 +20,12 @@ class Projects extends AbstractController {
   public function index(): Page {
     $projects = $this->projectsService->getProjects();
     $preloadImages = array_map(
-      fn($project) => $project->preloadImage,
+      fn($project) => $project->thumbnail,
       $projects
     );
 
     return $this->getPage(
+      bodyTemplatePath: 'index',
       templateVars: [
         'title' => 'All Projects',
         'metaDescription' => '',

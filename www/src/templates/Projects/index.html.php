@@ -1,34 +1,27 @@
-<hr>
-
-<h2 class="text-center mt-5 mb-3">Featured Projects</h2>
-
-<p class="text-center mb-4">
-  Here are some of the projects I've worked on. Click on a project to learn more.
-</p>
-
 <div class="row">
   <?php foreach ($projects as $project): ?>
     <div class="col-sm-6 mb-3 d-flex">
-      <div class="card flex-column equal-height">
-        <a href="<?= $project->getPath() ?>">
+      <a
+        href="<?= $project->getPath() ?>"
+        class="text-reset text-decoration-none d-flex"
+      >
+        <div class="card flex-column equal-height">
           <img
             class="card-img-top"
             src="<?= "$mediaRoot/img/{$project->thumbnail->href}" ?>"
             alt="<?= $project->title ?>"
           >
-        </a>
-        <div class="card-body">
-          <h5 class="card-title">
-            <a href="<?= $project->getPath() ?>">
+          <div class="card-body">
+            <h5 class="card-title">
               <?= $project->title ?>
-            </a>
-          </h5>
-          <p class="card-text"><?= $project->description ?></p>
+            </h5>
+            <p class="card-text"><?= $project->description ?></p>
+          </div>
         </div>
-      </div>
+      </a>
     </div>
   <?php endforeach; ?>
-  <!-- <div class="col-sm-6 mb-3">
+  <div class="col-sm-6 mb-3 d-flex">
     <div class="card flex-column equal-height">
       <img
         class="card-img-top"
@@ -43,5 +36,5 @@
         </p>
       </div>
     </div>
-  </div> -->
+  </div>
 </div>

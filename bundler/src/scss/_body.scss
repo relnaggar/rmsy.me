@@ -15,9 +15,22 @@ section {
 }
 
 .btn-orange {
-  background-color: #ff7f00; /* Bright orange */
+  background-color: $orange;
   color: white !important;
 }
 .btn-orange:hover {
-  background-color: #e67300; /* Darker shade on hover */
+  background-color: shade-color($orange, 60%);
+}
+
+.card-header {
+  background-color: $primary;
+  color: white;
+}
+
+.card-body {
+  background-color: lighten($primary, 40%);
+}
+
+a:hover .card-body {
+  background-color: lighten($primary, 30%);
 }

@@ -26,6 +26,7 @@ class Site extends AbstractController {
     );
 
     $projects = $this->projectsService->getProjects();
+    $featuredProjects = array_slice($projects, 0, 2);
     $thumbnails = array_map(fn($project) => $project->thumbnail, $projects);
     $preloadImages = array_slice($thumbnails, 0, 2);
 
@@ -100,21 +101,21 @@ class Site extends AbstractController {
         'metaDescription' => "Hi, I'm Ramsey 👋." .
           "Welcome to my slice of the internet pie!",
         'numberOfYearsTutoringAsWord' => $numberOfYearsTutoringAsWord,
-        'projects' => $projects,
+        'featuredProjects' => $featuredProjects,
         'preloadImages' => $preloadImages,
         'roles' => $roles,
       ],
       sections: [
         new Section(
-          id: 'intro',          
+          id: 'intro',
           templateDirectory: __FUNCTION__,
         ),
         new Section(
-          id: 'callToAction',          
+          id: 'callToAction',
           templateDirectory: __FUNCTION__,
         ),
         new Section(
-          id: 'projects',          
+          id: 'featuredProjects',
           templateDirectory: __FUNCTION__,
         ),
       ],

@@ -1,27 +1,5 @@
-<header class="text-center">
-  <div class="display-none-xl-down d-flex">
-    <a
-      href="/"
-      class="display-5 flex-fill text-reset banner-tag"
-    >
-      &lt;<b>r</b>a<b>ms</b>e<b>y</b><b class="banner-link">.me</b>&gt;
-    </a>
-    <span
-      class="display-none-md-down display-5 flex-fill fw-bold"
-      id="center-banner"
-    >
-      Ramsey El&#8209;Naggar
-    </span>
-    <a
-      href="/"
-      class="display-5 flex-fill text-reset banner-tag"
-    >
-      &lt;/<b>r</b>a<b>ms</b>e<b>y</b><b class="banner-link">.me</b>&gt;
-    </a>
-  </div>
-  <div class="display-none-xl-up p-2">
-    <a href="/" class="display-5 text-reset banner-tag">
-      &lt;<b>rmsy</b><b class="banner-link">.me</b>/&gt;
-    </a>
-  </div>
+<header class="text-center pt-2 pb-3">
+  <a href="/" class="display-3 text-reset text-decoration-none banner-tag">
+    &lt;<span class="extra-bold">r</span>a<span class="extra-bold">ms</span>e<span class="extra-bold">y</span> el-naggar <span class="extra-bold banner-link">.me</span>&gt;
+  </a>
 </header>

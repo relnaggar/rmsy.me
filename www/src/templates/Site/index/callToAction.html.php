@@ -4,7 +4,7 @@
   <?php foreach ($roles as $role): ?>
     <div class="col-sm">
       <div class="card mb-3">
-        <div class="card-header pt-3">
+        <div class="card-header pt-3 bg-primary text-white">
           <h5>
             <?= $role['header'] ?>
             <i class="bi bi-<?= $role['icon'] ?>"></i>
