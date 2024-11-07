@@ -23,6 +23,10 @@ $custom-colors: (
 );
 $theme-colors: map.merge($theme-colors, $custom-colors);
 
+$position-values: map.merge($position-values, (
+  "1": 1%,
+));
+
 // 5. Include remainder of required parts
 @import "bootstrap/scss/maps";
 @import "bootstrap/scss/mixins";

@@ -37,12 +37,24 @@ class App extends AbstractApp {
         '/about' => [
           'GET' => new ControllerAction(Controllers\Site::class, 'about'),
         ],
+        // '/services/engineer' => [
+        //   'GET' => new ControllerAction(
+        //     Controllers\Services::class,
+        //     'engineer'
+        //   ),
+        // ],
+        // '/services/educator' => [
+        //   'GET' => new ControllerAction(
+        //     Controllers\Services::class,
+        //     'educator'
+        //   ),
+        // ],
+        '/projects/' => [
+          'GET' => new ControllerAction(Controllers\Projects::class, 'index'),
+        ],
         '/projects/<projectSlug>' => [
           'GET' => new ControllerAction(Controllers\Projects::class, 'show'),
         ],
-        // '/tutoring' => [
-        //   'GET' => new ControllerAction(Controllers\Site::class, 'tutoring'),
-        // ],
         '/free-meeting' => [
           'GET' => new Redirect("https://calendly.com/relnaggar/free-meeting"),
         ],

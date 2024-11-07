@@ -13,3 +13,11 @@
 section {
   scroll-margin-top: var(--nav-height);
 }
+
+.btn-orange {
+  background-color: #ff7f00; /* Bright orange */
+  color: white !important;
+}
+.btn-orange:hover {
+  background-color: #e67300; /* Darker shade on hover */
+}

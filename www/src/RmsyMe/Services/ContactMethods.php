@@ -5,16 +5,12 @@ use Framework\Routing\RouterInterface;
 
 class ContactMethods {
   private RouterInterface $router;
-  private array $data;
+  private array $contactMethods;
 
   public function __construct(RouterInterface $router) {
     $this->router = $router;
-    $this->data = [];
-    $this->initialiseData();
-  }
-
-  private function initialiseData(): void {
-    $this->addData([
+    $this->contactMethods = [];
+    $this->addContactMethod([
       'title' => 'Email',
       'icon' => 'envelope',
       'href' => 'mailto:ramsey.el-naggar@outlook.com',
@@ -24,7 +20,7 @@ class ContactMethods {
       HTML,
       'inNav' => false,
     ]);
-    $this->addData([
+    $this->addContactMethod([
       'title' => 'GitHub',
       'icon' => 'github',
       'href' => '/github',
@@ -33,7 +29,7 @@ class ContactMethods {
       'inNav' => true,
       'inFooter' => true,
     ]);
-    $this->addData([
+    $this->addContactMethod([
       'title' => 'LinkedIn',
       'icon' => 'linkedin',
       'href' => '/linkedin',
@@ -44,16 +40,16 @@ class ContactMethods {
     ]);
   }
 
-  private function addData(array $data): void {
+  private function addContactMethod(array $contactMethods): void {
     if (
-      $this->router->hasPath($data['href'])
-      || strpos($data['href'], "mailto:") === 0
+      $this->router->hasPath($contactMethods['href'])
+      || strpos($contactMethods['href'], "mailto:") === 0
     ) {
-      $this->data[] = $data;
+      $this->contactMethods[] = $contactMethods;
     }
   }
 
-  public function getData(): array {
-    return $this->data;
+  public function getContactMethods(): array {
+    return $this->contactMethods;
   }
 }

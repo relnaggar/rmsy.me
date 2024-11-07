@@ -17,6 +17,23 @@ class Projects extends AbstractController {
     $this->projectsService = $projectsService;
   }
 
+  public function index(): Page {
+    $projects = $this->projectsService->getProjects();
+    $preloadImages = array_map(
+      fn($project) => $project->preloadImage,
+      $projects
+    );
+
+    return $this->getPage(
+      templateVars: [
+        'title' => 'All Projects',
+        'metaDescription' => '',
+        'preloadImages' => $preloadImages,
+        'projects' => $projects,
+      ],
+    );
+  }
+
   public function show(string $projectSlug): Page {
     $project = $this->projectsService->getProject($projectSlug);
 

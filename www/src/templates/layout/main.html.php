@@ -1,7 +1,7 @@
 <main class="flex-grow-1 m-5 d-flex flex-column min-vh-100">
   <h1><?= $title ?></h1>
   <?php if (!empty($subtitle)): ?>
-    <h3 class="fw-light">
+    <h3 class="text-body-secondary">
       <?= $subtitle ?>
     </h3>
   <?php endif; ?>

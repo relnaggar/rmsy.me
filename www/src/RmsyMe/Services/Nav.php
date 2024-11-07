@@ -28,7 +28,7 @@ class Nav {
     // projects dropdown
     $projectsItem = new NavItem(text: 'Projects', path: '/projects');
     $projectsItem->addDropdownItem(new NavItem(
-      text: 'Projects Summary',
+      text: 'All Projects',
       path: '/',
     ));
     // add each project to the projects dropdown
@@ -100,7 +100,7 @@ class Nav {
   public function getData(): NavData {
     return new NavData(
       homePath: '/',
-      title: 'software engineer',
+      title: 'Software Engineer & Educator',
       items: $this->navItems,
     );
   }

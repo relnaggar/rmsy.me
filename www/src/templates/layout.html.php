@@ -49,7 +49,7 @@
           <?php // require 'layout/sidebarFixed.html.php'; ?>
         </div>
         <?php require 'layout/main.html.php'; ?>
-        <?php require 'layout/backToTop.html.php'; ?>
+        <?php require 'layout/fixed.html.php'; ?>
         <div class="col-lg-2 col-md-1 d-none d-lg-block">
           <?php
             !empty($onThisPage) && require 'layout/onThisPageSide.html.php';

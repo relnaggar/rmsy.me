@@ -22,6 +22,11 @@
         </li>
       <?php endif; ?>
     <?php endforeach; ?>
+    <li class="list-inline-item mx-3">
+      <a class="text-white" href="#" role="button">
+        <span class="visually-hidden">Back to top</span>
+        <i class="bi bi-arrow-up h2"></i>
+      </a>
   </ul>
   <p>
     Copyright &copy; <?= date("Y") ?> by
