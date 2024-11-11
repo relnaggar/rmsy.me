@@ -3,10 +3,10 @@ namespace RmsyMe\Decorators;
 
 use Framework\Decorators\DecoratorInterface;
 
-use RmsyMe\App;
 use RmsyMe\Services\Nav as NavService;
+use RmsyMe\App;
 
-class Nav implements DecoratorInterface {
+class Sidebar implements DecoratorInterface {
   private NavService $navService;
 
   public function __construct(NavService $navService) {
@@ -14,12 +14,10 @@ class Nav implements DecoratorInterface {
   }
 
   public function getNewTemplateVars(array $templateVars): array {
-    // set the active item in the nav data to whatever the title is
-    $nav = $this->navService->getNav();
-    $nav->setActiveItem(App::getCurrentPath());
-
-    // add nav data to the template vars
-    $newTemplateVars['menuNav'] = $nav;
+    $currentPath = App::getCurrentPath();
+    $sidebarRoot = '/' . explode('/', $currentPath)[1];
+    $sidebarNav = $this->navService->getNavItem($sidebarRoot)->getAsNav();
+    $newTemplateVars['sidebarNav'] = $sidebarNav;
     return $newTemplateVars;
   }
 }

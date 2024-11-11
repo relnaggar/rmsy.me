@@ -42,11 +42,13 @@
   >
     <div class="container-fluid d-flex flex-column p-0">
       <?php require 'layout/header.html.php'; ?>
-      <?php !empty($nav) && require 'layout/nav.html.php'; ?>
-      <?php // require 'layout/sidebarCollapsable.html.php'; ?>
+      <?php !empty($menuNav) && require 'layout/menuNav.html.php'; ?>
+      <div class="d-lg-none">
+        <?php require 'layout/sidebarCollapsable.html.php'; ?>
+      </div>
       <div class="d-flex flex-row">
-        <div class="col-lg-2 col-md-1">
-          <?php // require 'layout/sidebarFixed.html.php'; ?>
+        <div class="col-lg-2 col-md-1 d-none d-lg-block">
+          <?php require 'layout/sidebarFixed.html.php'; ?>
         </div>
         <?php require 'layout/main.html.php'; ?>
         <?php require 'layout/fixed.html.php'; ?>

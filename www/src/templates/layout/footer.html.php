@@ -4,7 +4,7 @@
     aria-label="Social media links"
     role="navigation"
   >
-    <?php foreach ($nav->items as $navKey => $navItem): ?>
+    <?php foreach ($menuNav->items as $navKey => $navItem): ?>
       <?php if ($navItem->inFooter): ?>
         <li class="list-inline-item mx-3">
           <a

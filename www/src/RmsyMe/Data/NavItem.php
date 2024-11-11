@@ -70,4 +70,12 @@ class NavItem {
     $index = array_search($item, $this->dropdownItems, true);
     unset($this->dropdownItems[$index]);
   }
+
+  public function getAsNav(): Nav {
+    return new Nav(
+      homePath: $this->path,
+      title: $this->text,
+      items: $this->dropdownItems,
+    );
+  }
 }

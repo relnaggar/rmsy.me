@@ -23,6 +23,7 @@ class App extends AbstractApp {
         Decorators\ExtendedTitle::class,
         Decorators\Nav::class,
         Decorators\MediaRoot::class,
+        Decorators\Sidebar::class,
       ]
     ];
   }

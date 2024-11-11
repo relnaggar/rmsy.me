@@ -8,9 +8,9 @@
 ">
   <a
     class="navbar-brand-custom navbar-brand-right-banner"
-    href="<?= $nav->homePath ?>"
+    href="<?= $menuNav->homePath ?>"
   >
-    <?= $nav->title ?>
+    <?= $menuNav->title ?>
   </a>
   <button
     class="navbar-toggler-custom"
@@ -27,7 +27,7 @@
   </button>
   <div class="collapse navbar-collapse" id="navbar">
     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-      <?php foreach ($nav->items as $navKey => $navItem): ?>
+      <?php foreach ($menuNav->items as $navKey => $navItem): ?>
         <li class="nav-item <?= $navItem->isDropdown() ? 'dropdown' : '' ?>">
           <?php if ($navItem->isDropdown()): ?>
             <a

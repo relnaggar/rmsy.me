@@ -5,13 +5,14 @@ use Framework\Controllers\AbstractController;
 use Framework\Views\Page;
 
 use RmsyMe\Services\Projects as ProjectsService;
+use RmsyMe\Services\Nav as NavService;
 
 class Projects extends AbstractController {
   private ProjectsService $projectsService;
 
   public function __construct(
     array $decorators,
-    ProjectsService $projectsService
+    ProjectsService $projectsService,
   ) {
     parent::__construct($decorators);
     $this->projectsService = $projectsService;
