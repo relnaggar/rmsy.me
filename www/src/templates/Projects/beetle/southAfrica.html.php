@@ -24,7 +24,7 @@
   It's like they're on a treadmill!
 </p>
 
-<figure class="figure m-3 text-center col-lg-5 float-end w-100-lg-down">
+<figure class="figure m-3 text-center col-lg-5 float-end col-12">
   <img
     src="<?= $mediaRoot ?>/img/beetle/sa-raincoat.jpg"
     class="figure-img img-fluid"

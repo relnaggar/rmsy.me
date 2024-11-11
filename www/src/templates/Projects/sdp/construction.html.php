@@ -1,4 +1,4 @@
-<figure class="figure m-3 text-center col-lg-5 float-start w-100-lg-down">
+<figure class="figure m-3 text-center col-lg-5 float-start col-12">
   <img
     src="<?= $mediaRoot ?>/img/sdp/initial-above.jpg"
     class="figure-img img-fluid"

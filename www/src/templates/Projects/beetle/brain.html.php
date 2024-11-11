@@ -23,7 +23,7 @@
   agrees with the adage "if it ain't broke, don't fix it".
 </p>
 
-<figure class="figure m-3 text-center col-lg-5 float-start w-100-lg-down">
+<figure class="figure m-3 text-center col-lg-5 float-start col-12">
   <img
     src="<?= $mediaRoot ?>/img/beetle/cx-full.png"
     class="figure-img img-fluid"

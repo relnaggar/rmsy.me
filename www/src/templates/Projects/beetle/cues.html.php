@@ -29,7 +29,7 @@
   It worked like a charm!
 </p>
 
-<figure class="figure m-3 text-center col-lg-5 float-end w-100-lg-down">
+<figure class="figure m-3 text-center col-lg-5 float-end col-12">
   <img
     src="<?= $mediaRoot ?>/img/beetle/cx-path.jpg"
     class="figure-img img-fluid"
@@ -97,7 +97,7 @@
   </dd>
 </ol>
 
-<figure class="figure m-3 text-center col-lg-5 float-start w-100-lg-down">
+<figure class="figure m-3 text-center col-lg-5 float-start col-12">
   <img
     src="<?= $mediaRoot ?>/img/beetle/sa-posing.jpg"
     class="figure-img img-fluid"

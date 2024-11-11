@@ -1,6 +1,6 @@
 <?php use RmsyMe\Components\ExternalLink; ?>
 
-<figure class="figure w-50 float-end m-3 w-100-sm-down">
+<figure class="figure col-sm-6 float-end m-3 col-12">
   <img
     src="<?= $mediaRoot ?>/img/profile.jpg"
     class="figure-img img-fluid"

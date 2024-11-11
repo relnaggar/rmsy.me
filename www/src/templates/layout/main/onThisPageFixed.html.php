@@ -5,7 +5,8 @@
     justify-content-start
     navbar-light
     bg-light
-    display-none-lg-up
+    d-lg-none
+    d-block
     border
     m-3
     navbar-vertical

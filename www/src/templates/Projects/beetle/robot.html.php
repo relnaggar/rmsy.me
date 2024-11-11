@@ -16,7 +16,7 @@
    life... ❤️ ...that's right, programming!
 </p>
 
-<figure class="figure m-3 text-center float-start col-lg-5 w-100-lg-down">
+<figure class="figure m-3 text-center float-start col-lg-5 col-12">
   <img
     src="<?= $mediaRoot ?>/img/beetle/robot-below.jpg"
     class="figure-img img-fluid"
@@ -30,7 +30,7 @@
   </figcaption>
 </figure>
 
-<figure class="figure m-3 text-center col-lg-5 w-100-lg-down">
+<figure class="figure m-3 text-center col-lg-5 col-12">
   <img
     src="<?= $mediaRoot ?>/img/beetle/robot-above.jpg"
     class="figure-img img-fluid"
@@ -57,7 +57,7 @@
   coming from the sky, just like his dung beetle brethren.
 </p>
 
-<figure class="figure m-3 text-center float-end col-lg-3 w-100-lg-down">
+<figure class="figure m-3 text-center float-end col-lg-3 col-12">
   <img
     src="<?= $mediaRoot ?>/img/beetle/robot-polarisation.jpg"
     class="figure-img img-fluid"
