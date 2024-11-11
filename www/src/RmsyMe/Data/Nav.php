@@ -28,4 +28,28 @@ class Nav {
       $item->setActiveItem($activePath);
     }
   }
+
+  public function getPreviousPath(): string {
+    $previousItem = null;
+    foreach ($this->items as $item) {
+      if ($item->isActive()) {
+        return $previousItem ? $previousItem->getPath() : "";
+      }
+      $previousItem = $item;
+    }
+    return "";
+  }
+
+  public function getNextPath(): string {
+    $foundActive = false;
+    foreach ($this->items as $item) {
+      if ($foundActive) {
+        return $item->getPath();
+      }
+      if ($item->isActive()) {
+        $foundActive = true;
+      }
+    }
+    return "";
+  }
 }

@@ -5,7 +5,7 @@
       <?= $subtitle ?>
     </h3>
   <?php endif; ?>
-  <?php // require 'main/previousNextButtonsTop.html.php'; ?>
+  <?php require 'main/previousNextButtons.html.php'; ?>
   <div class="mt-3">
     <?= $bodyContent ?>
   </div>
@@ -21,5 +21,5 @@
       </section>
     <?php endforeach; ?>
   <?php endif; ?>
-  <?php // require 'main/previousNextButtonsBottom.html.php'; ?>
+  <?php require 'main/previousNextButtons.html.php'; ?>
 </main>
