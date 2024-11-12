@@ -26,6 +26,7 @@ class Site extends AbstractController
 
   public function index(): Page
   {
+    // calculate the number of years tutoring
     $currentDate = new \DateTime();
     $tutoringStartDate = new \DateTime('2019-01-01');
     $numberOfYearsTutoring = $currentDate->diff($tutoringStartDate)->y;
@@ -34,18 +35,24 @@ class Site extends AbstractController
       $formatter->format($numberOfYearsTutoring)
     );
 
+    // get the featured projects
     $projects = $this->projectsService->getProjects();
     $featuredProjects = array_slice($projects, 0, 2);
-    $thumbnails = array_map(fn($project) => $project->thumbnail, $projects);
+
+    // preload the thumbnails for the featured projects
+    $thumbnails = array_map(
+      fn($project) => $project->thumbnail,
+      $featuredProjects
+    );
     $preloadImages = array_slice($thumbnails, 0, 2);
 
-    $freeMeeting = [
+    // define the roles data
+    $freeMeetingCallToAction = [
       'href' => '/free-meeting',
       'external' => true,
       'text' => 'Book a free meeting',
       'btn-type' => 'orange',
     ];
-
     $roles = [
       [
         'header' => 'Ramsey the Engineer',
@@ -70,7 +77,7 @@ class Site extends AbstractController
             'text' => 'View my full stack developer resume',
             'btn-type' => 'success',
           ],
-          $freeMeeting,
+          $freeMeetingCallToAction,
         ],
         'icon' => 'terminal-fill',
       ], [
@@ -96,7 +103,7 @@ class Site extends AbstractController
             'text' => 'View my tutoring resume',
             'btn-type' => 'success',
           ],
-          $freeMeeting,
+          $freeMeetingCallToAction,
         ],
         'icon' => 'mortarboard-fill',
       ]
@@ -133,6 +140,7 @@ class Site extends AbstractController
 
   public function about(): Page
   {
+    // get the last modified date of the template
     $relativeTemplatePath = __FUNCTION__;
     $fullTemplateFilePath = $this->getFullTemplateFilePath(
       $relativeTemplatePath

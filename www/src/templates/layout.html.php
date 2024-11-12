@@ -27,7 +27,7 @@
           rel="preload"
           href="<?= "$mediaRoot/img/{$preloadImage->href}" ?>"
           as="image"
-          type="<?= $preloadImage->getType() ?>"
+          type="<?= $preloadImage->getMimeType() ?>"
         >
       <?php endforeach; ?>
     <?php endif ?>

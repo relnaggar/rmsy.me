@@ -1,19 +1,22 @@
 :root {
+  // global variable for the height of the main menu nav
   --nav-height: 56px;
 }
 
 .sidebar {
-  position: sticky;
+  position: sticky; // keep the sidebar fixed while scrolling
   align-self: flex-start; // for sticky to work within flexbox
-  top: var(--nav-height);
-  height: calc(100vh - var(--nav-height));
-  overflow-y: scroll;
+  top: var(--nav-height); // keep the sidebar fixed below the nav
+  height: calc(100vh - var(--nav-height)); // fill the remaining height
+  overflow-y: scroll; // allow scrolling within the sidebar
 }
 
 section {
+  // offset for on-page anchor links
   scroll-margin-top: var(--nav-height);
 }
 
+// new class for orange buttons
 .btn-orange {
   background-color: $orange;
   color: white !important;
@@ -22,15 +25,14 @@ section {
   background-color: shade-color($orange, 60%);
 }
 
+// modify bootstrap card styles to use primary color
 .card-header {
   background-color: $primary;
   color: white;
 }
-
 .card-body {
   background-color: lighten($primary, 40%);
 }
-
 a:hover .card-body {
   background-color: lighten($primary, 30%);
 }

@@ -29,6 +29,8 @@ class Project
     $this->thumbnailDescription = $thumbnailDescription;
     $this->thumbnail = new Image($this->slug . '/' . $thumbnailFile);
     $this->preloadImage = new Image($this->slug . '/' . $preloadImageFile);
+
+    // validate the sections array and add each section
     $this->sections = [];
     foreach ($sections as $section) {
       if (count($section) !== 2) {

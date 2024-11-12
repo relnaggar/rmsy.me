@@ -35,6 +35,11 @@ class NavItem
     return $this->path;
   }
 
+  /**
+   * Add a base path to the item's path.
+   *
+   * @param string $basePath The base path to add to the item's path.
+   */
   public function addBasePath(string $basePath): void
   {
     $this->path = $basePath . $this->path;
@@ -45,6 +50,11 @@ class NavItem
     return $this->active;
   }
 
+  /**
+   * Set the active item in the navigation based on the current path.
+   *
+   * @param string $activePath The path to the currently active item.
+   */
   public function setActiveItem(string $activePath): void
   {
     if ($this->path === $activePath) {
@@ -83,6 +93,11 @@ class NavItem
     unset($this->dropdownItems[$index]);
   }
 
+  /**
+   * Get the navigation item as a Nav object.
+   *
+   * @return Nav The navigation item as a Nav object.
+   */
   public function getAsNav(): Nav
   {
     return new Nav(

@@ -12,7 +12,7 @@ class Image {
     $this->href = $href;
   }
 
-  public function getType(): string
+  public function getMimeType(): string
   {
     $parts = explode('.', $this->href);
     $extension = $parts[count($parts) - 1];

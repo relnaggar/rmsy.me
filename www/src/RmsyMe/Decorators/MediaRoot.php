@@ -7,6 +7,9 @@ namespace RmsyMe\Decorators;
 use Framework\Decorators\DecoratorInterface;
 use RmsyMe\Services\Media;
 
+/**
+ * Decorator to add the media root to the template vars.
+ */
 class MediaRoot implements DecoratorInterface
 {
   private Media $mediaService;

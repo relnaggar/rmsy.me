@@ -10,6 +10,9 @@ use RmsyMe\{
   Services\Nav as NavService,
 };
 
+/**
+ * Decorator to add the nav data to the template vars.
+ */
 class Nav implements DecoratorInterface
 {
   private NavService $navService;
@@ -21,7 +24,7 @@ class Nav implements DecoratorInterface
 
   public function getNewTemplateVars(array $templateVars): array
   {
-    // set the active item in the nav data to whatever the title is
+    // set the active item in the nav data to the current path
     $nav = $this->navService->getNav();
     $nav->setActiveItem(App::getCurrentPath());
 

@@ -47,6 +47,7 @@ class ContactMethods
 
   private function addContactMethod(array $contactMethods): void
   {
+    // only add the contact method if it matches a route or is a mailto link
     if (
       $this->router->hasPath($contactMethods['href'])
       || strpos($contactMethods['href'], "mailto:") === 0

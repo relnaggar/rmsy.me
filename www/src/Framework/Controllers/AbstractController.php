@@ -18,14 +18,14 @@ abstract class AbstractController
 
   public function __construct(array $decorators = [])
   {
-    $this->decorators = $decorators;
-    foreach ($this->decorators as $decorator) {
+    foreach ($decorators as $decorator) {
       if (!$decorator instanceof DecoratorInterface) {
         throw new \Error(
           'All decorators must implement the DecoratorInterface.'
         );
       }
     }
+    $this->decorators = $decorators;
   }
 
   /**
@@ -93,8 +93,10 @@ abstract class AbstractController
     string $layoutTemplatePath = '',
     array $sections = [],
   ): Page {
+    // apply decorators
     $templateVars = $this->applyDecorators($templateVars);
 
+    // apply sections
     $controllerName = $this->getControllerName();
     foreach ($sections as $section) {
       if (!$section instanceof SectionInterface) {
@@ -111,6 +113,7 @@ abstract class AbstractController
       $templateVars['sections'] = $sections;
     }
 
+    // build the page
     return Page::withLayout(
       "$controllerName/$bodyTemplatePath",
       $templateVars,

@@ -1,7 +1,9 @@
 header {
-  z-index: 1021; // for box-shadow to appear over navbar
+  // add a shadow to the header
   box-shadow: 0 0 1rem rgba(0,0,0,0.2);
-  // background-color: $light;
+  z-index: 1021; // for box-shadow to appear over navbar
+
+  // banner colours
   background-image: linear-gradient(to right, $primary, $white 80%);
   color: color-contrast($light);
 }
@@ -15,10 +17,7 @@ header {
   }
 }
 
-.banner-link {
-  color: $primary;
-}
-
+// new class for extra-bold text
 .extra-bold {
   font-weight: 1000;
 }

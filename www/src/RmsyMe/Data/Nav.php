@@ -26,6 +26,11 @@ class Nav {
     $this->items = $items;
   }
 
+  /**
+   * Set the active item in the navigation based on the current path.
+   *
+   * @param string $activePath The path to the currently active item.
+   */
   public function setActiveItem(string $activePath): void
   {
     foreach ($this->items as $item) {
@@ -33,6 +38,11 @@ class Nav {
     }
   }
 
+  /**
+   * Get the path to the previous item in the navigation.
+   *
+   * @return string The path to the previous item in the navigation.
+   */
   public function getPreviousPath(): string
   {
     $previousItem = null;
@@ -45,6 +55,11 @@ class Nav {
     return "";
   }
 
+  /**
+   * Get the path to the next item in the navigation.
+   *
+   * @return string The path to the next item in the navigation.
+   */
   public function getNextPath(): string
   {
     $foundActive = false;
