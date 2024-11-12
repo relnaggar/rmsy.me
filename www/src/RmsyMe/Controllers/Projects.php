@@ -34,7 +34,8 @@ class Projects extends AbstractController
       bodyTemplatePath: 'index',
       templateVars: [
         'title' => 'All Projects',
-        'metaDescription' => '',
+        'metaDescription' => 'A collection of programming and robotics '
+        . 'projects I\'ve worked on over the years. Check out my work!',
         'preloadImages' => $preloadImages,
         'projects' => $projects,
       ],
@@ -48,7 +49,7 @@ class Projects extends AbstractController
     return $this->getPage(
       templateVars: [
         'title' => $project->title,
-        'metaDescription' => $project->description,
+        'metaDescription' => $project->metaDescription,
         'onThisPage' => true,
         'preloadImages' => [$project->preloadImage],
       ],

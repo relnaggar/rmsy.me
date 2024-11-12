@@ -8,7 +8,8 @@ class Project
 {
   public readonly string $slug;
   public readonly string $title;
-  public readonly string $description;
+  public readonly string $metaDescription;
+  public readonly string $thumbnailDescription;
   public readonly Image $thumbnail;
   public readonly Image $preloadImage;
   private array $sections;
@@ -16,14 +17,16 @@ class Project
   public function __construct(
     string $slug,
     string $title,
-    string $description,
+    string $metaDescription,
+    string $thumbnailDescription,
     string $thumbnailFile,
     string $preloadImageFile,
     array $sections = [],
   ) {
     $this->slug = $slug;
     $this->title = $title;
-    $this->description = $description;
+    $this->metaDescription = $metaDescription;
+    $this->thumbnailDescription = $thumbnailDescription;
     $this->thumbnail = new Image($this->slug . '/' . $thumbnailFile);
     $this->preloadImage = new Image($this->slug . '/' . $preloadImageFile);
     $this->sections = [];

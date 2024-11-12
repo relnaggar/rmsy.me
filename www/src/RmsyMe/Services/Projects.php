@@ -16,6 +16,10 @@ class Projects
     $this->addProject(new Project(
       'beetle',
       'Pooptimus Prime: The World\'s First Dung Beetle Biorobot',
+      'Explore the intriguing world of dung beetle navigation through the eyes '
+      . 'of a biorobot. This groundbreaking research unpacks how beetles use '
+      . 'celestial cues to navigate, offering insights into biology and '
+      . 'robotics alike.',
       'Robot vs beetle: who will be the ultimate fighting champion?',
       'vs-robot.jpg',
       'beetles-fighting.jpg',
@@ -31,6 +35,8 @@ class Projects
     $this->addProject(new Project(
       'sdp',
       'Robo-Messi: When Silicon Met Soccer',
+      'Join the journey of building Robo-Messi, the football-playing LEGO '
+      . 'robot that changed robo-football forever.',
       'Robo-Messi wants a hug. Will you give him one?',
       'hug.jpg',
       'initial-front.jpg',

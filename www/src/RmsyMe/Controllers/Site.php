@@ -108,7 +108,7 @@ class Site extends AbstractController
         'title' => 'Ramsey El-Naggar',
         'subtitle' => 'Software Engineer & Educator',
         'metaDescription' => "Hi, I'm Ramsey 👋." .
-          "Welcome to my slice of the internet pie!",
+          'Welcome to my slice of the internet pie!',
         'numberOfYearsTutoringAsWord' => $numberOfYearsTutoringAsWord,
         'featuredProjects' => $featuredProjects,
         'preloadImages' => $preloadImages,
@@ -150,17 +150,6 @@ class Site extends AbstractController
           'full-stack web application development.',
         'preloadImages' => [new Image('profile.jpg')],
         'lastModifiedDateFormatted' => $lastModifiedDateFormatted
-      ]
-    );
-  }
-
-  public function tutoring(): Page
-  {
-    return $this->getPage(
-      __FUNCTION__,
-      [
-        'title' => 'Tutoring',
-        'metaDescription' => '',
       ]
     );
   }
