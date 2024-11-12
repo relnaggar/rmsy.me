@@ -1,9 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Components;
 
 use Framework\Components\ComponentInterface;
 
-class FormInput implements ComponentInterface {
+class FormInput implements ComponentInterface
+{
   private readonly string $name;
   private readonly string $label;
   private readonly string $type;
@@ -33,7 +37,8 @@ class FormInput implements ComponentInterface {
     $this->formText = $formText;
   }
 
-  public function render(): string {
+  public function render(): string
+  {
     ob_start();
     ?>
       <div class="mb-3">

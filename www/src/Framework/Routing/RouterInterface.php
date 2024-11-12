@@ -1,7 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Framework\Routing;
 
-interface RouterInterface {
+interface RouterInterface
+{
   /**
    * Routes to a \Framework\Routing\ControllerAction object, which contains the
    * controller and action to be called when the user navigates to the given

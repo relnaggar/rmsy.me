@@ -1,11 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Framework;
 
-class Config {
+class Config
+{
   // singleton pattern
+
   private static $instance = null;
+
   private function __construct() {}
-  public static function getInstance(): Config {
+
+  public static function getInstance(): Config
+  {
     if (self::$instance === null) {
       self::$instance = new Config();
     }
@@ -20,11 +28,13 @@ class Config {
     'layoutTemplatePath' => 'layout',
   ];
 
-  public function set($key, $value) {
+  public function set($key, $value)
+  {
     $this->settings[$key] = $value;
   }
 
-  public function get($key, $default = null) {
+  public function get($key, $default = null)
+  {
     return $this->settings[$key] ?? $default;
   }
 }

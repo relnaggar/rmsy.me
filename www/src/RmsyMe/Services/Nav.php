@@ -1,12 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Services;
 
 use Framework\Routing\RouterInterface;
+use RmsyMe\Data\{
+  Nav as NavData,
+  NavItem,
+};
 
-use RmsyMe\Data\Nav as NavData;
-use RmsyMe\Data\NavItem;
-
-class Nav {
+class Nav
+{
   private RouterInterface $router;
   private Projects $projectsService;
   private ContactMethods $contactMethodsService;
@@ -86,7 +91,8 @@ class Nav {
     );
   }
 
-  private function addNavItem(NavItem $navItem): void {
+  private function addNavItem(NavItem $navItem): void
+  {
     $hasPath = false;
     if ($this->router->hasPath($navItem->getPath())) {
       $hasPath = true;
@@ -106,11 +112,13 @@ class Nav {
     }
   }
 
-  public function getNav(): NavData {
+  public function getNav(): NavData
+  {
     return $this->nav;
   }
 
-  public function getNavItem(string $path): NavItem {
+  public function getNavItem(string $path): NavItem
+  {
     foreach ($this->nav->items as $navItem) {
       if ($navItem->getPath() === $path) {
         return $navItem;

@@ -1,7 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Data;
 
-class Project {
+class Project
+{
   public readonly string $slug;
   public readonly string $title;
   public readonly string $description;
@@ -33,7 +37,8 @@ class Project {
     }
   }
 
-  private function addSection(string $id, string $title): void {
+  private function addSection(string $id, string $title): void
+  {
     $this->sections[] = new Section(
       id: $id,
       templateDirectory: $this->slug,
@@ -41,11 +46,13 @@ class Project {
     );
   }
 
-  public function getSections(): array {
+  public function getSections(): array
+  {
     return $this->sections;
   }
 
-  public function getPath(): string {
+  public function getPath(): string
+  {
     return "/projects/{$this->slug}";
   }
 }

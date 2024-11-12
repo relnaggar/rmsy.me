@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Data;
 
 class Nav {
@@ -23,13 +26,15 @@ class Nav {
     $this->items = $items;
   }
 
-  public function setActiveItem(string $activePath): void {
+  public function setActiveItem(string $activePath): void
+  {
     foreach ($this->items as $item) {
       $item->setActiveItem($activePath);
     }
   }
 
-  public function getPreviousPath(): string {
+  public function getPreviousPath(): string
+  {
     $previousItem = null;
     foreach ($this->items as $item) {
       if ($item->isActive()) {
@@ -40,7 +45,8 @@ class Nav {
     return "";
   }
 
-  public function getNextPath(): string {
+  public function getNextPath(): string
+  {
     $foundActive = false;
     foreach ($this->items as $item) {
       if ($foundActive) {

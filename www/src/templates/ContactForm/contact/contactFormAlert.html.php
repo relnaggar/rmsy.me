@@ -1,4 +1,8 @@
-<?php use RmsyMe\Components\Alert; ?>
+<?php
+
+use RmsyMe\Components\Alert;
+
+?>
 
 <?php if ($success): ?>
   <?= (new Alert(

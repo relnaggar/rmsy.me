@@ -1,7 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Framework\Routing;
 
-class BasicRouter implements RouterInterface {
+class BasicRouter implements RouterInterface
+{
   private array $routes;
   private ControllerAction $pageNotFound;
 
@@ -12,7 +16,8 @@ class BasicRouter implements RouterInterface {
    * @param ControllerAction $pageNotFound The controller and action to be
    *   called when no route matches the given path.
    */
-  public function __construct(array $routes, ControllerAction $pageNotFound) {
+  public function __construct(array $routes, ControllerAction $pageNotFound)
+  {
     // validate routes
     foreach ($routes as $pattern => $methods) {
       foreach ($methods as $method => $controllerAction) {
@@ -34,7 +39,8 @@ class BasicRouter implements RouterInterface {
     $this->pageNotFound = $pageNotFound;
   }
 
-  public function hasPath(string $serverRequestPath): bool {
+  public function hasPath(string $serverRequestPath): bool
+  {
     foreach ($this->routes as $pattern => $route) {
       // replace all <...> with (?P<...>[^/]+)
       $regx = preg_replace('/<(\w+)>/', '(?P<$1>[^/]+)', $pattern);

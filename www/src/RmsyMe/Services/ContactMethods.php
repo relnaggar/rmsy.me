@@ -1,13 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Services;
 
 use Framework\Routing\RouterInterface;
 
-class ContactMethods {
+class ContactMethods
+{
   private RouterInterface $router;
   private array $contactMethods;
 
-  public function __construct(RouterInterface $router) {
+  public function __construct(RouterInterface $router)
+  {
     $this->router = $router;
     $this->contactMethods = [];
     $this->addContactMethod([
@@ -40,7 +45,8 @@ class ContactMethods {
     ]);
   }
 
-  private function addContactMethod(array $contactMethods): void {
+  private function addContactMethod(array $contactMethods): void
+  {
     if (
       $this->router->hasPath($contactMethods['href'])
       || strpos($contactMethods['href'], "mailto:") === 0
@@ -49,7 +55,8 @@ class ContactMethods {
     }
   }
 
-  public function getContactMethods(): array {
+  public function getContactMethods(): array
+  {
     return $this->contactMethods;
   }
 }

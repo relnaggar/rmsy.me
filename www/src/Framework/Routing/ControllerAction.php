@@ -1,9 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Framework\Routing;
 
 use Framework\Controllers\AbstractController;
 
-class ControllerAction {
+class ControllerAction
+{
   public readonly string $controllerClass;
   public readonly string $action;
   public readonly array $params;

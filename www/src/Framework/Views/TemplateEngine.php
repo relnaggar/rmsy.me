@@ -1,9 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Framework\Views;
 
 use Framework\Config;
 
-class TemplateEngine {
+class TemplateEngine
+{
   /**
     * Load a template file, inject variables into it, and return the result.
     *
@@ -19,8 +23,8 @@ class TemplateEngine {
     */
   public static function loadTemplate(
     string $templatePath,
-    array $templateVars=[],
-    string $templateDirectory=''
+    array $templateVars = [],
+    string $templateDirectory = ''
   ): string {
     $config = Config::getInstance();
 
@@ -62,8 +66,8 @@ class TemplateEngine {
     */
   public static function getSnippet(
     string $templatePath,
-    int $numberOfWords=-1,
-    array $templateVars=[],
+    int $numberOfWords = -1,
+    array $templateVars = [],
   ): string {
     $html = self::loadTemplate($templatePath, $templateVars);
     $text = strip_tags($html);

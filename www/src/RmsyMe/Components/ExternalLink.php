@@ -1,9 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Components;
 
 use Framework\Components\ComponentInterface;
 
-class ExternalLink implements ComponentInterface {
+class ExternalLink implements ComponentInterface
+{
   private readonly string $href;
   private readonly string $text;
   private readonly string $class;
@@ -12,7 +16,7 @@ class ExternalLink implements ComponentInterface {
   public function __construct(
     string $href,
     string $text,
-    string $class=''
+    string $class = ''
   ) {
     $this->href = $href;
     $this->text = $text;

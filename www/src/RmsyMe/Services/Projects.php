@@ -1,12 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Services;
 
 use RmsyMe\Data\Project;
 
-class Projects {
+class Projects
+{
   private array $projects;
 
-  public function __construct() {
+  public function __construct()
+  {
     $this->projects = [];
     $this->addProject(new Project(
       'beetle',
@@ -41,15 +46,18 @@ class Projects {
     ));
   }
 
-  private function addProject(Project $project): void {
+  private function addProject(Project $project): void
+  {
     $this->projects[$project->slug] = $project;
   }
 
-  public function getProjects(): array {
+  public function getProjects(): array
+  {
     return $this->projects;
   }
 
-  public function getProject(string $slug): Project {
+  public function getProject(string $slug): Project
+  {
     return $this->projects[$slug];
   }
 }

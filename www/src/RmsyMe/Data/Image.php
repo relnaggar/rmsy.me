@@ -1,14 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Data;
 
 class Image {
   public readonly string $href;
 
-  public function __construct(string $href) {
+  public function __construct(string $href)
+  {
     $this->href = $href;
   }
 
-  public function getType(): string {
+  public function getType(): string
+  {
     $parts = explode('.', $this->href);
     $extension = $parts[count($parts) - 1];
     return match ($extension) {

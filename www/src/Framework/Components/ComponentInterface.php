@@ -1,7 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Framework\Components;
 
-interface ComponentInterface {
+interface ComponentInterface
+{
   /**
    * Render the component
    *

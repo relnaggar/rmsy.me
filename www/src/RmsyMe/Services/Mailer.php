@@ -1,16 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Services;
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
-
+use PHPMailer\PHPMailer\{
+  PHPMailer,
+  SMTP,
+  Exception,
+};
 use RmsyMe\Services\Secrets;
 
-class Mailer {
+class Mailer
+{
   private Secrets $secretsService;
 
-  public function __construct(Secrets $secretsService) {
+  public function __construct(Secrets $secretsService)
+  {
     $this->secretsService = $secretsService;
   }
 
@@ -19,10 +25,10 @@ class Mailer {
     string $toEmail,
     string $subject,
     string $htmlBody,
-    string $fromName="",
-    string $toName="",
-    string $replyToEmail="",
-    string $replyToName=""
+    string $fromName = "",
+    string $toName = "",
+    string $replyToEmail = "",
+    string $replyToName = ""
   ): bool {
     // return false; // currently disabled
 

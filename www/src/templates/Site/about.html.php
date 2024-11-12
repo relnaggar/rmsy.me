@@ -1,4 +1,8 @@
-<?php use RmsyMe\Components\ExternalLink; ?>
+<?php
+
+use RmsyMe\Components\ExternalLink;
+
+?>
 
 <figure class="figure col-sm-6 float-end m-3 col-12">
   <img

@@ -1,14 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Controllers;
 
-use Framework\Controllers\AbstractController;
-use Framework\Views\Page;
+use Framework\{
+  Controllers\AbstractController,
+  Views\Page,
+};
+use RmsyMe\{
+  Services\ContactMethods,
+  Services\Mailer,
+  Data\ContactFormData,
+};
 
-use RmsyMe\Services\ContactMethods;
-use RmsyMe\Services\Mailer;
-use RmsyMe\Data\ContactFormData;
-
-class ContactForm extends AbstractController {
+class ContactForm extends AbstractController
+{
   private ContactMethods $contactMethodsService;
   private Mailer $mailerService;
 
@@ -22,7 +29,8 @@ class ContactForm extends AbstractController {
     $this->mailerService = $mailerService;
   }
 
-  private function getContactTemplateVars(): array {
+  private function getContactTemplateVars(): array
+  {
     return [
       'title' => 'Contact',
       'metaDescription' => 'I\'m always game to talk tech, tutoring, or ' .
@@ -33,14 +41,16 @@ class ContactForm extends AbstractController {
     ];
   }
 
-  public function contact(): Page {
+  public function contact(): Page
+  {
     return $this->getPage(
       __FUNCTION__,
       $this->getContactTemplateVars()
     );
   }
 
-  public function contactSubmit(): Page {
+  public function contactSubmit(): Page
+  {
     // set template path and vars same as contact method
     $templatePath = 'contact';
     $templateVars = $this->getContactTemplateVars();

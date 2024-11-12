@@ -1,13 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Controllers;
 
-use Framework\Controllers\AbstractController;
-use Framework\Views\Page;
-
+use Framework\{
+  Controllers\AbstractController,
+  Views\Page,
+};
 use RmsyMe\Services\Projects as ProjectsService;
-use RmsyMe\Services\Nav as NavService;
 
-class Projects extends AbstractController {
+class Projects extends AbstractController
+{
   private ProjectsService $projectsService;
 
   public function __construct(
@@ -18,7 +22,8 @@ class Projects extends AbstractController {
     $this->projectsService = $projectsService;
   }
 
-  public function index(): Page {
+  public function index(): Page
+  {
     $projects = $this->projectsService->getProjects();
     $preloadImages = array_map(
       fn($project) => $project->thumbnail,
@@ -36,7 +41,8 @@ class Projects extends AbstractController {
     );
   }
 
-  public function show(string $projectSlug): Page {
+  public function show(string $projectSlug): Page
+  {
     $project = $this->projectsService->getProject($projectSlug);
 
     return $this->getPage(

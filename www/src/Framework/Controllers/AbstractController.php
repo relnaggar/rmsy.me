@@ -1,16 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Framework\Controllers;
 
-use Framework\Decorators\DecoratorInterface;
-use Framework\Config;
-use Framework\Views\Page;
-use Framework\Data\SectionInterface;
-use Framework\Views\TemplateEngine;
+use Framework\{
+  Decorators\DecoratorInterface,
+  Config,
+  Views\Page,
+  Data\SectionInterface,
+  Views\TemplateEngine,
+};
 
-abstract class AbstractController {
+abstract class AbstractController
+{
   private array $decorators;
 
-  public function __construct(array $decorators=[]) {
+  public function __construct(array $decorators = [])
+  {
     $this->decorators = $decorators;
     foreach ($this->decorators as $decorator) {
       if (!$decorator instanceof DecoratorInterface) {
@@ -26,7 +33,8 @@ abstract class AbstractController {
    *
    * @return string The name of the controller class.
    */
-  public function getControllerName(): string {
+  public function getControllerName(): string
+  {
     return (new \ReflectionClass($this))->getShortName();
   }
 
@@ -38,7 +46,8 @@ abstract class AbstractController {
    *   extension.
    * @return string The full path to the template file.
    */
-  public function getFullTemplateFilePath($relativeTemplatePath): string {
+  public function getFullTemplateFilePath($relativeTemplatePath): string
+  {
     $config = Config::getInstance();
     $sourceDirectory = $config->get('sourceDirectory');
     $templateRootDirectory = $config->get('templateRootDirectory');
@@ -79,10 +88,10 @@ abstract class AbstractController {
    *   injected.
    */
   public function getPage(
-    string $bodyTemplatePath='',
-    array $templateVars=[],
-    string $layoutTemplatePath='',
-    array $sections=[],
+    string $bodyTemplatePath = '',
+    array $templateVars = [],
+    string $layoutTemplatePath = '',
+    array $sections = [],
   ): Page {
     $templateVars = $this->applyDecorators($templateVars);
 
@@ -114,12 +123,14 @@ abstract class AbstractController {
    *
    * @param string $path The path to redirect the user to.
    */
-  public function redirect(string $path): void {
+  public function redirect(string $path): void
+  {
     header('Location: ' . $path);
     exit();
   }
 
-  private function applyDecorators(array $templateVars): array {
+  private function applyDecorators(array $templateVars): array
+  {
     foreach ($this->decorators as $decorator) {
       $newTemplateVars = $decorator->getNewTemplateVars($templateVars);
       foreach ($newTemplateVars as $key => $value) {

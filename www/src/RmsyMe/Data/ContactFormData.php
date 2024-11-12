@@ -1,14 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Data;
 
 use Framework\Data\AbstractFormData;
 
-class ContactFormData extends AbstractFormData {
+class ContactFormData extends AbstractFormData
+{
   public string $name;
   public string $email;
   public string $message;
 
-  public function validate(): array {
+  public function validate(): array
+  {
     $errorCodes = [];
     if (
       empty($this->name)

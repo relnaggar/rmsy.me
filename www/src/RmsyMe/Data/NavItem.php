@@ -1,7 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Data;
 
-class NavItem {
+class NavItem
+{
   public readonly string $text;
   private string $path;
   public readonly bool $external;
@@ -13,9 +17,9 @@ class NavItem {
   public function __construct(
     string $text,
     string $path,
-    bool $external=false,
-    string $icon='',
-    bool $inFooter=false
+    bool $external = false,
+    string $icon = '',
+    bool $inFooter = false
   ) {
     $this->text = $text;
     $this->path = $path;
@@ -26,19 +30,23 @@ class NavItem {
     $this->inFooter = $inFooter;
   }
 
-  public function getPath(): string {
+  public function getPath(): string
+  {
     return $this->path;
   }
 
-  public function addBasePath(string $basePath): void {
+  public function addBasePath(string $basePath): void
+  {
     $this->path = $basePath . $this->path;
   }
 
-  public function isActive(): bool {
+  public function isActive(): bool
+  {
     return $this->active;
   }
 
-  public function setActiveItem(string $activePath): void {
+  public function setActiveItem(string $activePath): void
+  {
     if ($this->path === $activePath) {
       $this->active = true;
     }
@@ -50,15 +58,18 @@ class NavItem {
     }
   }
 
-  public function isDropdown(): bool {
+  public function isDropdown(): bool
+  {
     return !empty($this->dropdownItems);
   }
 
-  public function getDropdownItems(): array {
+  public function getDropdownItems(): array
+  {
     return $this->dropdownItems;
   }
 
-  public function addDropdownItem(NavItem $item): void {
+  public function addDropdownItem(NavItem $item): void
+  {
     if ($item->isDropdown()) {
       throw new \Exception('Cannot add a dropdown item to a dropdown item');
     }
@@ -66,12 +77,14 @@ class NavItem {
     $this->dropdownItems[] = $item;
   }
 
-  public function removeDropdownItem(NavItem $item): void {
+  public function removeDropdownItem(NavItem $item): void
+  {
     $index = array_search($item, $this->dropdownItems, true);
     unset($this->dropdownItems[$index]);
   }
 
-  public function getAsNav(): Nav {
+  public function getAsNav(): Nav
+  {
     return new Nav(
       homePath: $this->path,
       title: $this->text,

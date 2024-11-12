@@ -1,22 +1,31 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Controllers;
 
-use Framework\Controllers\AbstractController;
-use Framework\Views\Page;
+use Framework\{
+  Controllers\AbstractController,
+  Views\Page,
+};
+use RmsyMe\{
+  Data\Section,
+  Services\Projects,
+  Data\Image,
+};
 
-use RmsyMe\Data\Section;
-use RmsyMe\Services\Projects;
-use RmsyMe\Data\Image;
-
-class Site extends AbstractController {
+class Site extends AbstractController
+{
   private Projects $projectsService;
 
-  public function __construct(array $decorators, Projects $projectsService) {
+  public function __construct(array $decorators, Projects $projectsService)
+  {
     parent::__construct($decorators);
     $this->projectsService = $projectsService;
   }
 
-  public function index(): Page {
+  public function index(): Page
+  {
     $currentDate = new \DateTime();
     $tutoringStartDate = new \DateTime('2019-01-01');
     $numberOfYearsTutoring = $currentDate->diff($tutoringStartDate)->y;
@@ -122,7 +131,8 @@ class Site extends AbstractController {
     );
   }
 
-  public function about(): Page {
+  public function about(): Page
+  {
     $relativeTemplatePath = __FUNCTION__;
     $fullTemplateFilePath = $this->getFullTemplateFilePath(
       $relativeTemplatePath
@@ -144,7 +154,8 @@ class Site extends AbstractController {
     );
   }
 
-  public function tutoring(): Page {
+  public function tutoring(): Page
+  {
     return $this->getPage(
       __FUNCTION__,
       [
@@ -154,7 +165,8 @@ class Site extends AbstractController {
     );
   }
 
-  public function pageNotFound(): Page {
+  public function pageNotFound(): Page
+  {
     http_response_code(404);
     return $this->getPage(
       __FUNCTION__,

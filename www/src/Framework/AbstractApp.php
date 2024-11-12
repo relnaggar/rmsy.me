@@ -1,22 +1,32 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Framework;
 
-use DI\Container;
-use DI\ContainerBuilder;
+use DI\{
+  Container,
+  ContainerBuilder,
+};
+use Framework\{
+  Routing\RouterInterface,
+  Controllers\AbstractController,
+  Decorators\DecoratorInterface,
+  Routing\ControllerAction,
+  Views\Page,
+};
 
-use function DI\value;
-use function DI\autowire;
+use function DI\{
+  value,
+  autowire,
+};
 
-use Framework\Routing\RouterInterface;
-use Framework\Controllers\AbstractController;
-use Framework\Decorators\DecoratorInterface;
-use Framework\Routing\ControllerAction;
-use Framework\Views\Page;
-
-abstract class AbstractApp {
+abstract class AbstractApp
+{
   protected Container $container;
 
-  public function __construct() {
+  public function __construct()
+  {
     $diDefinitions = [];
 
     // add the router to the DI definitions if it's set by the subclass
@@ -64,7 +74,8 @@ abstract class AbstractApp {
    *
    * @return RouterInterface The router to use.
    */
-  protected function getRouter(): ?RouterInterface {
+  protected function getRouter(): ?RouterInterface
+  {
     return null;
   }
 
@@ -77,7 +88,8 @@ abstract class AbstractApp {
    *  [ 'ControllerClass' => [ 'DecoratorClass1', 'DecoratorClass2', ... ] ]
    *  Classes must be fully qualified class names, e.g. via ::class.
    */
-  protected function getDecoratorMap(): array {
+  protected function getDecoratorMap(): array
+  {
     return [];
   }
 
@@ -109,11 +121,13 @@ abstract class AbstractApp {
    *
    * @return string The current path
    */
-  public static function getCurrentPath(): string {
+  public static function getCurrentPath(): string
+  {
     return explode('?', $_SERVER['REQUEST_URI'])[0];
   }
 
-  public final function run(): void {
+  public final function run(): void
+  {
     // get the URL path, not including the query string
     $serverRequestPath = self::getCurrentPath();
 

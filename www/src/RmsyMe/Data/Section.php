@@ -1,9 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe\Data;
 
 use Framework\Data\SectionInterface;
 
-class Section implements SectionInterface {
+class Section implements SectionInterface
+{
   public readonly string $id;
   private string $templateDirectory;
   public readonly string $title;
@@ -20,15 +24,18 @@ class Section implements SectionInterface {
     $this->htmlContent = '';
   }
 
-  public function getTemplatePath(string $controllerName): string {
+  public function getTemplatePath(string $controllerName): string
+  {
     return "$controllerName/{$this->templateDirectory}/{$this->id}";
   }
 
-  public function setHtmlContent(string $htmlContent): void {
+  public function setHtmlContent(string $htmlContent): void
+  {
     $this->htmlContent = $htmlContent;
   }
 
-  public function getHtmlContent(): string {
+  public function getHtmlContent(): string
+  {
     return $this->htmlContent;
   }
 }

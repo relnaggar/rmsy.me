@@ -1,14 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace RmsyMe;
 
-use Framework\AbstractApp;
-use Framework\Routing\RouterInterface;
-use Framework\Routing\BasicRouter;
-use Framework\Routing\ControllerAction;
-use Framework\Routing\Redirect;
+use Framework\{
+  AbstractApp,
+  Routing\RouterInterface,
+  Routing\BasicRouter,
+  Routing\ControllerAction,
+  Routing\Redirect,
+};
 
-class App extends AbstractApp {
-  public function getDecoratorMap(): array {
+class App extends AbstractApp
+{
+  public function getDecoratorMap(): array
+  {
     return [
       Controllers\Site::class => [
         Decorators\ExtendedTitle::class,
@@ -28,7 +35,8 @@ class App extends AbstractApp {
     ];
   }
 
-  public function getRouter(): RouterInterface {
+  public function getRouter(): RouterInterface
+  {
     $mediaService = new Services\Media();
     return new BasicRouter(
       routes: [

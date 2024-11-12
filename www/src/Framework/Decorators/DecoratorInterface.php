@@ -1,7 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Framework\Decorators;
 
-interface DecoratorInterface {
+interface DecoratorInterface
+{
   /**
    * This method should return an array of new template variables that will be
    * added to the template variables array that is passed to the template

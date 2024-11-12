@@ -1,20 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Framework\Views;
 
 use Framework\Config;
 
-class Page {
+class Page
+{
   private string $htmlContent;
   private array $templateVars = [];
 
   // factory pattern used since PHP doesn't support method overloading
   private function __construct() {}
 
-  public function getHtmlContent(): string {
+  public function getHtmlContent(): string
+  {
     return $this->htmlContent;
   }
 
-  public function getTemplateVars(): array {
+  public function getTemplateVars(): array
+  {
     return $this->templateVars;
   }
 
@@ -24,7 +30,8 @@ class Page {
    * @param string $htmlContent The HTML content for the Page.
    * @return Page A new Page instance with the specified HTML content.
    */
-  public static function withHtmlContent(string $htmlContent): Page {
+  public static function withHtmlContent(string $htmlContent): Page
+  {
     $obj = new Page();
     $obj->htmlContent = $htmlContent;
     $obj->templateVars = [];
@@ -44,7 +51,7 @@ class Page {
    */
   public static function withTemplate(
     string $templatePath,
-    array $templateVars=[]
+    array $templateVars = []
   ): Page {
     $obj = new Page();
     $obj->htmlContent = TemplateEngine::loadTemplate(
@@ -75,9 +82,9 @@ class Page {
    *   injected.
    */
   public static function withLayout(
-    string $bodyTemplatePath='',
-    array $templateVars=[],
-    string $layoutTemplatePath='',
+    string $bodyTemplatePath = '',
+    array $templateVars = [],
+    string $layoutTemplatePath = '',
   ): Page {
     $obj = new Page();
 

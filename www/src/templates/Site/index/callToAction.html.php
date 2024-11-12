@@ -1,4 +1,8 @@
-<?php use RmsyMe\Components\ExternalLink; ?>
+<?php
+
+use RmsyMe\Components\ExternalLink;
+
+?>
 
 <div class="row">
   <?php foreach ($roles as $role): ?>
