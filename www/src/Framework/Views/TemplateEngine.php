@@ -28,7 +28,7 @@ class TemplateEngine {
     if (empty($templateDirectory)) {
       $templateDirectory = $config->get('templateRootDirectory');
     }
-    
+
     // extract the variables to be injected
     extract($templateVars);
 
@@ -70,7 +70,7 @@ class TemplateEngine {
 
     // remove extra whitespace
     $squashedText = trim(preg_replace('/\s+/', ' ', $text));
-    
+
     // return the full text if the number of words is -1
     if ($numberOfWords === -1) {
       return $squashedText;

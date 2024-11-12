@@ -34,7 +34,7 @@
   data is received, understood, and acknowledged before moving on to the next
   one.
   No more dropped calls or misunderstood texts.
-  No more stoic silence when the command was to charge forward. 
+  No more stoic silence when the command was to charge forward.
 </p>
 
 <p>

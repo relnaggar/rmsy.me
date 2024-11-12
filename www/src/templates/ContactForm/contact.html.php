@@ -10,12 +10,12 @@
   I've never lost a patient!
 </p>
 
-<div class="row">  
+<div class="row">
   <div class="col-xxl-7 mb-3">
     <?php $displayAlert && require 'contact/contactFormAlert.html.php' ?>
     <?php $displayForm && require 'contact/contactForm.html.php' ?>
   </div>
-  <div class="col-xxl-5">    
+  <div class="col-xxl-5">
     <?php foreach ($contactMethods as $contactMethod): ?>
       <div class="card mb-3">
         <div class="card-header">

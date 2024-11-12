@@ -30,7 +30,7 @@
         $formName=$formName,
         $autocomplete="on",
         $validationAttributes=<<<HTML
-          maxlength="254"        
+          maxlength="254"
           required
         HTML,
         $invalidFeedback='This field cannot be blank and must be a valid email

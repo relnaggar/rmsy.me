@@ -38,7 +38,7 @@
 </p>
 
 <p>
-  But, uh oh, what's this?  
+  But, uh oh, what's this?
   You're not the only one who's noticed your fine craftsmanship.
   A nefarious rival has been lurking from the shadows, eyeing up your spherical
   masterpiece with envy.

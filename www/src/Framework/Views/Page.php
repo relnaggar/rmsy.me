@@ -60,7 +60,7 @@ class Page {
    * template. The $bodyContent template variable is injected by
    * specifying the body template. Additional variables can then be
    * injected which will be available to both the layout and body templates.
-   * 
+   *
    * @param string $bodyTemplatePath The path to the body template file,
    *   relative to the configured template root directory. Given without the
    *   file extension.

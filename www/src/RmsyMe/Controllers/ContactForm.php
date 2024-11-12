@@ -21,11 +21,11 @@ class ContactForm extends AbstractController {
     $this->contactMethodsService = $contactMethodsService;
     $this->mailerService = $mailerService;
   }
-  
+
   private function getContactTemplateVars(): array {
     return [
       'title' => 'Contact',
-      'metaDescription' => 'I\'m always game to talk tech, tutoring, or ' . 
+      'metaDescription' => 'I\'m always game to talk tech, tutoring, or ' .
         'even dung beetles!',
       'contactMethods' => $this->contactMethodsService->getContactMethods(),
       'displayAlert' => false,
@@ -52,7 +52,7 @@ class ContactForm extends AbstractController {
     // display error alert if form not submitted
     if (!isset($_POST['submit']) || !isset($_POST['contactForm'])) {
       return $this->getPage($templatePath, $templateVars);
-    }    
+    }
 
     // validate form data
     $contactFormData = new ContactFormData($_POST['contactForm']);
@@ -72,7 +72,7 @@ class ContactForm extends AbstractController {
       subject: "From $contactFormData->name <$contactFormData->email>",
       htmlBody: nl2br($contactFormData->message, false),
       fromName: 'rmsy.me contact form',
-      toName: 'Ramsey El-Naggar',      
+      toName: 'Ramsey El-Naggar',
       replyToEmail: $contactFormData->email,
       replyToName: $contactFormData->name,
     );

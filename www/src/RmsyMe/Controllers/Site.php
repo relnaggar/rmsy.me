@@ -36,7 +36,7 @@ class Site extends AbstractController {
       'text' => 'Book a free meeting',
       'btn-type' => 'orange',
     ];
-  
+
     $roles = [
       [
         'header' => 'Ramsey the Engineer',

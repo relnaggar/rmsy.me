@@ -11,7 +11,7 @@ class ControllerAction {
   /**
    * Constructs a ControllerAction object, which is a simple pair of a
    * controller and an action.
-   * 
+   *
    * @param string $controllerClass The class of the controller to be called,
    *  which must extend AbstractController. Can be provided via the ::class.
    * @param string $action The action to be called on the controller.

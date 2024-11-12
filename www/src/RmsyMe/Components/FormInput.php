@@ -20,7 +20,7 @@ class FormInput implements ComponentInterface {
     string $formName,
     string $autocomplete,
     string $validationAttributes = '',
-    string $invalidFeedback = '',    
+    string $invalidFeedback = '',
     string $formText = ''
   ) {
     $this->name = $name;

@@ -33,7 +33,7 @@
         Oh no!
         Our web gnomes are telling me the email address you entered is invalid.
         Whoops!
-      HTML,      
+      HTML,
       'message' => <<<HTML
         Oh no!
         Our web gnomes are telling me the message you entered is invalid.
@@ -58,7 +58,7 @@
   ?>
   <?= (new Alert(
     'danger',
-    'Message send failure!', 
+    'Message send failure!',
     $errorMessages[$errorCode ?? 'default']
   ))->render() ?>
 <?php endif; ?>

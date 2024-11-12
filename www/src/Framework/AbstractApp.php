@@ -61,7 +61,7 @@ abstract class AbstractApp {
   /**
    * Override this method to tell the dependency injection container which
    * router to inject when a RouterInterface is requested.
-   * 
+   *
    * @return RouterInterface The router to use.
    */
   protected function getRouter(): ?RouterInterface {
@@ -71,7 +71,7 @@ abstract class AbstractApp {
   /**
    * Override this method to tell the dependency injection container which
    * controllers should be decorated by which decorators.
-   * 
+   *
    * @return array An associative array that maps controller classes to arrays
    *   of decorator classes. Must be in the format:
    *  [ 'ControllerClass' => [ 'DecoratorClass1', 'DecoratorClass2', ... ] ]
@@ -85,11 +85,11 @@ abstract class AbstractApp {
    * Routes to a \Framework\ControllerAction object, which contains the
    * controller and action to be called when the user navigates to the given
    * path using the given HTTP method.
-   * 
+   *
    * Override this method to define how the app should route requests. If you
    * don't override this method, the default implementation will use the router
    * injected by the getRouter method.
-   * 
+   *
    * @param string $serverRequestPath The URL path, not including the query
    *  string.
    * @param string $httpMethod The HTTP method e.g. GET, POST, PUT, DELETE
@@ -106,7 +106,7 @@ abstract class AbstractApp {
 
   /**
    * Returns the current path.
-   * 
+   *
    * @return string The current path
    */
   public static function getCurrentPath(): string {

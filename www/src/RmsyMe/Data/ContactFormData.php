@@ -21,7 +21,7 @@ class ContactFormData extends AbstractFormData {
       || !filter_var($this->email, FILTER_VALIDATE_EMAIL)
       || strlen($this->email) > 254
     ) {
-      $errorCodes['email'] = 'Email is required and must be a valid email ' . 
+      $errorCodes['email'] = 'Email is required and must be a valid email ' .
         'address (up to 254 characters)';
     }
     if (

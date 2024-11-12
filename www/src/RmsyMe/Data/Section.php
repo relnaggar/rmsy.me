@@ -6,7 +6,7 @@ use Framework\Data\SectionInterface;
 class Section implements SectionInterface {
   public readonly string $id;
   private string $templateDirectory;
-  public readonly string $title;  
+  public readonly string $title;
   private string $htmlContent;
 
   public function __construct(

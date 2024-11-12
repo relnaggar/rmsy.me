@@ -34,7 +34,7 @@
     It was an accident ref!
   </dd>
   <dt>Red</dt>
-  <dd>    
+  <dd>
     Infra-red sensor perfectly callibrated to detect the presence of the ball,
     or lack-thereof.
     This impeccable invisible eye was tuned so finely that it would make

@@ -7,7 +7,7 @@ use Framework\Config;
 spl_autoload_register(function (string $className): void {
     $sourceDirectory = Config::getInstance()->get('sourceDirectory');
     $fileName = str_replace('\\', '/', $className) . '.php';
-    $file = "$sourceDirectory/$fileName"; 
+    $file = "$sourceDirectory/$fileName";
     if (file_exists($file)) {
         require_once $file;
     }

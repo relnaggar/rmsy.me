@@ -23,7 +23,7 @@ abstract class AbstractController {
 
   /**
    * Get the name of the controller class.
-   * 
+   *
    * @return string The name of the controller class.
    */
   public function getControllerName(): string {
@@ -32,7 +32,7 @@ abstract class AbstractController {
 
   /**
    * Get the full path to the template file for the given controller.
-   * 
+   *
    * @param string $relativeTemplatePath The path to the template file,
    *   relative to the controller's template directory. Given without the file
    *   extension.
@@ -55,12 +55,12 @@ abstract class AbstractController {
    * specifying the body template in this controller's template directory.
    * Additional variables can then be injected which will be available to both
    * the layout and body templates.
-   * 
+   *
    * @param string $bodyTemplatePath The path to the body template file,
    *   relative to this controller's template directory, which is a subdirectory
    *   of the configured template root directory and named after the controller.
    *   Given without the file extension.
-   * 
+   *
    *   For example, if the controller class is named 'Home', the configured
    *   templateRootDirectory is 'templates', and $bodyTemplatePath is
    *   given as 'index', then the body template file will be loaded from
@@ -111,7 +111,7 @@ abstract class AbstractController {
 
   /**
    * Redirect the user to the specified path.
-   * 
+   *
    * @param string $path The path to redirect the user to.
    */
   public function redirect(string $path): void {

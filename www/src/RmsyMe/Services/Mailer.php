@@ -44,7 +44,7 @@ class Mailer {
         $phpMailer->setFrom($fromEmail);
       } else {
         $phpMailer->setFrom($fromEmail, $fromName);
-      }      
+      }
       if ($toName === "") {
         $phpMailer->addAddress($toEmail);
       } else {

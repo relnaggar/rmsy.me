@@ -81,7 +81,7 @@
               href="<?= $navItem->getPath() ?>"
               <?php if ($navItem->isActive()): ?>
                 aria-current="page"
-              <?php endif; ?>              
+              <?php endif; ?>
               <?php if ($navItem->external): ?>
                 target="_blank"
               <?php endif; ?>
@@ -92,7 +92,7 @@
               <?php // if (!empty($navItem->icon)): ?>
               <?php if (false): ?>
                 <span class="visually-hidden"><?= $navItem->text ?></span>
-                <i class ="bi bi-<?= $navItem->icon ?>"></i>                
+                <i class ="bi bi-<?= $navItem->icon ?>"></i>
               <?php else: ?>
                 <?=$navItem->text?>
                 <?php if ($navItem->external): ?>
