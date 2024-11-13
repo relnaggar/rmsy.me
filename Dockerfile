@@ -81,7 +81,7 @@ EOF
 
 RUN a2enmod headers \
   && sed -i '/<\/VirtualHost>/d' /etc/apache2/sites-available/default-ssl.conf \
-  && cat <<'EOF' >> /etc/apache2/sites-available/default-ssl.conf
+  && cat <<EOF >> /etc/apache2/sites-available/default-ssl.conf
   # implement HSTS in production mode
   <IfDefine PRODUCTION>
     Header always set Strict-Transport-Security "\\
