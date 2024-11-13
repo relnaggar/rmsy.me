@@ -73,10 +73,10 @@ class App extends AbstractApp
               '/resumes/ramsey-el-naggar-full-stack-developer.pdf'
           ),
         ],
-        '/resumes/tutor' => [
+        '/resumes/educator' => [
           'GET' => new Redirect(
             $mediaService->getMediaRoot() .
-              '/resumes/ramsey-el-naggar-tutor.pdf'
+              '/resumes/ramsey-el-naggar-educator.pdf'
           ),
         ],
         '/github' => [

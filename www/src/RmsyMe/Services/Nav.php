@@ -49,8 +49,8 @@ class Nav
       external: true,
     ));
     $resumesItem->addDropdownItem(new NavItem(
-      text: 'CS & SE Tutor',
-      path: '/tutor',
+      text: 'CS & SE Educator',
+      path: '/educator',
       external: true,
     ));
 
@@ -59,7 +59,6 @@ class Nav
     $this->addNavItem(new NavItem(text: 'Home', path: '/'));
     $this->addNavItem(new NavItem(text: 'About', path: '/about'));
     $this->addNavItem($projectsItem);
-    $this->addNavItem(new NavItem(text: 'Tutoring', path: '/tutoring'));
     $this->addNavItem($resumesItem);
 
     // add each contact method to the nav

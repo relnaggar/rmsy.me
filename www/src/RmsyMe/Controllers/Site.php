@@ -98,9 +98,9 @@ class Site extends AbstractController
             'btn-type' => 'primary',
           ],
           [
-            'href' => '/resumes/tutor',
+            'href' => '/resumes/educator',
             'external' => true,
-            'text' => 'View my tutoring resume',
+            'text' => 'View my educator resume',
             'btn-type' => 'success',
           ],
           $freeMeetingCallToAction,

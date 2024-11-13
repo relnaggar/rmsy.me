@@ -33,7 +33,7 @@ class ContactForm extends AbstractController
   {
     return [
       'title' => 'Contact',
-      'metaDescription' => 'I\'m always game to talk tech, tutoring, or ' .
+      'metaDescription' => 'I\'m always game to talk tech, education, or ' .
         'even dung beetles!',
       'contactMethods' => $this->contactMethodsService->getContactMethods(),
       'displayAlert' => false,
