@@ -64,15 +64,14 @@ class Nav
     // add each contact method to the nav
     $contactMethods = $this->contactMethodsService->getContactMethods();
     foreach ($contactMethods as $contactMethod) {
-      if ($contactMethod['inNav']) {
-        $this->addNavItem(new NavItem(
-          text: $contactMethod['title'],
-          path: $contactMethod['href'],
-          external: $contactMethod['external'] ?? false,
-          icon: $contactMethod['icon'],
-          inFooter: $contactMethod['inFooter'] ?? false,
-        ));
-      }
+      $this->addNavItem(new NavItem(
+        text: $contactMethod['title'],
+        path: $contactMethod['href'],
+        external: $contactMethod['external'] ?? false,
+        icon: $contactMethod['icon'],
+        inMenu: $contactMethod['inMenu'] ?? false,
+        inFooter: $contactMethod['inFooter'] ?? false,
+      ));
     }
 
     $this->addNavItem(new NavItem(

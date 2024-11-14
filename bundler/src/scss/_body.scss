@@ -36,3 +36,14 @@ section {
 a:hover .card-body {
   background-color: lighten($primary, 30%);
 }
+
+// except cta cards
+.card-cta .card-header {
+  background-color: $orange;
+}
+.card-cta .card-body {
+  background-color: lighten($orange, 40%);
+}
+// a:hover .card-cta .card-body {
+//   background-color: lighten($orange, 30%);
+// }

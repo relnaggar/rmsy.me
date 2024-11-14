@@ -17,7 +17,11 @@
   </div>
   <div class="col-xxl-5">
     <?php foreach ($contactMethods as $contactMethod): ?>
-      <div class="card mb-3">
+      <div class="
+        card
+        mb-3
+        <?= !empty($contactMethod['cta']) ? 'card-cta' : '' ?>
+      ">
         <div class="card-header">
           <h6 class="mb-0"><?= $contactMethod['title'] ?></h6>
         </div>

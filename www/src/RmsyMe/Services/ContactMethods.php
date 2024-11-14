@@ -16,6 +16,16 @@ class ContactMethods
     $this->router = $router;
     $this->contactMethods = [];
     $this->addContactMethod([
+      'title' => 'Free meeting',
+      'icon' => 'calendar3',
+      'href' => '/free-meeting',
+      'html' => 'rmsy.me/free-meeting',
+      'external' => true,
+      'inMenu' => false,
+      'inFooter' => true,
+      'cta' => true,
+    ]);
+    $this->addContactMethod([
       'title' => 'Email',
       'icon' => 'envelope',
       'href' => 'mailto:ramsey.el-naggar@outlook.com',
@@ -23,7 +33,8 @@ class ContactMethods
       'html' => <<<HTML
         ramsey.el&#8209;naggar@outlook.com
       HTML,
-      'inNav' => false,
+      'inMenu' => false,
+      'inFooter' => false,
     ]);
     $this->addContactMethod([
       'title' => 'GitHub',
@@ -31,7 +42,7 @@ class ContactMethods
       'href' => '/github',
       'html' => 'rmsy.me/github',
       'external' => true,
-      'inNav' => true,
+      'inMenu' => true,
       'inFooter' => true,
     ]);
     $this->addContactMethod([
@@ -40,7 +51,7 @@ class ContactMethods
       'href' => '/linkedin',
       'html' => 'rmsy.me/linkedin',
       'external' => true,
-      'inNav' => true,
+      'inMenu' => true,
       'inFooter' => true,
     ]);
   }

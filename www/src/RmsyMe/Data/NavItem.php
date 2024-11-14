@@ -12,6 +12,7 @@ class NavItem
   private bool $active;
   private array $dropdownItems;
   public readonly string $icon;
+  public readonly bool $inMenu;
   public readonly bool $inFooter;
 
   public function __construct(
@@ -19,6 +20,7 @@ class NavItem
     string $path,
     bool $external = false,
     string $icon = '',
+    bool $inMenu = true,
     bool $inFooter = false
   ) {
     $this->text = $text;
@@ -27,6 +29,7 @@ class NavItem
     $this->active = false;
     $this->dropdownItems = [];
     $this->icon = $icon;
+    $this->inMenu = $inMenu;
     $this->inFooter = $inFooter;
   }
 
