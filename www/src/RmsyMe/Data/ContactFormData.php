@@ -11,6 +11,7 @@ class ContactFormData extends AbstractFormData
   public string $name;
   public string $email;
   public string $message;
+  public string $website;
 
   public function validate(): array
   {
@@ -34,6 +35,9 @@ class ContactFormData extends AbstractFormData
       // || strlen($this->message) > 65534
     ) {
       $errorCodes['message'] = 'Message is required';
+    }
+    if (!empty($this->website)) {
+      $errorCodes['honeypot'] = 'Spam detected';
     }
     return $errorCodes;
   }

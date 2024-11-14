@@ -16,6 +16,7 @@ class FormInput implements ComponentInterface
   private readonly string $validationAttributes;
   private readonly string $invalidFeedback;
   private readonly string $formText;
+  private readonly bool $honeypot;
 
   public function __construct(
     string $name,
@@ -25,7 +26,8 @@ class FormInput implements ComponentInterface
     string $autocomplete,
     string $validationAttributes = '',
     string $invalidFeedback = '',
-    string $formText = ''
+    string $formText = '',
+    bool $honeypot = false,
   ) {
     $this->name = $name;
     $this->label = $label;
@@ -35,13 +37,14 @@ class FormInput implements ComponentInterface
     $this->validationAttributes = $validationAttributes;
     $this->invalidFeedback = $invalidFeedback;
     $this->formText = $formText;
+    $this->honeypot = $honeypot;
   }
 
   public function render(): string
   {
     ob_start();
     ?>
-      <div class="mb-3">
+      <div class="<?= $this->honeypot ? 'd-none' : 'mb-3' ?>">
         <label for="<?= $this->name ?>" class="col-form-label">
           <?= $this->label ?>
         </label>
@@ -61,7 +64,9 @@ class FormInput implements ComponentInterface
             name="<?= $this->formName ?>[<?= $this->name ?>]"
             value="<?= $_POST[$this->formName][$this->name] ?? '' ?>"
             autocomplete="<?= $this->autocomplete ?>"
-            <?= $this->validationAttributes ?>
+            <?php if (!empty($this->validationAttributes)): ?>
+              <?= $this->validationAttributes ?>
+            <?php endif; ?>
           >
         <?php endif; ?>
         <?php if ($this->invalidFeedback): ?>

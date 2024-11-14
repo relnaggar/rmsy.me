@@ -19,39 +19,47 @@ use RmsyMe\Components\FormInput;
       novalidate
     >
       <?= (new FormInput(
-        $name='name',
-        $label='Name',
-        $type='text',
-        $formName=$formName,
-        $autocomplete="on",
-        $validationAttributes="required",
-        $invalidFeedback='This field cannot be blank.'
+        name: 'name',
+        label: 'Name',
+        type: 'text',
+        formName: $formName,
+        autocomplete: "on",
+        validationAttributes: "required",
+        invalidFeedback: 'This field cannot be blank.'
       ))->render(); ?>
       <?= (new FormInput(
-        $name='email',
-        $label='Email',
-        $type='email',
-        $formName=$formName,
-        $autocomplete="on",
-        $validationAttributes=<<<HTML
+        name: 'email',
+        label: 'Email',
+        type: 'email',
+        formName: $formName,
+        autocomplete: "on",
+        validationAttributes: <<<HTML
           maxlength="254"
           required
         HTML,
-        $invalidFeedback='This field cannot be blank and must be a valid email
+        invalidFeedback: 'This field cannot be blank and must be a valid email
           address 254 characters or under.',
-        $formText=<<<HTML
+        formText: <<<HTML
           This will only be used so I can reply to your message.
           I'll never share your email with anyone.
         HTML
       ))->render(); ?>
       <?= (new FormInput(
-        $name='message',
-        $label='Message',
-        $type='textarea',
-        $formName=$formName,
-        $autocomplete="off",
-        $validationAttributes="required",
-        $invalidFeedback='This field cannot be blank.'
+        name: 'message',
+        label: 'Message',
+        type: 'textarea',
+        formName: $formName,
+        autocomplete: "off",
+        validationAttributes: "required",
+        invalidFeedback: 'This field cannot be blank.'
+      ))->render(); ?>
+      <?= (new FormInput(
+        name: 'website',
+        label: 'Leave this field blank',
+        type: 'text',
+        formName: $formName,
+        autocomplete: "off",
+        honeypot: true,
       ))->render(); ?>
       <input class="btn btn-primary" type="submit" name="submit" value="Submit">
     </form>

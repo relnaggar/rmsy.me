@@ -43,6 +43,13 @@ use RmsyMe\Components\Alert;
         Our web gnomes are telling me the message you entered is invalid.
         Whoops!
       HTML,
+      'honeypot' => <<<HTML
+        Oh no!
+        Our web gnomes are telling me you're a nasty little spambot.
+        Shame on you!
+        If you promise you're not a spambot, try disabling any auto-fill
+        features on your browser and try again.
+      HTML,
       'default' => <<<HTML
         <p>
           Yikes!
