@@ -13,7 +13,9 @@
   "
   data-nosnippet
 >
-  <span class="border-bottom text-muted p-3">On this page</span>
+  <span class="navbar-brand nav-link text-muted ps-3 pt-3 border-bottom">
+    On this page
+  </span>
   <ul class="navbar-nav">
     <?php foreach ($sections as $section): ?>
       <li class="nav-item">

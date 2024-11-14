@@ -31,7 +31,6 @@
   <p>
     Copyright &copy; <?= date("Y") ?> by
     <a href='/about' class="text-decoration-none text-white">
-      Ramsey El-Naggar
-    </a>.
+      Ramsey El-Naggar</a>.
   </p>
 </footer>
