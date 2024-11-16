@@ -47,3 +47,10 @@ a:hover .card-body {
 // a:hover .card-cta .card-body {
 //   background-color: lighten($orange, 30%);
 // }
+
+// honeypot field is the div parent of the input field with id "subject"
+.subject {
+  height: 0;
+  overflow: hidden;
+  margin-bottom: 0 !important;
+}

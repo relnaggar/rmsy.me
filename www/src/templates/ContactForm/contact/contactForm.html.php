@@ -24,7 +24,7 @@ use RmsyMe\Components\FormInput;
         type: 'text',
         formName: $formName,
         autocomplete: "on",
-        validationAttributes: "required",
+        extraAttributes: "required",
         invalidFeedback: 'This field cannot be blank.'
       ))->render(); ?>
       <?= (new FormInput(
@@ -33,7 +33,7 @@ use RmsyMe\Components\FormInput;
         type: 'email',
         formName: $formName,
         autocomplete: "on",
-        validationAttributes: <<<HTML
+        extraAttributes: <<<HTML
           maxlength="254"
           required
         HTML,
@@ -45,23 +45,30 @@ use RmsyMe\Components\FormInput;
         HTML
       ))->render(); ?>
       <?= (new FormInput(
+        name: 'subject',
+        label: 'Subject',
+        type: 'text',
+        formName: $formName,
+        autocomplete: "off",
+        extraAttributes: "tabindex='-1' aria-hidden='true'",
+        honeypot: true,
+      ))->render(); ?>
+      <?= (new FormInput(
         name: 'message',
         label: 'Message',
         type: 'textarea',
         formName: $formName,
         autocomplete: "off",
-        validationAttributes: "required",
+        extraAttributes: "required",
         invalidFeedback: 'This field cannot be blank.'
       ))->render(); ?>
-      <?= (new FormInput(
-        name: 'website',
-        label: 'Leave this field blank',
-        type: 'text',
-        formName: $formName,
-        autocomplete: "off",
-        honeypot: true,
-      ))->render(); ?>
+      <div class="cf-turnstile mb-3" data-sitekey="0x4AAAAAAA0I76BgLIpOMLLa"></div>
       <input class="btn btn-primary" type="submit" name="submit" value="Submit">
     </form>
   </div>
 </div>
+
+<script
+  src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+  defer
+></script>

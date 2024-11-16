@@ -166,6 +166,7 @@ RUN apt-get update -y \
 
 # add composer dependencies for rmsy.me
 RUN composer require phpmailer/phpmailer
+RUN composer require symfony/http-client
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"

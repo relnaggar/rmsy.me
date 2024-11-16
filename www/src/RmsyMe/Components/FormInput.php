@@ -13,7 +13,7 @@ class FormInput implements ComponentInterface
   private readonly string $type;
   private readonly string $formName;
   private readonly string $autocomplete;
-  private readonly string $validationAttributes;
+  private readonly string $extraAttributes;
   private readonly string $invalidFeedback;
   private readonly string $formText;
   private readonly bool $honeypot;
@@ -24,7 +24,7 @@ class FormInput implements ComponentInterface
     string $type,
     string $formName,
     string $autocomplete,
-    string $validationAttributes = '',
+    string $extraAttributes = '',
     string $invalidFeedback = '',
     string $formText = '',
     bool $honeypot = false,
@@ -34,7 +34,7 @@ class FormInput implements ComponentInterface
     $this->type = $type;
     $this->formName = $formName;
     $this->autocomplete = $autocomplete;
-    $this->validationAttributes = $validationAttributes;
+    $this->extraAttributes = $extraAttributes;
     $this->invalidFeedback = $invalidFeedback;
     $this->formText = $formText;
     $this->honeypot = $honeypot;
@@ -44,7 +44,10 @@ class FormInput implements ComponentInterface
   {
     ob_start();
     ?>
-      <div class="<?= $this->honeypot ? 'd-none' : 'mb-3' ?>">
+      <div class="
+        mb-3
+        <?= $this->honeypot ? 'subject' : '' ?>
+      ">
         <label for="<?= $this->name ?>" class="col-form-label">
           <?= $this->label ?>
         </label>
@@ -54,7 +57,7 @@ class FormInput implements ComponentInterface
             id="<?= $this->name ?>"
             name="<?= $this->formName ?>[<?= $this->name ?>]"
             autocomplete="<?= $this->autocomplete ?>"
-            <?= $this->validationAttributes ?>
+            <?= $this->extraAttributes ?>
           ><?= $_POST[$this->formName][$this->name] ?? '' ?></textarea>
         <?php else: // input ?>
           <input
@@ -64,9 +67,7 @@ class FormInput implements ComponentInterface
             name="<?= $this->formName ?>[<?= $this->name ?>]"
             value="<?= $_POST[$this->formName][$this->name] ?? '' ?>"
             autocomplete="<?= $this->autocomplete ?>"
-            <?php if (!empty($this->validationAttributes)): ?>
-              <?= $this->validationAttributes ?>
-            <?php endif; ?>
+            <?= $this->extraAttributes ?>
           >
         <?php endif; ?>
         <?php if ($this->invalidFeedback): ?>

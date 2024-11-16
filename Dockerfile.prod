@@ -43,7 +43,8 @@ RUN \
   # framework
   composer require php-di/php-di \
   # rmsy.me
-  && composer require phpmailer/phpmailer
+  && composer require phpmailer/phpmailer \
+  && composer require symfony/http-client
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="PRODUCTION"

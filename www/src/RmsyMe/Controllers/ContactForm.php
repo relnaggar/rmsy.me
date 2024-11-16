@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace RmsyMe\Controllers;
 
+use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Framework\{
   Controllers\AbstractController,
   Views\Page,
@@ -12,21 +13,29 @@ use RmsyMe\{
   Services\ContactMethods,
   Services\Mailer,
   Data\ContactFormData,
+  Services\ApiClient,
+  Services\Secrets,
 };
 
 class ContactForm extends AbstractController
 {
   private ContactMethods $contactMethodsService;
   private Mailer $mailerService;
+  private ApiClient $apiClientService;
+  private Secrets $secretsService;
 
   public function __construct(
     array $decorators,
     ContactMethods $contactMethodsService,
-    Mailer $mailerService
+    Mailer $mailerService,
+    ApiClient $apiClientService,
+    Secrets $secretsService,
   ) {
     parent::__construct($decorators);
     $this->contactMethodsService = $contactMethodsService;
     $this->mailerService = $mailerService;
+    $this->apiClientService = $apiClientService;
+    $this->secretsService = $secretsService;
   }
 
   private function getContactTemplateVars(): array
@@ -72,6 +81,38 @@ class ContactForm extends AbstractController
     if (!empty($errorCodes)) {
       // pass error code to template
       $templateVars['errorCode'] = array_keys($errorCodes)[0];
+      return $this->getPage($templatePath, $templateVars);
+    }
+
+    if (empty($_POST['cf-turnstile-response'])) {
+      // display error alert if turnstile not submitted
+      $templateVars['errorCode'] = 'CAPTCHA';
+      return $this->getPage($templatePath, $templateVars);
+    }
+
+    // verify turnstile response via siteverify API
+    // https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
+    try {
+      $body = [
+        'secret' => $this->secretsService->getSecret('TURNSTILE_SECRET_KEY'),
+        'response' => $_POST['cf-turnstile-response'],
+      ];
+      if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+        $body['remoteip'] = $_SERVER['HTTP_CF_CONNECTING_IP'];
+      }
+      $response = $this->apiClientService->post(
+        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+        $body
+      );
+    } catch (ExceptionInterface $e) {
+      // display error alert if siteverify API call fails
+      $templateVars['errorCode'] = 'CAPTCHA';
+      return $this->getPage($templatePath, $templateVars);
+    }
+
+    if (empty($response['success']) || $response['success'] !== true) {
+      // display error alert unless siteverify API succeeds
+      $templateVars['errorCode'] = 'CAPTCHA';
       return $this->getPage($templatePath, $templateVars);
     }
 

@@ -14,6 +14,7 @@ services:
       - SMTP_HOST
       - SMTP_USERNAME
       - SMTP_PASSWORD
+      - TURNSTILE_SECRET_KEY
   bundler:
     init: true
     container_name: bundler
@@ -30,3 +31,5 @@ secrets:
     file: ./secrets/SMTP_USERNAME
   SMTP_PASSWORD:
     file: ./secrets/SMTP_PASSWORD
+  TURNSTILE_SECRET_KEY:
+    file: ./secrets/TURNSTILE_SECRET_KEY
