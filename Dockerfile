@@ -139,7 +139,7 @@ RUN apt-get update -y \
 COPY --from=composer/composer:2.2-bin /composer /usr/bin/composer
 
 # add framework
-RUN composer require relnaggar/veloz
+RUN composer require relnaggar/veloz:^1.1
 
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends \
