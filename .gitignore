@@ -6,3 +6,4 @@ www/html/fonts/*.woff*
 *.jpeg
 *.png
 secrets
+db

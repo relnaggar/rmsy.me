@@ -40,6 +40,15 @@
     tabindex="0"
     class="position-relative"
   >
+    <?php
+      $databaseWorking = false;
+      try {
+        $pdo = new PDO('sqlite:/var/db/database.sqlite');
+        $databaseWorking = true;
+      } catch (PDOException $e) {
+        $error = $e->getMessage();
+      }
+    ?>
     <div class="container-fluid d-flex flex-column p-0">
       <?php require 'layout/header.html.php'; ?>
       <?php !empty($menuNav) && require 'layout/menuNav.html.php'; ?>

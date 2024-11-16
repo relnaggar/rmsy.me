@@ -10,6 +10,7 @@ services:
       - ./www:/var/www
       - ./config/apache2:/etc/apache2
       - ./config/php:/etc/php
+      - ./db:/var/db
     secrets:
       - SMTP_HOST
       - SMTP_USERNAME

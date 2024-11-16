@@ -28,12 +28,17 @@ RUN apt-get update -y \
   libapache2-mod-php \
   # composer dependencies
   ca-certificates \
-  # rmsy.me
-  php-intl \
+  # sqlite3
+  php-sqlite3 \
+  # for rmsy.me
+  php-intl \  
   # cleanup
   && apt autoremove -y \
   && apt clean \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  # database setup
+  && mkdir /var/db \
+  && chown -R apache2:apache2 /var/db
 
 # install composer
 COPY --from=composer/composer:2.2-bin /composer /usr/bin/composer
