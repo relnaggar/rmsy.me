@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace RmsyMe;
 
-use Framework\{
+use Relnaggar\Veloz\{
   AbstractApp,
   Routing\RouterInterface,
   Routing\BasicRouter,

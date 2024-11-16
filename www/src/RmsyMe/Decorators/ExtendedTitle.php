@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace RmsyMe\Decorators;
 
-use Framework\Decorators\DecoratorInterface;
+use Relnaggar\Veloz\Decorators\DecoratorInterface;
 
 /**
  * Decorator to add the site title to the end of the page title.

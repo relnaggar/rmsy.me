@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace RmsyMe\Components;
 
-use Framework\Components\ComponentInterface;
+use Relnaggar\Veloz\Components\ComponentInterface;
 
 class FormInput implements ComponentInterface
 {

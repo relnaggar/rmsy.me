@@ -153,8 +153,8 @@ RUN apt-get update -y \
 # install composer
 COPY --from=composer/composer:2.2-bin /composer /usr/bin/composer
 
-# add composer dependencies for framework
-RUN composer require php-di/php-di
+# add framework
+RUN composer require relnaggar/veloz
 
 # add php-intl
 RUN apt-get update -y \

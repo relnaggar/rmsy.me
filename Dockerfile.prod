@@ -41,7 +41,7 @@ COPY --from=composer/composer:2.2-bin /composer /usr/bin/composer
 # add composer dependencies
 RUN \
   # framework
-  composer require php-di/php-di \
+  composer require relnaggar/veloz \
   # rmsy.me
   && composer require phpmailer/phpmailer \
   && composer require symfony/http-client

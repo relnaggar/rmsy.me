@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace RmsyMe\Data;
 
-use Framework\Data\SectionInterface;
+use Relnaggar\Veloz\Data\SectionInterface;
 
 class Section implements SectionInterface
 {

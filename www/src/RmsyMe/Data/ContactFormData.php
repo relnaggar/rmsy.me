@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace RmsyMe\Data;
 
-use Framework\Data\AbstractFormData;
+use Relnaggar\Veloz\Data\AbstractFormData;
 
 class ContactFormData extends AbstractFormData
 {

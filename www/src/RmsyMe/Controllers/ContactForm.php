@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace RmsyMe\Controllers;
 
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
-use Framework\{
+use Relnaggar\Veloz\{
   Controllers\AbstractController,
   Views\Page,
 };

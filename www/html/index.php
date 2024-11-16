@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 require_once '/vendor/autoload.php'; // composer
-require_once '../src/Framework/autoload.php'; // framework
+require_once '../src/autoload.php'; // for RmsyMe
 
-// use Framework\Config;
-// set config here e.g.
-// Config::getInstance()->set('templateRootDirectory', 'templates');
+use Relnaggar\Veloz\Config;
+use RmsyMe\App;
 
-$app = new RmsyMe\App();
+Config::getInstance()->set('sourceDirectory', __DIR__ . '/../src/');
+$app = new App();
 $app->run();

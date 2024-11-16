@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace RmsyMe\Decorators;
 
-use Framework\Decorators\DecoratorInterface;
+use Relnaggar\Veloz\Decorators\DecoratorInterface;
 use RmsyMe\{
   App,
   Services\Nav as NavService,

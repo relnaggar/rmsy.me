@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace RmsyMe\Controllers;
 
-use Framework\{
+use Relnaggar\Veloz\{
   Controllers\AbstractController,
   Views\Page,
 };

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace RmsyMe\Services;
 
-use Framework\Routing\RouterInterface;
+use Relnaggar\Veloz\Routing\RouterInterface;
 
 class ContactMethods
 {
