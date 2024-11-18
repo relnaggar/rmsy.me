@@ -20,9 +20,9 @@
             alt="<?= $project->title ?>"
           >
           <div class="card-body">
-            <h5 class="card-title">
+            <div class="card-title h5">
               <?= $project->title ?>
-            </h5>
+            </div>
             <p class="card-text"><?= $project->thumbnailDescription ?></p>
           </div>
         </div>

@@ -8,6 +8,6 @@ use RmsyMe\Components\ExternalLink;
   <?= (new ExternalLink(
     '/free-meeting',
     'Book a free<br>meeting',
-    'btn btn-orange btn-lg shadow-lg fw-bold p-3',
+    'btn btn-cta btn-lg shadow-lg fw-bold p-3',
   ))->render(); ?>
 </div>

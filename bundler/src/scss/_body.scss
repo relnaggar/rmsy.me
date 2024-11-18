@@ -16,13 +16,13 @@ section {
   scroll-margin-top: var(--nav-height);
 }
 
-// new class for orange buttons
-.btn-orange {
-  background-color: $orange;
-  color: white !important;
+// new class for cta buttons
+.btn-cta {
+  background-color: $ctaBackgroundColor;
+  color: color-contrast($ctaBackgroundColor);
 }
-.btn-orange:hover {
-  background-color: shade-color($orange, 60%);
+.btn-cta:hover {
+  background-color: shade-color($ctaBackgroundColor, 60%);
 }
 
 // modify bootstrap card styles to use primary color
@@ -39,13 +39,13 @@ a:hover .card-body {
 
 // except cta cards
 .card-cta .card-header {
-  background-color: $orange;
+  background-color: $ctaBackgroundColor;
 }
 .card-cta .card-body {
-  background-color: lighten($orange, 40%);
+  background-color: lighten($ctaBackgroundColor, 40%);
 }
 // a:hover .card-cta .card-body {
-//   background-color: lighten($orange, 30%);
+//   background-color: lighten($ctaBackgroundColor, 30%);
 // }
 
 // honeypot field is the div parent of the input field with id "subject"

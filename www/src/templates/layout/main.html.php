@@ -1,9 +1,9 @@
 <main class="flex-grow-1 m-5 d-flex flex-column min-vh-100">
   <h1><?= $title ?></h1>
   <?php if (!empty($subtitle)): ?>
-    <h3 class="text-body-secondary">
+    <div class="text-body-secondary h3">
       <?= $subtitle ?>
-    </h3>
+    </div>
   <?php endif; ?>
   <?php require 'main/previousNextButtons.html.php'; ?>
   <div class="mt-3">

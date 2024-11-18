@@ -9,10 +9,10 @@ use RmsyMe\Components\ExternalLink;
     <div class="col-sm">
       <div class="card mb-3">
         <div class="card-header pt-3">
-          <h5>
+          <div class="h5">
             <?= $role['header'] ?>
             <i class="bi bi-<?= $role['icon'] ?>"></i>
-          </h5>
+          </div>
         </div>
         <div class="card-body">
           <p>

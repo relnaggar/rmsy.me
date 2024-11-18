@@ -21,6 +21,7 @@ $custom-colors: (
   "primary": $primary
 );
 $theme-colors: map.merge($theme-colors, $custom-colors);
+$ctaBackgroundColor: $pink;
 
 $position-values: map.merge($position-values, (
   "1": 1%,

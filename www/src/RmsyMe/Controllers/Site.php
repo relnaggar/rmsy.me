@@ -51,7 +51,7 @@ class Site extends AbstractController
       'href' => '/free-meeting',
       'external' => true,
       'text' => 'Book a free meeting',
-      'btn-type' => 'orange',
+      'btn-type' => 'cta',
     ];
     $roles = [
       [

@@ -12,9 +12,9 @@
             alt="<?= $project->title ?>"
           >
           <div class="card-body">
-            <h5 class="card-title">
+            <div class="card-title h5">
               <?= $project->title ?>
-            </h5>
+            </div>
             <p class="card-text"><?= $project->thumbnailDescription ?></p>
           </div>
         </div>
@@ -29,7 +29,7 @@
         alt="Coming Soon"
       >
       <div class="card-body">
-      <h5 class="card-title">Top Secret</h5>
+      <div class="card-title h5">Top Secret</div>
         <p class="card-text">
           A project so secret, even my compiler doesn't know about it yet!
           Stay tuned for more details.
