@@ -13,10 +13,8 @@
     <?php !empty($onThisPage) && require 'main/onThisPageFixed.html.php'; ?>
     <?php foreach ($sections as $section): ?>
       <section id="<?= $section->id ?>" class="mb-3">
-        <?php if (!empty($section->title)): ?>
-          <h2><?= $section->title ?></h2>
-          <hr>
-        <?php endif; ?>
+        <h2><?= $section->title ?></h2>
+        <hr>
         <?= $section->getHtmlContent() ?>
       </section>
     <?php endforeach; ?>

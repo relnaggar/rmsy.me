@@ -40,7 +40,7 @@
     This impeccable invisible eye was tuned so finely that it would make
     Mozart's famous grand piano green with jealousy.
   </dd>
-<dl>
+</dl>
 
 <p>
   As for the touch sensors that look like long eyelashes, we can't deny

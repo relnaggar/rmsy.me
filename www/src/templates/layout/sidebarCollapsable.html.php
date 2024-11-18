@@ -17,9 +17,7 @@
       aria-expanded="false"
       aria-label="Toggle navigation"
     >
-      <div class="navbar-toggler-icon-manual"></div>
-      <div class="navbar-toggler-icon-manual"></div>
-      <div class="navbar-toggler-icon-manual"></div>
+      <span class="navbar-toggler-icon"></span>
     </button>
     <span class="navbar-brand-custom"><?= $sidebarNav->title ?></span>
     <div class="collapse navbar-collapse" id="sidebar">

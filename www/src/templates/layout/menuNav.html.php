@@ -21,9 +21,7 @@
     aria-expanded="false"
     aria-label="Toggle navigation"
   >
-    <div class="navbar-toggler-icon-manual"></div>
-    <div class="navbar-toggler-icon-manual"></div>
-    <div class="navbar-toggler-icon-manual"></div>
+    <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbar">
     <ul class="navbar-nav me-auto mb-2 mb-lg-0">

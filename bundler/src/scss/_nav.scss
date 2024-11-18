@@ -33,20 +33,6 @@
   border-width: 2px;
 }
 
-.navbar-toggler-icon-manual {
-  @extend .user-select-none;
-  // https://www.w3schools.com/howto/howto_css_menu_icon.asp
-  width: 35px;
-  height: 5px;
-  margin: 6px 0;
-  .navbar-dark & {
-    background-color: $light;
-  }
-  .navbar-light & {
-    background-color: $dark;
-  }
-}
-
 .navbar-nav {
   margin-bottom: 0 !important;
 }

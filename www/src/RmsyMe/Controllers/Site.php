@@ -121,20 +121,6 @@ class Site extends AbstractController
         'preloadImages' => $preloadImages,
         'roles' => $roles,
       ],
-      sections: [
-        new Section(
-          id: 'intro',
-          templateDirectory: __FUNCTION__,
-        ),
-        new Section(
-          id: 'callToAction',
-          templateDirectory: __FUNCTION__,
-        ),
-        new Section(
-          id: 'featuredProjects',
-          templateDirectory: __FUNCTION__,
-        ),
-      ],
     );
   }
 

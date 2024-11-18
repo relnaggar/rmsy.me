@@ -80,16 +80,17 @@
   they see in the sky to keep their fabulous fecal formations rolling straight
   into the sunset.
   The two most important visual cues are:
-  <dl>
-    <dt>The intensity-gradient cue.</dt>
-    <dd>
-      This comes from the position of celestial objects such as the sun, moon,
-      and even the stars!
-    </dd>
-    <dt>The polarisation cue.</dt>
-    <dd>
-      This comes from the polarisation pattern of the sky (explained more
-      below).
-    </dd>
-  </dl>
 </p>
+
+<dl>
+  <dt>The intensity-gradient cue.</dt>
+  <dd>
+    This comes from the position of celestial objects such as the sun, moon,
+    and even the stars!
+  </dd>
+  <dt>The polarisation cue.</dt>
+  <dd>
+    This comes from the polarisation pattern of the sky (explained more
+    below).
+  </dd>
+</dl>

@@ -95,7 +95,7 @@
     measurement: the length of the line for the CV, and the degree of
     polarisation calculated from the polarisation sensor.
   </dd>
-</ol>
+</dl>
 
 <figure class="figure m-3 text-center col-lg-5 float-start col-12">
   <img

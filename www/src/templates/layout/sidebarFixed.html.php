@@ -11,10 +11,10 @@
       flex-nowrap
     "
   >
+    <span class="navbar-brand p-3 m-0">
+      <?= $sidebarNav->title ?>
+    </span>
     <ul class="navbar-nav w-100">
-      <span class="navbar-brand p-3 m-0">
-        <?= $sidebarNav->title ?>
-      </span>
       <?php foreach ($sidebarNav->items as $sidebarNavItem): ?>
         <li class="nav-item">
           <a
