@@ -15,7 +15,7 @@ class Projects
     $this->projects = [];
     $this->addProject(new Project(
       'rmsy.me',
-      'My Mona Lisa: A Personal Website',
+      '🖼 My Mona Lisa: A Personal Website',
       'TODO',
       'Find out how I gave birth to this technological tapestry of blood, '
         . 'tears and Dockerfiles. Curiosity is better than regret!',
@@ -28,7 +28,7 @@ class Projects
     ));
     $this->addProject(new Project(
       'beetle',
-      'Pooptimus Prime: The World\'s First Dung Beetle Biorobot',
+      '🪲 Pooptimus Prime: The World\'s First Dung Beetle Biorobot',
       'Explore the intriguing world of dung beetle navigation through the eyes '
       . 'of a biorobot. This groundbreaking research unpacks how beetles use '
       . 'celestial cues to navigate, offering insights into biology and '
@@ -47,7 +47,7 @@ class Projects
     ));
     $this->addProject(new Project(
       'sdp',
-      'Robo-Messi: When Silicon Met Soccer',
+      '⚽ Robo-Messi: When Silicon Met Soccer',
       'Join the journey of building Robo-Messi, the football-playing LEGO '
       . 'robot that changed robo-football forever.',
       'Robo-Messi wants a hug. Will you give him one?',
