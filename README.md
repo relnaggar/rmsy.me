@@ -1,5 +1,5 @@
 # [🖼 My Mona Lisa: A Personal Website](https://rmsy.me) 
-[![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade-score/rmsy.me?publish)](https://observatory.mozilla.org/analyze/rmsy.me) [![30 day uptime ratio (Uptime Robot)](https://img.shields.io/uptimerobot/ratio/30/m784796051-da0b2757e43473b1f9d676b0)](https://stats.uptimerobot.com/KjJ317wYaG)
+[![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade-score/rmsy.me?publish)](https://observatory.mozilla.org/analyze/rmsy.me) [![30 day uptime ratio (Uptime Robot)](https://img.shields.io/uptimerobot/ratio/30/m784796051-da0b2757e43473b1f9d676b0)](https://stats.uptimerobot.com/KjJ317wYaG) [![Docker image size](https://img.shields.io/docker/image-size/relnaggar/rmsy.me)](https://hub.docker.com/r/relnaggar/rmsy.me)
 
 ## Quick Start
 
