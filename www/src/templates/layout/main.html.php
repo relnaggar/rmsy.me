@@ -1,4 +1,4 @@
-<main class="flex-grow-1 m-5 d-flex flex-column min-vh-100">
+<main class="flex-grow-1 m-5 d-flex flex-column min-vh-100" id="main">
   <h1><?= $title ?></h1>
   <?php if (!empty($subtitle)): ?>
     <div class="text-body-secondary h3">
