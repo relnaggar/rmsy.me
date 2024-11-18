@@ -138,9 +138,6 @@ RUN apt-get update -y \
 # install composer
 COPY --from=composer/composer:2.2-bin /composer /usr/bin/composer
 
-# add framework
-RUN composer require relnaggar/veloz:^1.1
-
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends \
   # install sqlite3 for php
@@ -166,6 +163,9 @@ RUN apt-get update -y \
 # add composer dependencies for rmsy.me
 RUN composer require phpmailer/phpmailer
 RUN composer require symfony/http-client
+
+# add framework
+RUN composer require relnaggar/veloz:^1.2
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"

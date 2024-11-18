@@ -62,8 +62,12 @@ class Projects
     return $this->projects;
   }
 
-  public function getProject(string $slug): Project
+  public function getProject(string $slug): ?Project
   {
-    return $this->projects[$slug];
+    if (array_key_exists($slug, $this->projects)) {
+      return $this->projects[$slug];
+    } else {
+      return null;
+    }
   }
 }

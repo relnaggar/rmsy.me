@@ -7,19 +7,23 @@ namespace RmsyMe\Controllers;
 use Relnaggar\Veloz\{
   Controllers\AbstractController,
   Views\Page,
+  Routing\RouterInterface,
 };
 use RmsyMe\Services\Projects as ProjectsService;
 
 class Projects extends AbstractController
 {
   private ProjectsService $projectsService;
+  private RouterInterface $router;
 
   public function __construct(
     array $decorators,
     ProjectsService $projectsService,
+    RouterInterface $router
   ) {
     parent::__construct($decorators);
     $this->projectsService = $projectsService;
+    $this->router = $router;
   }
 
   public function index(): Page
@@ -47,6 +51,9 @@ class Projects extends AbstractController
   public function show(string $projectSlug): Page
   {
     $project = $this->projectsService->getProject($projectSlug);
+    if ($project === null) {
+      return $this->router->getPageNotFound()->getPage();
+    }
 
     return $this->getPage(
       templateVars: [
