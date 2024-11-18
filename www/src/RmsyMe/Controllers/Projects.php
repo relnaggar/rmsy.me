@@ -55,12 +55,17 @@ class Projects extends AbstractController
       return $this->router->getPageNotFound()->getPage();
     }
 
+    $preloadImages = [];
+    if ($project->preloadImage !== null) {
+      $preloadImages[] = $project->preloadImage;
+    }
+
     return $this->getPage(
       templateVars: [
         'title' => $project->title,
         'metaDescription' => $project->metaDescription,
         'onThisPage' => true,
-        'preloadImages' => [$project->preloadImage],
+        'preloadImages' => $preloadImages,
       ],
       sections: $project->getSections(),
     );

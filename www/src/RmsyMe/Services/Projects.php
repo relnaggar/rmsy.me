@@ -14,6 +14,19 @@ class Projects
   {
     $this->projects = [];
     $this->addProject(new Project(
+      'rmsy.me',
+      'My Mona Lisa: A Personal Website',
+      'TODO',
+      'Find out how I gave birth to this technological tapestry of blood, '
+        . 'tears and Dockerfiles. Curiosity is better than regret!',
+      'contact.jpg',
+      //  preloadImageFile: 'preload.jpg',
+      sections: [
+        ['summary', 'Executive Summary'],
+        ['source', 'Source'],
+      ]
+    ));
+    $this->addProject(new Project(
       'beetle',
       'Pooptimus Prime: The World\'s First Dung Beetle Biorobot',
       'Explore the intriguing world of dung beetle navigation through the eyes '
@@ -22,8 +35,8 @@ class Projects
       . 'robotics alike.',
       'Robot vs beetle: who will be the ultimate fighting champion?',
       'vs-robot.jpg',
-      'beetles-fighting.jpg',
-      [
+      preloadImageFile: 'beetles-fighting.jpg',
+      sections: [
         ['summary', 'Executive Summary'],
         ['beetles101', 'The Beetle Hunter Diaries'],
         ['robot', 'Say Hello to My Little Friend'],
@@ -39,8 +52,8 @@ class Projects
       . 'robot that changed robo-football forever.',
       'Robo-Messi wants a hug. Will you give him one?',
       'hug.jpg',
-      'initial-front.jpg',
-      [
+      preloadImageFile: 'initial-front.jpg',
+      sections: [
         ['summary', 'Executive Summary'],
         ['introduction', 'SDP: The Third-Year Frontier'],
         ['construction', 'The Building Blocks of Victory'],

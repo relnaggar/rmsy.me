@@ -11,7 +11,7 @@ class Project
   public readonly string $metaDescription;
   public readonly string $thumbnailDescription;
   public readonly Image $thumbnail;
-  public readonly Image $preloadImage;
+  public readonly ?Image $preloadImage;
   private array $sections;
 
   public function __construct(
@@ -20,7 +20,7 @@ class Project
     string $metaDescription,
     string $thumbnailDescription,
     string $thumbnailFile,
-    string $preloadImageFile,
+    ?string $preloadImageFile = null,
     array $sections = [],
   ) {
     $this->slug = $slug;
@@ -28,7 +28,11 @@ class Project
     $this->metaDescription = $metaDescription;
     $this->thumbnailDescription = $thumbnailDescription;
     $this->thumbnail = new Image($this->slug . '/' . $thumbnailFile);
-    $this->preloadImage = new Image($this->slug . '/' . $preloadImageFile);
+    if ($preloadImageFile !== null) {
+      $this->preloadImage = new Image($this->slug . '/' . $preloadImageFile);
+    } else {
+      $this->preloadImage = null;
+    }
 
     // validate the sections array and add each section
     $this->sections = [];
