@@ -3,6 +3,20 @@
   --nav-height: 56px;
 }
 
+.skip-link {
+  position: absolute;
+  top: -50px;
+  left: 0;
+  background-color: $primary;
+  color: white;
+  padding: 10px;
+  z-index: 100;
+
+  &:focus {
+    top: 0;
+  }
+}
+
 .sidebar {
   position: sticky; // keep the sidebar fixed while scrolling
   align-self: flex-start; // for sticky to work within flexbox
@@ -18,11 +32,10 @@ section {
 
 // new class for cta buttons
 .btn-cta {
-  background-color: $ctaBackgroundColor;
-  color: color-contrast($ctaBackgroundColor);
-}
-.btn-cta:hover {
-  background-color: shade-color($ctaBackgroundColor, 60%);
+  @include button-variant(
+    $ctaBackgroundColor,
+    $ctaBackgroundColor,
+  );
 }
 
 // modify bootstrap card styles to use primary color
