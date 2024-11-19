@@ -30,10 +30,11 @@ class Projects extends AbstractController
   {
     $projects = $this->projectsService->getProjects();
     
-    // preload the thumbnails for all projects
-    $preloadImages = array_map(
-      fn($project) => $project->thumbnail,
-      $projects
+    // preload the thumbnails for the first two projects
+    $preloadImages = array_slice(
+      array_map(fn($project) => $project->thumbnail, $projects),
+      0,
+      2,
     );
 
     return $this->getPage(

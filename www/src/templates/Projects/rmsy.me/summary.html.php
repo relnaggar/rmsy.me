@@ -1,14 +1,14 @@
 <ul>
   <li>
-    Built reusable PHP backend from scratch including routing, templating and a
-    100% spam-free contact form.
+    Crafted fully responsive front-end HTML/CSS template using Bootstrap,
+    including dynamic menu, sidebar, footer and scrollspy.
   </li>
   <li>
-    Crafted intricate front-end HTML/CSS template using Bootstrap, including
-    fully responsive menu and sidebar.
+    Reduced contact form spam by 100% by implementing honeypots and integrating 
+    Cloudfare's turnstile.
   </li>
   <li>
-    Containerised application using Docker; built automated DevOps pipeline;
-    configured AWS and Apache.
+    Achieved average Lighthouse score of 100% for performance, accessibility,
+    best practices and SEO.
   </li>
 </ul>

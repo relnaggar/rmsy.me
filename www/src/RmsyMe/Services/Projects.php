@@ -17,15 +17,54 @@ class Projects
       'rmsy.me',
       '🖼 My Mona Lisa: A Personal Website',
       'TODO',
-      'Find out how I gave birth to this technological tapestry of blood, '
-        . 'tears and Dockerfiles. Curiosity is better than regret!',
-      'contact.jpg',
+      'Find out how I gave birth to this technological tapestry. '
+        . 'Curiosity is better than regret!',
+      'contact.webp',
+      //  preloadImageFile: 'preload.jpg',
+      featured: true,
+      sections: [
+        ['summary', 'Executive Summary'],
+        ['source', 'Source'],
+      ]
+    ));
+    $this->addProject(new Project(
+      'veloz',
+      '⚡ Veloz: Yet Another PHP Mini-Framework',
+      'TODO',
+      'Could this be the next big drop in the PHP ocean? Dive in and find out!',
+      'thumbnail.webp',
+      //  preloadImageFile: 'preload.jpg',
+      featured: true,
+      sections: [
+        ['summary', 'Executive Summary'],
+        ['source', 'Source'],
+      ]
+    ));
+    $this->addProject(new Project(
+      'veloz',
+      '⚡ Veloz: Yet Another PHP Mini-Framework',
+      'TODO',
+      'Could this be the next big drop in the PHP ocean? Dive in and find out!',
+      'thumbnail.webp',
       //  preloadImageFile: 'preload.jpg',
       sections: [
         ['summary', 'Executive Summary'],
         ['source', 'Source'],
       ]
     ));
+    // $this->addProject(new Project(
+    //   'apache2-template',
+    //   '🚀 WebPloy: From Apache 2 Production',
+    //   'TODO',
+    //   'TODO',
+    //   'thumbnail.webp',
+    //   //  preloadImageFile: 'preload.jpg',
+    //   sections: [
+    //     ['summary', 'Executive Summary'],
+    //     ['deploy', 'Deploy'],
+    //     ['source', 'Source'],
+    //   ]
+    // ));
     $this->addProject(new Project(
       'beetle',
       '🪲 Pooptimus Prime: The World\'s First Dung Beetle Biorobot',
@@ -34,8 +73,9 @@ class Projects
       . 'celestial cues to navigate, offering insights into biology and '
       . 'robotics alike.',
       'Robot vs beetle: who will be the ultimate fighting champion?',
-      'vs-robot.jpg',
+      'vs-robot.webp',
       preloadImageFile: 'beetles-fighting.jpg',
+      featured: true,
       sections: [
         ['summary', 'Executive Summary'],
         ['beetles101', 'The Beetle Hunter Diaries'],

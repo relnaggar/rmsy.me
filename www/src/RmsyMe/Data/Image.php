@@ -19,6 +19,7 @@ class Image {
     return match ($extension) {
       'jpg', 'jpeg' => 'image/jpeg',
       'png' => 'image/png',
+      'webp' => 'image/webp',
       default => throw new \Exception('Unsupported image type'),
     };
   }

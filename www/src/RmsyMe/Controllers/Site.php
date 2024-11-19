@@ -9,7 +9,6 @@ use Relnaggar\Veloz\{
   Views\Page,
 };
 use RmsyMe\{
-  Data\Section,
   Services\Projects,
   Data\Image,
 };
@@ -37,7 +36,10 @@ class Site extends AbstractController
 
     // get the featured projects
     $projects = $this->projectsService->getProjects();
-    $featuredProjects = array_slice($projects, 0, 2);
+    $featuredProjects = array_filter(
+      $projects,
+      fn($project) => $project->featured
+    );
 
     // preload the thumbnails for the featured projects
     $thumbnails = array_map(
