@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace RmsyMe\Services;
 
-use RmsyMe\Data\Project;
+use RmsyMe\Data\{
+  Project,
+  Source,
+};
 
 class Projects
 {
@@ -16,55 +19,77 @@ class Projects
     $this->addProject(new Project(
       'rmsy.me',
       '🖼 My Mona Lisa: A Personal Website',
-      'TODO',
+      '',
       'Find out how I gave birth to this technological tapestry. '
         . 'Curiosity is better than regret!',
-      'contact.webp',
-      //  preloadImageFile: 'preload.jpg',
-      featured: true,
-      sections: [
-        ['summary', 'Executive Summary'],
-        ['source', 'Source'],
-      ]
-    ));
-    $this->addProject(new Project(
-      'veloz',
-      '⚡ Veloz: Yet Another PHP Mini-Framework',
-      'TODO',
-      'Could this be the next big drop in the PHP ocean? Dive in and find out!',
       'thumbnail.webp',
       //  preloadImageFile: 'preload.jpg',
       featured: true,
       sections: [
         ['summary', 'Executive Summary'],
-        ['source', 'Source'],
+      ],
+      sources: [
+        new Source(
+          title: 'GitHub',
+          icon: 'github',
+          href: 'https://github.com/relnaggar/rmsy.me',
+          html: 'relnaggar/rmsy.me',
+        ),
       ]
     ));
     $this->addProject(new Project(
       'veloz',
       '⚡ Veloz: Yet Another PHP Mini-Framework',
-      'TODO',
+      '',
       'Could this be the next big drop in the PHP ocean? Dive in and find out!',
       'thumbnail.webp',
       //  preloadImageFile: 'preload.jpg',
       sections: [
         ['summary', 'Executive Summary'],
-        ['source', 'Source'],
+      ],
+      sources: [
+        new Source(
+          title: 'GitHub',
+          icon: 'github',
+          href: 'https://github.com/relnaggar/veloz',
+          html: 'relnaggar/veloz',
+        ),
+        new Source(
+          title: 'Packagist',
+          icon: 'box-seam',
+          href: 'https://packagist.org/packages/relnaggar/veloz',
+          html: 'packages/relnaggar/veloz',
+        )
       ]
     ));
-    // $this->addProject(new Project(
-    //   'apache2-template',
-    //   '🚀 WebPloy: From Apache 2 Production',
-    //   'TODO',
-    //   'TODO',
-    //   'thumbnail.webp',
-    //   //  preloadImageFile: 'preload.jpg',
-    //   sections: [
-    //     ['summary', 'Executive Summary'],
-    //     ['deploy', 'Deploy'],
-    //     ['source', 'Source'],
-    //   ]
-    // ));
+    $this->addProject(new Project(
+      'webploy',
+      '🚀 WebPloy: From Apache 2 Production',
+      '',
+      'Drama-free deployment for your Apache 2 projects. '
+        . 'Avoid the chaos and focus on the code!',
+      'thumbnail.webp',
+      //  preloadImageFile: 'preload.jpg',
+      sections: [
+        ['summary', 'Executive Summary'],
+        ['template', 'Template'],
+        ['deploy', 'Deployment'],
+      ],
+      sources: [
+        new Source(
+          title: 'Template GitHub',
+          icon: 'github',
+          href: 'https://github.com/relnaggar/apache2-template',
+          html: 'relnaggar/apache2-template',
+        ),
+        new Source(
+          title: 'Deployment GitHub',
+          icon: 'github',
+          href: 'https://github.com/relnaggar/apache2-deploy',
+          html: 'relnaggar/apache2-deploy',
+        ),
+      ]
+    ));
     $this->addProject(new Project(
       'beetle',
       '🪲 Pooptimus Prime: The World\'s First Dung Beetle Biorobot',

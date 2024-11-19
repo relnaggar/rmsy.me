@@ -6,7 +6,7 @@ use RmsyMe\Components\FormInput;
 
 <div class="card">
   <div class="card-header">
-    <h6 class="mb-0">Contact form</h6>
+    <div class="mb-0 h6">Contact form</div>
   </div>
   <div class="card-body">
     <?php

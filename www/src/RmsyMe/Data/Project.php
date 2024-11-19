@@ -14,6 +14,7 @@ class Project
   public readonly ?Image $preloadImage;
   public readonly bool $featured;
   private array $sections;
+  public readonly array $sources;
 
   public function __construct(
     string $slug,
@@ -24,6 +25,7 @@ class Project
     ?string $preloadImageFile = null,
     bool $featured = false,
     array $sections = [],
+    array $sources = [],
   ) {
     $this->slug = $slug;
     $this->title = $title;
@@ -47,6 +49,17 @@ class Project
       }
       $this->addSection($section[0], $section[1]);
     }
+
+    // validate the sources array
+    foreach ($sources as $source) {
+      if (!$source instanceof Source) {
+        $class = Source::class;
+        throw new \InvalidArgumentException(
+          "Each source must be an instance of $class.",
+        );
+      }
+    }
+    $this->sources = $sources;
   }
 
   private function addSection(string $id, string $title): void

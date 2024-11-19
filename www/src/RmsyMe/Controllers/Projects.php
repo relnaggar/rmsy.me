@@ -67,6 +67,7 @@ class Projects extends AbstractController
         'metaDescription' => $project->metaDescription,
         'onThisPage' => true,
         'preloadImages' => $preloadImages,
+        'sources' => $project->sources,
       ],
       sections: $project->getSections(),
     );

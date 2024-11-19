@@ -41,13 +41,6 @@ class Site extends AbstractController
       fn($project) => $project->featured
     );
 
-    // preload the thumbnails for the featured projects
-    $thumbnails = array_map(
-      fn($project) => $project->thumbnail,
-      $featuredProjects
-    );
-    $preloadImages = array_slice($thumbnails, 0, 2);
-
     // define the roles data
     $freeMeetingCallToAction = [
       'href' => '/free-meeting',
@@ -120,7 +113,6 @@ class Site extends AbstractController
           'Welcome to my slice of the internet pie!',
         'numberOfYearsTutoringAsWord' => $numberOfYearsTutoringAsWord,
         'featuredProjects' => $featuredProjects,
-        'preloadImages' => $preloadImages,
         'roles' => $roles,
       ],
     );

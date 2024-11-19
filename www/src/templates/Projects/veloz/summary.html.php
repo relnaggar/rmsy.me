@@ -1,3 +1,9 @@
+<?php
+
+use RmsyMe\Components\SourceCards;
+
+?>
+
 <ul>
   <li>
     Built reusable PHP backend from scratch including routing, templating and
@@ -8,3 +14,5 @@
     test coverage.
   </li>
 </ul>
+
+<?= (new SourceCards($sources))->render() ?>

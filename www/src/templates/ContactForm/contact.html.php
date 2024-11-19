@@ -23,7 +23,7 @@
         <?= !empty($contactMethod['cta']) ? 'card-cta' : '' ?>
       ">
         <div class="card-header">
-          <h6 class="mb-0"><?= $contactMethod['title'] ?></h6>
+          <div class="mb-0 h6"><?= $contactMethod['title'] ?></div>
         </div>
         <div class="card-body">
           <i class="bi bi-<?= $contactMethod['icon'] ?>"></i>
