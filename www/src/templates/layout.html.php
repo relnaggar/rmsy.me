@@ -31,6 +31,7 @@
         >
       <?php endforeach; ?>
     <?php endif ?>
+    <link rel="canonical" href="https://rmsy.me<?= $_SERVER['REQUEST_URI'] ?>">
   </head>
   <!-- offest of 56 pixels for the unexpanded navbar height -->
   <body
