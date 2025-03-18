@@ -165,7 +165,7 @@ RUN composer require phpmailer/phpmailer
 RUN composer require symfony/http-client
 
 # add framework
-RUN composer require relnaggar/veloz:^1.2
+RUN composer require relnaggar/veloz:^1.3
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"

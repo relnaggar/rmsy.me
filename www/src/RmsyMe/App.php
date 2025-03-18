@@ -80,10 +80,10 @@ class App extends AbstractApp
           ),
         ],
         '/github' => [
-          'GET' => new Redirect('https://github.com/relnaggar'),
+          'GET' => new Redirect('https://github.com/relnaggar', 301),
         ],
         '/linkedin' => [
-          'GET' => new Redirect('https://www.linkedin.com/in/relnaggar/'),
+          'GET' => new Redirect('https://www.linkedin.com/in/relnaggar/', 301),
         ],
         '/contact' => [
           'GET' => new ControllerAction(
