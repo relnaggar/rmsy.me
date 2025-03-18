@@ -66,9 +66,16 @@ RUN a2enmod rewrite \
   && sed -i '/<\/VirtualHost>/d' /etc/apache2/sites-available/000-default.conf \
   && cat <<'EOF' >> /etc/apache2/sites-available/000-default.conf
 
-  # rewrite HTTP to HTTPS
+  # start rewrite engine
   RewriteEngine On
-  RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L,QSA]
+
+	# redirect any www requests to the non‑www HTTPS URL
+	RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+	RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L,QSA]
+
+	# redirect HTTP requests (for non‑www) to HTTPS
+	RewriteCond %{HTTPS} off
+	RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,QSA]
 </VirtualHost>
 EOF
 
@@ -89,6 +96,13 @@ max-age=15768000;\\
 includeSubDomains\\
 "
   </IfDefine>
+
+  # start rewrite engine
+  RewriteEngine On
+
+	# redirect any www requests to the non‑www HTTPS URL
+	RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+	RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L,QSA]
 </VirtualHost>
 EOF
 
