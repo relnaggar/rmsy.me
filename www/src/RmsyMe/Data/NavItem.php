@@ -14,6 +14,7 @@ class NavItem
   public readonly string $icon;
   public readonly bool $inMenu;
   public readonly bool $inFooter;
+  public readonly bool $alignEnd;
 
   public function __construct(
     string $text,
@@ -21,7 +22,8 @@ class NavItem
     bool $external = false,
     string $icon = '',
     bool $inMenu = true,
-    bool $inFooter = false
+    bool $inFooter = false,
+    bool $alignEnd = false,
   ) {
     $this->text = $text;
     $this->path = $path;
@@ -31,6 +33,7 @@ class NavItem
     $this->icon = $icon;
     $this->inMenu = $inMenu;
     $this->inFooter = $inFooter;
+    $this->alignEnd = $alignEnd;
   }
 
   public function getPath(): string

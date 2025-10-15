@@ -81,6 +81,12 @@ class Nav
       inFooter: true
     ));
 
+    $this->addNavItem(new NavItem(
+      text: 'Client Login',
+      path: '/login',
+      alignEnd: true,
+    ));
+
     // nav
     $this->nav = new NavData(
       homePath: '/',

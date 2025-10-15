@@ -142,6 +142,24 @@ class Site extends AbstractController
     );
   }
 
+  public function login(): Page
+  {
+    return $this->getPage(
+      bodyTemplatePath: __FUNCTION__,
+      templateVars:[
+        'title' => 'Client Login',
+        'metaDescription' => 'Client login page.',
+        'metaRobots' => 'noindex, nofollow',
+      ]
+    );
+  }
+
+  public function loginSubmit(): void
+  {
+    // for now, just redirect back to login page
+    $this->redirect('/login', 302); // 302 means temporary redirect
+  }
+
   public function pageNotFound(): Page
   {
     http_response_code(404);

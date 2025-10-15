@@ -95,6 +95,16 @@ class App extends AbstractApp
             'contactSubmit'
           ),
         ],
+        '/login' => [
+          'GET' => new ControllerAction(
+            Controllers\Site::class,
+            'login'
+          ),
+          'POST' => new ControllerAction(
+            Controllers\Site::class,
+            'loginSubmit'
+          ),
+        ],
       ],
       pageNotFound: new ControllerAction(
         Controllers\Site::class,
