@@ -47,6 +47,7 @@ class ContactForm extends AbstractController
       'contactMethods' => $this->contactMethodsService->getContactMethods(),
       'displayAlert' => false,
       'displayForm' => true,
+      'formName' => 'contactForm',
     ];
   }
 
@@ -69,12 +70,12 @@ class ContactForm extends AbstractController
     $templateVars['success'] = false;
 
     // display error alert if form not submitted
-    if (!isset($_POST['submit']) || !isset($_POST['contactForm'])) {
+    if (!isset($_POST['submit']) || !isset($_POST[$templateVars['formName']])) {
       return $this->getPage($templatePath, $templateVars);
     }
 
     // validate form data
-    $contactFormData = new ContactFormData($_POST['contactForm']);
+    $contactFormData = new ContactFormData($_POST[$templateVars['formName']]);
     $errorCodes = $contactFormData->validate();
 
     // display error alert if form data is invalid

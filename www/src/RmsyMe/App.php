@@ -31,13 +31,28 @@ class App extends AbstractApp
         Decorators\Nav::class,
         Decorators\MediaRoot::class,
         Decorators\Sidebar::class,
-      ]
+      ],
+      Controllers\Client::class => [
+        Decorators\ExtendedTitle::class,
+        Decorators\Nav::class,
+      ],
     ];
   }
 
   public function getRouter(): RouterInterface
   {
     $mediaService = new Services\Media();
+    $databaseService = new Services\Database();
+    if (!$databaseService->isConnected()) {
+      return new BasicRouter(
+        routes: [],
+        pageNotFound: new ControllerAction(
+          Controllers\Site::class,
+          'databaseError'
+        ),
+      );
+    }
+
     return new BasicRouter(
       routes: [
         '/' => [
@@ -97,11 +112,11 @@ class App extends AbstractApp
         ],
         '/login' => [
           'GET' => new ControllerAction(
-            Controllers\Site::class,
+            Controllers\Client::class,
             'login'
           ),
           'POST' => new ControllerAction(
-            Controllers\Site::class,
+            Controllers\Client::class,
             'loginSubmit'
           ),
         ],

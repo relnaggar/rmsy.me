@@ -9,12 +9,9 @@ use RmsyMe\Components\FormInput;
     <div class="mb-0 h6">Contact form</div>
   </div>
   <div class="card-body">
-    <?php
-      $formName = 'contactForm';
-    ?>
     <form
       action="/contact"
-      method="POST"
+      method="post"
       class="needs-validation"
       novalidate
     >

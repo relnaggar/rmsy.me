@@ -41,15 +41,6 @@
     tabindex="0"
     class="position-relative"
   >
-    <?php
-      $databaseWorking = false;
-      try {
-        $pdo = new PDO('sqlite:/var/db/database.sqlite');
-        $databaseWorking = true;
-      } catch (PDOException $e) {
-        $error = $e->getMessage();
-      }
-    ?>
     <a href="#main" class="skip-link">Skip to content</a>
     <div class="container-fluid d-flex flex-column p-0">
       <?php require 'layout/header.html.php'; ?>
