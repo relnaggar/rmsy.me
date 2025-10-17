@@ -177,6 +177,7 @@ RUN apt-get update -y \
 # add composer dependencies for rmsy.me
 RUN composer require phpmailer/phpmailer
 RUN composer require symfony/http-client
+RUN composer require robmorgan/phinx
 
 # add framework
 RUN composer require relnaggar/veloz:^1.3

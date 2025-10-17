@@ -68,3 +68,35 @@ Changes to the following files require rebuilding with `docker compose build`:
 * `docker-compose.yml`
 * `bundler/Dockerfile`
 * `bundler/package.json`
+
+# Database
+
+The application uses a SQLite database located at `/var/db/database.sqlite3`
+inside the container. Phinx is used for database migrations and seeding. In
+general, phinx commands can be run inside the container using
+`docker compose exec`, and providing the path to the phinx configuration file
+`/var/db/phinx.php` with the `-c` option. Common commands are listed below.
+
+To check the status of migrations:
+
+```bash
+docker compose exec app vendor/bin/phinx status -c /var/db/phinx.php
+```
+
+To run database migrations:
+
+```bash
+docker compose exec app vendor/bin/phinx migrate -c /var/db/phinx.php
+```
+
+To seed the database:
+
+```bash
+docker compose exec app vendor/bin/phinx seed:run -c /var/db/phinx.php
+```
+
+To create a new migration:
+
+```bash
+docker compose exec app vendor/bin/phinx create <MigrationName> -c /var/db/phinx.php
+```

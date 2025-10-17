@@ -67,7 +67,16 @@ class Client extends AbstractController
 
     // check credentials
     // always fail for now
-    $templateVars['errorCode'] = 'login';
+    if (!$this->databaseService->login(
+      $loginFormData->email,
+      $loginFormData->password,
+    )) {
+      $templateVars['errorCode'] = 'login';
+      return $this->getPage($templatePath, $templateVars);
+    }
+
+    // success - redirect to dashboard
+    $this->redirect('/', 302);
     return $this->getPage($templatePath, $templateVars);
   }
 }
