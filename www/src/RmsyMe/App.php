@@ -42,16 +42,6 @@ class App extends AbstractApp
   public function getRouter(): RouterInterface
   {
     $mediaService = new Services\Media();
-    $databaseService = new Services\Database();
-    if (!$databaseService->isConnected()) {
-      return new BasicRouter(
-        routes: [],
-        pageNotFound: new ControllerAction(
-          Controllers\Site::class,
-          'databaseError'
-        ),
-      );
-    }
 
     return new BasicRouter(
       routes: [
@@ -118,6 +108,12 @@ class App extends AbstractApp
           'POST' => new ControllerAction(
             Controllers\Client::class,
             'loginSubmit'
+          ),
+        ],
+        '/database-error' => [
+          'GET' => new ControllerAction(
+            Controllers\Site::class,
+            'databaseError'
           ),
         ],
       ],

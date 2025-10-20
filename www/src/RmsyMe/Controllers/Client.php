@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace RmsyMe\Controllers;
 
+use PDOException;
 use Relnaggar\Veloz\{
   Controllers\AbstractController,
   Views\Page,
@@ -66,17 +67,22 @@ class Client extends AbstractController
     }
 
     // check credentials
-    // always fail for now
-    if (!$this->databaseService->login(
-      $loginFormData->email,
-      $loginFormData->password,
-    )) {
-      $templateVars['errorCode'] = 'login';
-      return $this->getPage($templatePath, $templateVars);
+    try {
+      if (!$this->databaseService->login(
+        $loginFormData->email,
+        $loginFormData->password,
+      )) {
+        $templateVars['errorCode'] = 'login';
+        return $this->getPage($templatePath, $templateVars);
+      }
+    } catch (PDOException $e) {
+      error_log($e->getMessage());
+      $this->redirect('/database-error', 302);
+      return Page::empty();
     }
 
     // success - redirect to dashboard
     $this->redirect('/', 302);
-    return $this->getPage($templatePath, $templateVars);
+    return Page::empty();
   }
 }

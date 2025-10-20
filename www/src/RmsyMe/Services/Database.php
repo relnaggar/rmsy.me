@@ -9,25 +9,40 @@ use PDOException;
 
 class Database
 {
-  private PDO $pdo;
+  private ?PDO $pdo;
   private bool $databaseConnected;
 
   public function __construct()
   {
-    try {
-      $this->pdo = new PDO('sqlite:/var/db/database.sqlite3');
-      // throw new PDOException('Simulated failure');
-      $this->databaseConnected = true;
-    } catch (PDOException $e) {
-      $this->databaseConnected = false;
-    }
+    $this->pdo = null;
+    $this->databaseConnected = false;
   }
 
+  /**
+   * Establish a connection to the database.
+   * 
+   * @throws PDOException If there is a database connection error.
+   */
+  public function connect(): void {
+    if ($this->databaseConnected) {
+      return;
+    }
+
+    $this->pdo = new PDO('sqlite:/var/db/database.sqlite3');
+    $this->databaseConnected = true;
+  }
+
+  /**
+   * Attempt to log in a user with the given email and password.
+   * 
+   * @param string $email The user's email address.
+   * @param string $password The user's password.
+   * @return bool True if the email and password are valid, false otherwise.
+   * @throws PDOException If there is a database error.
+   */
   public function login(string $email, string $password): bool
   {
-    if (!$this->databaseConnected) {
-      return false;
-    }
+    $this->connect();
 
     $stmt = $this->pdo->prepare('SELECT password_hash FROM users WHERE email = :email');
     $stmt->execute(['email' => $email]);
@@ -38,15 +53,5 @@ class Database
     }
 
     return false;
-  }
-
-  public function getPdo(): PDO
-  {
-    return $this->pdo;
-  }
-
-  public function isConnected(): bool
-  {
-    return $this->databaseConnected;
   }
 }

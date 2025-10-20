@@ -180,7 +180,7 @@ RUN composer require symfony/http-client
 RUN composer require robmorgan/phinx
 
 # add framework
-RUN composer require relnaggar/veloz:^1.3
+RUN composer require relnaggar/veloz:^1.4
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"
