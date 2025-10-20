@@ -85,3 +85,7 @@ COPY config/apache2/ /etc/apache2
 
 # copy contents of public folder to /var/www
 COPY www/ /var/www
+
+# copy contents of phinx folders
+COPY phinx/ /var/phinx
+COPY migrations/ /var/migrations

@@ -2,8 +2,8 @@
 
 return [
     'paths' => [
-        'migrations' => '/var/db/migrations',
-        'seeds'      => '/var/db/seeds',
+        'migrations' => '/var/migrations',
+        'seeds'      => '/var/seeds',
     ],
     'environments' => [
         'default_migration_table' => 'phinxlog',

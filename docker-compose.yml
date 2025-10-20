@@ -11,6 +11,9 @@ services:
       - ./config/apache2:/etc/apache2
       - ./config/php:/etc/php
       - ./db:/var/db
+      - ./phinx:/var/phinx
+      - ./migrations:/var/migrations
+      - ./seeds:/var/seeds
     secrets:
       - SMTP_HOST
       - SMTP_USERNAME

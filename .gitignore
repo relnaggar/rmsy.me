@@ -6,5 +6,4 @@ www/html/fonts/*.woff*
 *.jpeg
 *.png
 secrets
-*.sqlite3
-db/seeds/
+seeds/
