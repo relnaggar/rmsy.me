@@ -32,9 +32,14 @@ class App extends AbstractApp
         Decorators\MediaRoot::class,
         Decorators\Sidebar::class,
       ],
+      Controllers\Login::class => [
+        Decorators\ExtendedTitle::class,
+        Decorators\Nav::class,
+      ],
       Controllers\Client::class => [
         Decorators\ExtendedTitle::class,
         Decorators\Nav::class,
+        Decorators\Sidebar::class,
       ],
     ];
   }
@@ -102,25 +107,22 @@ class App extends AbstractApp
         ],
         '/login' => [
           'GET' => new ControllerAction(
-            Controllers\Client::class,
+            Controllers\Login::class,
             'login'
           ),
           'POST' => new ControllerAction(
-            Controllers\Client::class,
+            Controllers\Login::class,
             'loginSubmit'
-          ),
-        ],
-        '/welcome' => [
-          'GET' => new ControllerAction(
-            Controllers\Client::class,
-            'welcome'
           ),
         ],
         '/logout' => [
           'GET' => new ControllerAction(
-            Controllers\Client::class,
+            Controllers\Login::class,
             'logout'
           ),
+        ],
+        '/client/' => [
+          'GET' => new ControllerAction(Controllers\Client::class, 'welcome'),
         ],
         '/database-error' => [
           'GET' => new ControllerAction(
