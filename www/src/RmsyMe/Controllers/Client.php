@@ -10,18 +10,25 @@ use Relnaggar\Veloz\{
   Views\Page,
 };
 use RmsyMe\{
-  Services\Database,
   Data\LoginFormData,
+  Services\Database,
+  Services\Login,
 };
 
 class Client extends AbstractController
 {
   private Database $databaseService;
+  private Login $loginService;
 
-  public function __construct(array $decorators, Database $databaseService)
+  public function __construct(
+    array $decorators,
+    Database $databaseService,
+    Login $loginService
+  )
   {
     parent::__construct($decorators);
     $this->databaseService = $databaseService;
+    $this->loginService = $loginService;
   }
 
   private function getLoginTemplateVars(): array
@@ -36,6 +43,12 @@ class Client extends AbstractController
 
   public function login(): Page
   {
+    $userId = $this->loginService->getLoggedInUserId();
+    if ($userId !== -1) {
+      $this->redirect('/welcome', 302);
+      return Page::empty();
+    }
+
     return $this->getPage(
       bodyTemplatePath: __FUNCTION__,
       templateVars: $this->getLoginTemplateVars(),
@@ -68,7 +81,7 @@ class Client extends AbstractController
 
     // check credentials
     try {
-      if (!$this->databaseService->login(
+      if (!$this->loginService->login(
         $loginFormData->email,
         $loginFormData->password,
       )) {
@@ -82,7 +95,38 @@ class Client extends AbstractController
     }
 
     // success - redirect to dashboard
-    $this->redirect('/', 302);
+    $this->redirect('/welcome', 302);
     return Page::empty();
+  }
+
+  private function authenticate(): int
+  {
+    $userId = $this->loginService->getLoggedInUserId();
+    if ($userId === -1) {
+      $this->redirect('/login', 302);
+      return 0;
+    } else {
+      return $userId;
+    }
+  }
+
+  public function logout(): Page
+  {
+    $this->loginService->logout();
+    $this->redirect('/login', 302);
+    return Page::empty();
+  }
+
+  public function welcome(): Page
+  {
+    $loggedInUserId = $this->authenticate();
+
+    return $this->getPage(
+      bodyTemplatePath: __FUNCTION__,
+      templateVars: [
+        'title' => 'Welcome',
+        'userEmail' => $this->databaseService->getUserEmail($loggedInUserId),
+      ],
+    );
   }
 }

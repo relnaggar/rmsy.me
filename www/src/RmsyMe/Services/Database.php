@@ -33,25 +33,43 @@ class Database
   }
 
   /**
-   * Attempt to log in a user with the given email and password.
+   * Get the user ID for the given email and password.
    * 
    * @param string $email The user's email address.
    * @param string $password The user's password.
-   * @return bool True if the email and password are valid, false otherwise.
+   * @return int The user ID if the email and password are valid, -1 otherwise.
    * @throws PDOException If there is a database error.
    */
-  public function login(string $email, string $password): bool
+  public function getUserId(string $email, string $password): int
   {
     $this->connect();
 
-    $stmt = $this->pdo->prepare('SELECT password_hash FROM users WHERE email = :email');
+    $stmt = $this->pdo->prepare('SELECT id, password_hash FROM users WHERE email = :email');
     $stmt->execute(['email' => $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user && password_verify($password, $user['password_hash'])) {
-      return true;
+      return $user['id'];
     }
 
-    return false;
+    return -1;
+  }
+
+  /**
+   * Get the email address of a user by their user ID.
+   * 
+   * @param int $userId The user's ID.
+   * @return string The user's email address.
+   * @throws PDOException If there is a database error.
+   */
+  public function getUserEmail(int $userId): string
+  {
+    $this->connect();
+
+    $stmt = $this->pdo->prepare('SELECT email FROM users WHERE id = :id');
+    $stmt->execute(['id' => $userId]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $user['email'];
   }
 }

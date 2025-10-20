@@ -110,6 +110,18 @@ class App extends AbstractApp
             'loginSubmit'
           ),
         ],
+        '/welcome' => [
+          'GET' => new ControllerAction(
+            Controllers\Client::class,
+            'welcome'
+          ),
+        ],
+        '/logout' => [
+          'GET' => new ControllerAction(
+            Controllers\Client::class,
+            'logout'
+          ),
+        ],
         '/database-error' => [
           'GET' => new ControllerAction(
             Controllers\Site::class,
