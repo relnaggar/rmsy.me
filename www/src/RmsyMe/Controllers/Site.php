@@ -165,4 +165,14 @@ class Site extends AbstractController
       ]
     );
   }
+
+  public function wiseDeposit(): Page
+  {
+    error_log('Received Wise deposit webhook v2');
+    $raw = file_get_contents('php://input');
+    error_log($raw);
+    $headers = getallheaders();
+    error_log(print_r($headers, true));
+    return Page::empty();
+  }
 }

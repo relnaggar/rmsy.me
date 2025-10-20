@@ -124,6 +124,12 @@ class App extends AbstractApp
         '/client/' => [
           'GET' => new ControllerAction(Controllers\Client::class, 'welcome'),
         ],
+        '/wise-deposit' => [
+          'POST' => new ControllerAction(
+            Controllers\Site::class,
+            'wiseDeposit'
+          ),
+        ],
         '/database-error' => [
           'GET' => new ControllerAction(
             Controllers\Site::class,
