@@ -35,9 +35,11 @@
   </head>
   <!-- offest of 56 pixels for the unexpanded navbar height -->
   <body
-    data-bs-spy="scroll"
-    data-bs-target="#sidebarMenu"
-    data-bs-offset="56"
+    <?php if (!empty($onThisPage)): ?>
+      data-bs-spy="scroll"
+      data-bs-target="#sidebarMenu"
+      data-bs-offset="56"
+    <?php endif; ?>
     tabindex="0"
     class="position-relative"
   >
