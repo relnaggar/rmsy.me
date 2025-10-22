@@ -15,6 +15,7 @@ class NavItem
   public readonly bool $inMenu;
   public readonly bool $inFooter;
   public readonly bool $alignEnd;
+  public readonly bool $previousNextButtonsEnabled;
 
   public function __construct(
     string $text,
@@ -24,6 +25,7 @@ class NavItem
     bool $inMenu = true,
     bool $inFooter = false,
     bool $alignEnd = false,
+    bool $previousNextButtonsEnabled = false,
   ) {
     $this->text = $text;
     $this->path = $path;
@@ -34,6 +36,7 @@ class NavItem
     $this->inMenu = $inMenu;
     $this->inFooter = $inFooter;
     $this->alignEnd = $alignEnd;
+    $this->previousNextButtonsEnabled = $previousNextButtonsEnabled;
   }
 
   public function getPath(): string
@@ -110,6 +113,7 @@ class NavItem
       homePath: $this->path,
       title: $this->text,
       items: $this->dropdownItems,
+      previousNextButtonsEnabled: $this->previousNextButtonsEnabled,
     );
   }
 }

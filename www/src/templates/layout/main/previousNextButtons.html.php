@@ -1,4 +1,4 @@
-<?php if (!empty($sidebarNav)): ?>
+<?php if (!empty($sidebarNav) && $sidebarNav->isPreviousNextButtonsEnabled()): ?>
   <?php
     $previousPath = $sidebarNav->getPreviousPath();
     $nextPath = $sidebarNav->getNextPath();

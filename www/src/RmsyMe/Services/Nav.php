@@ -28,7 +28,11 @@ class Nav
     $this->contactMethodsService = $contactMethodsService;
 
     // projects dropdown
-    $projectsItem = new NavItem(text: 'Projects', path: '/projects');
+    $projectsItem = new NavItem(
+      text: 'Projects',
+      path: '/projects',
+      previousNextButtonsEnabled: true,
+    );
     $projectsItem->addDropdownItem(new NavItem(
       text: 'All Projects',
       path: '/',

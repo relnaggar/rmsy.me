@@ -8,11 +8,13 @@ class Nav {
   public readonly string $homePath;
   public readonly string $title;
   public readonly array $items;
+  public readonly bool $previousNextButtonsEnabled;
 
   public function __construct(
     string $homePath,
     string $title,
-    array $items
+    array $items,
+    bool $previousNextButtonsEnabled = false,
   ) {
     // validate the items array
     foreach ($items as $item) {
@@ -24,6 +26,7 @@ class Nav {
     $this->homePath = $homePath;
     $this->title = $title;
     $this->items = $items;
+    $this->previousNextButtonsEnabled = $previousNextButtonsEnabled;
   }
 
   /**
@@ -36,6 +39,16 @@ class Nav {
     foreach ($this->items as $item) {
       $item->setActiveItem($activePath);
     }
+  }
+
+  /**
+   * Check if previous/next buttons are enabled.
+   *
+   * @return bool True if previous/next buttons are enabled, false otherwise.
+   */
+  public function isPreviousNextButtonsEnabled(): bool
+  {
+    return $this->previousNextButtonsEnabled;
   }
 
   /**
