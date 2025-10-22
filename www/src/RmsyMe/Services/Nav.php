@@ -87,7 +87,7 @@ class Nav
 
     $this->addNavItem(new NavItem(
       text: 'Client Login',
-      path: '/login',
+      path: '/client/login',
       alignEnd: true,
     ));
     
@@ -96,6 +96,10 @@ class Nav
     $clientItem->addDropdownItem(new NavItem(
       text: 'Welcome',
       path: '/',
+    ));
+    $clientItem->addDropdownItem(new NavItem(
+      text: 'Logout',
+      path: '/logout',
     ));
     $this->addNavItem($clientItem);
 

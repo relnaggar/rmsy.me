@@ -41,7 +41,7 @@ use RmsyMe\Components\{
     ))->render() ?>
   <?php endif; ?>
   <form
-    action="/login"
+    action="/client/login"
     method="post"
     class="needs-validation"
     novalidate

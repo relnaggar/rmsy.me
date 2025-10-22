@@ -105,7 +105,7 @@ class App extends AbstractApp
             'contactSubmit'
           ),
         ],
-        '/login' => [
+        '/client/login' => [
           'GET' => new ControllerAction(
             Controllers\Login::class,
             'login'
@@ -115,14 +115,15 @@ class App extends AbstractApp
             'loginSubmit'
           ),
         ],
-        '/logout' => [
+        '/client/' => [
+          'GET' => new ControllerAction(Controllers\Client::class, 'welcome'),
+        ],
+
+        '/client/logout' => [
           'GET' => new ControllerAction(
             Controllers\Login::class,
             'logout'
           ),
-        ],
-        '/client/' => [
-          'GET' => new ControllerAction(Controllers\Client::class, 'welcome'),
         ],
         '/wise-deposit' => [
           'POST' => new ControllerAction(

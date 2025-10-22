@@ -95,13 +95,14 @@ class Login extends AbstractController
       return Page::empty();
     }
 
+    // success
     return $this->redirectToClientDashboard();
   }
 
   public function logout(): Page
   {
     $this->loginService->logout();
-    $this->redirect('/login', 302);
+    $this->redirect('/client/login', 302);
     return Page::empty();
   }
 }

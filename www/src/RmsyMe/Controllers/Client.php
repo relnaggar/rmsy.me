@@ -34,7 +34,7 @@ class Client extends AbstractController
   {
     $userId = $this->loginService->getLoggedInUserId();
     if ($userId === -1) {
-      $this->redirect('/login', 302);
+      $this->redirect('/client/login', 302);
       return 0;
     } else {
       return $userId;
