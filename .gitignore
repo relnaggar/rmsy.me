@@ -8,3 +8,4 @@ www/html/fonts/*.woff*
 secrets
 db/
 seeds/
+uploads/

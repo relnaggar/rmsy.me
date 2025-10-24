@@ -61,11 +61,11 @@ class Nav {
     $previousItem = null;
     foreach ($this->items as $item) {
       if ($item->isActive()) {
-        return $previousItem ? $previousItem->getPath() : "";
+        return $previousItem ? $previousItem->getPath() : '';
       }
       $previousItem = $item;
     }
-    return "";
+    return '';
   }
 
   /**
@@ -84,6 +84,6 @@ class Nav {
         $foundActive = true;
       }
     }
-    return "";
+    return '';
   }
 }

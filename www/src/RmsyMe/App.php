@@ -117,6 +117,10 @@ class App extends AbstractApp
         ],
         '/client/' => [
           'GET' => new ControllerAction(Controllers\Client::class, 'welcome'),
+          'POST' => new ControllerAction(
+            Controllers\Client::class,
+            'welcomeSubmit'
+          ),
         ],
 
         '/client/logout' => [
