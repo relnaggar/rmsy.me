@@ -109,7 +109,7 @@ class Site extends AbstractController
       templateVars: [
         'title' => 'Ramsey El-Naggar',
         'subtitle' => 'Software Engineer & Educator',
-        'metaDescription' => "Hi, I'm Ramsey 👋. " .
+        'metaDescription' => 'Hi, I\'m Ramsey 👋. ' .
           'Welcome to my slice of the internet pie!',
         'numberOfYearsTutoringAsWord' => $numberOfYearsTutoringAsWord,
         'featuredProjects' => $featuredProjects,

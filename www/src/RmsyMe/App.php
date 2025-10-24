@@ -75,7 +75,7 @@ class App extends AbstractApp
           'GET' => new ControllerAction(Controllers\Projects::class, 'show'),
         ],
         '/free-meeting' => [
-          'GET' => new Redirect("https://calendly.com/relnaggar/free-meeting"),
+          'GET' => new Redirect('https://calendly.com/relnaggar/free-meeting'),
         ],
         '/resumes/full-stack-developer' => [
           'GET' => new Redirect(

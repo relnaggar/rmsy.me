@@ -25,10 +25,10 @@ class Mailer
     string $toEmail,
     string $subject,
     string $htmlBody,
-    string $fromName = "",
-    string $toName = "",
-    string $replyToEmail = "",
-    string $replyToName = ""
+    string $fromName = '',
+    string $toName = '',
+    string $replyToEmail = '',
+    string $replyToName = ''
   ): bool {
     // return false; // currently disabled
 
@@ -46,18 +46,18 @@ class Mailer
       $phpMailer->Port = 465;
 
       // recipients
-      if ($fromName === "") {
+      if ($fromName === '') {
         $phpMailer->setFrom($fromEmail);
       } else {
         $phpMailer->setFrom($fromEmail, $fromName);
       }
-      if ($toName === "") {
+      if ($toName === '') {
         $phpMailer->addAddress($toEmail);
       } else {
         $phpMailer->addAddress($toEmail, $toName);
       }
-      if ($replyToEmail !== "") {
-        if ($replyToName === "") {
+      if ($replyToEmail !== '') {
+        if ($replyToName === '') {
           $phpMailer->addReplyTo($replyToEmail);
         } else {
           $phpMailer->addReplyTo($replyToEmail, $replyToName);
