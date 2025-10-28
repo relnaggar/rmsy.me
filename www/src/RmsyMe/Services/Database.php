@@ -44,7 +44,9 @@ class Database
   {
     $this->connect();
 
-    $stmt = $this->pdo->prepare('SELECT id, password_hash FROM users WHERE email = :email');
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT id, password_hash FROM users WHERE email = :email
+    SQL);
     $stmt->execute(['email' => $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -66,10 +68,102 @@ class Database
   {
     $this->connect();
 
-    $stmt = $this->pdo->prepare('SELECT email FROM users WHERE id = :id');
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT email FROM users WHERE id = :id
+    SQL);
     $stmt->execute(['id' => $userId]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     return $user['email'];
+  }
+
+  private function paymentExists(string $paymentId, array $existingPayments): bool
+  {
+      $stmt = $this->pdo->prepare(<<<SQL
+      SELECT COUNT(*) as count FROM payments WHERE id = :id
+    SQL);
+    $stmt->execute(['id' => $paymentId]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $result['count'] > 0;
+  }
+
+  /**
+   * Import payments from a CSV file into the payments table.
+   * 
+   * @param string $csvPath The path to the CSV file.
+   * @return bool True on success, false on failure.
+   * @throws PDOException If there is a database error.
+   */
+  public function importPayments(string $csvPath): bool
+  {
+    $this->connect();
+
+    $this->pdo->beginTransaction();
+
+    $update_stmt = $this->pdo->prepare(<<<SQL
+      INSERT INTO payments (id, datetime, amount, currency, payment_reference, payer_name)
+      VALUES (:id, :datetime, :amount, :currency, :payment_reference, :payer_name)
+    SQL);
+
+    if (($handle = fopen($csvPath, 'r')) !== false) {
+      // validate header row
+      if (($header = fgetcsv($handle)) === false ||
+        count($header) < 12 ||
+        $header[0] !== 'TransferWise ID' ||
+        $header[2] !== 'Date Time' ||
+        $header[3] !== 'Amount' ||
+        $header[4] !== 'Currency' ||
+        $header[6] !== 'Payment Reference' ||
+        $header[11] !== 'Payer Name'
+      ) {
+        fclose($handle);
+        $this->pdo->rollBack();
+        return false;
+      }
+
+      // get existing payment IDs to avoid duplicates
+      $select_stmt = $this->pdo->prepare(<<<SQL
+        SELECT id FROM payments
+      SQL);
+      $select_stmt->execute();
+      $existingPayments = $select_stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+
+      // import each row
+      while (($data = fgetcsv($handle)) !== false) {
+        $id = $data[0];
+        $datetime = $data[2];
+        $amount = (int)((float)$data[3]*100);
+        $currency = $data[4];
+        $payment_reference = $data[6];
+        $payer_name = $data[11];
+
+        // ignore negative amounts
+        if ($amount < 0) {
+          continue;
+        }
+
+        // ignore duplicate IDs
+        if (in_array($id, $existingPayments, true)) {
+          continue;
+        }
+
+        $update_stmt->execute([
+          'id' => $id,
+          'datetime' => $datetime,
+          'amount' => $amount,
+          'currency' => $currency,
+          'payment_reference' => $payment_reference,
+          'payer_name' => $payer_name,
+        ]);
+      }
+      fclose($handle);
+    } else {
+      $this->pdo->rollBack();
+      return false;
+    }
+
+    $this->pdo->commit();
+    return true;
   }
 }
