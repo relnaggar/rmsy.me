@@ -12,26 +12,17 @@ use RmsyMe\Components\{
     <?php
       $errorMessages = [
         'email' => <<<HTML
-          Oh no!
-          Our web gnomes are telling me the email address you entered is invalid.
-          Whoops!
+          Invalid email address. Please enter a valid email address 254 characters or under.
         HTML,
         'password' => <<<HTML
-          Oh no!
-          Our web gnomes are telling me the password you entered is invalid.
-          Whoops!
+          Blank password. Please enter your password.
         HTML,
         'login' => <<<HTML
-          Oh no!
-          Our web gnomes are telling me the email and password combination you
-          entered hasn't been recognised.
-          Whoops!
+          Unrecognized login credentials. Please try again.
         HTML,
         'default' => <<<HTML
-          <p>
-            Login failed!
-          </p>
-          HTML
+          Login failed for an unknown reason! Please try again later.
+        HTML
       ];
     ?>
     <?= (new Alert(
