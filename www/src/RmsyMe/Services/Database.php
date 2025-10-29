@@ -77,12 +77,21 @@ class Database
     return $user['email'];
   }
 
-  private function paymentExists(string $paymentId, array $existingPayments): bool
+  /**
+   * Check if a payer exists in the payers table.
+   * 
+   * @param string $payerId The payer's ID.
+   * @return bool True if the payer exists, false otherwise.
+   * @throws PDOException If there is a database error.
+   */
+  private function payerExists(string $payerId): bool
   {
-      $stmt = $this->pdo->prepare(<<<SQL
-      SELECT COUNT(*) as count FROM payments WHERE id = :id
+    $this->connect();
+
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT COUNT(*) as count FROM payers WHERE id = :id
     SQL);
-    $stmt->execute(['id' => $paymentId]);
+    $stmt->execute(['id' => $payerId]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
     return $result['count'] > 0;
@@ -101,8 +110,8 @@ class Database
 
     $this->pdo->beginTransaction();
 
-    $update_stmt = $this->pdo->prepare(<<<SQL
-      INSERT INTO payments (id, datetime, amount, currency, payment_reference, payer_name)
+    $insertIntoPayments = $this->pdo->prepare(<<<SQL
+      INSERT INTO payments (id, datetime, amount, currency, payment_reference, payer_id)
       VALUES (:id, :datetime, :amount, :currency, :payment_reference, :payer_name)
     SQL);
 
@@ -123,11 +132,16 @@ class Database
       }
 
       // get existing payment IDs to avoid duplicates
-      $select_stmt = $this->pdo->prepare(<<<SQL
+      $selectFromPayments = $this->pdo->prepare(<<<SQL
         SELECT id FROM payments
       SQL);
-      $select_stmt->execute();
-      $existingPayments = $select_stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+      $selectFromPayments->execute();
+      $existingPayments = $selectFromPayments->fetchAll(PDO::FETCH_COLUMN, 0);
+
+      // prepare payer insert statement
+      $insertIntoPayers = $this->pdo->prepare(<<<SQL
+        INSERT INTO payers (id, name) VALUES (:id, :name)
+      SQL);
 
       // import each row
       while (($data = fgetcsv($handle)) !== false) {
@@ -148,7 +162,15 @@ class Database
           continue;
         }
 
-        $update_stmt->execute([
+        // add payer to payers table
+        if (!$this->payerExists($payer_name, $existingPayments)) {
+          $insertIntoPayers->execute([
+            'id' => $payer_name,
+            'name' => $payer_name,
+          ]);
+        }
+
+        $insertIntoPayments->execute([
           'id' => $id,
           'datetime' => $datetime,
           'amount' => $amount,

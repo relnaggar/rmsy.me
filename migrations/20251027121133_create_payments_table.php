@@ -26,7 +26,8 @@ final class CreatePaymentsTable extends AbstractMigration
         //     amount INT NOT NULL,
         //     currency VARCHAR(3) NOT NULL,
         //     payment_reference VARCHAR(150) NOT NULL,
-        //     payer_name VARCHAR(100) NOT NULL
+        //     payer_id VARCHAR(100) NOT NULL,
+        //     FOREIGN KEY (payer_id) REFERENCES payers(id)
         // );
         // SQL;
 
@@ -36,7 +37,7 @@ final class CreatePaymentsTable extends AbstractMigration
             ->addColumn('amount', 'integer', ['null' => false])
             ->addColumn('currency', 'string', ['limit' => 3, 'null' => false])
             ->addColumn('payment_reference', 'string', ['limit' => 150, 'null' => false])
-            ->addColumn('payer_name', 'string', ['limit' => 100, 'null' => false])
+            ->addColumn('payer_id', 'string', ['limit' => 100, 'null' => false])
             ->create();
     }
 }
