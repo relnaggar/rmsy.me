@@ -12,8 +12,8 @@
 
 <div class="row">
   <div class="col-xxl-7 mb-3">
-    <?php $displayAlert && require 'contact/contactFormAlert.html.php' ?>
-    <?php $displayForm && require 'contact/contactForm.html.php' ?>
+    <?php $displayAlert && require 'contact/formAlert.html.php' ?>
+    <?php $displayForm && require 'contact/form.html.php' ?>
   </div>
   <div class="col-xxl-5">
     <?php foreach ($contactMethods as $contactMethod): ?>

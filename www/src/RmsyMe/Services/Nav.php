@@ -90,12 +90,16 @@ class Nav
       path: '/client/login',
       alignEnd: true,
     ));
-    
+
     // add client side nav (not in main menu)
     $clientItem = new NavItem(text: 'Client', path: '/client', inMenu: false);
     $clientItem->addDropdownItem(new NavItem(
-      text: 'Welcome',
+      text: 'Dashboard',
       path: '/',
+    ));
+    $clientItem->addDropdownItem(new NavItem(
+      text: 'Payments',
+      path: '/payments',
     ));
     $clientItem->addDropdownItem(new NavItem(
       text: 'Logout',

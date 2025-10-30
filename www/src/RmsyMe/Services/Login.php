@@ -28,7 +28,7 @@ class Login
   public function login(string $email, string $password): bool
   {
     $userId = $this->databaseService->getUserId($email, $password);
-    if ($userId === -1) {
+    if ($userId === null) {
       return false;
     } else {
       $_SESSION['user_id'] = $userId;
@@ -41,8 +41,8 @@ class Login
     unset($_SESSION['user_id']);
   }
 
-  public function getLoggedInUserId(): int
+  public function getLoggedInUserId(): ?int
   {
-    return $_SESSION['user_id'] ?? -1;
+    return $_SESSION['user_id'] ?? null;
   }
 }

@@ -5,7 +5,7 @@ use RmsyMe\Components\FormInput;
 ?>
 
 <form
-  action="/client/" 
+  action="/client/payments" 
   method="post"
   class="needs-validation"
   novalidate

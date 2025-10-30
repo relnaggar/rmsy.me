@@ -115,18 +115,20 @@ class App extends AbstractApp
             'loginSubmit'
           ),
         ],
-        '/client/' => [
-          'GET' => new ControllerAction(Controllers\Client::class, 'welcome'),
-          'POST' => new ControllerAction(
-            Controllers\Client::class,
-            'welcomeSubmit'
-          ),
-        ],
-
         '/client/logout' => [
           'GET' => new ControllerAction(
             Controllers\Login::class,
             'logout'
+          ),
+        ],
+        '/client/' => [
+          'GET' => new ControllerAction(Controllers\Client::class, 'index'),
+        ],
+        '/client/payments' => [
+          'GET' => new ControllerAction(Controllers\Client::class, 'payments'),
+          'POST' => new ControllerAction(
+            Controllers\Client::class,
+            'paymentsSubmit'
           ),
         ],
         '/wise-deposit' => [

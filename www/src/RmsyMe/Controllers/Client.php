@@ -34,7 +34,7 @@ class Client extends AbstractController
   private function authenticate(): int
   {
     $userId = $this->loginService->getLoggedInUserId();
-    if ($userId === -1) {
+    if ($userId === null) {
       $this->redirect('/client/login', 302);
       return 0;
     } else {
@@ -42,38 +42,59 @@ class Client extends AbstractController
     }
   }
 
-  private function getWelcomePageTemplateVars(int $loggedInUserId): array
+  public function index(): Page
   {
+    $loggedInUserId = $this->authenticate();
     try {
       $userEmail = $this->databaseService->getUserEmail($loggedInUserId);
     } catch (PDOException $e) {
-      error_log($e->getMessage());
       $this->redirect('/database-error', 302);
     }
+    return $this->getPage(
+      bodyTemplatePath: __FUNCTION__,
+      templateVars: [
+        'title' => 'Dashboard',
+        'userEmail' => $userEmail,
+      ]
+    );
+  }
 
+  private function getPayments(): array
+  {
+    try {
+      return $this->databaseService->getPayments();
+    } catch (PDOException $e) {
+      $this->redirect('/database-error', 302);
+    }
+    return [];
+  }
+
+  private function getPaymentsTemplateVars(): array
+  {
     return [
-      'title' => 'Welcome',
-      'userEmail' => $userEmail,
-      'formName' => 'uploadForm',
+      'title' => 'Payments',
+      'formName' => 'paymentsForm',
       'displayAlert' => false,
     ];
   }
 
-  public function welcome(): Page
+  public function payments(): Page
   {
-    $loggedInUserId = $this->authenticate();
+    $this->authenticate();
+    $templateVars = $this->getPaymentsTemplateVars();
+    $templateVars['payments'] = $this->getPayments();
     return $this->getPage(
       bodyTemplatePath: __FUNCTION__,
-      templateVars: $this->getWelcomePageTemplateVars($loggedInUserId),
+      templateVars: $templateVars,
     );
   }
 
-  public function welcomeSubmit(): Page
+  public function paymentsSubmit(): Page
   {
-    $loggedInUserId = $this->authenticate();
+    $this->authenticate();
 
-    $templatePath = 'welcome';
-    $templateVars = $this->getWelcomePageTemplateVars($loggedInUserId);
+    $templatePath = 'payments';
+    $templateVars = $this->getPaymentsTemplateVars();
     $formName = $templateVars['formName'];
     $fieldName = 'csvFile';
 
@@ -126,14 +147,14 @@ class Client extends AbstractController
         $templateVars['errorCode'] = 'import';
         return $this->getPage($templatePath, $templateVars);
       }
-    } catch (PDOException $e) {
-      error_log($e->getMessage());
+    } catch (PDOException) {
       $templateVars['errorCode'] = 'database';
       return $this->getPage($templatePath, $templateVars);
     }
 
     // Success
     $templateVars['success'] = true;
+    $templateVars['payments'] = $this->getPayments();
     return $this->getPage($templatePath, $templateVars);
   }
 }

@@ -6,6 +6,7 @@ namespace RmsyMe\Services;
 
 use PDO;
 use PDOException;
+use RmsyMe\Data\Payment;
 
 class Database
 {
@@ -37,10 +38,10 @@ class Database
    * 
    * @param string $email The user's email address.
    * @param string $password The user's password.
-   * @return int The user ID if the email and password are valid, -1 otherwise.
+   * @return ?int The user's ID if the email and password are valid, null otherwise.
    * @throws PDOException If there is a database error.
    */
-  public function getUserId(string $email, string $password): int
+  public function getUserId(string $email, string $password): ?int
   {
     $this->connect();
 
@@ -54,7 +55,7 @@ class Database
       return $user['id'];
     }
 
-    return -1;
+    return null;
   }
 
   /**
@@ -187,5 +188,23 @@ class Database
 
     $this->pdo->commit();
     return true;
+  }
+
+  /**
+   * Get all payments from the payments table.
+   * 
+   * @return array An array of Payment objects.
+   * @throws PDOException If there is a database error.
+   */  public function getPayments(): array
+  {
+    $this->connect();
+
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT * FROM payments
+    SQL);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_CLASS, Payment::class);
+
+    return $results;
   }
 }

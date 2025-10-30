@@ -46,7 +46,7 @@ class Login extends AbstractController
   public function login(): Page
   {
     $userId = $this->loginService->getLoggedInUserId();
-    if ($userId !== -1) {
+    if ($userId !== null) {
       return $this->redirectToClientDashboard();
     }
 
@@ -89,8 +89,7 @@ class Login extends AbstractController
         $templateVars['errorCode'] = 'login';
         return $this->getPage($templatePath, $templateVars);
       }
-    } catch (PDOException $e) {
-      error_log($e->getMessage());
+    } catch (PDOException) {
       $this->redirect('/database-error', 302);
       return Page::empty();
     }
