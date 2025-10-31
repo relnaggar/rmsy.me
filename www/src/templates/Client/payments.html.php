@@ -16,7 +16,10 @@
         <td><?= $payment->getDate() ?></td>
         <td><?= $payment->getFormattedAmount() ?></td>
         <td><?= $payment->payment_reference ?></td>
-        <td><?= $payment->payer_id ?>
+        <td>
+          <a href="/client/payers/<?= urlencode($payment->payer_id) ?>">
+            <?= $payment->payer_id ?>
+          </a>
         </td>
       </tr>
       <?php endforeach; ?>

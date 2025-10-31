@@ -12,19 +12,23 @@ use Relnaggar\Veloz\{
 use RmsyMe\{
   Data\LoginFormData,
   Services\Login as LoginService,
+  Services\Database,
 };
 
 class Login extends AbstractController
 {
   private LoginService $loginService;
+  private Database $databaseService;
 
   public function __construct(
     array $decorators,
-    LoginService $loginService
+    LoginService $loginService,
+    Database $databaseService,
   )
   {
     parent::__construct($decorators);
     $this->loginService = $loginService;
+    $this->databaseService = $databaseService;
   }
 
   private function getLoginTemplateVars(): array
@@ -51,7 +55,7 @@ class Login extends AbstractController
     }
 
     return $this->getPage(
-      bodyTemplatePath: __FUNCTION__,
+      relativeBodyTemplatePath: __FUNCTION__,
       templateVars: $this->getLoginTemplateVars(),
     );
   }
@@ -89,9 +93,8 @@ class Login extends AbstractController
         $templateVars['errorCode'] = 'login';
         return $this->getPage($templatePath, $templateVars);
       }
-    } catch (PDOException) {
-      $this->redirect('/database-error', 302);
-      return Page::empty();
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
     }
 
     // success

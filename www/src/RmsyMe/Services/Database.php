@@ -6,7 +6,14 @@ namespace RmsyMe\Services;
 
 use PDO;
 use PDOException;
-use RmsyMe\Data\Payment;
+use Relnaggar\Veloz\{
+  Views\Page,
+  Controllers\AbstractController,
+};
+use RmsyMe\Data\{
+  Payment,
+  Payer,
+};
 
 class Database
 {
@@ -31,6 +38,21 @@ class Database
 
     $this->pdo = new PDO('sqlite:/var/db/database.sqlite3');
     $this->databaseConnected = true;
+  }
+
+  public function getDatabaseErrorPage(
+    AbstractController $controller,
+    PDOException $e,
+  ): Page {
+    http_response_code(500);
+    error_log($e->getMessage());
+    return $controller->getPage(
+      fullBodyTemplatePath: 'Site/databaseError',
+      templateVars: [
+        'title' => 'Database Error',
+        'metaRobots' => 'noindex, nofollow'
+      ],
+    );
   }
 
   /**
@@ -206,5 +228,29 @@ class Database
     $results = $stmt->fetchAll(PDO::FETCH_CLASS, Payment::class);
 
     return $results;
+  }
+
+  /**
+   * Get a payer by their ID.
+   * 
+   * @param string $payerId The payer's ID.
+   * @return ?Payer The Payer object if found, null otherwise.
+   * @throws PDOException If there is a database error.
+   */
+  public function getPayer(string $payerId): ?Payer
+  {
+    $this->connect();
+
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT * FROM payers WHERE id = :id
+    SQL);
+    $stmt->execute(['id' => $payerId]);
+    $result = $stmt->fetchObject(Payer::class);
+
+    if (!$result) {
+      return null;
+    }
+
+    return $result;
   }
 }

@@ -9,6 +9,7 @@ use finfo;
 use Relnaggar\Veloz\{
   Controllers\AbstractController,
   Views\Page,
+  Routing\RouterInterface,
 };
 use RmsyMe\{
   Services\Database,
@@ -19,16 +20,19 @@ class Client extends AbstractController
 {
   private Login $loginService;
   private Database $databaseService;
+  private RouterInterface $router;
   
   public function __construct(
     array $decorators,
     Login $loginService,
-    Database $databaseService
+    Database $databaseService,
+    RouterInterface $router,
   )
   {
     parent::__construct($decorators);
     $this->loginService = $loginService;
     $this->databaseService = $databaseService;
+    $this->router = $router;
   }
 
   private function authenticate(): int
@@ -48,25 +52,15 @@ class Client extends AbstractController
     try {
       $userEmail = $this->databaseService->getUserEmail($loggedInUserId);
     } catch (PDOException $e) {
-      $this->redirect('/database-error', 302);
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
     }
     return $this->getPage(
-      bodyTemplatePath: __FUNCTION__,
+      relativeBodyTemplatePath: __FUNCTION__,
       templateVars: [
         'title' => 'Dashboard',
         'userEmail' => $userEmail,
       ]
     );
-  }
-
-  private function getPayments(): array
-  {
-    try {
-      return $this->databaseService->getPayments();
-    } catch (PDOException $e) {
-      $this->redirect('/database-error', 302);
-    }
-    return [];
   }
 
   private function getPaymentsTemplateVars(): array
@@ -82,9 +76,14 @@ class Client extends AbstractController
   {
     $this->authenticate();
     $templateVars = $this->getPaymentsTemplateVars();
-    $templateVars['payments'] = $this->getPayments();
+    try {
+      $templateVars['payments'] = $this->databaseService->getPayments();
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
+
     return $this->getPage(
-      bodyTemplatePath: __FUNCTION__,
+      relativeBodyTemplatePath: __FUNCTION__,
       templateVars: $templateVars,
     );
   }
@@ -97,10 +96,15 @@ class Client extends AbstractController
     $templateVars = $this->getPaymentsTemplateVars();
     $formName = $templateVars['formName'];
     $fieldName = 'csvFile';
+    try {
+      $templateVars['payments'] = $this->databaseService->getPayments();
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
 
     // display alert by default
     $templateVars['displayAlert'] = true;
-    $templateVars['success'] = false;
+    $templateVars['success'] = false;    
 
     // Check if file was uploaded
     if (!isset($_FILES[$formName]) || !isset($_FILES[$formName]['error'][$fieldName])) {
@@ -147,14 +151,48 @@ class Client extends AbstractController
         $templateVars['errorCode'] = 'import';
         return $this->getPage($templatePath, $templateVars);
       }
-    } catch (PDOException) {
+    } catch (PDOException $e) {
+      error_log($e->getMessage());
       $templateVars['errorCode'] = 'database';
       return $this->getPage($templatePath, $templateVars);
     }
 
     // Success
     $templateVars['success'] = true;
-    $templateVars['payments'] = $this->getPayments();
+    // Refresh payments list
+    try {
+      $templateVars['payments'] = $this->databaseService->getPayments();
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
     return $this->getPage($templatePath, $templateVars);
+  }
+
+  public function payer(string $payerId): Page
+  {
+    $this->authenticate();
+
+    try {
+      $payer = $this->databaseService->getPayer(urldecode($payerId));
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
+
+    if ($payer === null) {
+      return $this->router->getPageNotFound()->getPage();
+    }
+
+    $formName = 'payerForm';
+    $_POST[$formName] = (array) $payer;
+
+    $templateVars = [
+      'title' => 'Payer Details',
+      'formName' => $formName,
+      'payer' => $payer,
+    ];
+    return $this->getPage(
+      relativeBodyTemplatePath: __FUNCTION__,
+      templateVars: $templateVars,
+    );
   }
 }

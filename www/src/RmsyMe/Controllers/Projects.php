@@ -38,7 +38,7 @@ class Projects extends AbstractController
     );
 
     return $this->getPage(
-      bodyTemplatePath: 'index',
+      relativeBodyTemplatePath: 'index',
       templateVars: [
         'title' => 'All Projects',
         'metaDescription' => 'A collection of programming and robotics '

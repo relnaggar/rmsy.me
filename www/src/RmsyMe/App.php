@@ -131,16 +131,13 @@ class App extends AbstractApp
             'paymentsSubmit'
           ),
         ],
+        '/client/payers/<payerId>' => [
+          'GET' => new ControllerAction(Controllers\Client::class, 'payer'),
+        ],
         '/wise-deposit' => [
           'POST' => new ControllerAction(
             Controllers\Site::class,
             'wiseDeposit'
-          ),
-        ],
-        '/database-error' => [
-          'GET' => new ControllerAction(
-            Controllers\Site::class,
-            'databaseError'
           ),
         ],
       ],

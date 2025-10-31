@@ -105,7 +105,7 @@ class Site extends AbstractController
     ];
 
     return $this->getPage(
-      bodyTemplatePath: __FUNCTION__,
+      relativeBodyTemplatePath: __FUNCTION__,
       templateVars: [
         'title' => 'Ramsey El-Naggar',
         'subtitle' => 'Software Engineer & Educator',
@@ -149,18 +149,6 @@ class Site extends AbstractController
       __FUNCTION__,
       [
         'title' => 'Page Not Found',
-        'metaRobots' => 'noindex, nofollow'
-      ]
-    );
-  }
-
-  public function databaseError(): Page
-  {
-    http_response_code(500);
-    return $this->getPage(
-      __FUNCTION__,
-      [
-        'title' => 'Database Error',
         'metaRobots' => 'noindex, nofollow'
       ]
     );
