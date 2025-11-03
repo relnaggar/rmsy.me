@@ -8,9 +8,9 @@ use Relnaggar\Veloz\Components\ComponentInterface;
 
 class Alert implements ComponentInterface
 {
-  private readonly string $type;
-  private readonly string $title;
-  private readonly string $message;
+  public string $type;
+  public string $title;
+  public string $message;
 
   public function __construct(string $type, string $title, string $message)
   {

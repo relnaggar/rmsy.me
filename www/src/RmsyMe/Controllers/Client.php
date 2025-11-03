@@ -14,6 +14,7 @@ use Relnaggar\Veloz\{
 use RmsyMe\{
   Services\Database,
   Services\Login,
+  Components\Alert,
 };
 
 class Client extends AbstractController
@@ -68,19 +69,30 @@ class Client extends AbstractController
     return [
       'title' => 'Payments',
       'formName' => 'paymentsForm',
-      'displayAlert' => false,
     ];
+  }
+
+  private function getPayments(array &$templateVars): void
+  {
+    try {
+      $templateVars['payments'] = $this->databaseService->getPayments();
+    } catch (PDOException $e) {
+      error_log($e->getMessage());
+      $templateVars['alert'] = new Alert(
+        type: 'danger',
+        title: 'Error loading payments!',
+        message: <<<HTML
+          There was a database error while attempting to load the payments.
+        HTML,
+      );
+    }
   }
 
   public function payments(): Page
   {
     $this->authenticate();
     $templateVars = $this->getPaymentsTemplateVars();
-    try {
-      $templateVars['payments'] = $this->databaseService->getPayments();
-    } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
-    }
+    $this->getPayments($templateVars);
 
     return $this->getPage(
       relativeBodyTemplatePath: __FUNCTION__,
@@ -96,27 +108,35 @@ class Client extends AbstractController
     $templateVars = $this->getPaymentsTemplateVars();
     $formName = $templateVars['formName'];
     $fieldName = 'csvFile';
-    try {
-      $templateVars['payments'] = $this->databaseService->getPayments();
-    } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
-    }
 
-    // display alert by default
-    $templateVars['displayAlert'] = true;
-    $templateVars['success'] = false;    
+    // display error alert by default
+    $templateVars['alert'] = new Alert(
+      type: 'danger',
+      title: 'Upload failed!',
+      message: <<<HTML
+        There was an error uploading the payments but it's not clear why.
+      HTML,
+    );
+
+    // Load existing payments
+    $this->getPayments($templateVars);
 
     // Check if file was uploaded
     if (!isset($_FILES[$formName]) || !isset($_FILES[$formName]['error'][$fieldName])) {
-      $templateVars['errorCode'] = 'upload';
-      // error_log('No file uploaded.');
+      $templateVars['alert']->message = <<<HTML
+        No file uploaded.
+        Please try again.
+      HTML;
       return $this->getPage($templatePath, $templateVars);
     }
 
     // Check for upload errors
     if ($_FILES[$formName]['error'][$fieldName] !== UPLOAD_ERR_OK) {
-      $templateVars['errorCode'] = 'upload';
-      // error_log('File upload error code: ' . $_FILES[$formName]['error'][$fieldName]);
+      $templateVars['alert']->message = <<<HTML
+        File upload error.
+        Please try again.
+      HTML;
+      error_log('File upload error code: ' . $_FILES[$formName]['error'][$fieldName]);
       return $this->getPage($templatePath, $templateVars);
     }
 
@@ -124,47 +144,43 @@ class Client extends AbstractController
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime = $finfo->file($_FILES[$formName]['tmp_name'][$fieldName]);
     if (!in_array($mime, ['text/plain', 'text/csv'], true)) {
-      $templateVars['errorCode'] = 'invalid_file_type';
-      // error_log('Invalid file type. Only CSV files are allowed.');
+      $templateVars['alert']->message = <<<HTML
+        Invalid file type.
+        Please upload a valid CSV file.
+      HTML;
       return $this->getPage($templatePath, $templateVars);
     }
-
-    // // Ensure upload directory exists
-    // $uploadDir = __DIR__ . '/../../../uploads/';
-    // if (!is_dir($uploadDir) && !mkdir($uploadDir) && !is_dir($uploadDir)) {
-    //   $templateVars['errorCode'] = 'upload';
-    //   // error_log('Failed to create upload directory.');
-    //   return $this->getPage($templatePath, $templateVars);
-    // }
-
-    // // Move from temp directory to permanent location
-    // $destination = $uploadDir . basename($_FILES[$formName]['name'][$fieldName]);
-    // if (!move_uploaded_file($_FILES[$formName]['tmp_name'][$fieldName], $destination)) {
-    //   $templateVars['errorCode'] = 'upload';
-    //   // error_log('Failed to move uploaded file.');
-    //   return $this->getPage($templatePath, $templateVars);
-    // }
 
     // Import payments from CSV
     try {
       if (!$this->databaseService->importPayments($_FILES[$formName]['tmp_name'][$fieldName])) {
-        $templateVars['errorCode'] = 'import';
+        $templateVars['alert']->message = <<<HTML
+          Failed to import payments from the CSV file.
+          Please ensure the file is correctly formatted.
+        HTML;
         return $this->getPage($templatePath, $templateVars);
       }
     } catch (PDOException $e) {
       error_log($e->getMessage());
-      $templateVars['errorCode'] = 'database';
+      $templateVars['alert']->message = <<<HTML
+          There was a database error while attempting to import the payments.
+        HTML;
       return $this->getPage($templatePath, $templateVars);
     }
 
-    // Success
-    $templateVars['success'] = true;
     // Refresh payments list
-    try {
-      $templateVars['payments'] = $this->databaseService->getPayments();
-    } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
-    }
+    $this->getPayments($templateVars);
+
+    // Success
+    $templateVars['alert'] = new Alert(
+      type: 'success',
+      title: 'Upload successful!',
+      message: <<<HTML
+        <p>
+          The payments have been imported successfully!
+        </p>
+      HTML
+    );
     return $this->getPage($templatePath, $templateVars);
   }
 
@@ -183,16 +199,17 @@ class Client extends AbstractController
     }
 
     $formName = 'payerForm';
+
+    // pre-fill form data
     $_POST[$formName] = (array) $payer;
 
-    $templateVars = [
-      'title' => 'Payer Details',
-      'formName' => $formName,
-      'payer' => $payer,
-    ];
     return $this->getPage(
       relativeBodyTemplatePath: __FUNCTION__,
-      templateVars: $templateVars,
+      templateVars: [
+        'title' => 'Payer Details',
+        'formName' => $formName,
+        'payer' => $payer,
+      ],
     );
   }
 }

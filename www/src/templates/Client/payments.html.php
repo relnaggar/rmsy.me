@@ -1,3 +1,9 @@
+<?php
+
+use RmsyMe\Components\FormInput;
+
+?>
+
 <?php if ($payments): ?>
   <table class="table">
     <thead>
@@ -29,5 +35,23 @@
   <p>No payments found.</p>
 <?php endif; ?>
 
-<?php $displayAlert && require 'payments/formAlert.html.php' ?>
-<?php require 'payments/form.html.php' ?>
+<form
+  action="/client/payments" 
+  method="post"
+  class="needs-validation"
+  novalidate
+  enctype="multipart/form-data"
+>
+  <?= (new FormInput(
+    name: 'csvFile',
+    label: 'CSV File',
+    type: 'file',
+    formName: $formName,
+    autocomplete: "off",
+    extraAttributes: <<<HTML
+      required accept=".csv"
+    HTML,
+    invalidFeedback: 'You must choose a .csv file.'
+  ))->render();?>
+  <input class="btn btn-primary" type="submit" name="submit" value="Upload">
+</form>

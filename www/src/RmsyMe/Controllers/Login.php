@@ -10,25 +10,22 @@ use Relnaggar\Veloz\{
   Views\Page,
 };
 use RmsyMe\{
-  Data\LoginFormData,
+  Data\LoginForm,
   Services\Login as LoginService,
-  Services\Database,
+  Components\Alert,
 };
 
 class Login extends AbstractController
 {
   private LoginService $loginService;
-  private Database $databaseService;
 
   public function __construct(
     array $decorators,
     LoginService $loginService,
-    Database $databaseService,
   )
   {
     parent::__construct($decorators);
     $this->loginService = $loginService;
-    $this->databaseService = $databaseService;
   }
 
   private function getLoginTemplateVars(): array
@@ -66,7 +63,15 @@ class Login extends AbstractController
     $templateVars = $this->getLoginTemplateVars();
 
     // display error alert by default
-    $templateVars['displayAlert'] = true;
+    $templateVars['alert'] = new Alert(
+      type: 'danger',
+      title: 'Login failure!',
+      message: <<<HTML
+        Login failed but it's not clear why.
+        The login form could be under maintenance or broken.
+        If the problem persists, please <a href="/contact">let me know</a>.
+      HTML
+    );
 
     // display error alert if form not submitted
     if (!isset($_POST['submit']) || !isset($_POST[$templateVars['formName']])) {
@@ -74,27 +79,36 @@ class Login extends AbstractController
     }
 
     // validate form data
-    $loginFormData = new LoginFormData($_POST[$templateVars['formName']]);
-    $errorCodes = $loginFormData->validate();
+    $formData = new LoginForm($_POST[$templateVars['formName']]);
+    $errors = $formData->validate();
 
     // display error alert if form data is invalid
     if (!empty($errorCodes)) {
       // pass error code to template
-      $templateVars['errorCode'] = array_keys($errorCodes)[0];
+      $templateVars['alert']->message = $errors[array_key_first($errors)];
       return $this->getPage($templatePath, $templateVars);
     }
 
     // check credentials
     try {
       if (!$this->loginService->login(
-        $loginFormData->email,
-        $loginFormData->password,
+        $formData->email,
+        $formData->password,
       )) {
-        $templateVars['errorCode'] = 'login';
+        $templateVars['alert']->message = <<<HTML
+          Login credentials not recognised. Please check your email and password
+          and try again.
+        HTML;
         return $this->getPage($templatePath, $templateVars);
       }
     } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
+      $templateVars['alert']->message = <<<HTML
+        There was a database error while attempting to log you in.
+        The login form could be under maintenance or broken.
+        If the problem persists, please <a href="/contact">let me know</a>.
+      HTML;
+      error_log($e->getMessage());
+      return $this->getPage($templatePath, $templateVars);
     }
 
     // success

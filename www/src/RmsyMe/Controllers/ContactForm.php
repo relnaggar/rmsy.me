@@ -12,9 +12,10 @@ use Relnaggar\Veloz\{
 use RmsyMe\{
   Services\ContactMethods,
   Services\Mailer,
-  Data\ContactFormData,
+  Data\ContactForm as ContactFormData,
   Services\ApiClient,
   Services\Secrets,
+  Components\Alert,
 };
 
 class ContactForm extends AbstractController
@@ -45,8 +46,6 @@ class ContactForm extends AbstractController
       'metaDescription' => 'I\'m always game to talk tech, education, or ' .
         'even dung beetles!',
       'contactMethods' => $this->contactMethodsService->getContactMethods(),
-      'displayAlert' => false,
-      'displayForm' => true,
       'formName' => 'contactForm',
     ];
   }
@@ -54,8 +53,8 @@ class ContactForm extends AbstractController
   public function contact(): Page
   {
     return $this->getPage(
-      __FUNCTION__,
-      $this->getContactTemplateVars()
+      relativeBodyTemplatePath: __FUNCTION__,
+      templateVars: $this->getContactTemplateVars()
     );
   }
 
@@ -66,8 +65,15 @@ class ContactForm extends AbstractController
     $templateVars = $this->getContactTemplateVars();
 
     // display error alert by default
-    $templateVars['displayAlert'] = true;
-    $templateVars['success'] = false;
+    $templateVars['alert'] = new Alert(
+      type: 'danger',
+      title: 'Message send failure!',
+      message: <<<HTML
+        There was an error submitting the contact form but it's not clear why.
+        The contact form could be under maintenance or broken.
+        If the problem persists, please <a href="/contact">let me know</a>.
+      HTML
+    );
 
     // display error alert if form not submitted
     if (!isset($_POST['submit']) || !isset($_POST[$templateVars['formName']])) {
@@ -75,19 +81,22 @@ class ContactForm extends AbstractController
     }
 
     // validate form data
-    $contactFormData = new ContactFormData($_POST[$templateVars['formName']]);
-    $errorCodes = $contactFormData->validate();
+    $formData = new ContactFormData($_POST[$templateVars['formName']]);
+    $errors = $formData->validate();
 
     // display error alert if form data is invalid
-    if (!empty($errorCodes)) {
+    if (!empty($errors)) {
       // pass error code to template
-      $templateVars['errorCode'] = array_keys($errorCodes)[0];
+      $templateVars['alert']->message = $errors[array_key_first($errors)];
       return $this->getPage($templatePath, $templateVars);
     }
 
     if (empty($_POST['cf-turnstile-response'])) {
       // display error alert if turnstile not submitted
-      $templateVars['errorCode'] = 'CAPTCHA';
+      $templateVars['alert']->message = <<<HTML
+        Captcha not submitted.
+        Please try again.
+      HTML;
       return $this->getPage($templatePath, $templateVars);
     }
 
@@ -106,14 +115,21 @@ class ContactForm extends AbstractController
         $body
       );
     } catch (ExceptionInterface $e) {
+      error_log('Turnstile siteverify API error: ' . $e->getMessage());
       // display error alert if siteverify API call fails
-      $templateVars['errorCode'] = 'CAPTCHA';
+      $templateVars['alert']->message = <<<HTML
+        Captcha API error.
+        Please try again.
+      HTML;
       return $this->getPage($templatePath, $templateVars);
     }
 
     if (empty($response['success']) || $response['success'] !== true) {
       // display error alert unless siteverify API succeeds
-      $templateVars['errorCode'] = 'CAPTCHA';
+      $templateVars['alert']->message = <<<HTML
+        Captcha verification failed.
+        Please try again.
+      HTML;
       return $this->getPage($templatePath, $templateVars);
     }
 
@@ -121,12 +137,12 @@ class ContactForm extends AbstractController
     $emailSent = $this->mailerService->sendEmail(
       fromEmail: 'contactform@rmsy.me',
       toEmail: 'ramsey.el-naggar@outlook.com',
-      subject: "From $contactFormData->name <$contactFormData->email>",
-      htmlBody: nl2br($contactFormData->message, false),
+      subject: "From $formData->name <$formData->email>",
+      htmlBody: nl2br($formData->message, false),
       fromName: 'rmsy.me contact form',
       toName: 'Ramsey El-Naggar',
-      replyToEmail: $contactFormData->email,
-      replyToName: $contactFormData->name,
+      replyToEmail: $formData->email,
+      replyToName: $formData->name,
     );
 
     // display error alert if email not sent
@@ -135,9 +151,25 @@ class ContactForm extends AbstractController
     }
 
     // display success alert if email sent
-    $templateVars['displayForm'] = false;
-    $templateVars['success'] = true;
-    $templateVars['contactFormData'] = $contactFormData;
+    $templateVars['alert'] = new Alert(
+      type: 'success',
+      title: 'Message sent!',
+      message: <<<HTML
+        <p>
+          Your message has been sent successfully!
+          I'll get back to you as soon as I can.
+        </p>
+        <p>
+          Here's what you sent:
+          <ul>
+            <li><strong>Name:</strong> $formData->name</li>
+            <li><strong>Email:</strong> $formData->email</li>
+            <li><strong>Message:</strong> $formData->message</li>
+          </ul>
+        </p>
+      HTML,
+    );
+    $_POST = []; // clear POST data to reset form
     return $this->getPage($templatePath, $templateVars);
   }
 }

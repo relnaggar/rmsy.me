@@ -1,36 +1,10 @@
 <?php
 
-use RmsyMe\Components\{
-  FormInput,
-  Alert
-};
+use RmsyMe\Components\FormInput;
 
 ?>
 
 <div class="col-12 col-sm-9 col-md-8 col-lg-7 col-xl-6">
-  <?php if (!empty($displayAlert)): ?>
-    <?php
-      $errorMessages = [
-        'email' => <<<HTML
-          Invalid email address. Please enter a valid email address 254 characters or under.
-        HTML,
-        'password' => <<<HTML
-          Blank password. Please enter your password.
-        HTML,
-        'login' => <<<HTML
-          Unrecognized login credentials. Please try again.
-        HTML,
-        'default' => <<<HTML
-          Login failed for an unknown reason! Please try again later.
-        HTML
-      ];
-    ?>
-    <?= (new Alert(
-      'danger',
-      'Login failure!',
-      $errorMessages[$errorCode ?? 'default']
-    ))->render() ?>
-  <?php endif; ?>
   <form
     action="/client/login"
     method="post"
@@ -48,7 +22,7 @@ use RmsyMe\Components\{
         required
       HTML,
       invalidFeedback: 'This field cannot be blank and must be a valid email
-        address 254 characters or under.',
+        address less than or equal to 254 characters.',
     ))->render(); ?>
     <?= (new FormInput(
       name: 'password',
