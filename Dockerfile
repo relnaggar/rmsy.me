@@ -178,6 +178,7 @@ RUN apt-get update -y \
 RUN composer require phpmailer/phpmailer
 RUN composer require symfony/http-client
 RUN composer require robmorgan/phinx
+RUN composer require prinsfrank/standards
 
 # add framework
 RUN composer require relnaggar/veloz:^1.5

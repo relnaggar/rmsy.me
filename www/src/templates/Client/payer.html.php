@@ -24,6 +24,7 @@ use RmsyMe\Components\FormInput;
     type: 'text',
     formName: $formName,
     autocomplete: "on",
+    extraAttributes: 'required',
   ))->render();?>
   <?= (new FormInput(
     name: 'address1',
@@ -70,9 +71,14 @@ use RmsyMe\Components\FormInput;
   <?= (new FormInput(
     name: 'country',
     label: 'Country',
-    type: 'text',
+    type: 'select',
     formName: $formName,
     autocomplete: "on",
+    options: [
+      '' => 'Select a country',
+      ...$countryOptions,
+    ],
+    extraAttributes: 'required',
   ))->render();?>
   <?= (new FormInput(
     name: 'extra',

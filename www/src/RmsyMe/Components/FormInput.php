@@ -16,6 +16,7 @@ class FormInput implements ComponentInterface
   private readonly string $extraAttributes;
   private readonly string $invalidFeedback;
   private readonly string $formText;
+  private readonly array $options;
   private readonly bool $honeypot;
 
   public function __construct(
@@ -27,6 +28,7 @@ class FormInput implements ComponentInterface
     string $extraAttributes = '',
     string $invalidFeedback = '',
     string $formText = '',
+    array $options = [],
     bool $honeypot = false,
   ) {
     $this->name = $name;
@@ -37,7 +39,16 @@ class FormInput implements ComponentInterface
     $this->extraAttributes = $extraAttributes;
     $this->invalidFeedback = $invalidFeedback;
     $this->formText = $formText;
+    $this->options = $options;
     $this->honeypot = $honeypot;
+
+    if ($this->type === 'select') {
+      if (empty($this->options)) {
+        throw new \InvalidArgumentException(
+          'Options must be provided for select input types.'
+        );
+      }
+    }
   }
 
   public function render(): string
@@ -59,7 +70,31 @@ class FormInput implements ComponentInterface
             autocomplete="<?= $this->autocomplete ?>"
             <?= $this->extraAttributes ?>
           ><?= $_POST[$this->formName][$this->name] ?? '' ?></textarea>
-        <?php else: // input ?>
+        <?php elseif ($this->type === "select"): ?>
+          <select
+            class="form-select"
+            id="<?= $this->name ?>"
+            name="<?= $this->formName ?>[<?= $this->name ?>]"
+            autocomplete="<?= $this->autocomplete ?>"
+            <?= $this->extraAttributes ?>
+          >
+            <?php foreach ($this->options as $value => $label): ?>
+              <option
+                value="<?= $value ?>"
+                <?=
+                  (
+                    isset($_POST[$this->formName][$this->name])
+                    && $_POST[$this->formName][$this->name] === $value
+                  )
+                  ? 'selected'
+                  : ''
+                ?>
+              >
+                <?= $label ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        <?php else: ?>
           <input
             type="<?= $this->type ?>"
             class="form-control"

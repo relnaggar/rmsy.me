@@ -6,6 +6,10 @@ namespace RmsyMe\Controllers;
 
 use PDOException;
 use finfo;
+use PrinsFrank\Standards\{
+  Country\CountryAlpha2,
+  Language\LanguageAlpha2,
+};
 use Relnaggar\Veloz\{
   Controllers\AbstractController,
   Views\Page,
@@ -203,12 +207,21 @@ class Client extends AbstractController
     // pre-fill form data
     $_POST[$formName] = (array) $payer;
 
+    // prepare country options
+    $countryOptions = [];
+    foreach (CountryAlpha2::cases() as $country) {
+      $countryOptions[$country->value] = $country->getNameInLanguage(
+        LanguageAlpha2::English
+    );
+    }
+
     return $this->getPage(
       relativeBodyTemplatePath: __FUNCTION__,
       templateVars: [
         'title' => 'Payer Details',
         'formName' => $formName,
         'payer' => $payer,
+        'countryOptions' => $countryOptions,
       ],
     );
   }

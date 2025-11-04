@@ -50,7 +50,8 @@ RUN \
   # rmsy.me
   && composer require phpmailer/phpmailer \
   && composer require symfony/http-client \
-  && composer require robmorgan/phinx
+  && composer require robmorgan/phinx \
+  && composer require prinsfrank/standards
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="PRODUCTION"
