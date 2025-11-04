@@ -10,7 +10,7 @@ use Relnaggar\Veloz\{
   Views\Page,
 };
 use RmsyMe\{
-  Data\LoginForm,
+  Forms\Login as LoginForm,
   Services\Login as LoginService,
   Components\Alert,
 };
@@ -83,7 +83,7 @@ class Login extends AbstractController
     $errors = $formData->validate();
 
     // display error alert if form data is invalid
-    if (!empty($errorCodes)) {
+    if (!empty($errors)) {
       // pass error code to template
       $templateVars['alert']->message = $errors[array_key_first($errors)];
       return $this->getPage($templatePath, $templateVars);

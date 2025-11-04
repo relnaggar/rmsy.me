@@ -10,7 +10,7 @@ use Relnaggar\Veloz\{
   Views\Page,
   Controllers\AbstractController,
 };
-use RmsyMe\Data\{
+use RmsyMe\Models\{
   Payment,
   Payer,
 };
@@ -252,5 +252,43 @@ class Database
     }
 
     return $result;
+  }
+
+  /**
+   * Update a payer in the payers table.
+   * 
+   * @param Payer $payer The Payer object to update.
+   * @throws PDOException If there is a database error.
+   */
+  public function updatePayer(Payer $payer): void
+  {
+    $this->connect();
+
+    $stmt = $this->pdo->prepare(<<<SQL
+      UPDATE payers
+      SET
+        name = :name,
+        address1 = :address1,
+        address2 = :address2,
+        address3 = :address3,
+        town_city = :town_city,
+        state_province_county = :state_province_county,
+        zip_postal_code = :zip_postal_code,
+        country = :country,
+        extra = :extra
+      WHERE id = :id
+    SQL);
+    $stmt->execute([
+      'id' => $payer->id,
+      'name' => $payer->name,
+      'address1' => $payer->address1 == '' ? null : $payer->address1,
+      'address2' => $payer->address2 == '' ? null : $payer->address2,
+      'address3' => $payer->address3 == '' ? null : $payer->address3,
+      'town_city' => $payer->town_city == '' ? null : $payer->town_city,
+      'state_province_county' => $payer->state_province_county == '' ? null : $payer->state_province_county,
+      'zip_postal_code' => $payer->zip_postal_code == '' ? null : $payer->zip_postal_code,
+      'country' => $payer->country,
+      'extra' => $payer->extra == '' ? null : $payer->extra,
+    ]);
   }
 }

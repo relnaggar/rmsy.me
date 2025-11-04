@@ -22,7 +22,7 @@ class App extends AbstractApp
         Decorators\Nav::class,
         Decorators\MediaRoot::class,
       ],
-      Controllers\ContactForm::class => [
+      Controllers\Contact::class => [
         Decorators\ExtendedTitle::class,
         Decorators\Nav::class,
       ],
@@ -97,11 +97,11 @@ class App extends AbstractApp
         ],
         '/contact' => [
           'GET' => new ControllerAction(
-            Controllers\ContactForm::class,
+            Controllers\Contact::class,
             'contact'
           ),
           'POST' => new ControllerAction(
-            Controllers\ContactForm::class,
+            Controllers\Contact::class,
             'contactSubmit'
           ),
         ],
@@ -131,8 +131,12 @@ class App extends AbstractApp
             'paymentsSubmit'
           ),
         ],
-        '/client/payers/<payerId>' => [
+        '/client/payers/<encodedPayerId>' => [
           'GET' => new ControllerAction(Controllers\Client::class, 'payer'),
+          'POST' => new ControllerAction(
+            Controllers\Client::class,
+            'payerSubmit'
+          ),
         ],
         '/wise-deposit' => [
           'POST' => new ControllerAction(

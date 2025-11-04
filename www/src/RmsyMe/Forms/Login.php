@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace RmsyMe\Data;
+namespace RmsyMe\Forms;
 
-use Dom\HTMLElement;
 use Relnaggar\Veloz\Data\AbstractFormData;
 
-class LoginForm extends AbstractFormData
+class Login extends AbstractFormData
 {
   public string $email;
   public string $password;
@@ -27,10 +26,10 @@ class LoginForm extends AbstractFormData
     }
     if (
       empty($this->password)
-      || strlen($this->password) > 65534
+      || strlen($this->password) > 72
     ) {
       $errors['password'] = <<<HTML
-        Password is required and must be less than or equal to 65534 characters.
+        Password is required and must be less than or equal to 72 characters.
         Please try again.
       HTML;
     }

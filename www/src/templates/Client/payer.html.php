@@ -5,7 +5,7 @@ use RmsyMe\Components\FormInput;
 ?>
 
 <form
-  action="/client/payers/<?= urlencode($payer->id) ?>" 
+  action="/client/payers/<?= $encodedPayerId ?>" 
   method="post"
   class="needs-validation"
   novalidate
@@ -16,7 +16,7 @@ use RmsyMe\Components\FormInput;
     type: 'text',
     formName: $formName,
     autocomplete: "off",
-    extraAttributes: 'disabled',
+    extraAttributes: 'readonly',
   ))->render();?>
   <?= (new FormInput(
     name: 'name',

@@ -19,6 +19,7 @@ use RmsyMe\{
   Services\Database,
   Services\Login,
   Components\Alert,
+  Models\Payer,
 };
 
 class Client extends AbstractController
@@ -68,14 +69,6 @@ class Client extends AbstractController
     );
   }
 
-  private function getPaymentsTemplateVars(): array
-  {
-    return [
-      'title' => 'Payments',
-      'formName' => 'paymentsForm',
-    ];
-  }
-
   private function getPayments(array &$templateVars): void
   {
     try {
@@ -92,11 +85,20 @@ class Client extends AbstractController
     }
   }
 
+  private function getPaymentsTemplateVars(): array
+  {
+    $templateVars = [
+      'title' => 'Payments',
+      'formName' => 'paymentsForm',
+    ];
+    $this->getPayments($templateVars);
+    return $templateVars;
+  }
+
   public function payments(): Page
   {
     $this->authenticate();
     $templateVars = $this->getPaymentsTemplateVars();
-    $this->getPayments($templateVars);
 
     return $this->getPage(
       relativeBodyTemplatePath: __FUNCTION__,
@@ -107,9 +109,9 @@ class Client extends AbstractController
   public function paymentsSubmit(): Page
   {
     $this->authenticate();
-
     $templatePath = 'payments';
     $templateVars = $this->getPaymentsTemplateVars();
+
     $formName = $templateVars['formName'];
     $fieldName = 'csvFile';
 
@@ -121,9 +123,6 @@ class Client extends AbstractController
         There was an error uploading the payments but it's not clear why.
       HTML,
     );
-
-    // Load existing payments
-    $this->getPayments($templateVars);
 
     // Check if file was uploaded
     if (!isset($_FILES[$formName]) || !isset($_FILES[$formName]['error'][$fieldName])) {
@@ -188,41 +187,109 @@ class Client extends AbstractController
     return $this->getPage($templatePath, $templateVars);
   }
 
-  public function payer(string $payerId): Page
+  private function getCountryOptions(): array
   {
-    $this->authenticate();
-
-    try {
-      $payer = $this->databaseService->getPayer(urldecode($payerId));
-    } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
-    }
-
-    if ($payer === null) {
-      return $this->router->getPageNotFound()->getPage();
-    }
-
-    $formName = 'payerForm';
-
-    // pre-fill form data
-    $_POST[$formName] = (array) $payer;
-
-    // prepare country options
     $countryOptions = [];
     foreach (CountryAlpha2::cases() as $country) {
       $countryOptions[$country->value] = $country->getNameInLanguage(
         LanguageAlpha2::English
-    );
+      );
     }
+    return $countryOptions;
+  }
+
+  private function getPayerTemplateVars(string $encodedPayerId): array
+  {
+    return [
+      'title' => 'Payer Details',
+      'encodedPayerId' => $encodedPayerId,
+      'formName' => 'payerForm',
+      'countryOptions' => $this->getCountryOptions(),
+    ];
+  }
+
+  public function payer(string $encodedPayerId): Page
+  {
+    $this->authenticate();
+    $templateVars = $this->getPayerTemplateVars($encodedPayerId);
+
+    try {
+      $payer = $this->databaseService->getPayer(urldecode($encodedPayerId));
+      if ($payer === null) {
+        return $this->router->getPageNotFound()->getPage();
+      }
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
+
+    // pre-fill form data
+    $_POST[$templateVars['formName']] = (array) $payer;
 
     return $this->getPage(
       relativeBodyTemplatePath: __FUNCTION__,
-      templateVars: [
-        'title' => 'Payer Details',
-        'formName' => $formName,
-        'payer' => $payer,
-        'countryOptions' => $countryOptions,
-      ],
+      templateVars: $templateVars
     );
+  }
+
+  public function payerSubmit(string $encodedPayerId): Page
+  {
+    $this->authenticate();
+    $templateVars = $this->getPayerTemplateVars($encodedPayerId);
+    $templatePath = 'payer';
+
+    try {
+      $payer = $this->databaseService->getPayer(urldecode($encodedPayerId));
+      if ($payer === null) {
+        return $this->router->getPageNotFound()->getPage();
+      }
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
+
+    // display error alert by default
+    $templateVars['alert'] = new Alert(
+      type: 'danger',
+      title: 'Update failed!',
+      message: <<<HTML
+        There was an error submitting the payer form but it's not clear why.
+      HTML
+    );
+
+    // display error alert if form not submitted
+    if (!isset($_POST['submit']) || !isset($_POST[$templateVars['formName']])) {
+      return $this->getPage($templatePath, $templateVars);
+    }
+
+    // validate form data
+    $formData = new Payer($_POST[$templateVars['formName']]);
+    $errors = $formData->validate();
+    if (!empty($errors)) {
+      $templateVars['alert']->message = $errors[array_key_first($errors)];
+      return $this->getPage($templatePath, $templateVars);
+    }
+
+    // update payer in database
+    try {
+      $this->databaseService->updatePayer($formData);
+    } catch (PDOException $e) {
+      error_log($e->getMessage());
+      $templateVars['alert']->message = <<<HTML
+        There was a database error while attempting to update the payer.
+      HTML;
+      return $this->getPage($templatePath, $templateVars);
+    }
+
+    // success
+    $templateVars['alert'] = new Alert(
+      type: 'success',
+      title: 'Update successful!',
+      message: <<<HTML
+        <p>
+          The payer has been updated successfully!
+        </p>
+      HTML
+    );
+
+    return $this->getPage($templatePath, $templateVars);
   }
 }

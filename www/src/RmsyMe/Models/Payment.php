@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace RmsyMe\Data;
+namespace RmsyMe\Models;
 
 use DateTime;
 

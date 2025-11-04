@@ -12,13 +12,13 @@ use Relnaggar\Veloz\{
 use RmsyMe\{
   Services\ContactMethods,
   Services\Mailer,
-  Data\ContactForm as ContactFormData,
+  Forms\Contact as ContactForm,
   Services\ApiClient,
   Services\Secrets,
   Components\Alert,
 };
 
-class ContactForm extends AbstractController
+class Contact extends AbstractController
 {
   private ContactMethods $contactMethodsService;
   private Mailer $mailerService;
@@ -81,12 +81,11 @@ class ContactForm extends AbstractController
     }
 
     // validate form data
-    $formData = new ContactFormData($_POST[$templateVars['formName']]);
+    $formData = new ContactForm($_POST[$templateVars['formName']]);
     $errors = $formData->validate();
 
     // display error alert if form data is invalid
     if (!empty($errors)) {
-      // pass error code to template
       $templateVars['alert']->message = $errors[array_key_first($errors)];
       return $this->getPage($templatePath, $templateVars);
     }
