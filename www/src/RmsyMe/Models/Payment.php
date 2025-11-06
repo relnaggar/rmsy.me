@@ -14,6 +14,7 @@ class Payment
   public readonly string $currency;
   public readonly string $payment_reference;
   public readonly string $payer_id;
+  public readonly ?string $sequence_number;
 
   public function getDate(): string
   {
@@ -25,5 +26,21 @@ class Payment
   {
     return number_format($this->amount / 100, 2) . ' '
       . strtoupper($this->currency);
+  }
+
+  public function getYear(): string
+  {
+    $dateTime = new DateTime($this->datetime);
+    return $dateTime->format('Y');
+  }
+
+  public function getInvoiceNumber(): string
+  {
+    if ($this->sequence_number === null) {
+      $error_message = 'No sequence number for payment ' . $this->id;
+      error_log($error_message);
+      throw new \RuntimeException($error_message);
+    }
+    return $this->getYear() . '-' . $this->sequence_number;
   }
 }

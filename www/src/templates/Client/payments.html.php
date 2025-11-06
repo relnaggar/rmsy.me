@@ -13,6 +13,7 @@ use RmsyMe\Components\FormInput;
         <th>Amount</th>
         <th>Payment Reference</th>
         <th>Payer ID</th>
+        <th>Invoice number</th>
       </tr>
     </thead>
     <tbody>
@@ -27,6 +28,7 @@ use RmsyMe\Components\FormInput;
             <?= $payment->payer_id ?>
           </a>
         </td>
+        <td><?= $payment->getInvoiceNumber() ?></td>
       </tr>
       <?php endforeach; ?>
     </tbody>

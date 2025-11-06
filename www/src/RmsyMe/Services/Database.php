@@ -6,6 +6,7 @@ namespace RmsyMe\Services;
 
 use PDO;
 use PDOException;
+use DateTime;
 use Relnaggar\Veloz\{
   Views\Page,
   Controllers\AbstractController,
@@ -120,6 +121,53 @@ class Database
     return $result['count'] > 0;
   }
 
+  private function updateSequenceNumbers($years): void
+  {
+    $this->connect();
+
+    $payments = $this->getPayments(); // ordered by datetime DESC
+    $sequenceNumbers = [];
+    foreach (array_reverse($payments) as $payment) { // oldest to newest
+      $year = $payment->getYear();
+      // skip years we don't care about
+      if (!in_array($year, $years)) {
+        continue;
+      }
+
+      // increment sequence number for year
+      // works because we're processing oldest to newest
+      if (!isset($sequenceNumbers[$year])) {
+        $sequenceNumbers[$year] = 1;
+      } else {
+        $sequenceNumbers[$year]++;
+      }
+
+      // format sequence number as zero-padded 3-digit string
+      $sequenceNumberStr = str_pad(
+        (string)$sequenceNumbers[$year],
+        3,
+        '0',
+        STR_PAD_LEFT,
+      );
+
+      // skip if sequence number already set correctly
+      if ($payment->sequence_number === $sequenceNumberStr) {
+        continue;
+      }
+
+      // otherwise, update sequence number in database
+      $stmt = $this->pdo->prepare(<<<SQL
+        UPDATE payments
+        SET sequence_number = :sequence_number
+        WHERE id = :id
+      SQL);
+      $stmt->execute([
+        'sequence_number' => $sequenceNumberStr,
+        'id' => $payment->id,
+      ]);
+    }
+  }
+
   /**
    * Import payments from a CSV file into the payments table.
    * 
@@ -166,6 +214,7 @@ class Database
         INSERT INTO payers (id, name) VALUES (:id, :name)
       SQL);
 
+      $years = [];
       // import each row
       while (($data = fgetcsv($handle)) !== false) {
         $id = $data[0];
@@ -201,7 +250,15 @@ class Database
           'payment_reference' => $payment_reference,
           'payer_name' => $payer_name,
         ]);
+
+        // track years for sequence number updates
+        $year = (new DateTime($datetime))->format('Y');
+        if (!in_array($year, $years)) {
+          $years[] = $year;
+        }
       }
+
+      $this->updateSequenceNumbers($years);
       fclose($handle);
     } else {
       $this->pdo->rollBack();
@@ -213,16 +270,18 @@ class Database
   }
 
   /**
-   * Get all payments from the payments table.
+   * Get all payments from the payments table ordered by datetime descending.
    * 
    * @return array An array of Payment objects.
    * @throws PDOException If there is a database error.
-   */  public function getPayments(): array
+   */
+  public function getPayments(): array
   {
     $this->connect();
 
     $stmt = $this->pdo->prepare(<<<SQL
       SELECT * FROM payments
+      ORDER BY datetime DESC
     SQL);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_CLASS, Payment::class);
