@@ -27,7 +27,7 @@ class Client extends AbstractController
   private Login $loginService;
   private Database $databaseService;
   private RouterInterface $router;
-  
+
   public function __construct(
     array $decorators,
     Login $loginService,
@@ -133,7 +133,7 @@ class Client extends AbstractController
       return $this->getPage($templatePath, $templateVars);
     }
 
-    // Check for upload errors
+    // check for upload errors
     if ($_FILES[$formName]['error'][$fieldName] !== UPLOAD_ERR_OK) {
       $templateVars['alert']->message = <<<HTML
         File upload error.
@@ -143,7 +143,7 @@ class Client extends AbstractController
       return $this->getPage($templatePath, $templateVars);
     }
 
-    // Validate file type (only allow CSV files)
+    // validate file type (only allow CSV files)
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime = $finfo->file($_FILES[$formName]['tmp_name'][$fieldName]);
     if (!in_array($mime, ['text/plain', 'text/csv'], true)) {
@@ -154,7 +154,7 @@ class Client extends AbstractController
       return $this->getPage($templatePath, $templateVars);
     }
 
-    // Import payments from CSV
+    // import payments from CSV
     try {
       if (!$this->databaseService->importPayments($_FILES[$formName]['tmp_name'][$fieldName])) {
         $templateVars['alert']->message = <<<HTML
@@ -171,10 +171,10 @@ class Client extends AbstractController
       return $this->getPage($templatePath, $templateVars);
     }
 
-    // Refresh payments list
+    // refresh payments list
     $this->getPayments($templateVars);
 
-    // Success
+    // success
     $templateVars['alert'] = new Alert(
       type: 'success',
       title: 'Upload successful!',
@@ -213,6 +213,7 @@ class Client extends AbstractController
     $this->authenticate();
     $templateVars = $this->getPayerTemplateVars($encodedPayerId);
 
+    // verify payer exists
     try {
       $payer = $this->databaseService->getPayer(urldecode($encodedPayerId));
       if ($payer === null) {
@@ -237,6 +238,7 @@ class Client extends AbstractController
     $templateVars = $this->getPayerTemplateVars($encodedPayerId);
     $templatePath = 'payer';
 
+    // verify payer exists
     try {
       $payer = $this->databaseService->getPayer(urldecode($encodedPayerId));
       if ($payer === null) {
@@ -291,5 +293,28 @@ class Client extends AbstractController
     );
 
     return $this->getPage($templatePath, $templateVars);
+  }
+
+  public function invoice(string $invoiceNumber): Page
+  {
+    $this->authenticate();
+
+    // verify invoice exists
+    try {
+      if (!$this->databaseService->doesInvoiceExist($invoiceNumber)) {
+        return $this->router->getPageNotFound()->getPage();
+      }
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
+
+    // for now, just display the invoice number
+    return $this->getPage(
+      relativeBodyTemplatePath: __FUNCTION__,
+      templateVars: [
+        'title' => 'Invoice Details',
+        'invoiceNumber' => $invoiceNumber,
+      ],
+    );
   }
 }

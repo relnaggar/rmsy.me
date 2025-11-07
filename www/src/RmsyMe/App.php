@@ -138,6 +138,9 @@ class App extends AbstractApp
             'payerSubmit'
           ),
         ],
+        '/client/invoices/<invoiceNumber>' => [
+          'GET' => new ControllerAction(Controllers\Client::class, 'invoice'),
+        ],
         '/wise-deposit' => [
           'POST' => new ControllerAction(
             Controllers\Site::class,

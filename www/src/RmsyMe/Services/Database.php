@@ -69,7 +69,9 @@ class Database
     $this->connect();
 
     $stmt = $this->pdo->prepare(<<<SQL
-      SELECT id, password_hash FROM users WHERE email = :email
+      SELECT id, password_hash
+      FROM users
+      WHERE email = :email
     SQL);
     $stmt->execute(['email' => $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -93,7 +95,9 @@ class Database
     $this->connect();
 
     $stmt = $this->pdo->prepare(<<<SQL
-      SELECT email FROM users WHERE id = :id
+      SELECT email
+      FROM users
+      WHERE id = :id
     SQL);
     $stmt->execute(['id' => $userId]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -113,7 +117,9 @@ class Database
     $this->connect();
 
     $stmt = $this->pdo->prepare(<<<SQL
-      SELECT COUNT(*) as count FROM payers WHERE id = :id
+      SELECT COUNT(*) as count
+      FROM payers
+      WHERE id = :id
     SQL);
     $stmt->execute(['id' => $payerId]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -182,8 +188,12 @@ class Database
     $this->pdo->beginTransaction();
 
     $insertIntoPayments = $this->pdo->prepare(<<<SQL
-      INSERT INTO payments (id, datetime, amount, currency, payment_reference, payer_id)
-      VALUES (:id, :datetime, :amount, :currency, :payment_reference, :payer_name)
+      INSERT INTO payments (
+        id, datetime, amount, currency, payment_reference, payer_id
+      )
+      VALUES (
+        :id, :datetime, :amount, :currency, :payment_reference, :payer_name
+      )
     SQL);
 
     if (($handle = fopen($csvPath, 'r')) !== false) {
@@ -204,14 +214,16 @@ class Database
 
       // get existing payment IDs to avoid duplicates
       $selectFromPayments = $this->pdo->prepare(<<<SQL
-        SELECT id FROM payments
+        SELECT id
+        FROM payments
       SQL);
       $selectFromPayments->execute();
       $existingPayments = $selectFromPayments->fetchAll(PDO::FETCH_COLUMN, 0);
 
       // prepare payer insert statement
       $insertIntoPayers = $this->pdo->prepare(<<<SQL
-        INSERT INTO payers (id, name) VALUES (:id, :name)
+        INSERT INTO payers (id, name)
+        VALUES (:id, :name)
       SQL);
 
       $years = [];
@@ -280,7 +292,8 @@ class Database
     $this->connect();
 
     $stmt = $this->pdo->prepare(<<<SQL
-      SELECT * FROM payments
+      SELECT *
+      FROM payments
       ORDER BY datetime DESC
     SQL);
     $stmt->execute();
@@ -301,7 +314,9 @@ class Database
     $this->connect();
 
     $stmt = $this->pdo->prepare(<<<SQL
-      SELECT * FROM payers WHERE id = :id
+      SELECT *
+      FROM payers
+      WHERE id = :id
     SQL);
     $stmt->execute(['id' => $payerId]);
     $result = $stmt->fetchObject(Payer::class);
@@ -344,10 +359,56 @@ class Database
       'address2' => $payer->address2 == '' ? null : $payer->address2,
       'address3' => $payer->address3 == '' ? null : $payer->address3,
       'town_city' => $payer->town_city == '' ? null : $payer->town_city,
-      'state_province_county' => $payer->state_province_county == '' ? null : $payer->state_province_county,
+      'state_province_county' => $payer->state_province_county == '' ?
+        null : $payer->state_province_county,
       'zip_postal_code' => $payer->zip_postal_code == '' ? null : $payer->zip_postal_code,
       'country' => $payer->country,
       'extra' => $payer->extra == '' ? null : $payer->extra,
     ]);
+  }
+
+  /**
+   * Check if an invoice exists based on its invoice number.
+   * 
+   * @param string $invoiceNumber The invoice number to check.
+   * @return bool True if the invoice exists, false otherwise.
+   * @throws PDOException If there is a database error.
+   */
+  public function doesInvoiceExist(string $invoiceNumber): bool
+  {
+    $this->connect();
+
+    // basic validation of invoice number format
+    if (strlen($invoiceNumber) !== 8 || $invoiceNumber[4] !== '-') {
+      return false;
+    }
+    $yearString = substr($invoiceNumber, 0, 4);
+    $sequence_number = substr($invoiceNumber, 5, 3);
+    if (!is_numeric($yearString) || !is_numeric($sequence_number)) {
+      return false;
+    }
+
+    // validate year range
+    $year = (int)$yearString;
+    if ($year < 2020 || $year > (int)date('Y')) {
+      return false;
+    }
+
+    // find payments with matching sequence number
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT *
+      FROM payments
+      WHERE sequence_number = :sequence_number
+    SQL);
+    $stmt->execute(['sequence_number' => $sequence_number]);
+    $results = $stmt->fetchAll(PDO::FETCH_CLASS, Payment::class);
+
+    // check if any matching payment matches the full invoice number
+    foreach ($results as $payment) {
+      if ($payment->getInvoiceNumber() === $invoiceNumber) {
+        return true;
+      }
+    }
+    return false;
   }
 }
