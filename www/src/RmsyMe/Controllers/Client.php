@@ -308,13 +308,15 @@ class Client extends AbstractController
       return $this->databaseService->getDatabaseErrorPage($this, $e);
     }
 
-    // for now, just display the invoice number
-    return $this->getPage(
-      relativeBodyTemplatePath: __FUNCTION__,
-      templateVars: [
-        'title' => 'Invoice Details',
-        'invoiceNumber' => $invoiceNumber,
-      ],
+    // generate PDF download
+    header('Content-Type: application/pdf');
+    header(
+      'Content-Disposition: attachment; '
+      . "filename=\"invoice_$invoiceNumber.pdf\""
     );
+    echo $this->databaseService->generateInvoicePdf($invoiceNumber);
+    exit;
+
+    return Page::empty();
   }
 }

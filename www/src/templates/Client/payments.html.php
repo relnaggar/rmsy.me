@@ -28,7 +28,10 @@ use RmsyMe\Components\FormInput;
             <?= $payment->payer_id ?>
           </a>
         </td>
-        <td><a href="/client/invoices/<?= $payment->getInvoiceNumber() ?>">
+        <td><a
+          href="/client/invoices/<?= $payment->getInvoiceNumber() ?>"
+          target="_blank"
+        >
           <?= $payment->getInvoiceNumber() ?>
         </a></td>
       </tr>

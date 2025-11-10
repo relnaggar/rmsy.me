@@ -411,4 +411,22 @@ class Database
     }
     return false;
   }
+
+  public function generateInvoicePdf(string $invoiceNumber): string
+  {
+    // TODO: generate a proper PDF using dompdf
+    $pdfContent = "%PDF-1.4\n";
+    $pdfContent .= "1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n";
+    $pdfContent .= "2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n";
+    $pdfContent .= "3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] ";
+    $pdfContent .= "/Contents 4 0 R /Resources << >> >> endobj\n";
+    $pdfContent .= "4 0 obj << /Length 44 >> stream\n";
+    $pdfContent .= "BT /F1 24 Tf 100 700 Td (Invoice: $invoiceNumber) Tj ET\n";
+    $pdfContent .= "endstream endobj\n";
+    $pdfContent .= "xref\n0 5\n0000000000 65535 f \n0000000010 00000 n \n";
+    $pdfContent .= "0000000067 00000 n \n0000000123 00000 n \n0000000220 00000 n \n";
+    $pdfContent .= "trailer << /Size 5 /Root 1 0 R >>\nstartxref\n300\n%%EOF";
+
+    return $pdfContent;
+  }
 }
