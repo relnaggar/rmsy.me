@@ -51,7 +51,8 @@ RUN \
   && composer require phpmailer/phpmailer \
   && composer require symfony/http-client \
   && composer require robmorgan/phinx \
-  && composer require prinsfrank/standards
+  && composer require prinsfrank/standards \
+  && composer require dompdf/dompdf
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="PRODUCTION"

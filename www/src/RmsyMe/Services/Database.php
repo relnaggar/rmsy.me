@@ -7,6 +7,8 @@ namespace RmsyMe\Services;
 use PDO;
 use PDOException;
 use DateTime;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Relnaggar\Veloz\{
   Views\Page,
   Controllers\AbstractController,
@@ -15,14 +17,17 @@ use RmsyMe\Models\{
   Payment,
   Payer,
 };
+use RmsyMe\Services\Secrets;
 
 class Database
 {
   private ?PDO $pdo;
   private bool $databaseConnected;
+  private Secrets $secrets;
 
-  public function __construct()
+  public function __construct(Secrets $secrets)
   {
+    $this->secrets = $secrets;
     $this->pdo = null;
     $this->databaseConnected = false;
   }
@@ -412,20 +417,109 @@ class Database
     return false;
   }
 
+  /**
+   * Generate a PDF invoice for the given invoice number.
+   * 
+   * @param string $invoiceNumber The invoice number.
+   * @return string The PDF content as a string.
+   * @throws PDOException If there is a database error or any invoice data is
+   * missing.
+   */
   public function generateInvoicePdf(string $invoiceNumber): string
   {
+    $this->connect();
+
+    $sequence_number = substr($invoiceNumber, 5, 3);
+
+    // find payments with matching sequence number
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT *
+      FROM payments
+      WHERE sequence_number = :sequence_number
+    SQL);
+    $stmt->execute(['sequence_number' => $sequence_number]);
+    $results = $stmt->fetchAll(PDO::FETCH_CLASS, Payment::class);
+
+    // find the payment with the exact invoice number
+    $payment = null;
+    foreach ($results as $p) {
+      if ($p->getInvoiceNumber() === $invoiceNumber) {
+        // found the payment
+        $payment = $p;
+        break;
+      }
+    }
+    if ($payment === null) {
+      throw new PDOException('Invoice not found');
+    }
+
+    // find the payer
+    $payer = $this->getPayer($payment->payer_id);
+    if ($payer === null) {
+      throw new PDOException('Payer not found');
+    }
+
+    $sellerAddress = explode('|', $this->secrets->getSecret('SELLER_ADDRESS'));
+
+    $payerAddress = [$payer->name] + array_filter(
+      [
+        $payer->address1,
+        $payer->address2,
+        $payer->address3,
+        $payer->town_city,
+        $payer->state_province_county,
+        $payer->zip_postal_code,
+        $payer->country,
+        $payer->extra,
+      ],
+      fn($line) => $line !== null && $line !== ''
+    );
+
+    $invoice = [
+      'number'      => $invoiceNumber,
+      'issue_date'  => $payment->getDate(),
+      'exchange'    => '0.87650', // Tipo de cambio (GBP/EUR)
+      'notes'       => "Factura exenta de IVA según artículo 20. Uno. 10º - Ley 37/1992",
+    ];
+
+    $items = [
+      [
+        'date'        => $payment->getDate(),
+        'service'     => 'Clases online de informática',
+        'student'     => 'Example Student',
+        'client'      => 'Example Client',
+        'qty'         => 1,
+        'unit_price'  => 4100, // GBP
+      ],
+      [
+        'date'        => $payment->getDate(),
+        'service'     => 'Clases online de informática',
+        'student'     => 'Example Student',
+        'client'      => 'Example Client',
+        'qty'         => 1,
+        'unit_price'  => 3900, // GBP
+      ],
+    ];
+
     // TODO: generate a proper PDF using dompdf
-    $pdfContent = "%PDF-1.4\n";
-    $pdfContent .= "1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n";
-    $pdfContent .= "2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n";
-    $pdfContent .= "3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] ";
-    $pdfContent .= "/Contents 4 0 R /Resources << >> >> endobj\n";
-    $pdfContent .= "4 0 obj << /Length 44 >> stream\n";
-    $pdfContent .= "BT /F1 24 Tf 100 700 Td (Invoice: $invoiceNumber) Tj ET\n";
-    $pdfContent .= "endstream endobj\n";
-    $pdfContent .= "xref\n0 5\n0000000000 65535 f \n0000000010 00000 n \n";
-    $pdfContent .= "0000000067 00000 n \n0000000123 00000 n \n0000000220 00000 n \n";
-    $pdfContent .= "trailer << /Size 5 /Root 1 0 R >>\nstartxref\n300\n%%EOF";
+    $options = new Options();
+    // $options->set('isRemoteEnabled', true); // allow remote images
+    $options->set('defaultFont', 'DejaVu Sans');
+
+    $dompdf = new Dompdf($options);
+    $page = Page::withTemplate(
+      templatePath: 'Client/invoice',
+      templateVars: [
+        'sellerAddress' => $sellerAddress,
+        'payerAddress' => $payerAddress,
+        'invoice' => $invoice,
+        'items' => $items,
+      ],
+    );
+    $dompdf->loadHtml($page->getHtmlContent());
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+    $pdfContent = $dompdf->output();
 
     return $pdfContent;
   }
