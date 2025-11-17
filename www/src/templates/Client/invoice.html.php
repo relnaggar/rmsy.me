@@ -13,7 +13,7 @@
       <div><?= htmlspecialchars($line) ?></div>
     <?php endforeach; ?>
     <div><strong>Factura a:</strong></div>
-    <?php foreach ($payerAddress as $line): ?>
+    <?php foreach ($buyerAddress as $line): ?>
       <div><?= htmlspecialchars($line) ?></div>
     <?php endforeach; ?>
 

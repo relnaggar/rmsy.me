@@ -19,7 +19,7 @@ use RmsyMe\{
   Services\Database,
   Services\Login,
   Components\Alert,
-  Models\Payer,
+  Models\Buyer,
 };
 
 class Client extends AbstractController
@@ -198,25 +198,25 @@ class Client extends AbstractController
     return $countryOptions;
   }
 
-  private function getPayerTemplateVars(string $encodedPayerId): array
+  private function getBuyerTemplateVars(string $encodedBuyerId): array
   {
     return [
-      'title' => 'Payer Details',
-      'encodedPayerId' => $encodedPayerId,
-      'formName' => 'payerForm',
+      'title' => 'Buyer Details',
+      'encodedBuyerId' => $encodedBuyerId,
+      'formName' => 'buyerForm',
       'countryOptions' => $this->getCountryOptions(),
     ];
   }
 
-  public function payer(string $encodedPayerId): Page
+  public function buyer(string $encodedBuyerId): Page
   {
     $this->authenticate();
-    $templateVars = $this->getPayerTemplateVars($encodedPayerId);
+    $templateVars = $this->getBuyerTemplateVars($encodedBuyerId);
 
-    // verify payer exists
+    // verify buyer exists
     try {
-      $payer = $this->databaseService->getPayer(urldecode($encodedPayerId));
-      if ($payer === null) {
+      $buyer = $this->databaseService->getBuyer(urldecode($encodedBuyerId));
+      if ($buyer === null) {
         return $this->router->getPageNotFound()->getPage();
       }
     } catch (PDOException $e) {
@@ -224,7 +224,7 @@ class Client extends AbstractController
     }
 
     // pre-fill form data
-    $_POST[$templateVars['formName']] = (array) $payer;
+    $_POST[$templateVars['formName']] = (array) $buyer;
 
     return $this->getPage(
       relativeBodyTemplatePath: __FUNCTION__,
@@ -232,16 +232,16 @@ class Client extends AbstractController
     );
   }
 
-  public function payerSubmit(string $encodedPayerId): Page
+  public function buyerSubmit(string $encodedBuyerId): Page
   {
     $this->authenticate();
-    $templateVars = $this->getPayerTemplateVars($encodedPayerId);
-    $templatePath = 'payer';
+    $templateVars = $this->getBuyerTemplateVars($encodedBuyerId);
+    $templatePath = 'buyer';
 
-    // verify payer exists
+    // verify buyer exists
     try {
-      $payer = $this->databaseService->getPayer(urldecode($encodedPayerId));
-      if ($payer === null) {
+      $buyer = $this->databaseService->getBuyer(urldecode($encodedBuyerId));
+      if ($buyer === null) {
         return $this->router->getPageNotFound()->getPage();
       }
     } catch (PDOException $e) {
@@ -253,7 +253,7 @@ class Client extends AbstractController
       type: 'danger',
       title: 'Update failed!',
       message: <<<HTML
-        There was an error submitting the payer form but it's not clear why.
+        There was an error submitting the buyer form but it's not clear why.
       HTML
     );
 
@@ -263,20 +263,20 @@ class Client extends AbstractController
     }
 
     // validate form data
-    $formData = new Payer($_POST[$templateVars['formName']]);
+    $formData = new Buyer($_POST[$templateVars['formName']]);
     $errors = $formData->validate();
     if (!empty($errors)) {
       $templateVars['alert']->message = $errors[array_key_first($errors)];
       return $this->getPage($templatePath, $templateVars);
     }
 
-    // update payer in database
+    // update buyer in database
     try {
-      $this->databaseService->updatePayer($formData);
+      $this->databaseService->updateBuyer($formData);
     } catch (PDOException $e) {
       error_log($e->getMessage());
       $templateVars['alert']->message = <<<HTML
-        There was a database error while attempting to update the payer.
+        There was a database error while attempting to update the buyer.
       HTML;
       return $this->getPage($templatePath, $templateVars);
     }
@@ -287,7 +287,7 @@ class Client extends AbstractController
       title: 'Update successful!',
       message: <<<HTML
         <p>
-          The payer has been updated successfully!
+          The buyer has been updated successfully!
         </p>
       HTML
     );

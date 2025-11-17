@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class CreatePayersTable extends AbstractMigration
+final class CreateBuyersTable extends AbstractMigration
 {
     /**
      * Change Method.
@@ -20,7 +20,7 @@ final class CreatePayersTable extends AbstractMigration
     public function change(): void
     {
         // <<<SQL
-        // CREATE TABLE payers (
+        // CREATE TABLE buyers (
         //     id VARCHAR(100) PRIMARY KEY,
         //     name VARCHAR(255) NOT NULL,
         //     address1 VARCHAR(255),
@@ -33,7 +33,7 @@ final class CreatePayersTable extends AbstractMigration
         //     extra VARCHAR(255)
         // );
         // SQL;
-        $this->table('payers', ['id' => false, 'primary_key' => ['id']])
+        $this->table('buyers', ['id' => false, 'primary_key' => ['id']])
             ->addColumn('id', 'string', ['limit' => 100, 'null' => false])
             ->addColumn('name', 'string', ['limit' => 255, 'null' => false])
             ->addColumn('address1', 'string', ['limit' => 255])

@@ -12,7 +12,7 @@ use RmsyMe\Components\FormInput;
         <th>Date</th>
         <th>Amount</th>
         <th>Payment Reference</th>
-        <th>Payer ID</th>
+        <th>Buyer ID</th>
         <th>Invoice number</th>
       </tr>
     </thead>
@@ -24,8 +24,8 @@ use RmsyMe\Components\FormInput;
         <td><?= $payment->getFormattedAmount() ?></td>
         <td><?= $payment->payment_reference ?></td>
         <td>
-          <a href="/client/payers/<?= urlencode($payment->payer_id) ?>">
-            <?= $payment->payer_id ?>
+          <a href="/client/buyers/<?= urlencode($payment->buyer_id) ?>">
+            <?= $payment->buyer_id ?>
           </a>
         </td>
         <td><a

@@ -131,11 +131,11 @@ class App extends AbstractApp
             'paymentsSubmit'
           ),
         ],
-        '/client/payers/<encodedPayerId>' => [
-          'GET' => new ControllerAction(Controllers\Client::class, 'payer'),
+        '/client/buyers/<encodedBuyerId>' => [
+          'GET' => new ControllerAction(Controllers\Client::class, 'buyer'),
           'POST' => new ControllerAction(
             Controllers\Client::class,
-            'payerSubmit'
+            'buyerSubmit'
           ),
         ],
         '/client/invoices/<invoiceNumber>' => [

@@ -7,7 +7,7 @@ namespace RmsyMe\Models;
 use Relnaggar\Veloz\Data\AbstractFormData;
 use PrinsFrank\Standards\Country\CountryAlpha2;
 
-class Payer extends AbstractFormData
+class Buyer extends AbstractFormData
 {
   public string $id;
   public string $name;

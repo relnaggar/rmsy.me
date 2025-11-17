@@ -13,7 +13,7 @@ class Payment
   public readonly int $amount; // in pence / cents
   public readonly string $currency;
   public readonly string $payment_reference;
-  public readonly string $payer_id;
+  public readonly string $buyer_id;
   public readonly ?string $sequence_number;
 
   public function getDate(): string
