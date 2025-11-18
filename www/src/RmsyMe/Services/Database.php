@@ -9,6 +9,10 @@ use PDOException;
 use DateTime;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use PrinsFrank\Standards\{
+  Country\CountryAlpha2,
+  Language\LanguageAlpha2,
+};
 use Relnaggar\Veloz\{
   Views\Page,
   Controllers\AbstractController,
@@ -460,7 +464,15 @@ class Database
       throw new PDOException('Buyer not found');
     }
 
-    $sellerAddress = explode('|', $this->secrets->getSecret('SELLER_ADDRESS'));
+    $sellerAddress = array_map(
+      fn($line) => trim($line),
+      explode('|', $this->secrets->getSecret('SELLER_ADDRESS')),
+    );
+    $sellerAddress[5] = CountryAlpha2::from(
+      $sellerAddress[5]
+    )?->getNameInLanguage(
+      LanguageAlpha2::Spanish_Castilian
+    );
 
     $buyerAddress = array_merge([$buyer->name], array_filter(
       [
@@ -470,7 +482,9 @@ class Database
         $buyer->town_city,
         $buyer->state_province_county,
         $buyer->zip_postal_code,
-        $buyer->country,
+        CountryAlpha2::from($buyer->country)?->getNameInLanguage(
+          LanguageAlpha2::Spanish_Castilian
+        ),
         $buyer->extra,
       ],
       fn($line) => $line !== null && $line !== ''
