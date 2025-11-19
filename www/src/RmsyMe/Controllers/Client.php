@@ -311,8 +311,8 @@ class Client extends AbstractController
     // generate PDF download
     header('Content-Type: application/pdf');
     header(
-      'Content-Disposition: attachment; '
-      . "filename=\"invoice_$invoiceNumber.pdf\""
+      'Content-Disposition: inline; '
+      . "filename=\"$invoiceNumber.pdf\""
     );
     echo $this->databaseService->generateInvoicePdf($invoiceNumber);
     exit;
