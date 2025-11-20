@@ -516,10 +516,12 @@ class Database
       ],
     ];
 
-    // TODO: generate a proper PDF using dompdf
+    $publicPath = dirname(__DIR__, 3) . '/html';
+
     $options = new Options();
-    // $options->set('isRemoteEnabled', true); // allow remote images
+    $options->set('isRemoteEnabled', true); // allow remote assets
     $options->set('defaultFont', 'DejaVu Sans');
+    $options->set('chroot', $publicPath); // restrict file access to public path
 
     $dompdf = new Dompdf($options);
     $page = Page::withTemplate(
@@ -529,6 +531,7 @@ class Database
         'buyerAddress' => $buyerAddress,
         'invoice' => $invoice,
         'items' => $items,
+        'cssPath' => "file://$publicPath/css/invoice.css",
       ],
     );
     $dompdf->loadHtml($page->getHtmlContent());

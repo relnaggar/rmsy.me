@@ -2,22 +2,7 @@
 <html>
   <head>
     <title><?= $invoice['number'] ?></title>
-    <style>
-      hr {
-        clear: both;
-      }
-      .left-column {
-        float: left;
-        width: 50%;
-      }
-      .right-column {
-        float: right;
-        width: 50%;
-      }
-      h4 {
-        margin-bottom: 0;
-      }
-    </style>
+    <link rel="stylesheet" href="<?= $cssPath ?>">
   </head>
   <body>
     <header>
