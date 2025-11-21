@@ -532,8 +532,10 @@ class Database
         'invoice' => $invoice,
         'items' => $items,
         'cssPath' => "file://$publicPath/css/invoice.css",
+        // 'cssPath' => "/css/invoice.css",
       ],
     );
+    // return $page->getHtmlContent();
     $dompdf->loadHtml($page->getHtmlContent());
     $dompdf->setPaper('A4', 'portrait');
     $dompdf->render();

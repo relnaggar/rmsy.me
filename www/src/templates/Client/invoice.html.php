@@ -42,7 +42,7 @@
 
       <hr>
 
-      <table style="width: 100%;">
+      <table class="w-100">
         <thead>
           <tr>
             <th>Fecha</th>
@@ -54,12 +54,13 @@
         </thead>
         <tbody>
         <?php $total_gbp = 0; ?>
-        <?php foreach ($items as $item): ?>
+        <?php for ($i = 0; $i < count($items); $i++): ?>
           <?php
+            $item = $items[$i];
             $line_total = $item['qty'] * $item['unit_price'];
             $total_gbp += $line_total;
           ?>
-          <tr>
+          <tr class="<?= $i % 2 === 0 ? 'bg-body-secondary' : '' ?>">
             <td><?= htmlspecialchars($item['date']) ?></td>
             <td>
               <div><?= htmlspecialchars($item['service']) ?></div>
@@ -70,7 +71,7 @@
             <td><?= $item['unit_price'] ?></td>
             <td><?= $line_total ?></td>
           </tr>
-        <?php endforeach; ?>
+        <?php endfor; ?>
         </tbody>
       </table>
 
