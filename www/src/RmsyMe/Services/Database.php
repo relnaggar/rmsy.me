@@ -7,6 +7,7 @@ namespace RmsyMe\Services;
 use PDO;
 use PDOException;
 use DateTime;
+use InvalidArgumentException;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use PrinsFrank\Standards\{
@@ -422,6 +423,18 @@ class Database
     return false;
   }
 
+  public function formatCurrency(int $amountInCents, string $currency): string
+  {
+    $formattedAmount = number_format($amountInCents / 100, 2, '.', ',');
+    if ($currency == 'GBP') {
+      return 'GBP £' . $formattedAmount;
+    } elseif ($currency == 'EUR') {
+      return 'EUR €' . $formattedAmount;
+    } else {
+      throw new InvalidArgumentException('Unsupported currency: ' . $currency);
+    }
+  }
+
   /**
    * Generate a PDF invoice for the given invoice number.
    * 
@@ -531,6 +544,8 @@ class Database
         'buyerAddress' => $buyerAddress,
         'invoice' => $invoice,
         'items' => $items,
+        'formatCurrency' => fn($amount, $currency) =>
+          $this->formatCurrency($amount, $currency),
         'cssPath' => "file://$publicPath/css/invoice.css",
         // 'cssPath' => "/css/invoice.css",
       ],

@@ -68,8 +68,8 @@
               <div>Cliente: <?= htmlspecialchars($item['client']) ?></div>
             </td>
             <td><?= (int)$item['qty'] ?></td>
-            <td><?= $item['unit_price'] ?></td>
-            <td><?= $line_total ?></td>
+            <td><?= $formatCurrency($item['unit_price'], 'GBP') ?></td>
+            <td><?= $formatCurrency($line_total, 'GBP') ?></td>
           </tr>
         <?php endfor; ?>
         </tbody>
@@ -87,27 +87,32 @@
       <table class="right-column">
         <tr>
           <td>Base imponible en GBP</td>
-          <td><?= $total_gbp ?></td>
+          <td><?= $formatCurrency($total_gbp, 'GBP') ?></td>
         </tr>
         <tr>
           <td>Base imponible en EUR</td>
-          <td><?= ceil($total_gbp / $invoice['exchange']) ?></td>
+          <td>
+            <?= $formatCurrency(
+              (int)ceil($total_gbp / $invoice['exchange']),
+              'EUR',
+            ) ?>
+          </td>
         </tr>
         <tr>
           <td>IVA (Tipo de IVA 0%)</td>
-          <td>0.00</td>
+          <td><?= $formatCurrency(0, 'EUR') ?></td>
         </tr>
         <tr>
           <td>Importe total</td>
-          <td><?= $total_gbp ?></td>
+          <td><?= $formatCurrency($total_gbp, 'GBP') ?></td>
         </tr>
         <tr>
           <td>Importe pagado</td>
-          <td><?= $total_gbp ?></td>
+          <td><?= $formatCurrency($total_gbp, 'GBP') ?></td>
         </tr>
         <tr>
           <td>Importe a pagar</td>
-          <td><?= 0.0 ?></td>
+          <td><?= $formatCurrency(0, 'GBP') ?></td>
         </tr>
         <tr>
           <td>Tipo de cambio (GBP/EUR)</td>
