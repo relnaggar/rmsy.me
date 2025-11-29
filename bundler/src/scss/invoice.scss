@@ -1,17 +1,13 @@
-@import "bootstrap/scss/functions";
-
-@import "bootstrap/scss/variables";
-@import "bootstrap/scss/variables-dark";
-
-@import "bootstrap/scss/maps";
-@import "bootstrap/scss/mixins";
-@import "bootstrap/scss/root";
+@import 'bootstrap-common';
 
 @import "bootstrap/scss/utilities";
 @import "bootstrap/scss/tables";
 
 @import "bootstrap/scss/utilities/api";
 
+h1 {
+  color: $primary;
+}
 hr {
   clear: both;
 }
@@ -25,4 +21,8 @@ hr {
 }
 h4 {
   margin-bottom: 0;
+}
+th {
+  padding-bottom: 1rem;
+  color: $primary;
 }
