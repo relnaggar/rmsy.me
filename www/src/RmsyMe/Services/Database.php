@@ -305,7 +305,7 @@ class Database
     $stmt = $this->pdo->prepare(<<<SQL
       SELECT *
       FROM payments
-      ORDER BY datetime DESC
+      ORDER BY datetime(datetime) DESC
     SQL);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_CLASS, Payment::class);
@@ -435,6 +435,41 @@ class Database
     }
   }
 
+  public function getExchangeRateForDate(string $date): int
+  {
+    $this->connect();
+
+    // TODO: update exchange rate table from https://www.bde.es/webbe/es/estadisticas/compartido/datos/csv/tc_1_1.csv
+    // add one day to date to ensure we get the rate for that date
+    $stmt = $this->pdo->prepare(<<<SQL
+      INSERT INTO exchange_rates (date, gbpeur)
+      VALUES (:date, :gbpeur)
+      ON CONFLICT(date) DO UPDATE SET gbpeur = :gbpeur
+    SQL);
+    $stmt->execute(['date' => '2025-09-01', 'gbpeur' => 0.87540]); // example rate
+
+    $exchange_rate = null;
+    while ($exchange_rate === null) { // keep looking back until we find an exchange rate
+      $stmt = $this->pdo->prepare(<<<SQL
+        SELECT gbpeur
+        FROM exchange_rates
+        WHERE date = :date
+        LIMIT 1
+      SQL);
+      $stmt->execute(['date' => $date]);
+      $result = $stmt->fetch(PDO::FETCH_ASSOC);
+      if ($result) {
+        $exchange_rate = (int)round($result['gbpeur'] * 100000);
+      } else {
+        // look back one day
+        $dateTime = new DateTime($date);
+        $dateTime->modify('-1 day');
+        $date = $dateTime->format('Y-m-d');
+      }
+    }
+    return $exchange_rate;
+  }
+
   /**
    * Generate a PDF invoice for the given invoice number.
    * 
@@ -503,29 +538,31 @@ class Database
       fn($line) => $line !== null && $line !== ''
     ));
 
+    $issue_date = $payment->getDate();
+    $exchange_rate = $this->getExchangeRateForDate($issue_date);
     $invoice = [
-      'number'      => $invoiceNumber,
-      'issue_date'  => $payment->getDate(),
-      'exchange'    => '0.87650', // Tipo de cambio (GBP/EUR)
-      'notes'       => "Factura exenta de IVA según artículo 20. Uno. 10º - Ley 37/1992",
+      'number' => $invoiceNumber,
+      'issue_date' => $issue_date,
+      'exchange_rate' => $exchange_rate,
+      'notes' => "Factura exenta de IVA según artículo 20. Uno. 10º - Ley 37/1992",
     ];
 
     $items = [
       [
-        'date'        => $payment->getDate(),
-        'service'     => 'Clases online de informática',
-        'student'     => 'Example Student',
-        'client'      => 'Example Client',
-        'qty'         => 1,
-        'unit_price'  => 4100, // GBP
+        'date' => $issue_date,
+        'service' => 'Clases online de informática',
+        'student' => 'Example Student',
+        'client' => 'Example Client',
+        'qty' => 1,
+        'unit_price' => 4100, // GBP
       ],
       [
-        'date'        => $payment->getDate(),
-        'service'     => 'Clases online de informática',
-        'student'     => 'Example Student',
-        'client'      => 'Example Client',
-        'qty'         => 1,
-        'unit_price'  => 3900, // GBP
+        'date' => $issue_date,
+        'service' => 'Clases online de informática',
+        'student' => 'Example Student',
+        'client' => 'Example Client',
+        'qty' => 1,
+        'unit_price' => 3900, // GBP
       ],
     ];
 

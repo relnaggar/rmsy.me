@@ -21,7 +21,7 @@ final class CreatePaymentsTable extends AbstractMigration
     {
         // <<<SQL
         // CREATE TABLE payments (
-        //     id VARCHAR(40) PRIMARY KEY,
+        //     id VARCHAR(40) PRIMARY KEY NOT NULL,
         //     datetime DATETIME NOT NULL,
         //     amount INT NOT NULL,
         //     currency VARCHAR(3) NOT NULL,

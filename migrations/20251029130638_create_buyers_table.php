@@ -21,7 +21,7 @@ final class CreateBuyersTable extends AbstractMigration
     {
         // <<<SQL
         // CREATE TABLE buyers (
-        //     id VARCHAR(100) PRIMARY KEY,
+        //     id VARCHAR(100) PRIMARY KEY NOT NULL,
         //     name VARCHAR(255) NOT NULL,
         //     address1 VARCHAR(255),
         //     address2 VARCHAR(255),

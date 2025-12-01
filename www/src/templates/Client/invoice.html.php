@@ -93,7 +93,7 @@
           <td class="text-primary">Base imponible en EUR</td>
           <td class="text-end">
             <?= $formatCurrency(
-              (int)ceil($total_gbp / $invoice['exchange']),
+              (int)ceil($total_gbp / ($invoice['exchange_rate'] / 100000)),
               'EUR',
             ) ?>
           </td>
@@ -116,7 +116,7 @@
         </tr>
         <tr>
           <td>Tipo de cambio (GBP/EUR)</td>
-          <td class="text-end"><?= $invoice['exchange'] ?></td>
+          <td class="text-end"><?= $invoice['exchange_rate'] / 100000 ?></td>
         </tr>
       </table>
     </main>
