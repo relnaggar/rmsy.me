@@ -636,22 +636,15 @@ class Database
       'notes' => "Factura exenta de IVA según artículo 20. Uno. 10º - Ley 37/1992",
     ];
 
+    $qty = 1;
     $items = [
       [
         'date' => $issue_date,
         'service' => 'Clases online de informática',
-        'student' => 'Example Student',
-        'client' => 'Example Client',
-        'qty' => 1,
-        'unit_price' => 4100, // GBP
-      ],
-      [
-        'date' => $issue_date,
-        'service' => 'Clases online de informática',
-        'student' => 'Example Student',
-        'client' => 'Example Client',
-        'qty' => 1,
-        'unit_price' => 3900, // GBP
+        // 'student' => 'Example Student',
+        // 'client' => 'Example Client',
+        'qty' => $qty,
+        'unit_price' => intdiv($payment->amount, $qty),
       ],
     ];
 

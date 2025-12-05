@@ -62,11 +62,15 @@
           ?>
           <tr class="<?= $i % 2 === 0 ? 'bg-body-secondary' : '' ?>">
             <td class="text-start"><?= htmlspecialchars($item['date']) ?></td>
-            <td class="text-start">
-              <div><?= htmlspecialchars($item['service']) ?></div>
-              <div>Estudiante: <?= htmlspecialchars($item['student']) ?></div>
-              <div>Cliente: <?= htmlspecialchars($item['client']) ?></div>
-            </td>
+            <?php if (isset($item['student']) && isset($item['client'])): ?>
+              <td class="text-start">
+                <div><?= htmlspecialchars($item['service']) ?></div>
+                <div>Estudiante: <?= htmlspecialchars($item['student']) ?></div>
+                <div>Cliente: <?= htmlspecialchars($item['client']) ?></div>
+              </td>
+            <?php else: ?>
+              <td class="text-start"><?= htmlspecialchars($item['service']) ?></td>
+            <?php endif; ?>
             <td class="text-end"><?= (int)$item['qty'] ?></td>
             <td class="text-end"><?= $formatCurrency($item['unit_price'], 'GBP') ?></td>
             <td class="text-end"><?= $formatCurrency($line_total, 'GBP') ?></td>
