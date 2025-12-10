@@ -199,10 +199,10 @@ class Database
 
     $insertIntoPayments = $this->pdo->prepare(<<<SQL
       INSERT INTO payments (
-        id, datetime, amount, currency, payment_reference, buyer_id
+        id, datetime, amount_gbp_pence, currency, payment_reference, buyer_id
       )
       VALUES (
-        :id, :datetime, :amount, :currency, :payment_reference, :buyer_name
+        :id, :datetime, :amount_gbp_pence, :currency, :payment_reference, :buyer_id
       )
     SQL);
 
@@ -242,13 +242,13 @@ class Database
       while (($data = fgetcsv($handle)) !== false) {
         $id = $data[0];
         $datetime = $data[2];
-        $amount = (int)((float)$data[3]*100);
+        $amount_gbp_pence = (int)((float)$data[3]*100);
         $currency = $data[4];
         $payment_reference = $data[6];
         $buyer_name = $data[11];
 
         // ignore negative amounts
-        if ($amount < 0) {
+        if ($amount_gbp_pence < 0) {
           continue;
         }
 
@@ -268,10 +268,10 @@ class Database
         $insertIntoPayments->execute([
           'id' => $id,
           'datetime' => $datetime,
-          'amount' => $amount,
+          'amount_gbp_pence' => $amount_gbp_pence,
           'currency' => $currency,
           'payment_reference' => $payment_reference,
-          'buyer_name' => $buyer_name,
+          'buyer_id' => $buyer_name,
         ]);
 
         // track years for sequence number updates
@@ -644,7 +644,7 @@ class Database
         // 'student' => 'Example Student',
         // 'client' => 'Example Client',
         'qty' => $qty,
-        'unit_price' => intdiv($payment->amount, $qty),
+        'unit_price' => intdiv($payment->amount_gbp_pence, $qty),
       ],
     ];
 
@@ -663,8 +663,8 @@ class Database
         'buyerAddress' => $buyerAddress,
         'invoice' => $invoice,
         'items' => $items,
-        'formatCurrency' => fn($amount, $currency) =>
-          $this->formatCurrency($amount, $currency),
+        'formatCurrency' => fn($amountInCents, $currency) =>
+          $this->formatCurrency($amountInCents, $currency),
         'cssPath' => "file://$publicPath/css/invoice.css",
         // 'cssPath' => "/css/invoice.css",
       ],

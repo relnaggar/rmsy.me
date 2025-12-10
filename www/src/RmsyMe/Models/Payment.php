@@ -10,7 +10,7 @@ class Payment
 {
   public readonly string $id;
   public readonly string $datetime;
-  public readonly int $amount; // in pence / cents
+  public readonly int $amount_gbp_pence;
   public readonly string $currency;
   public readonly string $payment_reference;
   public readonly string $buyer_id;
@@ -24,7 +24,7 @@ class Payment
 
   public function getFormattedAmount(): string
   {
-    return number_format($this->amount / 100, 2) . ' '
+    return number_format($this->amount_gbp_pence / 100, 2) . ' '
       . strtoupper($this->currency);
   }
 
