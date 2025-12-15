@@ -319,4 +319,16 @@ class Client extends AbstractController
 
     return Page::empty();
   }
+
+  public function lessons(): Page
+  {
+    $this->authenticate();
+
+    return $this->getPage(
+      relativeBodyTemplatePath: __FUNCTION__,
+      templateVars: [
+        'title' => 'Lessons',
+      ]
+    );
+  }
 }

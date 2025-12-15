@@ -102,6 +102,10 @@ class Nav
       path: '/payments',
     ));
     $clientItem->addDropdownItem(new NavItem(
+      text: 'Lessons',
+      path: '/lessons',
+    ));
+    $clientItem->addDropdownItem(new NavItem(
       text: 'Logout',
       path: '/logout',
     ));

@@ -141,6 +141,9 @@ class App extends AbstractApp
         '/client/invoices/<invoiceNumber>' => [
           'GET' => new ControllerAction(Controllers\Client::class, 'invoice'),
         ],
+        '/client/lessons' => [
+          'GET' => new ControllerAction(Controllers\Client::class, 'lessons'),
+        ],
         '/wise-deposit' => [
           'POST' => new ControllerAction(
             Controllers\Site::class,
