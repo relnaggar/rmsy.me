@@ -21,6 +21,7 @@ use Relnaggar\Veloz\{
 use RmsyMe\Models\{
   Payment,
   Buyer,
+  Lesson,
 };
 use RmsyMe\Services\Secrets;
 
@@ -676,5 +677,24 @@ class Database
     $pdfContent = $dompdf->output();
 
     return $pdfContent;
+  }
+
+  public function getLessons(): array
+  {
+    $this->connect();
+
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT *
+      FROM lessons
+      ORDER BY datetime(datetime) DESC
+    SQL);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_CLASS, Lesson::class);
+
+    return $results;
+  }
+
+  public function importLessonsFromCalendar(): void
+  {
   }
 }

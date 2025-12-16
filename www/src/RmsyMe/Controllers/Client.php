@@ -324,10 +324,14 @@ class Client extends AbstractController
   {
     $this->authenticate();
 
+    $this->databaseService->importLessonsFromCalendar();
+    $lessons = $this->databaseService->getLessons();
+
     return $this->getPage(
       relativeBodyTemplatePath: __FUNCTION__,
       templateVars: [
         'title' => 'Lessons',
+        'lessons' => $lessons,
       ]
     );
   }
