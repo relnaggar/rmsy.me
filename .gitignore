@@ -4,7 +4,6 @@ www/html/js/*.js*
 www/html/fonts/*.woff*
 *.jpg
 *.jpeg
-*.png
 secrets
 db/
 seeds/

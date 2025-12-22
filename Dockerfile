@@ -52,6 +52,9 @@ script-src 'self';\\
 img-src 'self' data: https:;\\
 font-src 'self' https: data:;\\
 frame-ancestors 'self';\\
+manifest-src 'self';\\
+connect-src 'self';\\
+worker-src 'self';\\
 "
 EOF
 

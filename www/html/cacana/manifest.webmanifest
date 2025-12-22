@@ -1,0 +1,21 @@
+{
+  "name": "Cacana",
+  "short_name": "Cacana",
+  "start_url": "/cacana/",
+  "scope": "/cacana/",
+  "display": "standalone",
+  "background_color": "#7F6A3D",
+  "theme_color": "#7F6A3D",
+  "icons": [
+    {
+      "src": "/cacana/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/cacana/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
