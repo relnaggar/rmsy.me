@@ -28,10 +28,12 @@ RUN apt-get update -y \
   libapache2-mod-php \
   # composer dependencies
   ca-certificates \
+  git \
+  unzip \
   # sqlite3
   php-sqlite3 \
   # for rmsy.me
-  php-intl \  
+  php-intl \
   # cleanup
   && apt autoremove -y \
   && apt clean \

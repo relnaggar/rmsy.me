@@ -147,6 +147,8 @@ RUN apt-get update -y \
   && apt-get install -y --no-install-recommends \
   # install composer dependencies
   ca-certificates \
+  git \
+  unzip \
   # cleanup
   && apt autoremove -y \
   && apt clean \
