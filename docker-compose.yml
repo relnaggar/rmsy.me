@@ -20,6 +20,9 @@ services:
       - SMTP_PASSWORD
       - TURNSTILE_SECRET_KEY
       - SELLER_ADDRESS
+      - MS_CLIENT_SECRET
+      - MS_CLIENT_ID
+      - MS_REDIRECT_URI
   bundler:
     init: true
     container_name: bundler
@@ -40,3 +43,9 @@ secrets:
     file: ./secrets/TURNSTILE_SECRET_KEY
   SELLER_ADDRESS:
     file: ./secrets/SELLER_ADDRESS
+  MS_CLIENT_SECRET:
+    file: ./secrets/MS_CLIENT_SECRET
+  MS_CLIENT_ID:
+    file: ./secrets/MS_CLIENT_ID
+  MS_REDIRECT_URI:
+    file: ./secrets/MS_REDIRECT_URI

@@ -150,6 +150,12 @@ class App extends AbstractApp
             'wiseDeposit'
           ),
         ],
+        '/auth/callback' => [
+          'GET' => new ControllerAction(
+            Controllers\Auth::class,
+            'callback'
+          ),
+        ],
       ],
       pageNotFound: new ControllerAction(
         Controllers\Site::class,
