@@ -1,5 +1,5 @@
 const APP_NAME = "Cacana";
-const APP_VERSION = "v1"; // update this after any changes to the app shell
+const APP_VERSION = "v2"; // update this after any changes to the app shell
 const CACHE_NAME = APP_NAME + "-" + APP_VERSION;
 const APP_SHELL = [
   "",
@@ -10,6 +10,7 @@ const APP_SHELL = [
   "icons/icon-512.png",
   "icons/favicon.ico",
   "icons/apple-touch-icon.png",
+  "db.js",
 ].map((path) => "/" + APP_NAME.toLowerCase() + "/" + path);
 
 self.addEventListener("install", (event) => {

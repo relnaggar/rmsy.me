@@ -1,13 +1,12 @@
 <?php
   $APP_NAME = "Cacana";
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#7F6A3D">
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" type="image/x-icon" href="./icons/favicon.ico">
@@ -17,7 +16,8 @@
   <body>
     <h1><?= $APP_NAME ?></h1>
     <p>Welcome to <?= $APP_NAME ?>!</p>
+    <p id="status">Loading...</p>
 
-    <script src="./app.js" defer></script>
+    <script type="module" src="./app.js" defer></script>
   </body>
 </html>
