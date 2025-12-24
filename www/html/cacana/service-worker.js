@@ -1,6 +1,21 @@
 const APP_NAME = "Cacana";
-const APP_VERSION = "v2"; // update this after any changes to the app shell
-const CACHE_NAME = APP_NAME + "-" + APP_VERSION;
+const APP_VERSION = "v3"; // bump when you change the app shell
+const BASE = "/" + APP_NAME.toLowerCase() + "/";
+
+// load local Workbox runtime
+importScripts(BASE + "lib/workbox/workbox-sw.js");
+
+// tell Workbox where the rest of its modules live
+workbox.setConfig({
+  modulePathPrefix: BASE + "lib/workbox/",
+});
+
+// turn off Workbox debug logs
+workbox.setConfig({ debug: false });
+
+workbox.core.skipWaiting();
+workbox.core.clientsClaim();
+
 const APP_SHELL = [
   "",
   "index.php",
@@ -11,54 +26,50 @@ const APP_SHELL = [
   "icons/favicon.ico",
   "icons/apple-touch-icon.png",
   "db.js",
-].map((path) => "/" + APP_NAME.toLowerCase() + "/" + path);
+  "lib/dexie.mjs",
+  "lib/pulltorefresh.esm.js",
+  "lib/workbox/workbox-core.prod.js",
+  "lib/workbox/workbox-precaching.prod.js",
+  "lib/workbox/workbox-routing.prod.js",
+  "lib/workbox/workbox-strategies.prod.js",
+  "lib/workbox/workbox-cacheable-response.prod.js",
+  "lib/workbox/workbox-expiration.prod.js",
+].map((path) => ({
+  url: BASE + path,
+  revision: APP_VERSION,
+}));
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
-  );
-  self.skipWaiting();
-});
+// precache app shell: everything that must exist for the app to load and work offline
+workbox.precaching.precacheAndRoute(APP_SHELL);
 
-self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
-});
+// runtime caching: network-first for same-origin GET, but only if in the APP_SHELL
+workbox.routing.registerRoute(
+  ({ url, request }) =>
+    request.method === "GET" && url.origin === self.location.origin,
+  new workbox.strategies.NetworkFirst({
+    cacheName: `${APP_NAME}-${APP_VERSION}-runtime`,
+    plugins: [
+      // cache only good responses
+      new workbox.cacheableResponse.CacheableResponsePlugin({
+        statuses: [200],
+      }),
+      // avoid unbounded cache growth
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 200,
+        maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+      }),
+    ],
+  })
+);
 
-self.addEventListener("fetch", (event) => {
-  // only handle same-origin GET requests
-  if (event.request.method !== "GET") return;
-  const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return;
-
-  // use network-first strategy
-  event.respondWith(networkFirst(event.request));
-});
-
-async function networkFirst(request) {
-  const cache = await caches.open(CACHE_NAME);
-
-  try {
-    // try network first
-    const fresh = await fetch(request);
-
-    // only cache successful responses.
-    if (fresh && fresh.ok) {
-      cache.put(request, fresh.clone());
-    }
-
-    return fresh;
-  } catch (err) {
-    // network failed (e.g. offline), try cache
-    const cached = await cache.match(request);
-    if (cached) return cached;
-
-    // if not in cache, fallback to a user-friendly error response
-    return new Response(
-`${APP_NAME} is offline and the requested resource is not cached.
-Please try again when you are back online.`
-    , {
-      status: 503,
+// friendly offline fallback if neither network nor cache works
+workbox.routing.setCatchHandler(async ({ event }) => {
+  return new Response(
+    `${APP_NAME} is offline and the requested resource is not cached. ` +
+      `Please try again when you are back online.`,
+    {
+      status: 503, // Service Unavailable
       headers: { "Content-Type": "text/plain; charset=utf-8" },
-    });
-  }
-}
+    }
+  );
+});

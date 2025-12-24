@@ -1,3 +1,5 @@
+// downloaded from https://unpkg.com/dexie/dist/modern/dexie.mjs
+
 /*
  * Dexie.js - a minimalistic wrapper for IndexedDB
  * ===============================================
