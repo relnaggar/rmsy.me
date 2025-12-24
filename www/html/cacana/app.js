@@ -1,4 +1,14 @@
+import PullToRefresh from "./lib/pulltorefresh.esm.js";
+
 import { addCaca, listCacas } from "./db.js";
+
+
+PullToRefresh.init({
+    mainElement: "body",
+    onRefresh() {
+      location.reload();
+    }
+  });
 
 document.addEventListener("DOMContentLoaded", async () => {
   const id = await addCaca();
