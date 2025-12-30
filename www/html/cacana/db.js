@@ -1,18 +1,25 @@
-import { Dexie } from "./lib/dexie.mjs";
+import { Dexie } from "./lib/dexie.min.mjs";
 
-export const db = new Dexie("cacana-db");
+
+const db = new Dexie("cacana-db");
 
 db.version(1).stores({ // change version number when changing db schema e.g. adding stores or indexes
-  "cacana-store": "++id, createdAt", // auto-increment primary key, index on createdAt
+  cacas: "id, createdAt",
 });
 
-const STORE = "cacana-store";
-
-export async function addCaca() {
-  return db.table(STORE).add({ createdAt: Date.now() }); // returns generated id
+function uuid() {
+  return crypto.randomUUID();
 }
 
-export async function listCacas() {
-  // newest first
-  return db.table(STORE).orderBy("createdAt").reverse().toArray();
+export async function addCaca() {
+  console.log("Adding caca...");
+  await db.table("cacas").add({ id: uuid(), createdAt: Date.now() });
+  console.log("Caca added.");
+}
+
+export async function listCacasNewestFirst() {
+  console.log("Listing cacas...");
+  const cacas = await db.table("cacas").orderBy("createdAt").reverse().toArray();
+  console.log("Cacas listed.");
+  return cacas;
 }

@@ -1,23 +1,37 @@
-import PullToRefresh from "./lib/pulltorefresh.esm.js";
+import PullToRefresh from "./lib/pulltorefresh.min.mjs";
 
-import { addCaca, listCacas } from "./db.js";
+import { addCaca, listCacasNewestFirst } from "./db.js";
 
 
 // initialize pull to refresh
 PullToRefresh.init({
-    mainElement: "body",
-    onRefresh() {
-      location.reload();
-    }
-  });
+  mainElement: "body",
+  onRefresh() {
+    location.reload();
+  }
+});
 
 // on page load
 document.addEventListener("DOMContentLoaded", async () => {
-  const id = await addCaca();
-  const cacas = await listCacas();
+  await addCaca();
+  const cacas = await listCacasNewestFirst();
+  console.log("cacas:", cacas);
 
   const el = document.getElementById("status");
-  if (el) el.textContent = `Added caca ${id}. Total cacas: ${cacas.length}. Cacas: ${JSON.stringify(cacas)}`;
+  if (el) el.innerHTML = `
+<p>Added caca.</p>
+<p>
+  Cacas:
+  <ul>
+    ${cacas.map(c => `
+      <li>
+        ${new Date(c.createdAt).toLocaleString()}
+      </li>
+    `).join("\n")}
+  </ul>
+  Total cacas: ${cacas.length}.
+</p>
+  `;
 });
 
 // register service worker if supported

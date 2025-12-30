@@ -1,5 +1,5 @@
 const APP_NAME = "Cacana";
-const APP_VERSION = "v3"; // bump when you change the app shell
+const APP_VERSION = "v1"; // bump when you change the app shell
 const BASE = "/" + APP_NAME.toLowerCase() + "/";
 
 // load local Workbox runtime
@@ -26,8 +26,8 @@ const APP_SHELL = [
   "icons/favicon.ico",
   "icons/apple-touch-icon.png",
   "db.js",
-  "lib/dexie.mjs",
-  "lib/pulltorefresh.esm.js",
+  "lib/dexie.min.mjs",
+  "lib/pulltorefresh.min.mjs",
   "lib/workbox/workbox-core.prod.js",
   "lib/workbox/workbox-precaching.prod.js",
   "lib/workbox/workbox-routing.prod.js",
