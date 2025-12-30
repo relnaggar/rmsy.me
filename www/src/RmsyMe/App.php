@@ -156,6 +156,12 @@ class App extends AbstractApp
             'callback'
           ),
         ],
+        '/auth/login' => [
+          'GET' => new ControllerAction(
+            Controllers\Auth::class,
+            'login'
+          ),
+        ],
       ],
       pageNotFound: new ControllerAction(
         Controllers\Site::class,
