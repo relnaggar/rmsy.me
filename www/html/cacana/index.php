@@ -11,13 +11,22 @@
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" type="image/x-icon" href="./icons/favicon.ico">
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+    <link href="../css/cacana.css" rel="stylesheet" type="text/css">
     <title><?= $APP_NAME ?></title>
   </head>
   <body>
     <h1><?= $APP_NAME ?></h1>
     <p>Welcome to <?= $APP_NAME ?>!</p>
+
     <button id="addCacaButton">Add Caca</button>
-    <p id="cacaList">Loading cacas...</p>
+
+    <ul id="cacaList">
+      <li id="loadingCacaList">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </li>
+    </ul>
 
     <script type="module" src="./app.js" defer></script>
   </body>

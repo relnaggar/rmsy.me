@@ -77,11 +77,20 @@ foreach ($request['outbox'] as $outboxItem) {
 }
 
 try {
-  $success = $database->processOutbox($request['outbox']);
+  $database->processOutbox($request['outbox']);
 } catch (PDOException $e) {
   http_response_code(500);
   echo json_encode(['error' => 'Database error on processing outbox']);
   exit();
 }
 
-echo json_encode(['success' => $success]);
+try {
+  $cacas = $database->getAllCacasNewestFirst();
+} catch (PDOException $e) {
+  http_response_code(500);
+  echo json_encode(['error' => 'Database error on fetching cacas']);
+  exit();
+}
+
+echo json_encode(['success' => true, 'cacas' => $cacas]);
+exit();

@@ -23,8 +23,7 @@ class Database
     $this->pdo->exec(<<<SQL
       CREATE TABLE IF NOT EXISTS cacas (
         uuid TEXT PRIMARY KEY,
-        createdAt INTEGER,
-        deleted INTEGER DEFAULT 0 -- boolean
+        createdAt INTEGER
       );
       CREATE TABLE IF NOT EXISTS operations (
         uuid TEXT PRIMARY KEY,
@@ -36,12 +35,91 @@ class Database
     SQL);
   }
 
-  public function processOutbox($outbox): bool
+  /**
+    * Process outbox items received from the client.
+    *
+    * @param array $outbox Array of outbox items to process.
+    * @throws PDOException
+    */
+  public function processOutbox($outbox): void
   {
-    foreach ($outbox as $outboxItem) {
-      // TODO process each valid outbox item
-    }
+    $this->pdo->beginTransaction();
+    try {
+      foreach ($outbox as $outboxItem) {
+        // check if operation already processed
+        $stmt = $this->pdo->prepare(<<<SQL
+          SELECT COUNT(*) as count FROM operations
+          WHERE uuid = :uuid
+          ORDER BY timestamp DESC
+        SQL);
+        $stmt->execute([
+          ':uuid' => $outboxItem['uuid'],
+        ]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result && $result['count'] > 0) {
+          // operation already processed, skip
+          continue;
+        }
 
-    return true;
+        switch ($outboxItem['table']) {
+          case 'cacas':
+            switch ($outboxItem['action']) {
+              case 'create':
+                $stmt = $this->pdo->prepare(<<<SQL
+                  INSERT OR IGNORE INTO cacas (uuid, createdAt)
+                  VALUES (:uuid, :createdAt)
+                SQL);
+                $stmt->execute([
+                  ':uuid' => $outboxItem['entityUuid'],
+                  ':createdAt' => $outboxItem['timestamp'],
+                ]);
+                break;
+              case 'delete':
+                $stmt = $this->pdo->prepare(<<<SQL
+                  DELETE FROM cacas
+                  WHERE uuid = :uuid
+                SQL);
+                $stmt->execute([
+                  ':uuid' => $outboxItem['entityUuid'],
+                ]);
+                break;
+            }
+            break;
+        }
+
+        $stmt = $this->pdo->prepare(<<<SQL
+          INSERT INTO operations
+          VALUES (:uuid, :tableName, :entityUuid, :timestamp, :action)
+        SQL);
+        $stmt->execute([
+          ':uuid' => $outboxItem['uuid'],
+          ':tableName' => $outboxItem['table'],
+          ':entityUuid' => $outboxItem['entityUuid'],
+          ':timestamp' => $outboxItem['timestamp'],
+          ':action' => $outboxItem['action'],
+        ]);
+      }
+
+      $this->pdo->commit();
+    } catch (PDOException $e) {
+      $this->pdo->rollBack();
+      throw $e;
+    }
+  }
+
+  /**
+    * Retrieve all cacas from the database, newest first.
+    *
+    * @return array Array of cacas.
+    * @throws PDOException
+    */
+  public function getAllCacasNewestFirst(): array
+  {
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT uuid, createdAt FROM cacas
+      ORDER BY createdAt DESC
+    SQL);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 }

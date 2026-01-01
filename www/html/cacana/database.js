@@ -64,5 +64,16 @@ export async function sync() {
       await db.table("outbox").bulkDelete(outbox.map(item => item.localId));
       console.log("Pushed cacas cleared.");
     }
+
+    for (const caca of responseData.cacas) {
+      console.log("Updating/adding caca from server:", caca);
+      await db.table("cacas").put({
+        uuid: caca.uuid,
+        createdAt: caca.createdAt,
+        deleted: false,
+        updatedAt: caca.createdAt,
+      });
+      console.log("Caca updated/added.");
+    }
   }
 }
