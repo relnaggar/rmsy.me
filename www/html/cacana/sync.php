@@ -1,5 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
+require_once '/vendor/autoload.php'; // composer
+
+use Relnaggar\Veloz\Config;
+Config::getInstance()->set('sourceDirectory', __DIR__ . '/../../src/');
+
+require_once '/vendor/relnaggar/veloz/autoload.php'; // for Cacana
+
+use Cacana\Database;
+
+
+try {
+  $database = new Database();
+} catch (PDOException $e) {
+  http_response_code(500);
+  echo json_encode(['error' => 'Database error on connection']);
+  exit();
+}
+
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -56,8 +76,12 @@ foreach ($request['outbox'] as $outboxItem) {
   }
 }
 
-foreach ($request['outbox'] as $outboxItem) {
-  // TODO process each valid outbox item
+try {
+  $success = $database->processOutbox($request['outbox']);
+} catch (PDOException $e) {
+  http_response_code(500);
+  echo json_encode(['error' => 'Database error on processing outbox']);
+  exit();
 }
 
-echo json_encode(['success' => true]);
+echo json_encode(['success' => $success]);
