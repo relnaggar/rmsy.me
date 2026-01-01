@@ -16,7 +16,8 @@
   <body>
     <h1><?= $APP_NAME ?></h1>
     <p>Welcome to <?= $APP_NAME ?>!</p>
-    <p id="status">Loading...</p>
+    <button id="addCacaButton">Add Caca</button>
+    <p id="cacaList">Loading cacas...</p>
 
     <script type="module" src="./app.js" defer></script>
   </body>

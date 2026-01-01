@@ -25,7 +25,7 @@ const APP_SHELL = [
   "icons/icon-512.png",
   "icons/favicon.ico",
   "icons/apple-touch-icon.png",
-  "db.js",
+  "database.js",
   "lib/dexie.min.mjs",
   "lib/pulltorefresh.min.mjs",
   "lib/workbox/workbox-core.prod.js",

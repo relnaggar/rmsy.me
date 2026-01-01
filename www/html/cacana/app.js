@@ -1,7 +1,10 @@
 import PullToRefresh from "./lib/pulltorefresh.min.mjs";
 
-import { addCaca, listCacasNewestFirst } from "./db.js";
-
+import {
+  addCaca as dbAddCaca,
+  getAllCacasNewestFirst,
+  sync,
+} from "./database.js";
 
 // initialize pull to refresh
 PullToRefresh.init({
@@ -11,15 +14,12 @@ PullToRefresh.init({
   }
 });
 
-// on page load
-document.addEventListener("DOMContentLoaded", async () => {
-  await addCaca();
-  const cacas = await listCacasNewestFirst();
+async function refreshCacas() {
+  const cacas = await getAllCacasNewestFirst();
   console.log("cacas:", cacas);
 
-  const el = document.getElementById("status");
+  const el = document.getElementById("cacaList");
   if (el) el.innerHTML = `
-<p>Added caca.</p>
 <p>
   Cacas:
   <ul>
@@ -32,6 +32,36 @@ document.addEventListener("DOMContentLoaded", async () => {
   Total cacas: ${cacas.length}.
 </p>
   `;
+}
+
+async function addCaca() {
+  await dbAddCaca();
+  refreshCacas();
+
+  if (navigator.onLine) {
+    await sync();
+    refreshCacas();
+  }
+}
+
+// on document ready
+document.addEventListener("DOMContentLoaded", async () => {
+  if (navigator.onLine) {
+    await sync();
+  }
+  refreshCacas();
+
+  // add event listener for addCacaButton
+  const addCacaButton = document.getElementById("addCacaButton");
+  if (addCacaButton) {
+    addCacaButton.addEventListener("click", addCaca);
+  }
+});
+
+// on coming online
+window.addEventListener("online", async () => {
+  await sync();
+  refreshCacas();
 });
 
 // register service worker if supported
