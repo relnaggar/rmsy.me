@@ -41,6 +41,7 @@ export async function getAllCacasNewestFirst() {
 }
 
 export async function sync() {
+  let cacasUpdated = false;
   console.log("Collecting cacas to push...");
   const outbox = await db.table("outbox").orderBy("timestamp").limit(50).toArray();
   console.log("Cacas to push:", outbox);
@@ -73,7 +74,9 @@ export async function sync() {
         deleted: false,
         updatedAt: caca.createdAt,
       });
+      cacasUpdated = true;
       console.log("Caca updated/added.");
     }
   }
+  return cacasUpdated;
 }

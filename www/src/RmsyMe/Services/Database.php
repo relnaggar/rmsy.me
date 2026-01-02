@@ -48,7 +48,7 @@ class Database
       return;
     }
 
-    $this->pdo = new PDO('sqlite:/var/db/database.sqlite3');
+    $this->pdo = new PDO('sqlite:/var/db/rmsy.me.sqlite3');
     $this->databaseConnected = true;
   }
 

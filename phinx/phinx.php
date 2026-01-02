@@ -10,7 +10,7 @@ return [
         'default_environment'     => 'docker',
         'docker' => [
             'adapter' => 'sqlite',
-            'name'    => '/var/db/database',
+            'name'    => '/var/db/rmsy.me',
         ],
     ],
     'version_order' => 'creation'

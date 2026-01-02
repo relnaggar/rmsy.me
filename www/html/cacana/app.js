@@ -1,10 +1,7 @@
 import PullToRefresh from "./lib/pulltorefresh.min.mjs";
 
-import {
-  addCaca as dbAddCaca,
-  getAllCacasNewestFirst,
-  sync,
-} from "./database.js";
+import { addCaca, getAllCacasNewestFirst, sync } from "./database.js";
+
 
 // initialize pull to refresh
 PullToRefresh.init({
@@ -14,7 +11,7 @@ PullToRefresh.init({
   }
 });
 
-async function refreshCacas() {
+async function renderCacaList() {
   // show loading spinner
   const loading = document.getElementById("loadingCacaList");
   if (loading) {
@@ -61,13 +58,15 @@ async function refreshCacas() {
   }
 }
 
-async function addCaca() {
-  await dbAddCaca();
-  refreshCacas();
+async function addCacaButtonClicked() {
+  await addCaca();
+  renderCacaList();
 
   if (navigator.onLine) {
-    await sync();
-    refreshCacas();
+    cacasUpdated = await sync();
+    if (cacasUpdated) {
+      renderCacaList();
+    }
   }
 }
 
@@ -76,19 +75,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (navigator.onLine) {
     await sync();
   }
-  refreshCacas();
+  renderCacaList();
 
   // add event listener for addCacaButton
   const addCacaButton = document.getElementById("addCacaButton");
   if (addCacaButton) {
-    addCacaButton.addEventListener("click", addCaca);
+    addCacaButton.addEventListener("click", addCacaButtonClicked);
   }
 });
 
 // on coming online
 window.addEventListener("online", async () => {
-  await sync();
-  refreshCacas();
+  cacasUpdated = await sync();
+  if (cacasUpdated) {
+    renderCacaList();
+  }
 });
 
 // register service worker if supported
