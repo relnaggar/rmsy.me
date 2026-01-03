@@ -35,6 +35,7 @@ const APP_SHELL = [
   "lib/workbox/workbox-cacheable-response.prod.js",
   "lib/workbox/workbox-expiration.prod.js",
   "../css/cacana.css",
+  "../css/cacana.css.map",
 ].map((path) => ({
   url: BASE + path,
   revision: APP_VERSION,
