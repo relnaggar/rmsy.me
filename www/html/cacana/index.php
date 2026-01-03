@@ -17,12 +17,13 @@
   <body>
     <h1><?= $APP_NAME ?></h1>
     <p>Welcome to <?= $APP_NAME ?>!</p>
-    <div>
-      <button id="addCacaButton">Add Caca</button>
-    </div>
-    <div id="loadingSpinner" class="spinner-border" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
+    <button class="btn btn-primary" type="button" id="syncButton">
+      <span id="loadingSpinner"></span>
+      <span id="syncButtonText"></span>
+    </button>
+    <button class="btn btn-primary" type="button" id="addCacaButton">
+      Add Caca
+    </button>
     <ul id="cacaList"></ul>
 
     <script type="module" src="./app.js" defer></script>

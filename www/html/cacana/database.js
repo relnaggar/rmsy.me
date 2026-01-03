@@ -4,8 +4,9 @@ import { Dexie } from "./lib/dexie.min.mjs";
 const db = new Dexie("cacana-db");
 
 db.version(1).stores({ // change version number when changing db schema e.g. adding stores or indexes
-  cacas: "uuid, createdAt, deleted, updatedAt",
+  cacas: "uuid, createdAt, deletedAt, updatedAt",
   outbox: "++localId, uuid, table, entityUuid, timestamp, action", // for pending operations to sync
+  meta: "key, value", // for storing latest sync timestamp etc.
 });
 
 function generateUuid() {
@@ -15,22 +16,26 @@ function generateUuid() {
 export async function addCaca() {
   const cacaUuid = generateUuid();
   const now = Date.now();
+
+   // idempotent upsert
   console.log("Adding caca...");
-  await db.table("cacas").put({ // idempotent upsert
+  await db.table("cacas").put({
     uuid: cacaUuid,
     createdAt: now,
-    deleted: false,
+    deletedAt: null,
     updatedAt: now,
   });
   console.log("Caca added locally");
-  await db.table("outbox").add({ // queue for sync
+
+  // queue for sync
+  await db.table("outbox").add({
     uuid: generateUuid(),
     table: "cacas",
     entityUuid: cacaUuid,
     timestamp: now,
     action: "create",
   });
-  console.log("Caca queued for sync.");
+  console.log("Caca creation queued for sync.");
 }
 
 export async function getAllCacasNewestFirst() {
@@ -43,8 +48,15 @@ export async function getAllCacasNewestFirst() {
 export async function sync() {
   let cacasUpdated = false;
   console.log("Collecting cacas to push...");
-  const outbox = await db.table("outbox").orderBy("timestamp").limit(50).toArray();
+  const outbox = await db.table("outbox").orderBy("timestamp").toArray();
   console.log("Cacas to push:", outbox);
+
+  console.log("Getting latest timestamp...");
+  const latestTimestampEntry = await db.table("meta").get("latestTimestamp")
+  let latestTimestamp = 0;
+  if (latestTimestampEntry) {
+    latestTimestamp = latestTimestampEntry.value;
+  }
 
   console.log("Syncing...");
   const response = await fetch("/cacana/sync.php", {
@@ -52,7 +64,10 @@ export async function sync() {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ outbox }),
+    body: JSON.stringify({
+      outbox,
+      latestTimestamp,
+    }),
   });
   console.log("Sync response received.");
 
@@ -71,12 +86,42 @@ export async function sync() {
       await db.table("cacas").put({
         uuid: caca.uuid,
         createdAt: caca.createdAt,
-        deleted: false,
-        updatedAt: caca.createdAt,
+        deletedAt: caca.deletedAt,
+        updatedAt: caca.updatedAt,
       });
       cacasUpdated = true;
       console.log("Caca updated/added.");
     }
+
+    console.log("Updating latest timestamp...");
+    await db.table("meta").put({
+      key: "latestTimestamp",
+      value: responseData.newLatestTimestamp,
+    });
+    console.log("Latest timestamp updated.");
   }
   return cacasUpdated;
+}
+
+export async function deleteCaca(cacaUuid) {
+  const now = Date.now();
+
+  // mark as deleted locally
+  console.log("Deleting caca...");
+  await db.table("cacas").put({
+    uuid: cacaUuid,
+    deletedAt: now,
+    updatedAt: now,
+  });
+  console.log("Caca deleted locally.");
+
+  // queue for sync
+  await db.table("outbox").add({
+    uuid: generateUuid(),
+    table: "cacas",
+    entityUuid: cacaUuid,
+    timestamp: now,
+    action: "delete",
+  });
+  console.log("Caca deletion queued for sync.");
 }

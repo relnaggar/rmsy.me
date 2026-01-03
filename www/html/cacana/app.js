@@ -1,6 +1,11 @@
 import PullToRefresh from "./lib/pulltorefresh.min.mjs";
 
-import { addCaca, getAllCacasNewestFirst, sync } from "./database.js";
+import {
+  addCaca,
+  getAllCacasNewestFirst,
+  sync,
+  deleteCaca
+} from "./database.js";
 
 
 let loadingCount = 0;
@@ -12,9 +17,25 @@ const formatDateTime = (ms) => {
     `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
 
+const clickDeleteCacaButton = async (cacaUuid) => {
+  withSyncStatus(async () => {
+    await deleteCaca(cacaUuid);
+    await syncAndRender(true);
+  });
+}
+
 const renderCacaListItem = (caca) => {
+  const fragment = document.createDocumentFragment();
   const li = document.createElement("li");
-  li.textContent = formatDateTime(caca.createdAt);
+  fragment.appendChild(li);
+  const span = document.createElement("span");
+  li.appendChild(span);
+  span.textContent = formatDateTime(caca.createdAt);
+  const button = document.createElement("button");
+  button.className = "btn btn-sm btn-danger ms-2";
+  li.appendChild(button);
+  button.textContent = "Delete";
+  button.addEventListener("click", () => clickDeleteCacaButton(caca.uuid));
   return li;
 }
 
@@ -24,11 +45,14 @@ const renderCacaList = (cacas) => {
     return;
   }
 
-  const frag = document.createDocumentFragment();
+  const fragment = document.createDocumentFragment();
   for (const caca of cacas) {
-    frag.appendChild(renderCacaListItem(caca));
+    if (caca.deletedAt !== null) {
+      continue;
+    }
+    fragment.appendChild(renderCacaListItem(caca));
   }
-  cacaList.replaceChildren(frag);
+  cacaList.replaceChildren(fragment);
 }
 
 const syncAndRender = async (alwaysRender) => {
@@ -42,34 +66,67 @@ const syncAndRender = async (alwaysRender) => {
   }
 }
 
-const setIsLoading = (isLoading) => {
+const setSyncStatus = (syncStatus) => {
+  const syncButton = document.getElementById("syncButton");
+  if (!syncButton) {
+    return;
+  }
   const loadingSpinner = document.getElementById("loadingSpinner");
   if (!loadingSpinner) {
     return;
   }
-  loadingSpinner.style.display = isLoading ? "block" : "none";
+  const syncButtonText = document.getElementById("syncButtonText");
+  if (!syncButtonText) {
+    return;
+  }
+
+  if (syncStatus === "syncing") {
+    syncButton.disabled = true;
+
+    loadingSpinner.className = "spinner-border spinner-border-sm";
+    loadingSpinner.setAttribute("aria-hidden", "true");
+
+    syncButtonText.className = "";
+    syncButtonText.textContent = "Syncing...";
+  } else if (syncStatus === "online") {
+    syncButton.disabled = false;
+
+    loadingSpinner.className = "";
+    loadingSpinner.removeAttribute("aria-hidden");
+
+    syncButtonText.className = "mx-4";
+    syncButtonText.textContent = "Synced";
+  } else if (syncStatus === "offline") {
+    syncButton.disabled = true;
+
+    loadingSpinner.className = "";
+    loadingSpinner.removeAttribute("aria-hidden");
+
+    syncButtonText.className = "mx-3";
+    syncButtonText.textContent = "Offline";
+  }
 }
 
-const withLoading = async (fn) => {
+const withSyncStatus = async (fn) => {
   loadingCount++;
-  setIsLoading(true);
+  setSyncStatus("syncing");
   try {
     return await fn();
   }
   finally {
     loadingCount--;
     if (loadingCount <= 0) {
-      setIsLoading(false);
+      setSyncStatus(navigator.onLine ? "online" : "offline");
     }
   }
 }
 
 PullToRefresh.init({
-  onRefresh: () => withLoading(() => syncAndRender(false)),
+  onRefresh: () => withSyncStatus(() => syncAndRender(false)),
 });
 
-const addCacaButtonClicked = () => {
-  withLoading(async () => {
+const clickAddCacaButton = () => {
+  withSyncStatus(async () => {
     await addCaca();
     await syncAndRender(true);
   });
@@ -77,18 +134,31 @@ const addCacaButtonClicked = () => {
 
 // on document ready
 document.addEventListener("DOMContentLoaded", () => {
-  withLoading(() => syncAndRender(true));
+  withSyncStatus(() => syncAndRender(true));
+
+  // add event listener for syncButton
+  const syncButton = document.getElementById("syncButton");
+  if (syncButton) {
+    syncButton.addEventListener("click", () => {
+      withSyncStatus(() => syncAndRender(true));
+    });
+  }
 
   // add event listener for addCacaButton
   const addCacaButton = document.getElementById("addCacaButton");
   if (addCacaButton) {
-    addCacaButton.addEventListener("click", addCacaButtonClicked);
+    addCacaButton.addEventListener("click", clickAddCacaButton);
   }
 });
 
 // on coming online
 window.addEventListener("online", () => {
-  withLoading(() => syncAndRender(false));
+  withSyncStatus(() => syncAndRender(false));
+});
+
+// on going offline
+window.addEventListener("offline", () => {
+  setSyncStatus("offline");
 });
 
 // register service worker if supported

@@ -23,7 +23,9 @@ class Database
     $this->pdo->exec(<<<SQL
       CREATE TABLE IF NOT EXISTS cacas (
         uuid TEXT PRIMARY KEY,
-        createdAt INTEGER
+        createdAt INTEGER,
+        updatedAt INTEGER,
+        deletedAt INTEGER DEFAULT NULL
       );
       CREATE TABLE IF NOT EXISTS operations (
         uuid TEXT PRIMARY KEY,
@@ -48,7 +50,8 @@ class Database
       foreach ($outbox as $outboxItem) {
         // check if operation already processed
         $stmt = $this->pdo->prepare(<<<SQL
-          SELECT COUNT(*) as count FROM operations
+          SELECT COUNT(*) as count
+          FROM operations
           WHERE uuid = :uuid
           ORDER BY timestamp DESC
         SQL);
@@ -66,8 +69,15 @@ class Database
             switch ($outboxItem['action']) {
               case 'create':
                 $stmt = $this->pdo->prepare(<<<SQL
-                  INSERT OR IGNORE INTO cacas (uuid, createdAt)
-                  VALUES (:uuid, :createdAt)
+                  INSERT OR IGNORE INTO cacas (
+                    uuid,
+                    createdAt,
+                    updatedAt
+                  ) VALUES (
+                    :uuid,
+                    :createdAt,
+                    :createdAt
+                  )
                 SQL);
                 $stmt->execute([
                   ':uuid' => $outboxItem['entityUuid'],
@@ -76,11 +86,15 @@ class Database
                 break;
               case 'delete':
                 $stmt = $this->pdo->prepare(<<<SQL
-                  DELETE FROM cacas
+                  UPDATE cacas
+                  SET
+                    deletedAt=:deletedAt,
+                    updatedAt=:deletedAt
                   WHERE uuid = :uuid
                 SQL);
                 $stmt->execute([
                   ':uuid' => $outboxItem['entityUuid'],
+                  ':deletedAt' => $outboxItem['timestamp'],
                 ]);
                 break;
             }
@@ -89,7 +103,13 @@ class Database
 
         $stmt = $this->pdo->prepare(<<<SQL
           INSERT INTO operations
-          VALUES (:uuid, :tableName, :entityUuid, :timestamp, :action)
+          VALUES (
+            :uuid,
+            :tableName,
+            :entityUuid,
+            :timestamp,
+            :action
+          )
         SQL);
         $stmt->execute([
           ':uuid' => $outboxItem['uuid'],
@@ -108,18 +128,41 @@ class Database
   }
 
   /**
-    * Retrieve all cacas from the database, newest first.
+    * Retrieve all cacas since a given timestamp, newest first.
     *
     * @return array Array of cacas.
     * @throws PDOException
     */
-  public function getAllCacasNewestFirst(): array
+  public function getCacasSince(int $sinceTimestamp): array
   {
     $stmt = $this->pdo->prepare(<<<SQL
-      SELECT uuid, createdAt FROM cacas
+      SELECT * FROM cacas
+      WHERE updatedAt > :sinceTimestamp
       ORDER BY createdAt DESC
     SQL);
-    $stmt->execute();
+    $stmt->execute([
+      ':sinceTimestamp' => $sinceTimestamp,
+    ]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  /**
+    * Get the latest update timestamp from the cacas table.
+    *
+    * @return int Latest update timestamp.
+    * @throws PDOException
+    */
+  public function getLatestUpdateTimestamp(): int
+  {
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT MAX(updatedAt) as latestTimestamp
+      FROM cacas
+    SQL);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$result || $result['latestTimestamp'] === null) {
+      return 0;
+    }
+    return (int)$result['latestTimestamp'];
   }
 }

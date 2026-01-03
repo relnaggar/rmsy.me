@@ -58,8 +58,19 @@ if (!isset($request['outbox']) || !is_array($request['outbox'])) {
   echo json_encode(['error' => 'Invalid or missing outbox data']);
   exit();
 }
+$outbox = $request['outbox'];
 
-foreach ($request['outbox'] as $outboxItem) {
+if (
+  !isset($request['latestTimestamp']) 
+  || !is_numeric($request['latestTimestamp'])
+) {
+  http_response_code(400);
+  echo json_encode(['error' => 'Invalid or missing latestTimestamp']);
+  exit();
+}
+$latestTimestamp = (int)$request['latestTimestamp'];
+
+foreach ($outbox as $outboxItem) {
   if (
     !isset($outboxItem['uuid'])
     || !isset($outboxItem['table'])
@@ -77,7 +88,7 @@ foreach ($request['outbox'] as $outboxItem) {
 }
 
 try {
-  $database->processOutbox($request['outbox']);
+  $database->processOutbox($outbox);
 } catch (PDOException $e) {
   http_response_code(500);
   echo json_encode(['error' => 'Database error on processing outbox']);
@@ -85,12 +96,25 @@ try {
 }
 
 try {
-  $cacas = $database->getAllCacasNewestFirst();
+  $cacas = $database->getCacasSince($latestTimestamp);
 } catch (PDOException $e) {
   http_response_code(500);
   echo json_encode(['error' => 'Database error on fetching cacas']);
   exit();
 }
 
-echo json_encode(['success' => true, 'cacas' => $cacas]);
+try {
+  $newLatestTimestamp = $database->getLatestUpdateTimestamp();
+} catch (PDOException $e) {
+  http_response_code(500);
+  echo json_encode(['error' => 'Database error on fetching latest timestamp']);
+  exit();
+}
+
+http_response_code(200);
+echo json_encode([
+  'success' => true,
+  'cacas' => $cacas,
+  'newLatestTimestamp' => $newLatestTimestamp
+]);
 exit();
