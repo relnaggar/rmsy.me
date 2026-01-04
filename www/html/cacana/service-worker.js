@@ -20,6 +20,10 @@ const APP_SHELL = [
   "",
   "index.php",
   "app.js",
+  "auth.js",
+  "cacana.js",
+  "login.js",
+  "register.js",
   "manifest.webmanifest",
   "icons/icon-192.png",
   "icons/icon-512.png",
@@ -41,8 +45,23 @@ const APP_SHELL = [
   revision: APP_VERSION,
 }));
 
+// endpoints not to be cached
+const ENDPOINTS = [
+  "/cacana/login.php",
+  "/cacana/logout.php",
+  "/cacana/register.php",
+  "/cacana/is_logged_in.php",
+  "/cacana/sync.php",
+];
+
 // precache app shell: everything that must exist for the app to load and work offline
 workbox.precaching.precacheAndRoute(APP_SHELL);
+
+// endpoints: network-only
+workbox.routing.registerRoute(
+  ({ url }) => ENDPOINTS.some((endpoint) => url.pathname === endpoint),
+  new workbox.strategies.NetworkOnly()
+);
 
 // runtime caching: network-first for same-origin GET, but only if in the APP_SHELL
 workbox.routing.registerRoute(

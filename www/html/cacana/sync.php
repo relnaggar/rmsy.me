@@ -11,6 +11,16 @@ require_once '/vendor/relnaggar/veloz/autoload.php'; // for Cacana
 
 use Cacana\Database;
 
+header('Content-Type: application/json');
+
+// Check authentication
+session_start();
+if (!isset($_SESSION['cacanaUsername'])) {
+  http_response_code(401);
+  echo json_encode(['error' => 'Unauthorized']);
+  exit();
+}
+$username = $_SESSION['cacanaUsername'];
 
 try {
   $database = new Database();
@@ -19,8 +29,6 @@ try {
   echo json_encode(['error' => 'Database error on connection']);
   exit();
 }
-
-header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   http_response_code(405);
@@ -88,7 +96,7 @@ foreach ($outbox as $outboxItem) {
 }
 
 try {
-  $database->processOutbox($outbox);
+  $database->processOutbox($username, $outbox);
 } catch (PDOException $e) {
   http_response_code(500);
   echo json_encode(['error' => 'Database error on processing outbox']);
@@ -96,7 +104,7 @@ try {
 }
 
 try {
-  $cacas = $database->getCacasSince($latestTimestamp);
+  $cacas = $database->getCacasSince($username, $latestTimestamp);
 } catch (PDOException $e) {
   http_response_code(500);
   echo json_encode(['error' => 'Database error on fetching cacas']);
@@ -104,7 +112,7 @@ try {
 }
 
 try {
-  $newLatestTimestamp = $database->getLatestUpdateTimestamp();
+  $newLatestTimestamp = $database->getLatestUpdateTimestamp($username);
 } catch (PDOException $e) {
   http_response_code(500);
   echo json_encode(['error' => 'Database error on fetching latest timestamp']);

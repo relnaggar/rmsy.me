@@ -45,7 +45,7 @@ export async function getAllCacasNewestFirst() {
   return cacas;
 }
 
-export async function sync() {
+export async function sync(onUnauthorised) {
   let cacasUpdated = false;
   console.log("Collecting cacas to push...");
   const outbox = await db.table("outbox").orderBy("timestamp").toArray();
@@ -59,17 +59,23 @@ export async function sync() {
   }
 
   console.log("Syncing...");
-  const response = await fetch("/cacana/sync.php", {
+  const response = await fetch("sync.php", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "same-origin",
     body: JSON.stringify({
       outbox,
       latestTimestamp,
     }),
   });
   console.log("Sync response received.");
+
+  if (response.status === 401) {
+    onUnauthorised();
+    return false;
+  }
 
   const responseData = await response.json();
   if (responseData.success) {
@@ -124,4 +130,12 @@ export async function deleteCaca(cacaUuid) {
     action: "delete",
   });
   console.log("Caca deletion queued for sync.");
+}
+
+export async function clearLocalData() {
+  console.log("Clearing local data...");
+  await db.table("cacas").clear();
+  await db.table("outbox").clear();
+  await db.table("meta").clear();
+  console.log("Local data cleared.");
 }
