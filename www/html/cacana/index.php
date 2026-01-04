@@ -14,27 +14,33 @@
     <link href="../css/cacana.css" rel="stylesheet" type="text/css">
     <title><?= $APP_NAME ?></title>
   </head>
-  <body>
-    <h1><?= $APP_NAME ?></h1>
+  <!-- horizontally centered -->
+  <body class="container d-flex flex-column align-items-center mt-4">
+    <h1>
+      <?= $APP_NAME ?>
+      <img src="./icons/icon-192.png" alt="Cacana Logo" class="ms-2 h-1em">
+    </h1>
 
     <div id="authContent" class="d-none">
       <p id="authError" class="text-danger"></p>
 
       <form id="loginForm" class="d-none">
-        <div>
-          <label for="loginUsername">Username</label>
+        <div class="mb-3">
+          <label class="form-label" for="loginUsername">Username</label>
           <input
             id="loginUsername"
+            class="form-control"
             type="text"
             name="username"
             autocomplete="username"
             required
           >
         </div>
-        <div>
-          <label for="loginPassword">Password</label>
+        <div class="mb-3">
+          <label class="form-label" for="loginPassword">Password</label>
           <input
             id="loginPassword"
+            class="form-control"
             type="password"
             name="password"
             autocomplete="current-password"
@@ -42,37 +48,40 @@
           >
         </div>
         <button class="btn btn-primary" type="submit">Login</button>
-        <p>
+        <p class="mt-3">
           Don't have an account?
           <a href="#" id="showRegisterLink">Register</a>
         </p>
       </form>
 
       <form id="registerForm" class="d-none">
-        <div>
-          <label for="registerUsername">Username</label>
+        <div class="mb-3">
+          <label class="form-label" for="registerUsername">Username</label>
           <input
+            id="registerUsername"
+            class="form-control"
             type="text"
             name="username"
             autocomplete="username"
             required
-            id="registerUsername"
           >
         </div>
-        <div>
-          <label for="registerPassword">Password</label>
+        <div class="mb-3">
+          <label class="form-label" for="registerPassword">Password</label>
           <input
             id="registerPassword"
+            class="form-control"
             type="password"
             name="new-password"
             autocomplete="new-password"
             required
           >
         </div>
-        <div>
-          <label for="confirmPassword">Confirm Password</label>
+        <div class="mb-3">
+          <label class="form-label" for="confirmPassword">Confirm Password</label>
           <input
             id="confirmPassword"
+            class="form-control"
             type="password"
             name="confirm-password"
             autocomplete="new-password"
@@ -80,7 +89,10 @@
           >
         </div>
         <button class="btn btn-primary" type="submit">Register</button>
-        <p>Already have an account? <a href="#" id="showLoginLink">Login</a></p>
+        <p class="mt-3">
+          Already have an account?
+          <a href="#" id="showLoginLink">Login</a>
+        </p>
       </form>
     </div>
 
@@ -93,10 +105,19 @@
         <span id="loadingSpinner"></span>
         <span id="syncButtonText"></span>
       </button>
-      <button id="addCacaButton" class="btn btn-primary" type="button">
-        Add Caca
+      <button id="refreshButton" class="btn btn-success" type="button">
+        Refresh
       </button>
-      <ul id="cacaList"></ul>
+      <hr>
+      <div class="mb-4 d-grid">
+        <button id="addCacaButton" class="btn btn-brown" type="button">
+          Add Caca
+        </button>
+      </div>
+      <table id="cacaTable" class="table">
+        <tbody id="cacaTableBody">
+        </tbody>
+      </table>
     </div>
 
     <script type="module" src="./app.js" defer></script>

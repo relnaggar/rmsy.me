@@ -1,5 +1,3 @@
-import PullToRefresh from "./lib/pulltorefresh.min.mjs";
-
 import { isLoggedIn } from "./auth.js";
 import {
   initialiseCacana,
@@ -12,13 +10,6 @@ import { initialiseLoginForm, showLoginForm } from "./login.js";
 import { initialiseRegisterForm } from "./register.js";
 
 
-// initialize pull to refresh
-PullToRefresh.init({
-  onRefresh: () => {
-    document.location.reload();
-  },
-});
-
 // on document ready
 document.addEventListener("DOMContentLoaded", async () => {
   initialiseCacana();
@@ -29,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     (err) => console.error("Error checking login status:", err) // TODO
   );
   if (loggedIn) {
-    showCacana();
+    await showCacana();
   } else {
     showLoginForm();
   }

@@ -5,7 +5,7 @@ import {
   deleteCaca,
   clearLocalData
 } from "./database.js";
-import { logout } from "./auth.js";
+import { getCurrentUser, logout } from "./auth.js";
 import { showLoginForm } from "./login.js";
 
 
@@ -25,30 +25,46 @@ const clickDeleteCacaButton = (cacaUuid) => {
   });
 }
 
-const renderCacaListItem = (caca) => {
-  const fragment = document.createDocumentFragment();
-  const li = document.createElement("li");
-  fragment.appendChild(li);
-  const span = document.createElement("span");
-  li.appendChild(span);
-  span.textContent = formatDateTime(caca.createdAt);
+const renderCacaTableRow = (caca) => {
+  const tr = document.createElement("tr");
+
+  // caca image
+  const td1 = document.createElement("td");
+  const img = document.createElement("img");
+  img.className = "me-2";
+  img.src = "./icons/icon-192.png";
+  img.width = 16;
+  img.height = 16;
+  img.alt = "Caca";
+  td1.appendChild(img);
+  tr.appendChild(td1);
+
+  // created at
+  const td2 = document.createElement("td");
+  td2.textContent = formatDateTime(caca.createdAt);
+  tr.appendChild(td2);
+
+  // delete button
+  const td3 = document.createElement("td");
   const button = document.createElement("button");
   button.className = "btn btn-sm btn-danger ms-2";
-  li.appendChild(button);
   button.textContent = "Delete";
   button.addEventListener("click", () => clickDeleteCacaButton(caca.uuid));
-  return li;
+  td3.appendChild(button);
+  tr.appendChild(td3);
+
+  return tr;
 }
 
-const renderCacaList = (cacas) => {
+const renderCacaTable = (cacas) => {
   const fragment = document.createDocumentFragment();
   for (const caca of cacas) {
     if (caca.deletedAt !== null) {
       continue;
     }
-    fragment.appendChild(renderCacaListItem(caca));
+    fragment.appendChild(renderCacaTableRow(caca));
   }
-  document.getElementById("cacaList").replaceChildren(fragment);
+  document.getElementById("cacaTableBody").replaceChildren(fragment);
 }
 
 const onLoggedOut = async () => {
@@ -63,7 +79,7 @@ const syncAndRenderCacana = async (alwaysRender) => {
   }
   if (alwaysRender || cacasUpdated) {
     const cacas = await getAllCacasNewestFirst();
-    renderCacaList(cacas);
+    renderCacaTable(cacas);
   }
 }
 
@@ -87,7 +103,7 @@ const setSyncStatus = (syncStatus) => {
     loadingSpinner.removeAttribute("aria-hidden");
 
     syncButtonText.className = "mx-4";
-    syncButtonText.textContent = "Synced";
+    syncButtonText.textContent = "Sync";
   } else if (syncStatus === "offline") {
     syncButton.disabled = true;
 
@@ -117,6 +133,10 @@ const clickSyncButton = () => {
   withSyncStatus(() => syncAndRenderCacana(true));
 }
 
+const clickRefreshButton = () => {
+  window.location.reload();
+}
+
 const clickAddCacaButton = () => {
   withSyncStatus(async () => {
     await addCaca();
@@ -131,6 +151,8 @@ const clickLogoutButton = async () => {
 export const initialiseCacana = () => {
   document.getElementById("syncButton")
     .addEventListener("click", clickSyncButton);
+  document.getElementById("refreshButton")
+    .addEventListener("click", clickRefreshButton);
   document.getElementById("addCacaButton")
     .addEventListener("click", clickAddCacaButton);
   document.getElementById("logoutButton")
@@ -141,6 +163,8 @@ export const showCacana = async () => {
   document.getElementById("authContent").classList.add("d-none");
   document.getElementById("appContent").classList.remove("d-none");
   clickSyncButton();
+  const currentUser = await getCurrentUser();
+  document.getElementById("currentUser").textContent = currentUser;
 }
 
 export const isCacanaShown = () => {
