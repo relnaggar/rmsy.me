@@ -117,7 +117,7 @@
 
       <hr>
 
-      <div id="cacaTableContainer">
+      <div id="homeContainer" class="text-center">
         <div class="d-grid mb-2">
           <button id="addCacaButton" class="btn btn-brown" type="button">
             Add Caca
@@ -130,11 +130,21 @@
       </div>
 
       <div id="statsContainer" class="d-none text-center">
-        Stats
       </div>
 
       <div id="settingsContainer" class="d-none text-center">
-        Settings
+        <div class="mb-3">
+          <label class="form-label" for="userColourInput">
+            User colour:
+          </label>
+          <input
+            id="userColourInput"
+            class="form-control form-control-color mx-auto"
+            type="color"
+            name="userColour"
+            value="#000000"
+          >
+        </div>
       </div>
 
       <nav class="fixed-bottom bg-light border-top">
@@ -142,7 +152,7 @@
           <li class="nav-item border-end">
             <button
               id="homeButton"
-              class="btn btn-link nav-link"
+              class="nav-link"
               type="button"
             >
               <div class="bi bi-house-door-fill"></div>
@@ -152,7 +162,7 @@
           <li class="nav-item border-end">
             <button
               id="statsButton"
-              class="btn btn-link nav-link"
+              class="nav-link"
               type="button"
             >
               <div class="bi bi-bar-chart-fill"></div>
@@ -162,7 +172,7 @@
           <li class="nav-item">
             <button
               id="settingsButton"
-              class="btn btn-link nav-link"
+              class="nav-link"
               type="button"
             >
               <div class="bi bi-gear-fill"></div>

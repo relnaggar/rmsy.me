@@ -22,6 +22,7 @@ class Database
     // throw exceptions on errors
     $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    // original table creation
     $this->pdo->exec(<<<SQL
       CREATE TABLE IF NOT EXISTS users (
         username TEXT PRIMARY KEY,
@@ -44,6 +45,31 @@ class Database
         action TEXT
       );
     SQL);
+
+    // migration 1: add colour and updatedAt columns to users table
+    if (
+      $this->pdo->query(
+        "PRAGMA table_info(users);"
+      )->fetchAll(PDO::FETCH_ASSOC)
+    ) {
+      $columns = array_column(
+        $this->pdo->query("PRAGMA table_info(users);")
+          ->fetchAll(PDO::FETCH_ASSOC),
+        'name'
+      );
+      if (!in_array('colour', $columns)) {
+        $this->pdo->exec(<<<SQL
+          ALTER TABLE users
+          ADD COLUMN colour TEXT DEFAULT "#000000";
+        SQL);
+      }
+      if (!in_array('updatedAt', $columns)) {
+        $this->pdo->exec(<<<SQL
+          ALTER TABLE users
+          ADD COLUMN updatedAt INTEGER DEFAULT 0;
+        SQL);
+      }
+    }
   }
 
   /**
@@ -181,6 +207,31 @@ class Database
                   ':username' => $username,
                 ]);
                 break;
+              default:
+                throw new PDOException("Unknown action for cacas table");
+            }
+            break;
+          case 'users':
+            if ($outboxItem['entityUuid'] !== $username) {
+              throw new PDOException("Not authorized to update other users");
+            }
+            switch ($outboxItem['action']) {
+              case 'updateColour':
+                $stmt = $this->pdo->prepare(<<<SQL
+                  UPDATE users
+                  SET
+                    colour=:colour,
+                    updatedAt=:updatedAt
+                  WHERE username = :username
+                SQL);
+                $stmt->execute([
+                  ':colour' => $outboxItem['colour'] ?? null,
+                  ':updatedAt' => $outboxItem['timestamp'],
+                  ':username' => $username,
+                ]);
+                break;
+              default:
+                throw new PDOException("Unknown action for users table");
             }
             break;
         }
@@ -234,7 +285,7 @@ class Database
   }
 
   /**
-    * Get the latest update timestamp from the cacas table for a user.
+    * Get the latest update timestamp for a given user.
     *
     * @param string $username Username to filter by.
     * @return int Latest update timestamp.
@@ -243,15 +294,56 @@ class Database
   public function getLatestUpdateTimestamp(string $username): int
   {
     $stmt = $this->pdo->prepare(<<<SQL
-      SELECT MAX(updatedAt) as latestTimestamp
+      SELECT MAX(updatedAt) as latestCacaUpdate
       FROM cacas
       WHERE username = :username
     SQL);
     $stmt->execute([':username' => $username]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$result || $result['latestTimestamp'] === null) {
-      return 0;
+
+    $latestUpdateTimestamp = 0;
+    if ($result && $result['latestCacaUpdate'] !== null) {
+      $latestUpdateTimestamp = (int)$result['latestCacaUpdate'];
     }
-    return (int)$result['latestTimestamp'];
+
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT updatedAt
+      FROM users
+      WHERE username = :username
+    SQL);
+    $stmt->execute([':username' => $username]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($result && $result['updatedAt'] !== null) {
+      $latestUserUpdate = (int)$result['updatedAt'];
+      if ($latestUserUpdate > $latestUpdateTimestamp) {
+        $latestUpdateTimestamp = $latestUserUpdate;
+      }
+    }
+
+    return $latestUpdateTimestamp;
+  }
+
+  /**
+    * Get the colour associated with a user if it has been updated since a given timestamp.
+    *
+    * @param string $username Username to filter by.
+    * @return string|null User colour or null if not set.
+    * @throws PDOException
+    */
+  public function getUserColourIfUpdated(
+    string $username,
+    int $sinceTimestamp
+  ): ?string {
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT colour, updatedAt
+      FROM users
+      WHERE username = :username
+    SQL);
+    $stmt->execute([':username' => $username]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$result || (int)$result['updatedAt'] <= $sinceTimestamp) {
+      return null;
+    }
+    return $result['colour'];
   }
 }

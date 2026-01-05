@@ -1,12 +1,14 @@
 import { Dexie } from "./lib/dexie.min.mjs";
 
+import { getCurrentUser } from "./auth.js";
+
 
 const db = new Dexie("cacana-db");
 
 db.version(1).stores({ // change version number when changing db schema e.g. adding stores or indexes
   cacas: "uuid, createdAt, deletedAt, updatedAt",
   outbox: "++localId, uuid, table, entityUuid, timestamp, action", // for pending operations to sync
-  meta: "key, value", // for storing latest sync timestamp etc.
+  meta: "key, value", // latestTimestamp, userColour
 });
 
 function generateUuid() {
@@ -45,8 +47,35 @@ export async function getAllCacasNewestFirst() {
   return cacas;
 }
 
+export async function getUserColour() {
+  console.log("Getting user colour...");
+  const entry = await db.table("meta").get("userColour");
+  console.log("User colour retrieved.");
+  return entry ? entry.value : "#000000";
+}
+
+export async function setUserColour(colour) {
+  console.log("Setting user colour...");
+  await db.table("meta").put({
+    key: "userColour",
+    value: colour,
+  });
+  console.log("User colour set.");
+
+  // queue for sync
+  const now = Date.now();
+  await db.table("outbox").add({
+    uuid: generateUuid(),
+    table: "users",
+    entityUuid: await getCurrentUser(),
+    timestamp: now,
+    action: "updateColour",
+    colour: colour,
+  });
+  console.log("User colour update queued for sync.");
+}
+
 export async function sync(onUnauthorised) {
-  let cacasUpdated = false;
   console.log("Collecting cacas to push...");
   const outbox = await db.table("outbox").orderBy("timestamp").toArray();
   console.log("Cacas to push:", outbox);
@@ -82,9 +111,9 @@ export async function sync(onUnauthorised) {
     console.log("Sync successful.");
 
     if (outbox.length > 0) {
-      console.log("Clearing pushed cacas...");
+      console.log("Clearing outbox...");
       await db.table("outbox").bulkDelete(outbox.map(item => item.localId));
-      console.log("Pushed cacas cleared.");
+      console.log("Outbox cleared.");
     }
 
     for (const caca of responseData.cacas) {
@@ -95,8 +124,16 @@ export async function sync(onUnauthorised) {
         deletedAt: caca.deletedAt,
         updatedAt: caca.updatedAt,
       });
-      cacasUpdated = true;
       console.log("Caca updated/added.");
+    }
+
+    if (responseData.userColour) {
+      console.log("Updating user colour...");
+      await db.table("meta").put({
+        key: "userColour",
+        value: responseData.userColour,
+      });
+      console.log("User colour updated.");
     }
 
     console.log("Updating latest timestamp...");
@@ -106,7 +143,6 @@ export async function sync(onUnauthorised) {
     });
     console.log("Latest timestamp updated.");
   }
-  return cacasUpdated;
 }
 
 export async function deleteCaca(cacaUuid) {

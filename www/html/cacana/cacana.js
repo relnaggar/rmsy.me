@@ -3,7 +3,9 @@ import {
   getAllCacasNewestFirst,
   sync,
   deleteCaca,
-  clearLocalData
+  clearLocalData,
+  getUserColour,
+  setUserColour,
 } from "./database.js";
 import { getCurrentUser, logout } from "./auth.js";
 import { showLoginForm } from "./login.js";
@@ -25,7 +27,7 @@ const clickDeleteCacaButton = (cacaUuid) => {
   });
 }
 
-const renderCacaTableRow = (caca) => {
+const renderCacaTableRow = (caca, userColour) => {
   const tr = document.createElement("tr");
 
   // caca image
@@ -42,6 +44,7 @@ const renderCacaTableRow = (caca) => {
   // created at
   const td2 = document.createElement("td");
   td2.textContent = formatDateTime(caca.createdAt);
+  td2.style.backgroundColor = userColour;
   tr.appendChild(td2);
 
   // delete button
@@ -56,13 +59,13 @@ const renderCacaTableRow = (caca) => {
   return tr;
 }
 
-const renderCacaTable = (cacas) => {
+const renderCacaTable = (cacas, userColour) => {
   const fragment = document.createDocumentFragment();
   for (const caca of cacas) {
     if (caca.deletedAt !== null) {
       continue;
     }
-    fragment.appendChild(renderCacaTableRow(caca));
+    fragment.appendChild(renderCacaTableRow(caca, userColour));
   }
   document.getElementById("cacaTableBody").replaceChildren(fragment);
 }
@@ -72,15 +75,18 @@ const onLoggedOut = async () => {
   showLoginForm();
 }
 
-const syncAndRenderCacana = async (alwaysRender) => {
-  let cacasUpdated = false;
+const renderUserColourSetting = async (userColour) => {
+  document.getElementById("userColourInput").value = userColour;
+}
+
+const syncAndRenderCacana = async () => {
   if (navigator.onLine) {
-    cacasUpdated = await sync(onLoggedOut);
+    await sync(onLoggedOut);
   }
-  if (alwaysRender || cacasUpdated) {
-    const cacas = await getAllCacasNewestFirst();
-    renderCacaTable(cacas);
-  }
+  const cacas = await getAllCacasNewestFirst();
+  const userColour = await getUserColour();
+  renderCacaTable(cacas, userColour);
+  renderUserColourSetting(userColour);
 }
 
 const setSyncStatus = (syncStatus) => {
@@ -121,7 +127,7 @@ const withSyncStatus = async (fn) => {
 }
 
 const clickSyncButton = () => {
-  withSyncStatus(() => syncAndRenderCacana(true));
+  withSyncStatus(() => syncAndRenderCacana());
 }
 
 const clickRefreshButton = () => {
@@ -131,7 +137,7 @@ const clickRefreshButton = () => {
 const clickAddCacaButton = () => {
   withSyncStatus(async () => {
     await addCaca();
-    await syncAndRenderCacana(true);
+    await syncAndRenderCacana();
   });
 }
 
@@ -140,38 +146,75 @@ const clickLogoutButton = async () => {
 }
 
 const clickHomeButton = () => {
-  document.getElementById("cacaTableContainer").classList.remove("d-none");
+  document.getElementById("homeContainer").classList.remove("d-none");
+  document.getElementById("homeButton").classList.add("active");
+  document.getElementById("homeButton").setAttribute("aria-current", "page");
   document.getElementById("statsContainer").classList.add("d-none");
+  document.getElementById("statsButton").classList.remove("active");
+  document.getElementById("statsButton").removeAttribute("aria-current");
   document.getElementById("settingsContainer").classList.add("d-none");
+  document.getElementById("settingsButton").classList.remove("active");
+  document.getElementById("settingsButton").removeAttribute("aria-current");
 }
 
 const clickStatsButton = () => {
-  document.getElementById("cacaTableContainer").classList.add("d-none");
+  document.getElementById("homeContainer").classList.add("d-none");
+  document.getElementById("homeButton").classList.remove("active");
+  document.getElementById("homeButton").removeAttribute("aria-current");
   document.getElementById("statsContainer").classList.remove("d-none");
+  document.getElementById("statsButton").classList.add("active");
+  document.getElementById("statsButton").setAttribute("aria-current", "page");
   document.getElementById("settingsContainer").classList.add("d-none");
+  document.getElementById("settingsButton").classList.remove("active");
+  document.getElementById("settingsButton").removeAttribute("aria-current");
 }
 
 const clickSettingsButton = () => {
-  document.getElementById("cacaTableContainer").classList.add("d-none");
+  document.getElementById("homeContainer").classList.add("d-none");
+  document.getElementById("homeButton").classList.remove("active");
+  document.getElementById("homeButton").removeAttribute("aria-current");
   document.getElementById("statsContainer").classList.add("d-none");
+  document.getElementById("statsButton").classList.remove("active");
+  document.getElementById("statsButton").removeAttribute("aria-current");
   document.getElementById("settingsContainer").classList.remove("d-none");
+  document.getElementById("settingsButton").classList.add("active");
+  document.getElementById("settingsButton").setAttribute("aria-current", "page");
+}
+
+const initialiseHomePage = () => {
+  document.getElementById("addCacaButton")
+    .addEventListener("click", clickAddCacaButton);
+}
+
+const initialiseStatsPage = () => {
+}
+
+const initialiseSettingsPage = () => {
+  document.getElementById("userColourInput")
+    .addEventListener("change", async (event) => {
+      const colour = event.target.value;
+      await setUserColour(colour);
+      clickSyncButton();
+    });
 }
 
 export const initialiseCacana = () => {
+  document.getElementById("logoutButton")
+    .addEventListener("click", clickLogoutButton);
   document.getElementById("syncButton")
     .addEventListener("click", clickSyncButton);
   document.getElementById("refreshButton")
     .addEventListener("click", clickRefreshButton);
-  document.getElementById("addCacaButton")
-    .addEventListener("click", clickAddCacaButton);
-  document.getElementById("logoutButton")
-    .addEventListener("click", clickLogoutButton);
   document.getElementById("homeButton")
     .addEventListener("click", clickHomeButton);
   document.getElementById("statsButton")
     .addEventListener("click", clickStatsButton);
   document.getElementById("settingsButton")
     .addEventListener("click", clickSettingsButton);
+  initialiseHomePage();
+  initialiseStatsPage();
+  initialiseSettingsPage();
+  clickHomeButton();
 }
 
 export const showCacana = async () => {
@@ -187,7 +230,7 @@ export const isCacanaShown = () => {
 }
 
 export const onCacanaOnline = () => {
-  withSyncStatus(() => syncAndRenderCacana(false));
+  clickSyncButton();
 }
 
 export const onCacanaOffline = () => {

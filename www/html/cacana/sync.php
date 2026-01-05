@@ -82,12 +82,12 @@ foreach ($outbox as $outboxItem) {
   if (
     !isset($outboxItem['uuid'])
     || !isset($outboxItem['table'])
-    || !in_array($outboxItem['table'], ['cacas'])
+    || !in_array($outboxItem['table'], ['cacas', 'users'])
     || !isset($outboxItem['entityUuid'])
     || !isset($outboxItem['timestamp'])
     || !is_numeric($outboxItem['timestamp'])
     || !isset($outboxItem['action'])
-    || !in_array($outboxItem['action'], ['create', 'delete'])
+    || !in_array($outboxItem['action'], ['create', 'delete', 'updateColour'])
   ) {
     http_response_code(400);
     echo json_encode(['error' => 'Invalid outbox item format']);
@@ -112,6 +112,14 @@ try {
 }
 
 try {
+  $userColour = $database->getUserColourIfUpdated($username, $latestTimestamp);
+} catch (PDOException $e) {
+  http_response_code(500);
+  echo json_encode(['error' => 'Database error on fetching user colour']);
+  exit();
+}
+
+try {
   $newLatestTimestamp = $database->getLatestUpdateTimestamp($username);
 } catch (PDOException $e) {
   http_response_code(500);
@@ -120,9 +128,13 @@ try {
 }
 
 http_response_code(200);
-echo json_encode([
+$responseData = [
   'success' => true,
   'cacas' => $cacas,
   'newLatestTimestamp' => $newLatestTimestamp
-]);
+];
+if ($userColour !== null) {
+  $responseData['userColour'] = $userColour;
+}
+echo json_encode($responseData);
 exit();

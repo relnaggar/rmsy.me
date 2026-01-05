@@ -48,3 +48,10 @@ $brown: #8B4513;
     $brown,
   );
 }
+
+.nav-link {
+  &.active, &[aria-current="page"] {
+    background-color: $brown;
+    color: white;
+  }
+}
