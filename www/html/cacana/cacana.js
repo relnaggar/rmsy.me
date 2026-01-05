@@ -90,27 +90,18 @@ const setSyncStatus = (syncStatus) => {
 
   if (syncStatus === "syncing") {
     syncButton.disabled = true;
-
     loadingSpinner.className = "spinner-border spinner-border-sm";
     loadingSpinner.setAttribute("aria-hidden", "true");
-
-    syncButtonText.className = "";
     syncButtonText.textContent = "Syncing...";
   } else if (syncStatus === "online") {
     syncButton.disabled = false;
-
     loadingSpinner.className = "";
     loadingSpinner.removeAttribute("aria-hidden");
-
-    syncButtonText.className = "mx-4";
     syncButtonText.textContent = "Sync";
   } else if (syncStatus === "offline") {
     syncButton.disabled = true;
-
     loadingSpinner.className = "";
     loadingSpinner.removeAttribute("aria-hidden");
-
-    syncButtonText.className = "mx-3";
     syncButtonText.textContent = "Offline";
   }
 }
@@ -148,6 +139,24 @@ const clickLogoutButton = async () => {
   await logout(onLoggedOut);
 }
 
+const clickHomeButton = () => {
+  document.getElementById("cacaTableContainer").classList.remove("d-none");
+  document.getElementById("statsContainer").classList.add("d-none");
+  document.getElementById("settingsContainer").classList.add("d-none");
+}
+
+const clickStatsButton = () => {
+  document.getElementById("cacaTableContainer").classList.add("d-none");
+  document.getElementById("statsContainer").classList.remove("d-none");
+  document.getElementById("settingsContainer").classList.add("d-none");
+}
+
+const clickSettingsButton = () => {
+  document.getElementById("cacaTableContainer").classList.add("d-none");
+  document.getElementById("statsContainer").classList.add("d-none");
+  document.getElementById("settingsContainer").classList.remove("d-none");
+}
+
 export const initialiseCacana = () => {
   document.getElementById("syncButton")
     .addEventListener("click", clickSyncButton);
@@ -157,6 +166,12 @@ export const initialiseCacana = () => {
     .addEventListener("click", clickAddCacaButton);
   document.getElementById("logoutButton")
     .addEventListener("click", clickLogoutButton);
+  document.getElementById("homeButton")
+    .addEventListener("click", clickHomeButton);
+  document.getElementById("statsButton")
+    .addEventListener("click", clickStatsButton);
+  document.getElementById("settingsButton")
+    .addEventListener("click", clickSettingsButton);
 }
 
 export const showCacana = async () => {

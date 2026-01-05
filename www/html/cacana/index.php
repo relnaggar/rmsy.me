@@ -14,11 +14,15 @@
     <link href="../css/cacana.css" rel="stylesheet" type="text/css">
     <title><?= $APP_NAME ?></title>
   </head>
-  <!-- horizontally centered -->
-  <body class="container d-flex flex-column align-items-center mt-4">
+  <body class="container d-flex flex-column align-items-center py-4">
     <h1>
       <?= $APP_NAME ?>
-      <img src="./icons/icon-192.png" alt="Cacana Logo" class="ms-2 h-1em">
+      <img
+        src="./icons/icon-192.png"
+        alt="Cacana Logo"
+        class="ms-2 align-top"
+        height="32"
+      >
     </h1>
 
     <div id="authContent" class="d-none">
@@ -96,28 +100,77 @@
       </form>
     </div>
 
-    <div id="appContent" class="d-none">
+    <div id="appContent" class="d-none pb-5 mb-5">
       <p>Welcome to <?= $APP_NAME ?>, <span id="currentUser"></span>!</p>
-      <button id="logoutButton" class="btn btn-secondary" type="button">
-        Logout
-      </button>
-      <button id="syncButton" class="btn btn-primary" type="button">
-        <span id="loadingSpinner"></span>
-        <span id="syncButtonText"></span>
-      </button>
-      <button id="refreshButton" class="btn btn-success" type="button">
-        Refresh
-      </button>
-      <hr>
-      <div class="mb-4 d-grid">
-        <button id="addCacaButton" class="btn btn-brown" type="button">
-          Add Caca
+      <div class="d-flex justify-content-between">
+        <button id="logoutButton" class="btn btn-secondary" type="button">
+          Logout
+        </button>
+        <button id="syncButton" class="btn btn-primary flex-grow-1 mx-1" type="button">
+          <span id="loadingSpinner"></span>
+          <span id="syncButtonText"></span>
+        </button>
+        <button id="refreshButton" class="btn btn-success" type="button">
+          Refresh
         </button>
       </div>
-      <table id="cacaTable" class="table">
-        <tbody id="cacaTableBody">
-        </tbody>
-      </table>
+
+      <hr>
+
+      <div id="cacaTableContainer">
+        <div class="d-grid mb-2">
+          <button id="addCacaButton" class="btn btn-brown" type="button">
+            Add Caca
+          </button>
+        </div>
+        <table id="cacaTable" class="table">
+          <tbody id="cacaTableBody">
+          </tbody>
+        </table>
+      </div>
+
+      <div id="statsContainer" class="d-none text-center">
+        Stats
+      </div>
+
+      <div id="settingsContainer" class="d-none text-center">
+        Settings
+      </div>
+
+      <nav class="fixed-bottom bg-light border-top">
+        <ul class="nav nav-justified">
+          <li class="nav-item border-end">
+            <button
+              id="homeButton"
+              class="btn btn-link nav-link"
+              type="button"
+            >
+              <div class="bi bi-house-door-fill"></div>
+              Home
+            </button>
+          </li>
+          <li class="nav-item border-end">
+            <button
+              id="statsButton"
+              class="btn btn-link nav-link"
+              type="button"
+            >
+              <div class="bi bi-bar-chart-fill"></div>
+              Stats
+            </button>
+          </li>
+          <li class="nav-item">
+            <button
+              id="settingsButton"
+              class="btn btn-link nav-link"
+              type="button"
+            >
+              <div class="bi bi-gear-fill"></div>
+              Settings
+            </button>
+          </li>
+        </ul>
+      </nav>
     </div>
 
     <script type="module" src="./app.js" defer></script>
