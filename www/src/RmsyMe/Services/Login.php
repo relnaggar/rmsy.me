@@ -13,7 +13,9 @@ class Login
 
   public function __construct(Database $databaseService)
   {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+      session_start();
+    }
     $this->databaseService = $databaseService;
   }
 

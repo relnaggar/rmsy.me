@@ -29,7 +29,7 @@ class Projects extends AbstractController
   public function index(): Page
   {
     $projects = $this->projectsService->getProjects();
-    
+
     // preload the thumbnails for the first two projects
     $preloadImages = array_slice(
       array_map(fn($project) => $project->thumbnail, $projects),

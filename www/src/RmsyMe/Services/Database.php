@@ -24,16 +24,19 @@ use RmsyMe\Models\{
   Lesson,
 };
 use RmsyMe\Services\Secrets;
+use RmsyMe\Controllers\Auth;
 
 class Database
 {
   private ?PDO $pdo;
   private bool $databaseConnected;
-  private Secrets $secrets;
+  private Secrets $secretsService;
+  private Auth $authController;
 
-  public function __construct(Secrets $secrets)
+  public function __construct(Secrets $secretsService, Auth $authController)
   {
-    $this->secrets = $secrets;
+    $this->secretsService = $secretsService;
+    $this->authController = $authController;
     $this->pdo = null;
     $this->databaseConnected = false;
   }
@@ -604,7 +607,7 @@ class Database
 
     $sellerAddress = array_map(
       fn($line) => trim($line),
-      explode('|', $this->secrets->getSecret('SELLER_ADDRESS')),
+      explode('|', $this->secretsService->getSecret('SELLER_ADDRESS')),
     );
     $sellerAddress[5] = CountryAlpha2::from(
       $sellerAddress[5]
@@ -696,5 +699,6 @@ class Database
 
   public function importLessonsFromCalendar(): void
   {
+    $events = $this->authController->getCalendarEvents();
   }
 }

@@ -54,7 +54,8 @@ RUN \
   && composer require symfony/http-client \
   && composer require robmorgan/phinx \
   && composer require prinsfrank/standards \
-  && composer require dompdf/dompdf
+  && composer require dompdf/dompdf \
+  && composer require microsoft/microsoft-graph
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="PRODUCTION"

@@ -185,6 +185,7 @@ RUN composer require symfony/http-client
 RUN composer require robmorgan/phinx
 RUN composer require prinsfrank/standards
 RUN composer require dompdf/dompdf
+RUN composer require microsoft/microsoft-graph
 
 # add framework
 RUN composer require relnaggar/veloz:^1.5
