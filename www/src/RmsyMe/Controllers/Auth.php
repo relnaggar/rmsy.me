@@ -237,7 +237,7 @@ class Auth extends AbstractController
       . '&endDateTime=' . urlencode($now)
       . '&$top=1000'
       . '&$orderby=start/dateTime desc'
-      . '&$select=subject,start,end';
+      . '&$select=subject,start,end,type'; // seriesMasterId would give recurring info
 
     $response = $client->get($endpoint);
     $responseData = json_decode($response->getBody()->getContents(), true);

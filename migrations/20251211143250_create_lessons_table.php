@@ -41,7 +41,7 @@ final class CreateLessonsTable extends AbstractMigration
             ->addColumn('datetime', 'datetime', ['null' => false])
             ->addColumn('duration_minutes', 'integer', ['null' => false, 'default' => 55])
             ->addColumn('repeat_weeks', 'integer', ['null' => false, 'default' => 0])
-            ->addColumn('price', 'integer', ['null' => false])
+            ->addColumn('price_gbp_pence', 'integer', ['null' => false])
             ->addColumn('paid', 'boolean', ['null' => false, 'default' => false])
             ->addColumn('student_id', 'integer', ['null' => true])
             ->addForeignKey('student_id', 'students', 'id', ['delete'=> 'NO_ACTION', 'update'=> 'NO_ACTION'])

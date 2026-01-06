@@ -697,8 +697,170 @@ class Database
     return $results;
   }
 
+  public function getAllStudents(): array
+  {
+    $this->connect();
+
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT *
+      FROM students
+    SQL);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return $results;
+  }
+
+  public function getAllClients(): array
+  {
+    $this->connect();
+
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT *
+      FROM clients
+    SQL);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return $results;
+  }
+
+  public function getAllBuyers(): array
+  {
+    $this->connect();
+
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT *
+      FROM buyers
+    SQL);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_CLASS, Buyer::class);
+
+    return $results;
+  }
+
   public function importLessonsFromCalendar(): void
   {
+    $this->connect();
+
+    $students = $this->getAllStudents();
+    $clients = $this->getAllClients();
+    $buyers = $this->getAllBuyers();
+
+    $insertLessonStmt = $this->pdo->prepare(<<<SQL
+      INSERT INTO lessons (
+        datetime,
+        duration_minutes,
+        repeat_weeks,
+        price_gbp_pence,
+        student_id,
+        client_id,
+        buyer_id
+      )
+      VALUES (
+        :datetime,
+        :duration_minutes,
+        :repeat_weeks,
+        :price_gbp_pence,
+        :student_id,
+        :client_id,
+        :buyer_id
+      )
+    SQL);
+
     $events = $this->authController->getCalendarEvents();
+    foreach ($events as $event) {
+      // parse event data
+      $subject = $event['subject'];
+      if (!str_contains($subject, '£')) {
+        var_dump("Skipping free event: $subject<br>");
+        continue;
+      }
+
+      // extract source
+      $parts = explode(':', $subject);
+      if (count($parts) < 2) {
+        var_dump("Skipping event with invalid subject: $subject<br>");
+        continue;
+      }
+      $firstPart = trim($parts[1]);
+      $firstSubparts = explode(' ', $firstPart);
+      if (count($firstSubparts) < 2) {
+        var_dump("Skipping event with invalid subject: $subject<br>");
+        continue;
+      }
+      $source = trim($firstSubparts[0]);
+
+      // extract price
+      preg_match('/£([0-9]+(\.[0-9]{1,2})?)/', $subject, $matches);
+      if (count($matches) === 0) {
+        var_dump("Skipping event with invalid price: $subject<br>");
+        continue;
+      }
+      $price_gbp_pence = (int)round(floatval($matches[1]) * 100);
+
+      // determine student/client
+      $secondPart = trim($parts[1]);
+      $secondSubparts = explode(',', $secondPart);
+      $studentClient = trim($secondSubparts[0]);
+      $studentClientParts = explode('/', $studentClient);
+      if (count($studentClientParts) < 2) {
+        $studentName = trim($studentClientParts[0]);
+        $studentNameParts = explode(' ', $studentName);
+        if (count($studentNameParts) === 1) {
+          $studentFirstName = trim($studentNameParts[0]);
+          // TODO extract student id and client id
+        } else if (count($studentNameParts) === 2) {
+          $studentFirstName = trim($studentNameParts[0]);
+          $studentLastName = trim($studentNameParts[1]);
+          // TODO extract student id and client id
+        } else {
+          var_dump("Skipping event with invalid student/client: $subject<br>");
+          continue;
+        }
+      } else if (count($studentClientParts) === 2) {
+        $studentFirstName = trim($studentClientParts[0]);
+        $clientFirstName = trim($studentClientParts[1]);
+        // TODO extract student id and client id
+      } else {
+        var_dump("Skipping event with invalid student/client: $subject<br>");
+        continue;
+      }
+
+      // TODO determine buyer
+
+      // extract start time
+      $startDateTime = $event['start']['dateTime'];
+
+      // calculate duration in minutes
+      $start_dt = new DateTime($startDateTime);
+      $end_dt = new DateTime($event['end']['dateTime']);
+      $duration_minutes = (int)round(
+        ($end_dt->getTimestamp() - $start_dt->getTimestamp()) / 60
+      );
+      if ($duration_minutes === 60) {
+        $duration_minutes = 55; // standardize to 55 minutes
+      }
+
+      // determine if this is part of a recurring series
+      if (strtolower($event['type']) === 'occurrence') {
+        $repeat_weeks = 1;
+      } else {
+        $repeat_weeks = 0;
+      }
+
+      // insert lesson into database
+      $insertLessonStmt->execute(
+        [
+          'datetime' => $startDateTime,
+          'duration_minutes' => $duration_minutes,
+          'repeat_weeks' => $repeat_weeks,
+          'price_gbp_pence' => $price_gbp_pence,
+          'student_id' => null, // TODO
+          'client_id' => null, // TODO
+          'buyer_id' => null, // TODO
+        ]
+      );
+    }
   }
 }
