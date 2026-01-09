@@ -20,6 +20,7 @@ use RmsyMe\{
   Services\Login,
   Components\Alert,
   Models\Buyer,
+  Models\Student,
 };
 
 class Client extends AbstractController
@@ -391,5 +392,104 @@ class Client extends AbstractController
         'students' => $students,
       ]
     );
+  }
+
+  private function getStudentTemplateVars(int $studentId): array
+  {
+    return [
+      'title' => 'Student Details',
+      'studentId' => $studentId,
+      'formName' => 'studentForm',
+    ];
+  }
+
+  public function student(string $studentIdString): Page
+  {
+    $this->authenticate();
+    $studentId = (int) $studentIdString;
+    $templateVars = $this->getStudentTemplateVars($studentId);
+
+    // verify student exists
+    try {
+      $student = $this->databaseService->getStudent($studentId);
+      if ($student === null) {
+        return $this->router->getPageNotFound()->getPage();
+      }
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
+
+    // pre-fill form data
+    $_POST[$templateVars['formName']] = (array) $student;
+
+    return $this->getPage(
+      relativeBodyTemplatePath: __FUNCTION__,
+      templateVars: $templateVars
+    );
+  }
+
+  public function studentSubmit(string $studentIdString): Page
+  {
+    $this->authenticate();
+    $studentId = (int) $studentIdString;
+    $templateVars = $this->getStudentTemplateVars($studentId);
+    $templatePath = 'student';
+
+    // verify student exists
+    try {
+      $student = $this->databaseService->getStudent($studentId);
+      if ($student === null) {
+        return $this->router->getPageNotFound()->getPage();
+      }
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
+
+    // display error alert by default
+    $templateVars['alert'] = new Alert(
+      type: 'danger',
+      title: 'Update failed!',
+      message: <<<HTML
+        There was an error submitting the student form but it's not clear why.
+      HTML
+    );
+
+    // display error alert if form not submitted
+    if (!isset($_POST['submit']) || !isset($_POST[$templateVars['formName']])) {
+      return $this->getPage($templatePath, $templateVars);
+    }
+
+    // validate form data
+    $_POST[$templateVars['formName']]['id'] = $studentId;
+    $formData = new Student($_POST[$templateVars['formName']]);
+    $errors = $formData->validate();
+    if (!empty($errors)) {
+      $templateVars['alert']->message = $errors[array_key_first($errors)];
+      return $this->getPage($templatePath, $templateVars);
+    }
+
+    // update student in database
+    try {
+      $this->databaseService->updateStudent($formData);
+    } catch (PDOException $e) {
+      error_log($e->getMessage());
+      $templateVars['alert']->message = <<<HTML
+        There was a database error while attempting to update the student.
+      HTML;
+      return $this->getPage($templatePath, $templateVars);
+    }
+
+    // success
+    $templateVars['alert'] = new Alert(
+      type: 'success',
+      title: 'Update successful!',
+      message: <<<HTML
+        <p>
+          The student has been updated successfully!
+        </p>
+      HTML
+    );
+
+    return $this->getPage($templatePath, $templateVars);
   }
 }

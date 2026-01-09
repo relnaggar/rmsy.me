@@ -22,6 +22,7 @@ use RmsyMe\Models\{
   Payment,
   Buyer,
   Lesson,
+  Student,
 };
 use RmsyMe\Services\Secrets;
 use RmsyMe\Controllers\Auth;
@@ -335,6 +336,32 @@ class Database
     SQL);
     $stmt->execute(['id' => $buyerId]);
     $result = $stmt->fetchObject(Buyer::class);
+
+    if (!$result) {
+      return null;
+    }
+
+    return $result;
+  }
+
+  /**
+   * Get a student by their ID.
+   * 
+   * @param int $studentId The student's ID.
+   * @return ?Student The Student object if found, null otherwise.
+   * @throws PDOException If there is a database error.
+   */
+  public function getStudent(int $studentId): ?Student
+  {
+    $this->connect();
+
+    $stmt = $this->pdo->prepare(<<<SQL
+      SELECT *
+      FROM students
+      WHERE id = :id
+    SQL);
+    $stmt->execute(['id' => $studentId]);
+    $result = $stmt->fetchObject(Student::class);
 
     if (!$result) {
       return null;
@@ -923,5 +950,27 @@ class Database
         ]
       );
     }
+  }
+
+  /**
+   * Update a student in the students table.
+   * 
+   * @param Student $student The Student object to update.
+   * @throws PDOException If there is a database error.
+   */
+  public function updateStudent(Student $student): void
+  {
+    $this->connect();
+
+    $stmt = $this->pdo->prepare(<<<SQL
+      UPDATE students
+      SET
+        name = :name
+      WHERE id = :id
+    SQL);
+    $stmt->execute([
+      'id' => $student->id,
+      'name' => $student->name,
+    ]);
   }
 }

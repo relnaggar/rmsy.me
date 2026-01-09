@@ -137,6 +137,13 @@ class App extends AbstractApp
         '/client/students' => [
           'GET' => new ControllerAction(Controllers\Client::class, 'students'),
         ],
+        '/client/students/<studentIdString>' => [
+          'GET' => new ControllerAction(Controllers\Client::class, 'student'),
+          'POST' => new ControllerAction(
+            Controllers\Client::class,
+            'studentSubmit'
+          ),
+        ],
         '/client/clients' => [
           'GET' => new ControllerAction(Controllers\Client::class, 'clients'),
         ],
