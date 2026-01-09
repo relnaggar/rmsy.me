@@ -23,7 +23,7 @@ final class CreateLessonsTable extends AbstractMigration
         // CREATE TABLE lessons (
         //     id INT PRIMARY KEY AUTO_INCREMENT,
         //     description VARCHAR(255) NOT NULL DEFAULT 'Online computer science classes',
-        //     datetime DATETIME NOT NULL,
+        //     datetime DATETIME NOT NULL UNIQUE,
         //     duration_minutes INT NOT NULL DEFAULT 55,
         //     repeat_weeks INT NOT NULL DEFAULT 0,
         //     price_gbp_pence INT NOT NULL,
@@ -39,6 +39,7 @@ final class CreateLessonsTable extends AbstractMigration
         $this->table('lessons')
             ->addColumn('description', 'string', ['limit' => 255, 'null' => false, 'default' => 'Online computer science classes'])
             ->addColumn('datetime', 'datetime', ['null' => false])
+            ->addIndex(['datetime'], ['unique' => true])
             ->addColumn('duration_minutes', 'integer', ['null' => false, 'default' => 55])
             ->addColumn('repeat_weeks', 'integer', ['null' => false, 'default' => 0])
             ->addColumn('price_gbp_pence', 'integer', ['null' => false])

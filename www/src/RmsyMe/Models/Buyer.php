@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace RmsyMe\Models;
 
 use Relnaggar\Veloz\Data\AbstractFormData;
-use PrinsFrank\Standards\Country\CountryAlpha2;
+use PrinsFrank\Standards\{
+  Country\CountryAlpha2,
+  Language\LanguageAlpha2,
+};
 
 class Buyer extends AbstractFormData
 {
@@ -131,5 +134,11 @@ class Buyer extends AbstractFormData
     }
 
     return $errors;
+  }
+
+  public function getCountryName(): string
+  {
+    return CountryAlpha2::from($this->country)
+      ->getNameInLanguage(LanguageAlpha2::English);
   }
 }

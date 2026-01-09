@@ -335,4 +335,61 @@ class Client extends AbstractController
       ]
     );
   }
+
+  public function buyers(): Page
+  {
+    $this->authenticate();
+
+    try {
+      $buyers = $this->databaseService->getBuyers();
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
+
+    return $this->getPage(
+      relativeBodyTemplatePath: __FUNCTION__,
+      templateVars: [
+        'title' => 'Buyers',
+        'buyers' => $buyers,
+      ]
+    );
+  }
+
+  public function clients(): Page
+  {
+    $this->authenticate();
+
+    try {
+      $clients = $this->databaseService->getClients();
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
+
+    return $this->getPage(
+      relativeBodyTemplatePath: __FUNCTION__,
+      templateVars: [
+        'title' => 'Clients',
+        'clients' => $clients,
+      ]
+    );
+  }
+
+  public function students(): Page
+  {
+    $this->authenticate();
+
+    try {
+      $students = $this->databaseService->getStudents();
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
+
+    return $this->getPage(
+      relativeBodyTemplatePath: __FUNCTION__,
+      templateVars: [
+        'title' => 'Students',
+        'students' => $students,
+      ]
+    );
+  }
 }

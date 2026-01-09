@@ -102,6 +102,18 @@ class Nav
       path: '/payments',
     ));
     $clientItem->addDropdownItem(new NavItem(
+      text: 'Buyers',
+      path: '/buyers',
+    ));
+    $clientItem->addDropdownItem(new NavItem(
+      text: 'Clients',
+      path: '/clients',
+    ));
+    $clientItem->addDropdownItem(new NavItem(
+      text: 'Students',
+      path: '/students',
+    ));
+    $clientItem->addDropdownItem(new NavItem(
       text: 'Lessons',
       path: '/lessons',
     ));

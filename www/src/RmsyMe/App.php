@@ -131,6 +131,15 @@ class App extends AbstractApp
             'paymentsSubmit'
           ),
         ],
+        '/client/buyers' => [
+          'GET' => new ControllerAction(Controllers\Client::class, 'buyers'),
+        ],
+        '/client/students' => [
+          'GET' => new ControllerAction(Controllers\Client::class, 'students'),
+        ],
+        '/client/clients' => [
+          'GET' => new ControllerAction(Controllers\Client::class, 'clients'),
+        ],
         '/client/buyers/<encodedBuyerId>' => [
           'GET' => new ControllerAction(Controllers\Client::class, 'buyer'),
           'POST' => new ControllerAction(

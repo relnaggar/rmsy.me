@@ -697,7 +697,7 @@ class Database
     return $results;
   }
 
-  public function getAllStudents(): array
+  public function getStudents(): array
   {
     $this->connect();
 
@@ -711,7 +711,7 @@ class Database
     return $results;
   }
 
-  public function getAllClients(): array
+  public function getClients(): array
   {
     $this->connect();
 
@@ -725,7 +725,7 @@ class Database
     return $results;
   }
 
-  public function getAllBuyers(): array
+  public function getBuyers(): array
   {
     $this->connect();
 
@@ -739,16 +739,53 @@ class Database
     return $results;
   }
 
+  public function getOrCreateClientIdByName(
+    string $clientName,
+  ): int {
+    $this->connect();
+
+    // check if client exists
+    foreach ($this->getClients() as $client) {
+      if (str_starts_with($client['name'], $clientName)) {
+        return (int)$client['id'];
+      }
+    }
+
+    // create new client
+    $insertStmt = $this->pdo->prepare(<<<SQL
+      INSERT INTO clients (name)
+      VALUES (:name)
+    SQL);
+    $insertStmt->execute(['name' => $clientName]);
+    return (int)$this->pdo->lastInsertId();
+  }
+
+  public function getOrCreateStudentIdByName(
+    string $studentName
+  ): int {
+    $this->connect();
+
+    foreach ($this->getStudents() as $student) {
+      if (str_starts_with($student['name'], $studentName)) {
+        return (int)$student['id'];
+      }
+    }
+
+    // create new student
+    $insertStmt = $this->pdo->prepare(<<<SQL
+      INSERT INTO students (name)
+      VALUES (:name)
+    SQL);
+    $insertStmt->execute(['name' => $studentName]);
+    return (int)$this->pdo->lastInsertId();
+  }
+
   public function importLessonsFromCalendar(): void
   {
     $this->connect();
 
-    $students = $this->getAllStudents();
-    $clients = $this->getAllClients();
-    $buyers = $this->getAllBuyers();
-
     $insertLessonStmt = $this->pdo->prepare(<<<SQL
-      INSERT INTO lessons (
+      INSERT OR IGNORE INTO lessons (
         datetime,
         duration_minutes,
         repeat_weeks,
@@ -773,7 +810,9 @@ class Database
       // parse event data
       $subject = $event['subject'];
       if (!str_contains($subject, '£')) {
-        var_dump("Skipping free event: $subject<br>");
+        if (!str_contains($subject, 'meeting')) {
+          var_dump("Skipping free event: $subject<br>");
+        }
         continue;
       }
 
@@ -783,7 +822,7 @@ class Database
         var_dump("Skipping event with invalid subject: $subject<br>");
         continue;
       }
-      $firstPart = trim($parts[1]);
+      $firstPart = trim($parts[0]);
       $firstSubparts = explode(' ', $firstPart);
       if (count($firstSubparts) < 2) {
         var_dump("Skipping event with invalid subject: $subject<br>");
@@ -806,28 +845,50 @@ class Database
       $studentClientParts = explode('/', $studentClient);
       if (count($studentClientParts) < 2) {
         $studentName = trim($studentClientParts[0]);
-        $studentNameParts = explode(' ', $studentName);
-        if (count($studentNameParts) === 1) {
-          $studentFirstName = trim($studentNameParts[0]);
-          // TODO extract student id and client id
-        } else if (count($studentNameParts) === 2) {
-          $studentFirstName = trim($studentNameParts[0]);
-          $studentLastName = trim($studentNameParts[1]);
-          // TODO extract student id and client id
-        } else {
-          var_dump("Skipping event with invalid student/client: $subject<br>");
-          continue;
-        }
+        $client_id = $this->getOrCreateClientIdByName(
+          $studentName,
+        );
+        $student_id = $this->getOrCreateStudentIdByName(
+          $studentName,
+        );
       } else if (count($studentClientParts) === 2) {
         $studentFirstName = trim($studentClientParts[0]);
         $clientFirstName = trim($studentClientParts[1]);
-        // TODO extract student id and client id
+        $client_id = $this->getOrCreateClientIdByName(
+          $clientFirstName,
+        );
+        $student_id = $this->getOrCreateStudentIdByName(
+          $studentFirstName,
+        );
       } else {
         var_dump("Skipping event with invalid student/client: $subject<br>");
         continue;
       }
 
-      // TODO determine buyer
+      // determine buyer
+      switch ($source) {
+        case 'MyTutor':
+          $buyer_id = 'MYTUTORWEB LIMITED';
+          break;
+        case 'Tutorful':
+          $buyer_id = 'TUTORA LTD';
+          break;
+        case 'Spires':
+          $buyer_id = 'SOTC LTD';
+          break;
+        case 'TutorRecruiter':
+          $buyer_id = 'TUTORCRUNCHER LTD';
+          break;
+        case 'Superprof':
+          $buyer_id = 'PAYPAL';
+          break;
+        case 'private':
+          $buyer_id = 'PRIVATE';
+          break;
+        default:
+          var_dump("Skipping event with unknown source: $subject<br>");
+          continue 2;
+      }
 
       // extract start time
       $startDateTime = $event['start']['dateTime'];
@@ -839,7 +900,7 @@ class Database
         ($end_dt->getTimestamp() - $start_dt->getTimestamp()) / 60
       );
       if ($duration_minutes === 60) {
-        $duration_minutes = 55; // standardize to 55 minutes
+        $duration_minutes = 55; // standardise to 55 minutes
       }
 
       // determine if this is part of a recurring series
@@ -856,9 +917,9 @@ class Database
           'duration_minutes' => $duration_minutes,
           'repeat_weeks' => $repeat_weeks,
           'price_gbp_pence' => $price_gbp_pence,
-          'student_id' => null, // TODO
-          'client_id' => null, // TODO
-          'buyer_id' => null, // TODO
+          'student_id' => $student_id,
+          'client_id' => $client_id,
+          'buyer_id' => $buyer_id,
         ]
       );
     }
