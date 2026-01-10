@@ -18,28 +18,61 @@ use Relnaggar\Veloz\{
 use RmsyMe\{
   Services\Database,
   Services\Login,
+  Services\Invoice,
+  Services\Calendar,
   Components\Alert,
   Models\Buyer,
   Models\Student,
+  Models\Client as ClientModel,
+  Repositories\UserRepository,
+  Repositories\PaymentRepository,
+  Repositories\BuyerRepository,
+  Repositories\ClientRepository,
+  Repositories\StudentRepository,
+  Repositories\LessonRepository,
 };
 
 class Client extends AbstractController
 {
   private Login $loginService;
   private Database $databaseService;
+  private Invoice $invoiceService;
+  private Calendar $calendarService;
   private RouterInterface $router;
+  private UserRepository $userRepository;
+  private PaymentRepository $paymentRepository;
+  private BuyerRepository $buyerRepository;
+  private ClientRepository $clientRepository;
+  private StudentRepository $studentRepository;
+  private LessonRepository $lessonRepository;
 
   public function __construct(
     array $decorators,
     Login $loginService,
     Database $databaseService,
+    Invoice $invoiceService,
+    Calendar $calendarService,
     RouterInterface $router,
+    UserRepository $userRepository,
+    PaymentRepository $paymentRepository,
+    BuyerRepository $buyerRepository,
+    ClientRepository $clientRepository,
+    StudentRepository $studentRepository,
+    LessonRepository $lessonRepository,
   )
   {
     parent::__construct($decorators);
     $this->loginService = $loginService;
     $this->databaseService = $databaseService;
+    $this->invoiceService = $invoiceService;
+    $this->calendarService = $calendarService;
     $this->router = $router;
+    $this->userRepository = $userRepository;
+    $this->paymentRepository = $paymentRepository;
+    $this->buyerRepository = $buyerRepository;
+    $this->clientRepository = $clientRepository;
+    $this->studentRepository = $studentRepository;
+    $this->lessonRepository = $lessonRepository;
   }
 
   private function authenticate(): int
@@ -57,7 +90,7 @@ class Client extends AbstractController
   {
     $loggedInUserId = $this->authenticate();
     try {
-      $userEmail = $this->databaseService->getUserEmail($loggedInUserId);
+      $userEmail = $this->userRepository->selectEmail($loggedInUserId);
     } catch (PDOException $e) {
       return $this->databaseService->getDatabaseErrorPage($this, $e);
     }
@@ -73,7 +106,7 @@ class Client extends AbstractController
   private function getPayments(array &$templateVars): void
   {
     try {
-      $templateVars['payments'] = $this->databaseService->getPayments();
+      $templateVars['payments'] = $this->paymentRepository->selectAll();
     } catch (PDOException $e) {
       error_log($e->getMessage());
       $templateVars['alert'] = new Alert(
@@ -157,7 +190,9 @@ class Client extends AbstractController
 
     // import payments from CSV
     try {
-      if (!$this->databaseService->importPayments($_FILES[$formName]['tmp_name'][$fieldName])) {
+      if (!$this->paymentRepository->importFromCsv(
+        $_FILES[$formName]['tmp_name'][$fieldName]
+      )) {
         $templateVars['alert']->message = <<<HTML
           Failed to import payments from the CSV file.
           Please ensure the file is correctly formatted.
@@ -216,7 +251,7 @@ class Client extends AbstractController
 
     // verify buyer exists
     try {
-      $buyer = $this->databaseService->getBuyer(urldecode($encodedBuyerId));
+      $buyer = $this->buyerRepository->selectById(urldecode($encodedBuyerId));
       if ($buyer === null) {
         return $this->router->getPageNotFound()->getPage();
       }
@@ -241,7 +276,7 @@ class Client extends AbstractController
 
     // verify buyer exists
     try {
-      $buyer = $this->databaseService->getBuyer(urldecode($encodedBuyerId));
+      $buyer = $this->buyerRepository->selectById(urldecode($encodedBuyerId));
       if ($buyer === null) {
         return $this->router->getPageNotFound()->getPage();
       }
@@ -273,7 +308,7 @@ class Client extends AbstractController
 
     // update buyer in database
     try {
-      $this->databaseService->updateBuyer($formData);
+      $this->buyerRepository->update($formData);
     } catch (PDOException $e) {
       error_log($e->getMessage());
       $templateVars['alert']->message = <<<HTML
@@ -302,7 +337,7 @@ class Client extends AbstractController
 
     // verify invoice exists
     try {
-      if (!$this->databaseService->doesInvoiceExist($invoiceNumber)) {
+      if (!$this->invoiceService->doesInvoiceExist($invoiceNumber)) {
         return $this->router->getPageNotFound()->getPage();
       }
     } catch (PDOException $e) {
@@ -315,7 +350,7 @@ class Client extends AbstractController
       'Content-Disposition: inline; '
       . "filename=\"$invoiceNumber.pdf\""
     );
-    echo $this->databaseService->generateInvoicePdf($invoiceNumber);
+    echo $this->invoiceService->generateInvoicePdf($invoiceNumber);
     exit;
 
     return Page::empty();
@@ -325,8 +360,8 @@ class Client extends AbstractController
   {
     $this->authenticate();
 
-    $this->databaseService->importLessonsFromCalendar();
-    $lessons = $this->databaseService->getLessons();
+    $this->calendarService->importLessonsFromCalendar();
+    $lessons = $this->lessonRepository->selectAll();
 
     return $this->getPage(
       relativeBodyTemplatePath: __FUNCTION__,
@@ -342,7 +377,7 @@ class Client extends AbstractController
     $this->authenticate();
 
     try {
-      $buyers = $this->databaseService->getBuyers();
+      $buyers = $this->buyerRepository->selectAll();
     } catch (PDOException $e) {
       return $this->databaseService->getDatabaseErrorPage($this, $e);
     }
@@ -361,7 +396,7 @@ class Client extends AbstractController
     $this->authenticate();
 
     try {
-      $clients = $this->databaseService->getClients();
+      $clients = $this->clientRepository->selectAll();
     } catch (PDOException $e) {
       return $this->databaseService->getDatabaseErrorPage($this, $e);
     }
@@ -380,7 +415,7 @@ class Client extends AbstractController
     $this->authenticate();
 
     try {
-      $students = $this->databaseService->getStudents();
+      $students = $this->studentRepository->selectAll();
     } catch (PDOException $e) {
       return $this->databaseService->getDatabaseErrorPage($this, $e);
     }
@@ -411,7 +446,7 @@ class Client extends AbstractController
 
     // verify student exists
     try {
-      $student = $this->databaseService->getStudent($studentId);
+      $student = $this->studentRepository->selectById($studentId);
       if ($student === null) {
         return $this->router->getPageNotFound()->getPage();
       }
@@ -437,7 +472,7 @@ class Client extends AbstractController
 
     // verify student exists
     try {
-      $student = $this->databaseService->getStudent($studentId);
+      $student = $this->studentRepository->selectById($studentId);
       if ($student === null) {
         return $this->router->getPageNotFound()->getPage();
       }
@@ -470,7 +505,7 @@ class Client extends AbstractController
 
     // update student in database
     try {
-      $this->databaseService->updateStudent($formData);
+      $this->studentRepository->update($formData);
     } catch (PDOException $e) {
       error_log($e->getMessage());
       $templateVars['alert']->message = <<<HTML
@@ -486,6 +521,104 @@ class Client extends AbstractController
       message: <<<HTML
         <p>
           The student has been updated successfully!
+        </p>
+      HTML
+    );
+
+    return $this->getPage($templatePath, $templateVars);
+  }
+
+  private function getClientTemplateVars(int $clientId): array
+  {
+    return [
+      'title' => 'Client Details',
+      'clientId' => $clientId,
+      'formName' => 'clientForm',
+    ];
+  }
+
+  public function client(string $clientIdString): Page
+  {
+    $this->authenticate();
+    $clientId = (int) $clientIdString;
+    $templateVars = $this->getClientTemplateVars($clientId);
+    // verify client exists
+    try {
+      $client = $this->clientRepository->selectById($clientId);
+      if ($client === null) {
+        return $this->router->getPageNotFound()->getPage();
+      }
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
+
+    // pre-fill form data
+    $_POST[$templateVars['formName']] = (array) $client;
+
+    return $this->getPage(
+      relativeBodyTemplatePath: __FUNCTION__,
+      templateVars: $templateVars
+    );
+  }
+
+  public function clientSubmit(string $clientIdString): Page
+  {
+    $this->authenticate();
+    $clientId = (int) $clientIdString;
+    $templateVars = $this->getClientTemplateVars($clientId);
+    $templatePath = 'client';
+
+    // verify client exists
+    try {
+      $client = $this->clientRepository->selectById($clientId);
+      if ($client === null) {
+        return $this->router->getPageNotFound()->getPage();
+      }
+    } catch (PDOException $e) {
+      return $this->databaseService->getDatabaseErrorPage($this, $e);
+    }
+
+    // display error alert by default
+    $templateVars['alert'] = new Alert(
+      type: 'danger',
+      title: 'Update failed!',
+      message: <<<HTML
+        There was an error submitting the client form but it's not clear why.
+      HTML
+    );
+
+    // display error alert if form not submitted
+    if (!isset($_POST['submit']) || !isset($_POST[$templateVars['formName']])) {
+      return $this->getPage($templatePath, $templateVars);
+    }
+
+    // validate form data
+    $_POST[$templateVars['formName']]['id'] = $clientId;
+    $formData = new ClientModel($_POST[$templateVars['formName']]);
+    $errors = $formData->validate();
+    if (!empty($errors)) {
+      $templateVars['alert']->message = $errors[array_key_first($errors)];
+      return $this->getPage($templatePath, $templateVars);
+    }
+
+    // update client in database
+    try {
+      $this->clientRepository->update($formData);
+    } catch (PDOException $e) {
+      error_log($e->getMessage());
+      $templateVars['alert']->message = <<<HTML
+        There was a database error while attempting to update the client.
+      HTML;
+      return $this->getPage($templatePath, $templateVars);
+    }
+
+    // success
+    $templateVars['alert'] = new Alert(
+      type: 'success',
+      title: 'Update successful!',
+      message: <<<HTML
+        <p>
+          The client has been updated successfully!
         </p>
       HTML
     );

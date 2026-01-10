@@ -147,6 +147,13 @@ class App extends AbstractApp
         '/client/clients' => [
           'GET' => new ControllerAction(Controllers\Client::class, 'clients'),
         ],
+        '/client/clients/<clientIdString>' => [
+          'GET' => new ControllerAction(Controllers\Client::class, 'client'),
+          'POST' => new ControllerAction(
+            Controllers\Client::class,
+            'clientSubmit'
+          ),
+        ],
         '/client/buyers/<encodedBuyerId>' => [
           'GET' => new ControllerAction(Controllers\Client::class, 'buyer'),
           'POST' => new ControllerAction(

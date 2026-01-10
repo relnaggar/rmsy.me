@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace RmsyMe\Services;
 
 use PDOException;
-use RmsyMe\Services\Database;
+use RmsyMe\Repositories\UserRepository;
 
 class Login
 {
-  private Database $databaseService;
+  private UserRepository $userRepository;
 
-  public function __construct(Database $databaseService)
+  public function __construct(UserRepository $userRepository)
   {
     if (session_status() === PHP_SESSION_NONE) {
       session_start();
     }
-    $this->databaseService = $databaseService;
+    $this->userRepository = $userRepository;
   }
 
   /**
@@ -29,7 +29,7 @@ class Login
    */
   public function login(string $email, string $password): bool
   {
-    $userId = $this->databaseService->getUserId($email, $password);
+    $userId = $this->userRepository->selectIdByEmailPassword($email, $password);
     if ($userId === null) {
       return false;
     } else {

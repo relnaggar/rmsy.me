@@ -9,7 +9,11 @@
     <tbody>
       <?php foreach ($clients as $client): ?>
       <tr>
-        <td><?= htmlspecialchars($client['id']) ?></td>
+        <td>
+          <a href="/client/clients/<?= $client['id'] ?>">
+            <?= $client['id'] ?>
+          </a>
+        </td>
         <td><?= htmlspecialchars($client['name']) ?></td>
       </tr>
       <?php endforeach; ?>

@@ -20,9 +20,33 @@
         <td><?= $lesson->repeat_weeks ?></td>
         <td><?= $lesson->getPriceGbp() ?></td>
         <td><?= $lesson->paid ? 'Yes' : 'No' ?></td>
-        <td><?= $lesson->student_id !== null ? $lesson->student_id : 'N/A' ?></td>
-        <td><?= $lesson->client_id !== null ? $lesson->client_id : 'N/A' ?></td>
-        <td><?= $lesson->buyer_id !== null ? htmlspecialchars($lesson->buyer_id) : 'N/A' ?></td>
+        <td>
+          <?php if ($lesson->student_id !== null): ?>
+            <a href="/client/students/<?= $lesson->student_id ?>">
+              <?= $lesson->student_id ?>
+            </a>
+          <?php else: ?>
+            N/A
+          <?php endif; ?>
+        </td>
+        <td>
+          <?php if ($lesson->client_id !== null): ?>
+            <a href="/client/clients/<?= $lesson->client_id ?>">
+              <?= $lesson->client_id ?>
+            </a>
+          <?php else: ?>
+            N/A
+          <?php endif; ?>
+        </td>
+        <td>
+          <?php if ($lesson->buyer_id !== null): ?>
+            <a href="/client/buyers/<?= urlencode($lesson->buyer_id) ?>">
+              <?= htmlspecialchars($lesson->buyer_id) ?>
+            </a>
+          <?php else: ?>
+            N/A
+          <?php endif; ?>
+        </td>
       </tr>
       <?php endforeach; ?>
     </tbody>

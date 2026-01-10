@@ -61,7 +61,7 @@
             $total_gbp += $line_total;
           ?>
           <tr class="<?= $i % 2 === 0 ? 'bg-body-secondary' : '' ?>">
-            <td class="text-start"><?= htmlspecialchars($item['date']) ?></td>
+            <td class="text-start"><?= $item['date'] ?></td>
             <?php if (isset($item['student']) && isset($item['client'])): ?>
               <td class="text-start">
                 <div><?= htmlspecialchars($item['service']) ?></div>
@@ -69,10 +69,14 @@
                 <div>Cliente: <?= htmlspecialchars($item['client']) ?></div>
               </td>
             <?php else: ?>
-              <td class="text-start"><?= htmlspecialchars($item['service']) ?></td>
+              <td class="text-start">
+                <?= htmlspecialchars($item['service']) ?>
+              </td>
             <?php endif; ?>
             <td class="text-end"><?= (int)$item['qty'] ?></td>
-            <td class="text-end"><?= $formatCurrency($item['unit_price'], 'GBP') ?></td>
+            <td class="text-end">
+              <?= $formatCurrency($item['unit_price'], 'GBP') ?>
+            </td>
             <td class="text-end"><?= $formatCurrency($line_total, 'GBP') ?></td>
           </tr>
         <?php endfor; ?>
@@ -108,7 +112,9 @@
         </tr>
         <tr class="fw-bold">
           <td class="text-primary pb-3">Importe total</td>
-          <td class="text-end pb-3"><?= $formatCurrency($total_gbp, 'GBP') ?></td>
+          <td class="text-end pb-3">
+            <?= $formatCurrency($total_gbp, 'GBP') ?>
+          </td>
         </tr>
         <tr>
           <td class="text-primary">Importe pagado</td>

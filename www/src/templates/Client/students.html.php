@@ -8,14 +8,14 @@
     </thead>
     <tbody>
       <?php foreach ($students as $student): ?>
-      <tr>
-        <td>
-          <a href="/client/students/<?= htmlspecialchars($student['id']) ?>">
-            <?= htmlspecialchars($student['id']) ?>
-          </a>
-        </td>
-        <td><?= htmlspecialchars($student['name']) ?></td>
-      </tr>
+        <tr>
+          <td>
+            <a href="/client/students/<?= $student->id ?>">
+              <?= $student->id ?>
+            </a>
+          </td>
+          <td><?= htmlspecialchars($student->name) ?></td>
+        </tr>
       <?php endforeach; ?>
     </tbody>
   </table>
