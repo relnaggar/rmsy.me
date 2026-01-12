@@ -5,7 +5,7 @@ import { getCurrentUser } from "./auth.js";
 
 const db = new Dexie("cacana-db");
 
-db.version(1).stores({ // change version number when changing db schema e.g. adding stores or indexes
+db.version(2).stores({ // change version number when changing db schema e.g. adding stores or indexes
   cacas: "uuid, createdAt, deletedAt, updatedAt",
   outbox: "++localId, uuid, table, entityUuid, timestamp, action", // for pending operations to sync
   meta: "key, value", // latestTimestamp, userColour
