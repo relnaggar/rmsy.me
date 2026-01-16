@@ -14,14 +14,14 @@ use Relnaggar\Veloz\{
   Views\Page,
 };
 use RmsyMe\Services\{
-  Secrets,
-  ApiClient,
+  SecretsService,
+  ApiClientService,
 };
 
-class Auth extends AbstractController
+class AuthController extends AbstractController
 {
-  private Secrets $secretsService;
-  private ApiClient $apiClientService;
+  private SecretsService $secretsService;
+  private ApiClientService $apiClientService;
   private string $clientId;
   private string $clientSecret;
   private string $redirectUri;
@@ -31,8 +31,8 @@ class Auth extends AbstractController
   private ?Client $client;
 
   public function __construct(
-    Secrets $secretsService,
-    ApiClient $apiClientService,
+    SecretsService $secretsService,
+    ApiClientService $apiClientService,
   ) {
     if (session_status() === PHP_SESSION_NONE) {
       session_start();

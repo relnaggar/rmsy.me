@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace RmsyMe\Data;
 
+use Exception;
+
 class NavItem
 {
   public readonly string $text;
@@ -90,7 +92,7 @@ class NavItem
   public function addDropdownItem(NavItem $item): void
   {
     if ($item->isDropdown()) {
-      throw new \Exception('Cannot add a dropdown item to a dropdown item');
+      throw new Exception('Cannot add a dropdown item to a dropdown item');
     }
     $item->addBasePath($this->path);
     $this->dropdownItems[] = $item;

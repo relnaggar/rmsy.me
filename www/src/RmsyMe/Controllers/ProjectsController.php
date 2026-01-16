@@ -9,9 +9,9 @@ use Relnaggar\Veloz\{
   Views\Page,
   Routing\RouterInterface,
 };
-use RmsyMe\Services\Projects as ProjectsService;
+use RmsyMe\Services\ProjectsService;
 
-class Projects extends AbstractController
+class ProjectsController extends AbstractController
 {
   private ProjectsService $projectsService;
   private RouterInterface $router;

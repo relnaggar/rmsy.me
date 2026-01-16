@@ -9,13 +9,12 @@ use PHPMailer\PHPMailer\{
   SMTP,
   Exception,
 };
-use RmsyMe\Services\Secrets;
 
-class Mailer
+class MailerService
 {
-  private Secrets $secretsService;
+  private SecretsService $secretsService;
 
-  public function __construct(Secrets $secretsService)
+  public function __construct(SecretsService $secretsService)
   {
     $this->secretsService = $secretsService;
   }

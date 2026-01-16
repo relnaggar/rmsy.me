@@ -4,21 +4,25 @@ declare(strict_types=1);
 
 namespace RmsyMe\Controllers;
 
+use DateTime;
+use NumberFormatter;
 use Relnaggar\Veloz\{
   Controllers\AbstractController,
   Views\Page,
 };
 use RmsyMe\{
-  Services\Projects,
+  Services\ProjectsService,
   Data\Image,
 };
 
-class Site extends AbstractController
+class SiteController extends AbstractController
 {
-  private Projects $projectsService;
+  private ProjectsService $projectsService;
 
-  public function __construct(array $decorators, Projects $projectsService)
-  {
+  public function __construct(
+    array $decorators,
+    ProjectsService $projectsService,
+  ) {
     parent::__construct($decorators);
     $this->projectsService = $projectsService;
   }
@@ -26,10 +30,10 @@ class Site extends AbstractController
   public function index(): Page
   {
     // calculate the number of years tutoring
-    $currentDate = new \DateTime();
-    $tutoringStartDate = new \DateTime('2019-01-01');
+    $currentDate = new DateTime();
+    $tutoringStartDate = new DateTime('2019-01-01');
     $numberOfYearsTutoring = $currentDate->diff($tutoringStartDate)->y;
-    $formatter = new \NumberFormatter("en", \NumberFormatter::SPELLOUT);
+    $formatter = new NumberFormatter("en", NumberFormatter::SPELLOUT);
     $numberOfYearsTutoringAsWord = ucfirst(
       $formatter->format($numberOfYearsTutoring)
     );
@@ -125,8 +129,9 @@ class Site extends AbstractController
     $fullTemplateFilePath = $this->getFullTemplateFilePath(
       $relativeTemplatePath
     );
+    error_log("Full template file path: " . $fullTemplateFilePath);
     $lastModifiedTimestamp = filemtime($fullTemplateFilePath);
-    $lastModifiedDate = (new \DateTime())->setTimestamp($lastModifiedTimestamp);
+    $lastModifiedDate = (new DateTime())->setTimestamp($lastModifiedTimestamp);
     $lastModifiedDateFormatted = $lastModifiedDate->format('F Y');
 
     return $this->getPage(

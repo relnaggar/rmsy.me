@@ -11,7 +11,7 @@ use Relnaggar\Veloz\{
   Controllers\AbstractController,
 };
 
-class Database
+class DatabaseService
 {
   private ?PDO $pdo;
 

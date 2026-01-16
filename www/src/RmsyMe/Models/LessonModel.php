@@ -6,7 +6,7 @@ namespace RmsyMe\Models;
 
 use DateTime;
 
-class Lesson
+class LessonModel
 {
   public readonly int $id;
   public readonly string $description;

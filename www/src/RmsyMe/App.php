@@ -17,62 +17,74 @@ class App extends AbstractApp
   public function getDecoratorMap(): array
   {
     return [
-      Controllers\Site::class => [
-        Decorators\ExtendedTitle::class,
-        Decorators\Nav::class,
-        Decorators\MediaRoot::class,
+      Controllers\SiteController::class => [
+        Decorators\ExtendedTitleDecorator::class,
+        Decorators\NavDecorator::class,
+        Decorators\MediaRootDecorator::class,
       ],
-      Controllers\Contact::class => [
-        Decorators\ExtendedTitle::class,
-        Decorators\Nav::class,
+      Controllers\ContactController::class => [
+        Decorators\ExtendedTitleDecorator::class,
+        Decorators\NavDecorator::class,
       ],
-      Controllers\Projects::class => [
-        Decorators\ExtendedTitle::class,
-        Decorators\Nav::class,
-        Decorators\MediaRoot::class,
-        Decorators\Sidebar::class,
+      Controllers\ProjectsController::class => [
+        Decorators\ExtendedTitleDecorator::class,
+        Decorators\NavDecorator::class,
+        Decorators\MediaRootDecorator::class,
+        Decorators\SidebarDecorator::class,
       ],
-      Controllers\Login::class => [
-        Decorators\ExtendedTitle::class,
-        Decorators\Nav::class,
+      Controllers\LoginController::class => [
+        Decorators\ExtendedTitleDecorator::class,
+        Decorators\NavDecorator::class,
       ],
-      Controllers\Client::class => [
-        Decorators\ExtendedTitle::class,
-        Decorators\Nav::class,
-        Decorators\Sidebar::class,
+      Controllers\ClientController::class => [
+        Decorators\ExtendedTitleDecorator::class,
+        Decorators\NavDecorator::class,
+        Decorators\SidebarDecorator::class,
       ],
     ];
   }
 
   public function getRouter(): RouterInterface
   {
-    $mediaService = new Services\Media();
+    $mediaService = new Services\MediaService();
 
     return new BasicRouter(
       routes: [
         '/' => [
-          'GET' => new ControllerAction(Controllers\Site::class, 'index'),
+          'GET' => new ControllerAction(
+            Controllers\SiteController::class,
+            'index'
+          ),
         ],
         '/about' => [
-          'GET' => new ControllerAction(Controllers\Site::class, 'about'),
+          'GET' => new ControllerAction(
+            Controllers\SiteController::class,
+            'about'
+          ),
         ],
         // '/services/engineer' => [
         //   'GET' => new ControllerAction(
-        //     Controllers\Services::class,
+        //     Controllers\ServicesController::class,
         //     'engineer'
         //   ),
         // ],
         // '/services/educator' => [
         //   'GET' => new ControllerAction(
-        //     Controllers\Services::class,
+        //     Controllers\ServicesController::class,
         //     'educator'
         //   ),
         // ],
         '/projects/' => [
-          'GET' => new ControllerAction(Controllers\Projects::class, 'index'),
+          'GET' => new ControllerAction(
+            Controllers\ProjectsController::class,
+            'index'
+          ),
         ],
         '/projects/<projectSlug>' => [
-          'GET' => new ControllerAction(Controllers\Projects::class, 'show'),
+          'GET' => new ControllerAction(
+            Controllers\ProjectsController::class,
+            'show'
+          ),
         ],
         '/free-meeting' => [
           'GET' => new Redirect('https://calendly.com/relnaggar/free-meeting'),
@@ -97,97 +109,127 @@ class App extends AbstractApp
         ],
         '/contact' => [
           'GET' => new ControllerAction(
-            Controllers\Contact::class,
+            Controllers\ContactController::class,
             'contact'
           ),
           'POST' => new ControllerAction(
-            Controllers\Contact::class,
+            Controllers\ContactController::class,
             'contactSubmit'
           ),
         ],
         '/client/login' => [
           'GET' => new ControllerAction(
-            Controllers\Login::class,
+            Controllers\LoginController::class,
             'login'
           ),
           'POST' => new ControllerAction(
-            Controllers\Login::class,
+            Controllers\LoginController::class,
             'loginSubmit'
           ),
         ],
         '/client/logout' => [
           'GET' => new ControllerAction(
-            Controllers\Login::class,
+            Controllers\LoginController::class,
             'logout'
           ),
         ],
         '/client/' => [
-          'GET' => new ControllerAction(Controllers\Client::class, 'index'),
+          'GET' => new ControllerAction(
+            Controllers\ClientController::class,
+            'index'
+          ),
         ],
         '/client/payments' => [
-          'GET' => new ControllerAction(Controllers\Client::class, 'payments'),
+          'GET' => new ControllerAction(
+            Controllers\ClientController::class,
+            'payments'
+          ),
           'POST' => new ControllerAction(
-            Controllers\Client::class,
+            Controllers\ClientController::class,
             'paymentsSubmit'
           ),
         ],
         '/client/buyers' => [
-          'GET' => new ControllerAction(Controllers\Client::class, 'buyers'),
+          'GET' => new ControllerAction(
+            Controllers\ClientController::class,
+            'buyers'
+          ),
         ],
         '/client/students' => [
-          'GET' => new ControllerAction(Controllers\Client::class, 'students'),
+          'GET' => new ControllerAction(
+            Controllers\ClientController::class,
+            'students'
+          ),
         ],
         '/client/students/<studentIdString>' => [
-          'GET' => new ControllerAction(Controllers\Client::class, 'student'),
+          'GET' => new ControllerAction(
+            Controllers\ClientController::class,
+            'student'
+          ),
           'POST' => new ControllerAction(
-            Controllers\Client::class,
+            Controllers\ClientController::class,
             'studentSubmit'
           ),
         ],
         '/client/clients' => [
-          'GET' => new ControllerAction(Controllers\Client::class, 'clients'),
+          'GET' => new ControllerAction(
+            Controllers\ClientController::class,
+            'clients'
+          ),
         ],
         '/client/clients/<clientIdString>' => [
-          'GET' => new ControllerAction(Controllers\Client::class, 'client'),
+          'GET' => new ControllerAction(
+            Controllers\ClientController::class,
+            'client'
+          ),
           'POST' => new ControllerAction(
-            Controllers\Client::class,
+            Controllers\ClientController::class,
             'clientSubmit'
           ),
         ],
         '/client/buyers/<encodedBuyerId>' => [
-          'GET' => new ControllerAction(Controllers\Client::class, 'buyer'),
+          'GET' => new ControllerAction(
+            Controllers\ClientController::class,
+            'buyer'
+          ),
           'POST' => new ControllerAction(
-            Controllers\Client::class,
+            Controllers\ClientController::class,
             'buyerSubmit'
           ),
         ],
         '/client/invoices/<invoiceNumber>' => [
-          'GET' => new ControllerAction(Controllers\Client::class, 'invoice'),
+          'GET' => new ControllerAction(
+            Controllers\ClientController::class,
+            'invoice'
+          ),
         ],
         '/client/lessons' => [
-          'GET' => new ControllerAction(Controllers\Client::class, 'lessons'),
+          'GET' => new ControllerAction(
+            Controllers\ClientController::class,
+            'lessons'
+          ),
         ],
         '/wise-deposit' => [
           'POST' => new ControllerAction(
-            Controllers\Site::class,
+            Controllers\SiteController::class,
             'wiseDeposit'
           ),
         ],
         '/auth/callback' => [
           'GET' => new ControllerAction(
-            Controllers\Auth::class,
+            Controllers\AuthController::class,
             'callback'
           ),
         ],
         '/auth/login' => [
           'GET' => new ControllerAction(
-            Controllers\Auth::class,
+            Controllers\AuthController::class,
             'login'
           ),
         ],
       ],
       pageNotFound: new ControllerAction(
-        Controllers\Site::class,
+        Controllers\SiteController::class,
         'pageNotFound'
       ),
     );

@@ -10,7 +10,7 @@ use PrinsFrank\Standards\{
   Language\LanguageAlpha2,
 };
 
-class Buyer extends AbstractFormData
+class BuyerModel extends AbstractFormData
 {
   public string $id;
   public string $name;

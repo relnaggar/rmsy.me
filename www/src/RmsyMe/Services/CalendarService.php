@@ -6,23 +6,22 @@ namespace RmsyMe\Services;
 
 use DateTime;
 use PDO;
-use RmsyMe\Services\Database;
-use RmsyMe\Controllers\Auth;
-use RmsyMe\Repositories\{
-  ClientRepository,
-  StudentRepository,
+use RmsyMe\{
+  Controllers\AuthController,
+  Repositories\ClientRepository,
+  Repositories\StudentRepository,
 };
 
-class Calendar
+class CalendarService
 {
   private PDO $pdo;
-  private Auth $authController;
+  private AuthController $authController;
   private ClientRepository $clientRepository;
   private StudentRepository $studentRepository;
 
   public function __construct(
-    Database $databaseService,
-    Auth $authController,
+    DatabaseService $databaseService,
+    AuthController $authController,
     ClientRepository $clientRepository,
     StudentRepository $studentRepository,
   ) {

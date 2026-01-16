@@ -4,24 +4,27 @@ declare(strict_types=1);
 
 namespace RmsyMe\Repositories;
 
-use RmsyMe\Services\Database;
-use RmsyMe\Models\Client;
+use RmsyMe\{
+  Services\DatabaseService,
+  Models\ClientModel,
+};
 
 class ClientRepository extends AbstractRepository
 {
-  public function __construct(Database $databaseService)
+  public function __construct(DatabaseService $databaseService)
   {
     parent::__construct($databaseService);
     $this->tableName = 'clients';
+    $this->modelClass = ClientModel::class;
   }
 
   /**
    * Update a client in the clients table.
    * 
-   * @param Client $client The Client object to update.
+   * @param ClientModel $client The Client object to update.
    * @throws PDOException If there is a database error.
    */
-  public function update(Client $client): void
+  public function update(ClientModel $client): void
   {
     $stmt = $this->pdo->prepare(<<<SQL
       UPDATE {$this->tableName}

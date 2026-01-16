@@ -7,7 +7,7 @@ namespace RmsyMe\Services;
 use PDOException;
 use RmsyMe\Repositories\UserRepository;
 
-class Login
+class LoginService
 {
   private UserRepository $userRepository;
 

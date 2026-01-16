@@ -9,7 +9,7 @@ use RmsyMe\Data\{
   Source,
 };
 
-class Projects
+class ProjectsService
 {
   private array $projects;
 

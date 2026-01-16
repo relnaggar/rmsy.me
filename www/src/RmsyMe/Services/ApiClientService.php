@@ -7,7 +7,7 @@ namespace RmsyMe\Services;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 
-class ApiClient
+class ApiClientService
 {
   private $client;
 

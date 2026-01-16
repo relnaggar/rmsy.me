@@ -6,36 +6,37 @@ namespace RmsyMe\Services;
 
 use PDOException;
 use InvalidArgumentException;
-use Dompdf\Dompdf;
-use Dompdf\Options;
+use Dompdf\{
+  Dompdf,
+  Options,
+};
 use PrinsFrank\Standards\{
   Country\CountryAlpha2,
   Language\LanguageAlpha2,
 };
 use Relnaggar\Veloz\Views\Page;
-use RmsyMe\Repositories\{
-  BuyerRepository,
-  PaymentRepository,
-  ExchangeRateRepository,
+use RmsyMe\{
+  Repositories\BuyerRepository,
+  Repositories\PaymentRepository,
+  Repositories\ExchangeRateRepository,
 };
-use RmsyMe\Services\Secrets;
 
-class Invoice
+class InvoiceService
 {
-  private Secrets $secretsService;
+  private SecretsService $secretsService;
   private PaymentRepository $paymentRepository;
-  private BuyerRepository $buyerRepositry;
+  private BuyerRepository $buyerRepository;
   private ExchangeRateRepository $exchangeRateRepository;
 
   public function __construct(
-    Secrets $secretsService,
+    SecretsService $secretsService,
     PaymentRepository $paymentRepository,
-    BuyerRepository $buyerRepositry,
+    BuyerRepository $buyerRepository,
     ExchangeRateRepository $exchangeRateRepository,
   ) {
     $this->secretsService = $secretsService;
     $this->paymentRepository = $paymentRepository;
-    $this->buyerRepositry = $buyerRepositry;
+    $this->buyerRepository = $buyerRepository;
     $this->exchangeRateRepository = $exchangeRateRepository;
   }
 
@@ -121,7 +122,7 @@ class Invoice
     }
 
     // find the buyer
-    $buyer = $this->buyerRepositry->selectById($matchingPayment->buyer_id);
+    $buyer = $this->buyerRepository->selectById($matchingPayment->buyer_id);
     if ($buyer === null) {
       throw new PDOException('Buyer not found');
     }

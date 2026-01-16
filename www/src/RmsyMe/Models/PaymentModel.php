@@ -6,7 +6,7 @@ namespace RmsyMe\Models;
 
 use DateTime;
 
-class Payment
+class PaymentModel
 {
   public readonly string $id;
   public readonly string $datetime;

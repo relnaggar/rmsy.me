@@ -10,27 +10,27 @@ use Relnaggar\Veloz\{
   Views\Page,
 };
 use RmsyMe\{
-  Services\ContactMethods,
-  Services\Mailer,
-  Forms\Contact as ContactForm,
-  Services\ApiClient,
-  Services\Secrets,
+  Services\ContactMethodsService,
+  Services\MailerService,
+  Forms\ContactForm,
+  Services\ApiClientService,
+  Services\SecretsService,
   Components\Alert,
 };
 
-class Contact extends AbstractController
+class ContactController extends AbstractController
 {
-  private ContactMethods $contactMethodsService;
-  private Mailer $mailerService;
-  private ApiClient $apiClientService;
-  private Secrets $secretsService;
+  private ContactMethodsService $contactMethodsService;
+  private MailerService $mailerService;
+  private ApiClientService $apiClientService;
+  private SecretsService $secretsService;
 
   public function __construct(
     array $decorators,
-    ContactMethods $contactMethodsService,
-    Mailer $mailerService,
-    ApiClient $apiClientService,
-    Secrets $secretsService,
+    ContactMethodsService $contactMethodsService,
+    MailerService $mailerService,
+    ApiClientService $apiClientService,
+    SecretsService $secretsService,
   ) {
     parent::__construct($decorators);
     $this->contactMethodsService = $contactMethodsService;

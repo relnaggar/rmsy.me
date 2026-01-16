@@ -6,11 +6,11 @@ namespace RmsyMe\Repositories;
 
 use PDO;
 use PDOException;
-use RmsyMe\Services\Database;
+use RmsyMe\Services\DatabaseService;
 
 class UserRepository extends AbstractRepository
 {
-  public function __construct(Database $databaseService)
+  public function __construct(DatabaseService $databaseService)
   {
     parent::__construct($databaseService);
     $this->tableName = 'users';

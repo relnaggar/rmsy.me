@@ -16,14 +16,14 @@ use Relnaggar\Veloz\{
   Routing\RouterInterface,
 };
 use RmsyMe\{
-  Services\Database,
-  Services\Login,
-  Services\Invoice,
-  Services\Calendar,
+  Services\DatabaseService,
+  Services\LoginService,
+  Services\InvoiceService,
+  Services\CalendarService,
   Components\Alert,
-  Models\Buyer,
-  Models\Student,
-  Models\Client as ClientModel,
+  Models\BuyerModel,
+  Models\StudentModel,
+  Models\ClientModel,
   Repositories\UserRepository,
   Repositories\PaymentRepository,
   Repositories\BuyerRepository,
@@ -32,12 +32,12 @@ use RmsyMe\{
   Repositories\LessonRepository,
 };
 
-class Client extends AbstractController
+class ClientController extends AbstractController
 {
-  private Login $loginService;
-  private Database $databaseService;
-  private Invoice $invoiceService;
-  private Calendar $calendarService;
+  private LoginService $loginService;
+  private DatabaseService $databaseService;
+  private InvoiceService $invoiceService;
+  private CalendarService $calendarService;
   private RouterInterface $router;
   private UserRepository $userRepository;
   private PaymentRepository $paymentRepository;
@@ -48,10 +48,10 @@ class Client extends AbstractController
 
   public function __construct(
     array $decorators,
-    Login $loginService,
-    Database $databaseService,
-    Invoice $invoiceService,
-    Calendar $calendarService,
+    LoginService $loginService,
+    DatabaseService $databaseService,
+    InvoiceService $invoiceService,
+    CalendarService $calendarService,
     RouterInterface $router,
     UserRepository $userRepository,
     PaymentRepository $paymentRepository,
@@ -299,7 +299,7 @@ class Client extends AbstractController
     }
 
     // validate form data
-    $formData = new Buyer($_POST[$templateVars['formName']]);
+    $formData = new BuyerModel($_POST[$templateVars['formName']]);
     $errors = $formData->validate();
     if (!empty($errors)) {
       $templateVars['alert']->message = $errors[array_key_first($errors)];
@@ -496,7 +496,7 @@ class Client extends AbstractController
 
     // validate form data
     $_POST[$templateVars['formName']]['id'] = $studentId;
-    $formData = new Student($_POST[$templateVars['formName']]);
+    $formData = new StudentModel($_POST[$templateVars['formName']]);
     $errors = $formData->validate();
     if (!empty($errors)) {
       $templateVars['alert']->message = $errors[array_key_first($errors)];

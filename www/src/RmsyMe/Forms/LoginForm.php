@@ -6,7 +6,7 @@ namespace RmsyMe\Forms;
 
 use Relnaggar\Veloz\Data\AbstractFormData;
 
-class Login extends AbstractFormData
+class LoginForm extends AbstractFormData
 {
   public string $email;
   public string $password;

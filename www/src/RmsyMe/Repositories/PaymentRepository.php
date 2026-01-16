@@ -4,24 +4,27 @@ declare(strict_types=1);
 
 namespace RmsyMe\Repositories;
 
+use DateTime;
 use PDO;
 use PDOException;
-use RmsyMe\Services\Database;
-use RmsyMe\Models\Payment;
+use RmsyMe\{
+  Services\DatabaseService,
+  Models\PaymentModel,
+};
 
 class PaymentRepository extends AbstractRepository
 {
-  public function __construct(Database $databaseService)
+  public function __construct(DatabaseService $databaseService)
   {
     parent::__construct($databaseService);
     $this->tableName = 'payments';
-    $this->modelClass = Payment::class;
+    $this->modelClass = PaymentModel::class;
   }
 
   /**
    * Get all payments ordered by datetime descending.
    * 
-   * @return Payment[] An array of Payment objects.
+   * @return PaymentModel[] An array of PaymentModel objects.
    * @throws PDOException If there is a database error.
    */
   #[\Override]
@@ -33,7 +36,7 @@ class PaymentRepository extends AbstractRepository
       ORDER BY datetime(datetime) DESC
     SQL);
     $stmt->execute();
-    $results = $stmt->fetchAll(PDO::FETCH_CLASS, Payment::class);
+    $results = $stmt->fetchAll(PDO::FETCH_CLASS, PaymentModel::class);
 
     return $results;
   }
@@ -196,7 +199,7 @@ class PaymentRepository extends AbstractRepository
    * Find payments by sequence number.
    * 
    * @param string $sequence_number The sequence number to search for.
-   * @return Payment[] An array of Payment objects.
+   * @return PaymentModel[] An array of PaymentModel objects.
    * @throws PDOException If there is a database error.
    */
   public function selectBySequenceNumber(string $sequence_number): array
@@ -207,7 +210,7 @@ class PaymentRepository extends AbstractRepository
       WHERE sequence_number = :sequence_number
     SQL);
     $stmt->execute(['sequence_number' => $sequence_number]);
-    $results = $stmt->fetchAll(PDO::FETCH_CLASS, Payment::class);
+    $results = $stmt->fetchAll(PDO::FETCH_CLASS, PaymentModel::class);
     return $results;
   }
 }

@@ -7,13 +7,13 @@ namespace RmsyMe\Decorators;
 use Relnaggar\Veloz\Decorators\DecoratorInterface;
 use RmsyMe\{
   App,
-  Services\Nav as NavService,
+  Services\NavService,
 };
 
 /**
  * Decorator to add the nav data to the template vars.
  */
-class Nav implements DecoratorInterface
+class NavDecorator implements DecoratorInterface
 {
   private NavService $navService;
 

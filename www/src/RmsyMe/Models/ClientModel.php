@@ -6,7 +6,7 @@ namespace RmsyMe\Models;
 
 use Relnaggar\Veloz\Data\AbstractFormData;
 
-class Student extends AbstractFormData
+class ClientModel extends AbstractFormData
 {
   public int $id;
   public string $name;

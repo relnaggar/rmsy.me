@@ -5,25 +5,27 @@ declare(strict_types=1);
 namespace RmsyMe\Repositories;
 
 use PDOException;
-use RmsyMe\Services\Database;
-use RmsyMe\Models\Buyer;
+use RmsyMe\{
+  Services\DatabaseService,
+  Models\BuyerModel,
+};
 
 class BuyerRepository extends AbstractRepository
 {
-  public function __construct(Database $databaseService)
+  public function __construct(DatabaseService $databaseService)
   {
     parent::__construct($databaseService);
     $this->tableName = 'buyers';
-    $this->modelClass = Buyer::class;
+    $this->modelClass = BuyerModel::class;
   }
 
   /**
    * Update a buyer in the buyers table.
    * 
-   * @param Buyer $buyer The Buyer object to update.
+   * @param BuyerModel $buyer The Buyer object to update.
    * @throws PDOException If there is a database error.
    */
-  public function update(Buyer $buyer): void
+  public function update(BuyerModel $buyer): void
   {
     $stmt = $this->pdo->prepare(<<<SQL
       UPDATE {$this->tableName}

@@ -10,11 +10,11 @@
       <?php foreach ($clients as $client): ?>
       <tr>
         <td>
-          <a href="/client/clients/<?= $client['id'] ?>">
-            <?= $client['id'] ?>
+          <a href="/client/clients/<?= $client->id ?>">
+            <?= $client->id ?>
           </a>
         </td>
-        <td><?= htmlspecialchars($client['name']) ?></td>
+        <td><?= htmlspecialchars($client->name) ?></td>
       </tr>
       <?php endforeach; ?>
     </tbody>

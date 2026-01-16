@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace RmsyMe\Data;
 
+use InvalidArgumentException;
+
 class Project
 {
   public readonly string $slug;
@@ -43,7 +45,7 @@ class Project
     $this->sections = [];
     foreach ($sections as $section) {
       if (count($section) !== 2) {
-        throw new \InvalidArgumentException(
+        throw new InvalidArgumentException(
           'Each section must have exactly two elements: an ID and a title.',
         );
       }
@@ -54,7 +56,7 @@ class Project
     foreach ($sources as $source) {
       if (!$source instanceof Source) {
         $class = Source::class;
-        throw new \InvalidArgumentException(
+        throw new InvalidArgumentException(
           "Each source must be an instance of $class.",
         );
       }

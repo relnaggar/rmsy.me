@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace RmsyMe\Data;
 
+use Exception;
+
 class Nav {
   public readonly string $homePath;
   public readonly string $title;
@@ -19,7 +21,7 @@ class Nav {
     // validate the items array
     foreach ($items as $item) {
       if (!($item instanceof NavItem)) {
-        throw new \Exception('Invalid item in items array');
+        throw new Exception('Invalid item in items array');
       }
     }
 

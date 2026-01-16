@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace RmsyMe\Services;
 
-class Media
+class MediaService
 {
   public function getMediaRoot(): string
   {

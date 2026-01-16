@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace RmsyMe\Components;
 
+use InvalidArgumentException;
 use Relnaggar\Veloz\Components\ComponentInterface;
 use RmsyMe\Data\Source;
 
@@ -16,7 +17,7 @@ class SourceCards implements ComponentInterface
     foreach ($sources as $source) {
       if (!$source instanceof Source) {
         $class = Source::class;
-        throw new \InvalidArgumentException(
+        throw new InvalidArgumentException(
           "Each source must be an instance of $class.",
         );
       }

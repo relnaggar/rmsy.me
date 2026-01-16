@@ -9,7 +9,7 @@ use Relnaggar\Veloz\Decorators\DecoratorInterface;
 /**
  * Decorator to add the site title to the end of the page title.
  */
-class ExtendedTitle implements DecoratorInterface
+class ExtendedTitleDecorator implements DecoratorInterface
 {
   public function getNewTemplateVars(array $templateVars): array {
     $newTemplateVars['extendedTitle'] = $templateVars['title']

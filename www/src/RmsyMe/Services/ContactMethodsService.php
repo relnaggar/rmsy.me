@@ -6,7 +6,7 @@ namespace RmsyMe\Services;
 
 use Relnaggar\Veloz\Routing\RouterInterface;
 
-class ContactMethods
+class ContactMethodsService
 {
   private RouterInterface $router;
   private array $contactMethods;

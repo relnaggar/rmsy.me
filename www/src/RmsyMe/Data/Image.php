@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace RmsyMe\Data;
 
+use Exception;
+
 class Image {
   public readonly string $href;
 
@@ -20,7 +22,7 @@ class Image {
       'jpg', 'jpeg' => 'image/jpeg',
       'png' => 'image/png',
       'webp' => 'image/webp',
-      default => throw new \Exception('Unsupported image type'),
+      default => throw new Exception('Unsupported image type'),
     };
   }
 }

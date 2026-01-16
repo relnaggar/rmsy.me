@@ -4,25 +4,28 @@ declare(strict_types=1);
 
 namespace RmsyMe\Repositories;
 
-use RmsyMe\Services\Database;
-use RmsyMe\Models\Student;
+use PDOException;
+use RmsyMe\{
+  Services\DatabaseService,
+  Models\StudentModel,
+};
 
 class StudentRepository extends AbstractRepository
 {
-  public function __construct(Database $databaseService)
+  public function __construct(DatabaseService $databaseService)
   {
     parent::__construct($databaseService);
     $this->tableName = 'students';
-    $this->modelClass = Student::class;
+    $this->modelClass = StudentModel::class;
   }
 
   /**
    * Update a student in the students table.
    * 
-   * @param Student $student The Student object to update.
+   * @param StudentModel $student The Student object to update.
    * @throws PDOException If there is a database error.
    */
-  public function update(Student $student): void
+  public function update(StudentModel $student): void
   {
     $stmt = $this->pdo->prepare(<<<SQL
       UPDATE {$this->tableName}

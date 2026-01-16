@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace RmsyMe\Services;
 
-class Secrets
+class SecretsService
 {
   public function getSecret(string $name): string
   {

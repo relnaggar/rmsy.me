@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace RmsyMe\Repositories;
 
+use DateTime;
+use PDO;
 use PDOException;
-use RmsyMe\Services\Database;
+use RmsyMe\Services\DatabaseService;
 
 class ExchangeRateRepository extends AbstractRepository
 {
-  public function __construct(Database $databaseService)
+  public function __construct(DatabaseService $databaseService)
   {
     parent::__construct($databaseService);
     $this->tableName = 'exchange_rates';

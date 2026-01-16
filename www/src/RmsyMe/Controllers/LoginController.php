@@ -10,12 +10,12 @@ use Relnaggar\Veloz\{
   Views\Page,
 };
 use RmsyMe\{
-  Forms\Login as LoginForm,
-  Services\Login as LoginService,
+  Forms\LoginForm,
+  Services\LoginService,
   Components\Alert,
 };
 
-class Login extends AbstractController
+class LoginController extends AbstractController
 {
   private LoginService $loginService;
 

@@ -4,24 +4,25 @@ declare(strict_types=1);
 
 namespace RmsyMe\Services;
 
+use Exception;
 use Relnaggar\Veloz\Routing\RouterInterface;
 use RmsyMe\Data\{
-  Nav as NavData,
+  Nav,
   NavItem,
 };
 
-class Nav
+class NavService
 {
   private RouterInterface $router;
-  private Projects $projectsService;
-  private ContactMethods $contactMethodsService;
+  private ProjectsService $projectsService;
+  private ContactMethodsService $contactMethodsService;
   private array $navItems;
-  private NavData $nav;
+  private Nav $nav;
 
   public function __construct(
     RouterInterface $router,
-    Projects $projectsService,
-    ContactMethods $contactMethodsService,
+    ProjectsService $projectsService,
+    ContactMethodsService $contactMethodsService,
   ) {
     $this->router = $router;
     $this->projectsService = $projectsService;
@@ -124,7 +125,7 @@ class Nav
     $this->addNavItem($clientItem);
 
     // nav
-    $this->nav = new NavData(
+    $this->nav = new Nav(
       homePath: '/',
       title: 'Software Engineer & Educator',
       items: $this->navItems,
@@ -152,7 +153,7 @@ class Nav
     }
   }
 
-  public function getNav(): NavData
+  public function getNav(): Nav
   {
     return $this->nav;
   }
@@ -164,6 +165,6 @@ class Nav
         return $navItem;
       }
     }
-    throw new \Exception("No nav item found for path: $path");
+    throw new Exception("No nav item found for path: $path");
   }
 }

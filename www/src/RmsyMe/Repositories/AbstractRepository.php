@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace RmsyMe\Repositories;
 
 use PDO;
-use RmsyMe\Services\Database;
+use PDOException;
+use RmsyMe\Services\DatabaseService;
 
 abstract class AbstractRepository
 {
@@ -13,7 +14,7 @@ abstract class AbstractRepository
   protected string $tableName;
   protected string $modelClass;
 
-  public function __construct(Database $databaseService)
+  public function __construct(DatabaseService $databaseService)
   {
     $this->pdo = $databaseService->getConnection();
   }
