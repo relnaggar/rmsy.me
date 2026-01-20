@@ -7,13 +7,13 @@ namespace RmsyMe\Repositories;
 use DateTime;
 use PDO;
 use PDOException;
-use RmsyMe\Services\DatabaseService;
+use Relnaggar\Veloz\Repositories\AbstractRepository;
 
 class ExchangeRateRepository extends AbstractRepository
 {
-  public function __construct(DatabaseService $databaseService)
+  public function __construct(Database $database)
   {
-    parent::__construct($databaseService);
+    parent::__construct($database);
     $this->tableName = 'exchange_rates';
   }
 

@@ -188,7 +188,7 @@ RUN composer require dompdf/dompdf
 RUN composer require microsoft/microsoft-graph
 
 # add framework
-RUN composer require relnaggar/veloz:^1.5
+RUN composer require relnaggar/veloz:^1.6
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"

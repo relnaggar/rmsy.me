@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace RmsyMe\Repositories;
 
-use RmsyMe\{
-  Services\DatabaseService,
-  Models\ClientModel,
-};
+use Relnaggar\Veloz\Repositories\AbstractRepository;
+use RmsyMe\Models\ClientModel;
 
 class ClientRepository extends AbstractRepository
 {
-  public function __construct(DatabaseService $databaseService)
+  public function __construct(Database $database)
   {
-    parent::__construct($databaseService);
+    parent::__construct($database);
     $this->tableName = 'clients';
     $this->modelClass = ClientModel::class;
   }

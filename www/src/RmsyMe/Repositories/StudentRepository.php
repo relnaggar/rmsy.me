@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace RmsyMe\Repositories;
 
 use PDOException;
-use RmsyMe\{
-  Services\DatabaseService,
-  Models\StudentModel,
-};
+use Relnaggar\Veloz\Repositories\AbstractRepository;
+use RmsyMe\Models\StudentModel;
 
 class StudentRepository extends AbstractRepository
 {
-  public function __construct(DatabaseService $databaseService)
+  public function __construct(Database $database)
   {
-    parent::__construct($databaseService);
+    parent::__construct($database);
     $this->tableName = 'students';
     $this->modelClass = StudentModel::class;
   }

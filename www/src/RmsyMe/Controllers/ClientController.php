@@ -16,7 +16,6 @@ use Relnaggar\Veloz\{
   Routing\RouterInterface,
 };
 use RmsyMe\{
-  Services\DatabaseService,
   Services\LoginService,
   Services\InvoiceService,
   Services\CalendarService,
@@ -24,6 +23,7 @@ use RmsyMe\{
   Models\BuyerModel,
   Models\StudentModel,
   Models\ClientModel,
+  Repositories\Database,
   Repositories\UserRepository,
   Repositories\PaymentRepository,
   Repositories\BuyerRepository,
@@ -35,10 +35,10 @@ use RmsyMe\{
 class ClientController extends AbstractController
 {
   private LoginService $loginService;
-  private DatabaseService $databaseService;
   private InvoiceService $invoiceService;
   private CalendarService $calendarService;
   private RouterInterface $router;
+  private Database $database;
   private UserRepository $userRepository;
   private PaymentRepository $paymentRepository;
   private BuyerRepository $buyerRepository;
@@ -49,10 +49,10 @@ class ClientController extends AbstractController
   public function __construct(
     array $decorators,
     LoginService $loginService,
-    DatabaseService $databaseService,
     InvoiceService $invoiceService,
     CalendarService $calendarService,
     RouterInterface $router,
+    Database $database,
     UserRepository $userRepository,
     PaymentRepository $paymentRepository,
     BuyerRepository $buyerRepository,
@@ -63,7 +63,7 @@ class ClientController extends AbstractController
   {
     parent::__construct($decorators);
     $this->loginService = $loginService;
-    $this->databaseService = $databaseService;
+    $this->database = $database;
     $this->invoiceService = $invoiceService;
     $this->calendarService = $calendarService;
     $this->router = $router;
@@ -92,7 +92,7 @@ class ClientController extends AbstractController
     try {
       $userEmail = $this->userRepository->selectEmail($loggedInUserId);
     } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
+      return $this->database->getDatabaseErrorPage($this, $e);
     }
     return $this->getPage(
       relativeBodyTemplatePath: __FUNCTION__,
@@ -251,12 +251,12 @@ class ClientController extends AbstractController
 
     // verify buyer exists
     try {
-      $buyer = $this->buyerRepository->selectById(urldecode($encodedBuyerId));
+      $buyer = $this->buyerRepository->selectOne(urldecode($encodedBuyerId));
       if ($buyer === null) {
         return $this->router->getPageNotFound()->getPage();
       }
     } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
+      return $this->database->getDatabaseErrorPage($this, $e);
     }
 
     // pre-fill form data
@@ -276,12 +276,12 @@ class ClientController extends AbstractController
 
     // verify buyer exists
     try {
-      $buyer = $this->buyerRepository->selectById(urldecode($encodedBuyerId));
+      $buyer = $this->buyerRepository->selectOne(urldecode($encodedBuyerId));
       if ($buyer === null) {
         return $this->router->getPageNotFound()->getPage();
       }
     } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
+      return $this->database->getDatabaseErrorPage($this, $e);
     }
 
     // display error alert by default
@@ -341,7 +341,7 @@ class ClientController extends AbstractController
         return $this->router->getPageNotFound()->getPage();
       }
     } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
+      return $this->database->getDatabaseErrorPage($this, $e);
     }
 
     // generate PDF download
@@ -379,7 +379,7 @@ class ClientController extends AbstractController
     try {
       $buyers = $this->buyerRepository->selectAll();
     } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
+      return $this->database->getDatabaseErrorPage($this, $e);
     }
 
     return $this->getPage(
@@ -398,7 +398,7 @@ class ClientController extends AbstractController
     try {
       $clients = $this->clientRepository->selectAll();
     } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
+      return $this->database->getDatabaseErrorPage($this, $e);
     }
 
     return $this->getPage(
@@ -417,7 +417,7 @@ class ClientController extends AbstractController
     try {
       $students = $this->studentRepository->selectAll();
     } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
+      return $this->database->getDatabaseErrorPage($this, $e);
     }
 
     return $this->getPage(
@@ -446,12 +446,12 @@ class ClientController extends AbstractController
 
     // verify student exists
     try {
-      $student = $this->studentRepository->selectById($studentId);
+      $student = $this->studentRepository->selectOne($studentId);
       if ($student === null) {
         return $this->router->getPageNotFound()->getPage();
       }
     } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
+      return $this->database->getDatabaseErrorPage($this, $e);
     }
 
     // pre-fill form data
@@ -472,12 +472,12 @@ class ClientController extends AbstractController
 
     // verify student exists
     try {
-      $student = $this->studentRepository->selectById($studentId);
+      $student = $this->studentRepository->selectOne($studentId);
       if ($student === null) {
         return $this->router->getPageNotFound()->getPage();
       }
     } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
+      return $this->database->getDatabaseErrorPage($this, $e);
     }
 
     // display error alert by default
@@ -544,12 +544,12 @@ class ClientController extends AbstractController
     $templateVars = $this->getClientTemplateVars($clientId);
     // verify client exists
     try {
-      $client = $this->clientRepository->selectById($clientId);
+      $client = $this->clientRepository->selectOne($clientId);
       if ($client === null) {
         return $this->router->getPageNotFound()->getPage();
       }
     } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
+      return $this->database->getDatabaseErrorPage($this, $e);
     }
 
     // pre-fill form data
@@ -570,12 +570,12 @@ class ClientController extends AbstractController
 
     // verify client exists
     try {
-      $client = $this->clientRepository->selectById($clientId);
+      $client = $this->clientRepository->selectOne($clientId);
       if ($client === null) {
         return $this->router->getPageNotFound()->getPage();
       }
     } catch (PDOException $e) {
-      return $this->databaseService->getDatabaseErrorPage($this, $e);
+      return $this->database->getDatabaseErrorPage($this, $e);
     }
 
     // display error alert by default

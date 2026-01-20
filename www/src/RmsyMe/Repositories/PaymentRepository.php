@@ -7,16 +7,14 @@ namespace RmsyMe\Repositories;
 use DateTime;
 use PDO;
 use PDOException;
-use RmsyMe\{
-  Services\DatabaseService,
-  Models\PaymentModel,
-};
+use Relnaggar\Veloz\Repositories\AbstractRepository;
+use RmsyMe\Models\PaymentModel;
 
 class PaymentRepository extends AbstractRepository
 {
-  public function __construct(DatabaseService $databaseService)
+  public function __construct(Database $database)
   {
-    parent::__construct($databaseService);
+    parent::__construct($database);
     $this->tableName = 'payments';
     $this->modelClass = PaymentModel::class;
   }

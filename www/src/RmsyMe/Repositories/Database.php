@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace RmsyMe\Services;
+namespace RmsyMe\Repositories;
 
 use PDO;
 use PDOException;
 use Relnaggar\Veloz\{
   Views\Page,
   Controllers\AbstractController,
+  Repositories\DatabaseInterface,
 };
 
-class DatabaseService
+class Database implements DatabaseInterface
 {
   private ?PDO $pdo;
 
@@ -20,12 +21,6 @@ class DatabaseService
     $this->pdo = null;
   }
 
-  /**
-   * Get the PDO database connection.
-   * 
-   * @return PDO The PDO database connection.
-   * @throws PDOException If there is a database connection error.
-   */
   public function getConnection(): PDO
   {
     if ($this->pdo === null) {

@@ -8,6 +8,7 @@ use DateTime;
 use PDO;
 use RmsyMe\{
   Controllers\AuthController,
+  Repositories\Database,
   Repositories\ClientRepository,
   Repositories\StudentRepository,
 };
@@ -20,12 +21,12 @@ class CalendarService
   private StudentRepository $studentRepository;
 
   public function __construct(
-    DatabaseService $databaseService,
+    Database $database,
     AuthController $authController,
     ClientRepository $clientRepository,
     StudentRepository $studentRepository,
   ) {
-    $this->pdo = $databaseService->getConnection();
+    $this->pdo = $database->getConnection();
     $this->authController = $authController;
     $this->clientRepository = $clientRepository;
     $this->studentRepository = $studentRepository;
@@ -92,22 +93,33 @@ class CalendarService
       $secondSubparts = explode(',', $secondPart);
       $studentClient = trim($secondSubparts[0]);
       $studentClientParts = explode('/', $studentClient);
+      $isMatch = function($record, $dbRecord) {
+        if (is_object($dbRecord)) {
+          return str_starts_with($dbRecord->name, $record['name']);
+        } else {
+          return str_starts_with($dbRecord['name'], $record['name']);
+        }
+      };
       if (count($studentClientParts) < 2) {
         $studentName = trim($studentClientParts[0]);
-        $client_id = $this->clientRepository->getOrCreateIdByName(
-          $studentName,
+        $client_id = $this->clientRepository->getPkOrCreate(
+          ['name' => $studentName],
+          $isMatch,
         );
-        $student_id = $this->studentRepository->getOrCreateIdByName(
-          $studentName,
+        $student_id = $this->studentRepository->getPkOrCreate(
+          ['name' => $studentName],
+          $isMatch,
         );
       } else if (count($studentClientParts) === 2) {
         $studentFirstName = trim($studentClientParts[0]);
         $clientFirstName = trim($studentClientParts[1]);
-        $client_id = $this->clientRepository->getOrCreateIdByName(
-          $clientFirstName,
+        $client_id = $this->clientRepository->getPkOrCreate(
+          ['name' => $clientFirstName],
+          $isMatch,
         );
-        $student_id = $this->studentRepository->getOrCreateIdByName(
-          $studentFirstName,
+        $student_id = $this->studentRepository->getPkOrCreate(
+          ['name' => $studentFirstName],
+          $isMatch,
         );
       } else {
         var_dump("Skipping event with invalid student/client: $subject<br>");
