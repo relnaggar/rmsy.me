@@ -87,13 +87,13 @@ class NavService
     ));
 
     $this->addNavItem(new NavItem(
-      text: 'Client Login',
-      path: '/client/login',
+      text: 'Portal Login',
+      path: '/portal/login',
       alignEnd: true,
     ));
 
     // add client side nav (not in main menu)
-    $clientItem = new NavItem(text: 'Client', path: '/client', inMenu: false);
+    $clientItem = new NavItem(text: 'Portal', path: '/portal', inMenu: false);
     $clientItem->addDropdownItem(new NavItem(
       text: 'Dashboard',
       path: '/',

@@ -22,7 +22,7 @@
         <td><?= $lesson->paid ? 'Yes' : 'No' ?></td>
         <td>
           <?php if ($lesson->student_id !== null): ?>
-            <a href="/client/students/<?= $lesson->student_id ?>">
+            <a href="/portal/students/<?= $lesson->student_id ?>">
               <?= $lesson->student_id ?>
             </a>
           <?php else: ?>
@@ -31,7 +31,7 @@
         </td>
         <td>
           <?php if ($lesson->client_id !== null): ?>
-            <a href="/client/clients/<?= $lesson->client_id ?>">
+            <a href="/portal/clients/<?= $lesson->client_id ?>">
               <?= $lesson->client_id ?>
             </a>
           <?php else: ?>
@@ -40,7 +40,7 @@
         </td>
         <td>
           <?php if ($lesson->buyer_id !== null): ?>
-            <a href="/client/buyers/<?= urlencode($lesson->buyer_id) ?>">
+            <a href="/portal/buyers/<?= urlencode($lesson->buyer_id) ?>">
               <?= htmlspecialchars($lesson->buyer_id) ?>
             </a>
           <?php else: ?>

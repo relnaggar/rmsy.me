@@ -7,7 +7,7 @@ namespace RmsyMe\Services;
 use DateTime;
 use PDO;
 use RmsyMe\{
-  Controllers\AuthController,
+  Controllers\MicrosoftAuthController,
   Repositories\Database,
   Repositories\ClientRepository,
   Repositories\StudentRepository,
@@ -16,18 +16,18 @@ use RmsyMe\{
 class CalendarService
 {
   private PDO $pdo;
-  private AuthController $authController;
+  private MicrosoftAuthController $microsoftAuthController;
   private ClientRepository $clientRepository;
   private StudentRepository $studentRepository;
 
   public function __construct(
     Database $database,
-    AuthController $authController,
+    MicrosoftAuthController $microsoftAuthController,
     ClientRepository $clientRepository,
     StudentRepository $studentRepository,
   ) {
     $this->pdo = $database->getConnection();
-    $this->authController = $authController;
+    $this->microsoftAuthController = $microsoftAuthController;
     $this->clientRepository = $clientRepository;
     $this->studentRepository = $studentRepository;
   }
@@ -55,7 +55,7 @@ class CalendarService
       )
     SQL);
 
-    $events = $this->authController->getCalendarEvents();
+    $events = $this->microsoftAuthController->getCalendarEvents();
     foreach ($events as $event) {
       // parse event data
       $subject = $event['subject'];

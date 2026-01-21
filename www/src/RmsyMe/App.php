@@ -36,7 +36,12 @@ class App extends AbstractApp
         Decorators\ExtendedTitleDecorator::class,
         Decorators\NavDecorator::class,
       ],
-      Controllers\ClientController::class => [
+      Controllers\PortalController::class => [
+        Decorators\ExtendedTitleDecorator::class,
+        Decorators\NavDecorator::class,
+        Decorators\SidebarDecorator::class,
+      ],
+      Controllers\PaymentsController::class => [
         Decorators\ExtendedTitleDecorator::class,
         Decorators\NavDecorator::class,
         Decorators\SidebarDecorator::class,
@@ -117,7 +122,7 @@ class App extends AbstractApp
             'contactSubmit'
           ),
         ],
-        '/client/login' => [
+        '/portal/login' => [
           'GET' => new ControllerAction(
             Controllers\LoginController::class,
             'login'
@@ -127,85 +132,85 @@ class App extends AbstractApp
             'loginSubmit'
           ),
         ],
-        '/client/logout' => [
+        '/portal/logout' => [
           'GET' => new ControllerAction(
             Controllers\LoginController::class,
             'logout'
           ),
         ],
-        '/client/' => [
+        '/portal/' => [
           'GET' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PortalController::class,
             'index'
           ),
         ],
-        '/client/payments' => [
+        '/portal/payments' => [
           'GET' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PaymentsController::class,
             'payments'
           ),
           'POST' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PaymentsController::class,
             'paymentsSubmit'
           ),
         ],
-        '/client/buyers' => [
+        '/portal/buyers' => [
           'GET' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PaymentsController::class,
             'buyers'
           ),
         ],
-        '/client/students' => [
+        '/portal/students' => [
           'GET' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PaymentsController::class,
             'students'
           ),
         ],
-        '/client/students/<studentIdString>' => [
+        '/portal/students/<studentIdString>' => [
           'GET' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PaymentsController::class,
             'student'
           ),
           'POST' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PaymentsController::class,
             'studentSubmit'
           ),
         ],
-        '/client/clients' => [
+        '/portal/clients' => [
           'GET' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PaymentsController::class,
             'clients'
           ),
         ],
-        '/client/clients/<clientIdString>' => [
+        '/portal/clients/<clientIdString>' => [
           'GET' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PaymentsController::class,
             'client'
           ),
           'POST' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PaymentsController::class,
             'clientSubmit'
           ),
         ],
-        '/client/buyers/<encodedBuyerId>' => [
+        '/portal/buyers/<encodedBuyerId>' => [
           'GET' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PaymentsController::class,
             'buyer'
           ),
           'POST' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PaymentsController::class,
             'buyerSubmit'
           ),
         ],
-        '/client/invoices/<invoiceNumber>' => [
+        '/portal/invoices/<invoiceNumber>' => [
           'GET' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PaymentsController::class,
             'invoice'
           ),
         ],
-        '/client/lessons' => [
+        '/portal/lessons' => [
           'GET' => new ControllerAction(
-            Controllers\ClientController::class,
+            Controllers\PaymentsController::class,
             'lessons'
           ),
         ],
@@ -217,13 +222,13 @@ class App extends AbstractApp
         ],
         '/auth/callback' => [
           'GET' => new ControllerAction(
-            Controllers\AuthController::class,
+            Controllers\MicrosoftAuthController::class,
             'callback'
           ),
         ],
         '/auth/login' => [
           'GET' => new ControllerAction(
-            Controllers\AuthController::class,
+            Controllers\MicrosoftAuthController::class,
             'login'
           ),
         ],

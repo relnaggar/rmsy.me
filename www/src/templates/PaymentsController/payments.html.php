@@ -24,12 +24,12 @@ use RmsyMe\Components\FormInput;
         <td><?= $payment->getFormattedAmount() ?></td>
         <td><?= $payment->payment_reference ?></td>
         <td>
-          <a href="/client/buyers/<?= urlencode($payment->buyer_id) ?>">
+          <a href="/portal/buyers/<?= urlencode($payment->buyer_id) ?>">
             <?= $payment->buyer_id ?>
           </a>
         </td>
         <td><a
-          href="/client/invoices/<?= $payment->getInvoiceNumber() ?>"
+          href="/portal/invoices/<?= $payment->getInvoiceNumber() ?>"
           target="_blank"
         >
           <?= $payment->getInvoiceNumber() ?>
@@ -43,7 +43,7 @@ use RmsyMe\Components\FormInput;
 <?php endif; ?>
 
 <form
-  action="/client/payments" 
+  action="/portal/payments" 
   method="post"
   class="needs-validation"
   novalidate

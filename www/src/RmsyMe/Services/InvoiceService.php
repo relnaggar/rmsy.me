@@ -122,7 +122,7 @@ class InvoiceService
     }
 
     // find the buyer
-    $buyer = $this->buyerRepository->selectById($matchingPayment->buyer_id);
+    $buyer = $this->buyerRepository->selectOne($matchingPayment->buyer_id);
     if ($buyer === null) {
       throw new PDOException('Buyer not found');
     }

@@ -5,7 +5,7 @@ use RmsyMe\Components\FormInput;
 ?>
 
 <form
-  action="/client/students/<?= $studentId ?>" 
+  action="/portal/students/<?= $studentId ?>" 
   method="post"
   class="needs-validation"
   novalidate

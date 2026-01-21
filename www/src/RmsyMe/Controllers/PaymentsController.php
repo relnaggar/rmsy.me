@@ -11,12 +11,10 @@ use PrinsFrank\Standards\{
   Language\LanguageAlpha2,
 };
 use Relnaggar\Veloz\{
-  Controllers\AbstractController,
   Views\Page,
   Routing\RouterInterface,
 };
 use RmsyMe\{
-  Services\LoginService,
   Services\InvoiceService,
   Services\CalendarService,
   Components\Alert,
@@ -24,22 +22,22 @@ use RmsyMe\{
   Models\StudentModel,
   Models\ClientModel,
   Repositories\Database,
-  Repositories\UserRepository,
   Repositories\PaymentRepository,
   Repositories\BuyerRepository,
   Repositories\ClientRepository,
   Repositories\StudentRepository,
   Repositories\LessonRepository,
+  Attributes\RequiresAuth,
+  Services\LoginService,
 };
 
-class ClientController extends AbstractController
+#[RequiresAuth]
+class PaymentsController extends AbstractAuthenticatedController
 {
-  private LoginService $loginService;
   private InvoiceService $invoiceService;
   private CalendarService $calendarService;
   private RouterInterface $router;
   private Database $database;
-  private UserRepository $userRepository;
   private PaymentRepository $paymentRepository;
   private BuyerRepository $buyerRepository;
   private ClientRepository $clientRepository;
@@ -48,59 +46,28 @@ class ClientController extends AbstractController
 
   public function __construct(
     array $decorators,
-    LoginService $loginService,
     InvoiceService $invoiceService,
     CalendarService $calendarService,
     RouterInterface $router,
     Database $database,
-    UserRepository $userRepository,
     PaymentRepository $paymentRepository,
     BuyerRepository $buyerRepository,
     ClientRepository $clientRepository,
     StudentRepository $studentRepository,
     LessonRepository $lessonRepository,
+    LoginService $loginService,
   )
   {
-    parent::__construct($decorators);
-    $this->loginService = $loginService;
+    parent::__construct($decorators, $loginService);
     $this->database = $database;
     $this->invoiceService = $invoiceService;
     $this->calendarService = $calendarService;
     $this->router = $router;
-    $this->userRepository = $userRepository;
     $this->paymentRepository = $paymentRepository;
     $this->buyerRepository = $buyerRepository;
     $this->clientRepository = $clientRepository;
     $this->studentRepository = $studentRepository;
     $this->lessonRepository = $lessonRepository;
-  }
-
-  private function authenticate(): int
-  {
-    $userId = $this->loginService->getLoggedInUserId();
-    if ($userId === null) {
-      $this->redirect('/client/login', 302);
-      return 0;
-    } else {
-      return $userId;
-    }
-  }
-
-  public function index(): Page
-  {
-    $loggedInUserId = $this->authenticate();
-    try {
-      $userEmail = $this->userRepository->selectEmail($loggedInUserId);
-    } catch (PDOException $e) {
-      return $this->database->getDatabaseErrorPage($this, $e);
-    }
-    return $this->getPage(
-      relativeBodyTemplatePath: __FUNCTION__,
-      templateVars: [
-        'title' => 'Dashboard',
-        'userEmail' => $userEmail,
-      ]
-    );
   }
 
   private function getPayments(array &$templateVars): void
@@ -131,7 +98,6 @@ class ClientController extends AbstractController
 
   public function payments(): Page
   {
-    $this->authenticate();
     $templateVars = $this->getPaymentsTemplateVars();
 
     return $this->getPage(
@@ -142,7 +108,6 @@ class ClientController extends AbstractController
 
   public function paymentsSubmit(): Page
   {
-    $this->authenticate();
     $templatePath = 'payments';
     $templateVars = $this->getPaymentsTemplateVars();
 
@@ -244,9 +209,9 @@ class ClientController extends AbstractController
     ];
   }
 
+
   public function buyer(string $encodedBuyerId): Page
   {
-    $this->authenticate();
     $templateVars = $this->getBuyerTemplateVars($encodedBuyerId);
 
     // verify buyer exists
@@ -270,7 +235,6 @@ class ClientController extends AbstractController
 
   public function buyerSubmit(string $encodedBuyerId): Page
   {
-    $this->authenticate();
     $templateVars = $this->getBuyerTemplateVars($encodedBuyerId);
     $templatePath = 'buyer';
 
@@ -333,8 +297,6 @@ class ClientController extends AbstractController
 
   public function invoice(string $invoiceNumber): Page
   {
-    $this->authenticate();
-
     // verify invoice exists
     try {
       if (!$this->invoiceService->doesInvoiceExist($invoiceNumber)) {
@@ -358,8 +320,6 @@ class ClientController extends AbstractController
 
   public function lessons(): Page
   {
-    $this->authenticate();
-
     $this->calendarService->importLessonsFromCalendar();
     $lessons = $this->lessonRepository->selectAll();
 
@@ -374,8 +334,6 @@ class ClientController extends AbstractController
 
   public function buyers(): Page
   {
-    $this->authenticate();
-
     try {
       $buyers = $this->buyerRepository->selectAll();
     } catch (PDOException $e) {
@@ -393,8 +351,6 @@ class ClientController extends AbstractController
 
   public function clients(): Page
   {
-    $this->authenticate();
-
     try {
       $clients = $this->clientRepository->selectAll();
     } catch (PDOException $e) {
@@ -412,8 +368,6 @@ class ClientController extends AbstractController
 
   public function students(): Page
   {
-    $this->authenticate();
-
     try {
       $students = $this->studentRepository->selectAll();
     } catch (PDOException $e) {
@@ -440,7 +394,6 @@ class ClientController extends AbstractController
 
   public function student(string $studentIdString): Page
   {
-    $this->authenticate();
     $studentId = (int) $studentIdString;
     $templateVars = $this->getStudentTemplateVars($studentId);
 
@@ -465,7 +418,6 @@ class ClientController extends AbstractController
 
   public function studentSubmit(string $studentIdString): Page
   {
-    $this->authenticate();
     $studentId = (int) $studentIdString;
     $templateVars = $this->getStudentTemplateVars($studentId);
     $templatePath = 'student';
@@ -539,7 +491,6 @@ class ClientController extends AbstractController
 
   public function client(string $clientIdString): Page
   {
-    $this->authenticate();
     $clientId = (int) $clientIdString;
     $templateVars = $this->getClientTemplateVars($clientId);
     // verify client exists
@@ -563,7 +514,6 @@ class ClientController extends AbstractController
 
   public function clientSubmit(string $clientIdString): Page
   {
-    $this->authenticate();
     $clientId = (int) $clientIdString;
     $templateVars = $this->getClientTemplateVars($clientId);
     $templatePath = 'client';

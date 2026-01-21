@@ -10,7 +10,7 @@
       <?php foreach ($clients as $client): ?>
       <tr>
         <td>
-          <a href="/client/clients/<?= $client->id ?>">
+          <a href="/portal/clients/<?= $client->id ?>">
             <?= $client->id ?>
           </a>
         </td>

@@ -5,42 +5,37 @@ declare(strict_types=1);
 namespace RmsyMe\Controllers;
 
 use PDOException;
-use Relnaggar\Veloz\{
-  Controllers\AbstractController,
-  Views\Page,
-};
+use Relnaggar\Veloz\Views\Page;
 use RmsyMe\{
   Forms\LoginForm,
   Services\LoginService,
   Components\Alert,
 };
 
-class LoginController extends AbstractController
+class LoginController extends AbstractAuthenticatedController
 {
-  private LoginService $loginService;
-
   public function __construct(
     array $decorators,
     LoginService $loginService,
   )
   {
-    parent::__construct($decorators);
+    parent::__construct($decorators, $loginService);
     $this->loginService = $loginService;
   }
 
   private function getLoginTemplateVars(): array
   {
     return [
-      'title' => 'Client Login',
-      'metaDescription' => 'Client login page.',
+      'title' => 'Portal Login',
+      'metaDescription' => 'Portal login page.',
       'metaRobots' => 'noindex, nofollow',
       'formName' => 'loginForm',
     ];
   }
 
-  private function redirectToClientDashboard(): Page
+  private function redirectToPortalDashboard(): Page
   {
-    $this->redirect('/client/', 302);
+    $this->redirect('/portal/', 302);
     return Page::empty();
   }
 
@@ -48,7 +43,7 @@ class LoginController extends AbstractController
   {
     $userId = $this->loginService->getLoggedInUserId();
     if ($userId !== null) {
-      return $this->redirectToClientDashboard();
+      return $this->redirectToPortalDashboard();
     }
 
     return $this->getPage(
@@ -112,13 +107,13 @@ class LoginController extends AbstractController
     }
 
     // success
-    return $this->redirectToClientDashboard();
+    return $this->redirectToPortalDashboard();
   }
 
   public function logout(): Page
   {
     $this->loginService->logout();
-    $this->redirect('/client/login', 302);
+    $this->redirect('/portal/login', 302);
     return Page::empty();
   }
 }

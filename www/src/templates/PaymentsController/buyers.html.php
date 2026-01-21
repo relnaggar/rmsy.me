@@ -11,7 +11,7 @@
       <?php foreach ($buyers as $buyer): ?>
       <tr>
         <td>
-          <a href="/client/buyers/<?= urlencode($buyer->id) ?>">
+          <a href="/portal/buyers/<?= urlencode($buyer->id) ?>">
             <?= htmlspecialchars($buyer->id) ?>
           </a>
         </td>

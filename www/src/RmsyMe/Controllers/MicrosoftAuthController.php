@@ -18,7 +18,7 @@ use RmsyMe\Services\{
   ApiClientService,
 };
 
-class AuthController extends AbstractController
+class MicrosoftAuthController extends AbstractController
 {
   private SecretsService $secretsService;
   private ApiClientService $apiClientService;
@@ -106,7 +106,7 @@ class AuthController extends AbstractController
     $_SESSION['MS_EXPIRES_AT'] = time() + (int)($responseData['expires_in']);
     $_SESSION['MS_ID_TOKEN'] = $responseData['id_token'] ?? null;
 
-    $this->redirect('/client/lessons', 302);
+    $this->redirect('/portal/lessons', 302);
     return Page::empty();
   }
 

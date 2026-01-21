@@ -10,7 +10,7 @@
       <?php foreach ($students as $student): ?>
         <tr>
           <td>
-            <a href="/client/students/<?= $student->id ?>">
+            <a href="/portal/students/<?= $student->id ?>">
               <?= $student->id ?>
             </a>
           </td>

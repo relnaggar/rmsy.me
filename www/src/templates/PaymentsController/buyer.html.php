@@ -5,7 +5,7 @@ use RmsyMe\Components\FormInput;
 ?>
 
 <form
-  action="/client/buyers/<?= $encodedBuyerId ?>" 
+  action="/portal/buyers/<?= $encodedBuyerId ?>" 
   method="post"
   class="needs-validation"
   novalidate
