@@ -6,11 +6,8 @@ namespace RmsyMe\Controllers;
 
 use PDOException;
 use finfo;
-use PrinsFrank\Standards\{
-  Country\CountryAlpha2,
-  Language\LanguageAlpha2,
-};
 use Relnaggar\Veloz\{
+  Controllers\AbstractController,
   Views\Page,
   Routing\RouterInterface,
 };
@@ -18,28 +15,29 @@ use RmsyMe\{
   Services\InvoiceService,
   Services\CalendarService,
   Components\Alert,
-  Models\BuyerModel,
   Models\StudentModel,
   Models\ClientModel,
   Repositories\Database,
   Repositories\PaymentRepository,
-  Repositories\BuyerRepository,
   Repositories\ClientRepository,
   Repositories\StudentRepository,
   Repositories\LessonRepository,
   Attributes\RequiresAuth,
   Services\LoginService,
+  Traits\AuthenticatesTrait,
 };
 
 #[RequiresAuth]
-class PaymentsController extends AbstractAuthenticatedController
+class PaymentsController extends AbstractController
 {
+  use AuthenticatesTrait;
+
+  private LoginService $loginService;
   private InvoiceService $invoiceService;
   private CalendarService $calendarService;
   private RouterInterface $router;
   private Database $database;
   private PaymentRepository $paymentRepository;
-  private BuyerRepository $buyerRepository;
   private ClientRepository $clientRepository;
   private StudentRepository $studentRepository;
   private LessonRepository $lessonRepository;
@@ -51,23 +49,27 @@ class PaymentsController extends AbstractAuthenticatedController
     RouterInterface $router,
     Database $database,
     PaymentRepository $paymentRepository,
-    BuyerRepository $buyerRepository,
     ClientRepository $clientRepository,
     StudentRepository $studentRepository,
     LessonRepository $lessonRepository,
     LoginService $loginService,
   )
   {
-    parent::__construct($decorators, $loginService);
+    parent::__construct($decorators);
+    $this->loginService = $loginService;
     $this->database = $database;
     $this->invoiceService = $invoiceService;
     $this->calendarService = $calendarService;
     $this->router = $router;
     $this->paymentRepository = $paymentRepository;
-    $this->buyerRepository = $buyerRepository;
     $this->clientRepository = $clientRepository;
     $this->studentRepository = $studentRepository;
     $this->lessonRepository = $lessonRepository;
+  }
+
+  protected function getLoginService(): LoginService
+  {
+    return $this->loginService;
   }
 
   private function getPayments(array &$templateVars): void
@@ -188,113 +190,6 @@ class PaymentsController extends AbstractAuthenticatedController
     return $this->getPage($templatePath, $templateVars);
   }
 
-  private function getCountryOptions(): array
-  {
-    $countryOptions = [];
-    foreach (CountryAlpha2::cases() as $country) {
-      $countryOptions[$country->value] = $country->getNameInLanguage(
-        LanguageAlpha2::English
-      );
-    }
-    return $countryOptions;
-  }
-
-  private function getBuyerTemplateVars(string $encodedBuyerId): array
-  {
-    return [
-      'title' => 'Buyer Details',
-      'encodedBuyerId' => $encodedBuyerId,
-      'formName' => 'buyerForm',
-      'countryOptions' => $this->getCountryOptions(),
-    ];
-  }
-
-
-  public function buyer(string $encodedBuyerId): Page
-  {
-    $templateVars = $this->getBuyerTemplateVars($encodedBuyerId);
-
-    // verify buyer exists
-    try {
-      $buyer = $this->buyerRepository->selectOne(urldecode($encodedBuyerId));
-      if ($buyer === null) {
-        return $this->router->getPageNotFound()->getPage();
-      }
-    } catch (PDOException $e) {
-      return $this->database->getDatabaseErrorPage($this, $e);
-    }
-
-    // pre-fill form data
-    $_POST[$templateVars['formName']] = (array) $buyer;
-
-    return $this->getPage(
-      relativeBodyTemplatePath: __FUNCTION__,
-      templateVars: $templateVars
-    );
-  }
-
-  public function buyerSubmit(string $encodedBuyerId): Page
-  {
-    $templateVars = $this->getBuyerTemplateVars($encodedBuyerId);
-    $templatePath = 'buyer';
-
-    // verify buyer exists
-    try {
-      $buyer = $this->buyerRepository->selectOne(urldecode($encodedBuyerId));
-      if ($buyer === null) {
-        return $this->router->getPageNotFound()->getPage();
-      }
-    } catch (PDOException $e) {
-      return $this->database->getDatabaseErrorPage($this, $e);
-    }
-
-    // display error alert by default
-    $templateVars['alert'] = new Alert(
-      type: 'danger',
-      title: 'Update failed!',
-      message: <<<HTML
-        There was an error submitting the buyer form but it's not clear why.
-      HTML
-    );
-
-    // display error alert if form not submitted
-    if (!isset($_POST['submit']) || !isset($_POST[$templateVars['formName']])) {
-      return $this->getPage($templatePath, $templateVars);
-    }
-
-    // validate form data
-    $formData = new BuyerModel($_POST[$templateVars['formName']]);
-    $errors = $formData->validate();
-    if (!empty($errors)) {
-      $templateVars['alert']->message = $errors[array_key_first($errors)];
-      return $this->getPage($templatePath, $templateVars);
-    }
-
-    // update buyer in database
-    try {
-      $this->buyerRepository->update($formData);
-    } catch (PDOException $e) {
-      error_log($e->getMessage());
-      $templateVars['alert']->message = <<<HTML
-        There was a database error while attempting to update the buyer.
-      HTML;
-      return $this->getPage($templatePath, $templateVars);
-    }
-
-    // success
-    $templateVars['alert'] = new Alert(
-      type: 'success',
-      title: 'Update successful!',
-      message: <<<HTML
-        <p>
-          The buyer has been updated successfully!
-        </p>
-      HTML
-    );
-
-    return $this->getPage($templatePath, $templateVars);
-  }
-
   public function invoice(string $invoiceNumber): Page
   {
     // verify invoice exists
@@ -328,23 +223,6 @@ class PaymentsController extends AbstractAuthenticatedController
       templateVars: [
         'title' => 'Lessons',
         'lessons' => $lessons,
-      ]
-    );
-  }
-
-  public function buyers(): Page
-  {
-    try {
-      $buyers = $this->buyerRepository->selectAll();
-    } catch (PDOException $e) {
-      return $this->database->getDatabaseErrorPage($this, $e);
-    }
-
-    return $this->getPage(
-      relativeBodyTemplatePath: __FUNCTION__,
-      templateVars: [
-        'title' => 'Buyers',
-        'buyers' => $buyers,
       ]
     );
   }

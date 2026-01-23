@@ -5,17 +5,22 @@ declare(strict_types=1);
 namespace RmsyMe\Controllers;
 
 use PDOException;
+use Relnaggar\Veloz\Controllers\AbstractController;
 use Relnaggar\Veloz\Views\Page;
 use RmsyMe\{
   Services\LoginService,
   Repositories\UserRepository,
   Repositories\Database,
   Attributes\RequiresAuth,
+  Traits\AuthenticatesTrait,
 };
 
 #[RequiresAuth]
-class PortalController extends AbstractAuthenticatedController
+class PortalController extends AbstractController
 {
+  use AuthenticatesTrait;
+
+  private LoginService $loginService;
   private UserRepository $userRepository;
   private Database $database;
 
@@ -26,10 +31,15 @@ class PortalController extends AbstractAuthenticatedController
     Database $database,
   )
   {
-    parent::__construct($decorators, $loginService);
+    parent::__construct($decorators);
     $this->loginService = $loginService;
     $this->userRepository = $userRepository;
     $this->database = $database;
+  }
+
+  protected function getLoginService(): LoginService
+  {
+    return $this->loginService;
   }
 
   public function index(): Page

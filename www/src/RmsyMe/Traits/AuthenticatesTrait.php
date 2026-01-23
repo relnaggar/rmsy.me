@@ -2,39 +2,29 @@
 
 declare(strict_types=1);
 
-namespace RmsyMe\Controllers;
+namespace RmsyMe\Traits;
 
 use ReflectionClass;
 use ReflectionMethod;
-use Relnaggar\Veloz\Controllers\AbstractController;
 use RmsyMe\{
   Services\LoginService,
   Attributes\RequiresAuth,
 };
 
-abstract class AbstractAuthenticatedController extends AbstractController
+trait AuthenticatesTrait
 {
-  protected ?int $loggedInUserId;
-  protected LoginService $loginService;
+  protected ?int $loggedInUserId = null;
 
-  public function __construct(
-    array $decorators,
-    LoginService $loginService,
-  ) {
-    parent::__construct($decorators);
-    $this->loginService = $loginService;
-    $this->loggedInUserId = null;
-  }
+  abstract protected function getLoginService(): LoginService;
 
   private function authenticate(): void
   {
-    $this->loggedInUserId = $this->loginService->getLoggedInUserId();
+    $this->loggedInUserId = $this->getLoginService()->getLoggedInUserId();
     if ($this->loggedInUserId === null) {
       $this->redirect('/portal/login', 302);
     }
   }
 
-  #[\Override]
   public function beforeAction(string $action): void
   {
     $class = new ReflectionClass($this);

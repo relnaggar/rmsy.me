@@ -5,21 +5,26 @@ declare(strict_types=1);
 namespace RmsyMe\Controllers;
 
 use PDOException;
-use Relnaggar\Veloz\Views\Page;
+use Relnaggar\Veloz\{
+  Views\Page,
+  Controllers\AbstractController,
+};
 use RmsyMe\{
   Forms\LoginForm,
   Services\LoginService,
   Components\Alert,
 };
 
-class LoginController extends AbstractAuthenticatedController
+class LoginController extends AbstractController
 {
+  private LoginService $loginService;
+
   public function __construct(
     array $decorators,
     LoginService $loginService,
   )
   {
-    parent::__construct($decorators, $loginService);
+    parent::__construct($decorators);
     $this->loginService = $loginService;
   }
 

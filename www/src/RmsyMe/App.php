@@ -46,6 +46,11 @@ class App extends AbstractApp
         Decorators\NavDecorator::class,
         Decorators\SidebarDecorator::class,
       ],
+      Controllers\BuyersController::class => [
+        Decorators\ExtendedTitleDecorator::class,
+        Decorators\NavDecorator::class,
+        Decorators\SidebarDecorator::class,
+      ],
     ];
   }
 
@@ -156,8 +161,8 @@ class App extends AbstractApp
         ],
         '/portal/buyers' => [
           'GET' => new ControllerAction(
-            Controllers\PaymentsController::class,
-            'buyers'
+            Controllers\BuyersController::class,
+            'index'
           ),
         ],
         '/portal/students' => [
@@ -192,14 +197,14 @@ class App extends AbstractApp
             'clientSubmit'
           ),
         ],
-        '/portal/buyers/<encodedBuyerId>' => [
+        '/portal/buyers/<encodedId>' => [
           'GET' => new ControllerAction(
-            Controllers\PaymentsController::class,
-            'buyer'
+            Controllers\BuyersController::class,
+            'edit'
           ),
           'POST' => new ControllerAction(
-            Controllers\PaymentsController::class,
-            'buyerSubmit'
+            Controllers\BuyersController::class,
+            'editSubmit'
           ),
         ],
         '/portal/invoices/<invoiceNumber>' => [
