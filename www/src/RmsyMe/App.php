@@ -51,6 +51,16 @@ class App extends AbstractApp
         Decorators\NavDecorator::class,
         Decorators\SidebarDecorator::class,
       ],
+      Controllers\StudentsController::class => [
+        Decorators\ExtendedTitleDecorator::class,
+        Decorators\NavDecorator::class,
+        Decorators\SidebarDecorator::class,
+      ],
+      Controllers\ClientsController::class => [
+        Decorators\ExtendedTitleDecorator::class,
+        Decorators\NavDecorator::class,
+        Decorators\SidebarDecorator::class,
+      ],
     ];
   }
 
@@ -167,37 +177,37 @@ class App extends AbstractApp
         ],
         '/portal/students' => [
           'GET' => new ControllerAction(
-            Controllers\PaymentsController::class,
-            'students'
+            Controllers\StudentsController::class,
+            'index'
           ),
         ],
-        '/portal/students/<studentIdString>' => [
+        '/portal/students/<idString>' => [
           'GET' => new ControllerAction(
-            Controllers\PaymentsController::class,
-            'student'
+            Controllers\StudentsController::class,
+            'edit'
           ),
           'POST' => new ControllerAction(
-            Controllers\PaymentsController::class,
-            'studentSubmit'
+            Controllers\StudentsController::class,
+            'editSubmit'
           ),
         ],
         '/portal/clients' => [
           'GET' => new ControllerAction(
-            Controllers\PaymentsController::class,
-            'clients'
+            Controllers\ClientsController::class,
+            'index'
           ),
         ],
-        '/portal/clients/<clientIdString>' => [
+        '/portal/clients/<idString>' => [
           'GET' => new ControllerAction(
-            Controllers\PaymentsController::class,
-            'client'
+            Controllers\ClientsController::class,
+            'edit'
           ),
           'POST' => new ControllerAction(
-            Controllers\PaymentsController::class,
-            'clientSubmit'
+            Controllers\ClientsController::class,
+            'editSubmit'
           ),
         ],
-        '/portal/buyers/<encodedId>' => [
+        '/portal/buyers/<idString>' => [
           'GET' => new ControllerAction(
             Controllers\BuyersController::class,
             'edit'
