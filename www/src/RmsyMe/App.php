@@ -16,51 +16,27 @@ class App extends AbstractApp
 {
   public function getDecoratorMap(): array
   {
+    $base = [
+      Decorators\ExtendedTitleDecorator::class,
+      Decorators\NavDecorator::class,
+    ];
+    $withSidebar = [...$base, Decorators\SidebarDecorator::class];
+    $withMedia = [...$base, Decorators\MediaRootDecorator::class];
+    $withBoth = [...$withMedia, Decorators\SidebarDecorator::class];
+
     return [
-      Controllers\SiteController::class => [
-        Decorators\ExtendedTitleDecorator::class,
-        Decorators\NavDecorator::class,
-        Decorators\MediaRootDecorator::class,
-      ],
-      Controllers\ContactController::class => [
-        Decorators\ExtendedTitleDecorator::class,
-        Decorators\NavDecorator::class,
-      ],
-      Controllers\ProjectsController::class => [
-        Decorators\ExtendedTitleDecorator::class,
-        Decorators\NavDecorator::class,
-        Decorators\MediaRootDecorator::class,
-        Decorators\SidebarDecorator::class,
-      ],
-      Controllers\LoginController::class => [
-        Decorators\ExtendedTitleDecorator::class,
-        Decorators\NavDecorator::class,
-      ],
-      Controllers\PortalController::class => [
-        Decorators\ExtendedTitleDecorator::class,
-        Decorators\NavDecorator::class,
-        Decorators\SidebarDecorator::class,
-      ],
-      Controllers\PaymentsController::class => [
-        Decorators\ExtendedTitleDecorator::class,
-        Decorators\NavDecorator::class,
-        Decorators\SidebarDecorator::class,
-      ],
-      Controllers\BuyersController::class => [
-        Decorators\ExtendedTitleDecorator::class,
-        Decorators\NavDecorator::class,
-        Decorators\SidebarDecorator::class,
-      ],
-      Controllers\StudentsController::class => [
-        Decorators\ExtendedTitleDecorator::class,
-        Decorators\NavDecorator::class,
-        Decorators\SidebarDecorator::class,
-      ],
-      Controllers\ClientsController::class => [
-        Decorators\ExtendedTitleDecorator::class,
-        Decorators\NavDecorator::class,
-        Decorators\SidebarDecorator::class,
-      ],
+      // Public pages
+      Controllers\SiteController::class => $withMedia,
+      Controllers\ContactController::class => $base,
+      Controllers\ProjectsController::class => $withBoth,
+      Controllers\LoginController::class => $base,
+
+      // Portal pages
+      Controllers\PortalController::class => $withSidebar,
+      Controllers\PaymentsController::class => $withSidebar,
+      Controllers\BuyersController::class => $withSidebar,
+      Controllers\StudentsController::class => $withSidebar,
+      Controllers\ClientsController::class => $withSidebar,
     ];
   }
 
