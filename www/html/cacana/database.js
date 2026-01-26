@@ -1,15 +1,28 @@
 import { Dexie } from "./lib/dexie.min.mjs";
-
-import { getCurrentUser } from "./auth.js";
-
+import { authFetch } from "./auth.js";
 
 const db = new Dexie("cacana-db");
 
-db.version(2).stores({ // change version number when changing db schema e.g. adding stores or indexes
+db.version(3).stores({ // change version number when changing db schema e.g. adding stores or indexes
   cacas: "uuid, createdAt, deletedAt, updatedAt",
   outbox: "++localId, uuid, table, entityUuid, timestamp, action", // for pending operations to sync
-  meta: "key, value", // latestTimestamp, userColour
+  meta: "key, value", // latestTimestamp, userColour, authToken, authUsername
 });
+
+export async function storeAuth(token, username) {
+  await db.table("meta").put({ key: "authToken", value: token });
+  await db.table("meta").put({ key: "authUsername", value: username });
+}
+
+export async function getAuthToken() {
+  const entry = await db.table("meta").get("authToken");
+  return entry ? entry.value : null;
+}
+
+export async function getAuthUsername() {
+  const entry = await db.table("meta").get("authUsername");
+  return entry ? entry.value : null;
+}
 
 function generateUuid() {
   return crypto.randomUUID();
@@ -67,7 +80,7 @@ export async function setUserColour(colour) {
   await db.table("outbox").add({
     uuid: generateUuid(),
     table: "users",
-    entityUuid: await getCurrentUser(),
+    entityUuid: await getAuthUsername(),
     timestamp: now,
     action: "updateColour",
     colour: colour,
@@ -88,12 +101,11 @@ export async function sync(onUnauthorised) {
   }
 
   console.log("Syncing...");
-  const response = await fetch("sync.php", {
+  const response = await authFetch("sync.php", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "same-origin",
     body: JSON.stringify({
       outbox,
       latestTimestamp,

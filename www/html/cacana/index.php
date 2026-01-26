@@ -101,9 +101,14 @@
     </div>
 
     <div id="appContent" class="d-none pb-5 mb-5">
-      <p>Welcome to <?= $APP_NAME ?>, <span id="currentUser"></span>!</p>
+      <p>Welcome to <?= $APP_NAME ?>, <span id="authUsername"></span>!</p>
       <div class="d-flex justify-content-between">
-        <button id="logoutButton" class="btn btn-secondary" type="button">
+        <button
+          id="logoutButton"
+          class="btn btn-secondary"
+          type="button"
+          disabled
+        >
           Logout
         </button>
         <button id="syncButton" class="btn btn-primary flex-grow-1 mx-1" type="button">

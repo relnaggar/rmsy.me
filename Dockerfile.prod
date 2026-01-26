@@ -55,7 +55,8 @@ RUN \
   && composer require robmorgan/phinx \
   && composer require prinsfrank/standards \
   && composer require dompdf/dompdf \
-  && composer require microsoft/microsoft-graph
+  && composer require microsoft/microsoft-graph \
+  && composer require firebase/php-jwt
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="PRODUCTION"

@@ -1,36 +1,58 @@
-let currentUser = null;
+import {
+  storeAuth,
+  getAuthToken,
+  getAuthUsername,
+  clearLocalData,
+} from "./database.js";
 
-export function getCurrentUser() {
-  return currentUser;
+export async function authFetch(url, options = {}) {
+  const authToken = await getAuthToken();
+  const headers = new Headers(options.headers || {});
+  if (authToken) {
+    headers.set("Authorization", `Bearer ${authToken}`);
+  }
+  return fetch(url, { ...options, headers });
 }
 
-export async function isLoggedIn(onError) {
-  let response;
-  try {
-    response = await fetch("is_logged_in.php", {
-      method: "GET",
-      credentials: "same-origin",
-    });
-  } catch (err) {
-    onError(err);
+export async function isLoggedIn() {
+  const authUsername = await getAuthUsername();
+  const authToken = await getAuthToken();
+
+  if (!authUsername || !authToken) {
     return false;
   }
 
-  let responseData;
-  try {
-    responseData = await response.json();
-  } catch (err) {
-    onError(err);
-    return false;
+  // if online, validate with server
+  if (navigator.onLine) {
+    let response;
+    try {
+      response = await authFetch("is_logged_in.php", {
+        method: "GET",
+      });
+    } catch (err) {
+      // network error: trust local token
+      return true;
+    }
+
+    let responseData;
+    try {
+      responseData = await response.json();
+    } catch (err) {
+      // invalid response: trust local token
+      return true;
+    }
+
+    if (responseData.loggedIn && responseData.username === authUsername) {
+      return true;
+    } else {
+      // token invalid: log out
+      await logout(() => {}, () => {});
+      return false;
+    }
   }
 
-  if (responseData.loggedIn) {
-    currentUser = responseData.username;
-    return true;
-  } else {
-    currentUser = null;
-    return false;
-  }
+  // offline: trust local token
+  return true;
 }
 
 export async function login(username, password, onSuccess, onFailure) {
@@ -41,7 +63,6 @@ export async function login(username, password, onSuccess, onFailure) {
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "same-origin",
       body: JSON.stringify({ username, password }),
     });
   } catch (err) {
@@ -58,7 +79,7 @@ export async function login(username, password, onSuccess, onFailure) {
   }
 
   if (responseData.success) {
-    currentUser = responseData.username;
+    await storeAuth(responseData.token, responseData.username);
     onSuccess();
   } else {
     onFailure(new Error(responseData.error));
@@ -73,7 +94,6 @@ export async function register(username, password, onSuccess, onFailure) {
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "same-origin",
       body: JSON.stringify({
         username,
         password,
@@ -94,7 +114,7 @@ export async function register(username, password, onSuccess, onFailure) {
   }
 
   if (responseData.success) {
-    currentUser = responseData.username;
+    await storeAuth(responseData.token, responseData.username);
     onSuccess();
   } else {
     onFailure(new Error(responseData.error));
@@ -102,30 +122,17 @@ export async function register(username, password, onSuccess, onFailure) {
 }
 
 export async function logout(onSuccess, onFailure) {
-  let response;
-
-  try {
-    response = await fetch("logout.php", {
-      method: "POST",
-      credentials: "same-origin",
-    });
-  } catch (err) {
-    onFailure(err);
-    return;
-  }
-
-  let responseData;
-  try {
-    responseData = await response.json();
-  } catch (err) {
-    onFailure(err);
-    return;
-  }
-
-  if (responseData.success) {
-    currentUser = null;
-    onSuccess();
+  if (navigator.onLine) {
+    try {
+      await fetch("logout.php", {
+        method: "POST"
+      });
+      await clearLocalData();
+      onSuccess();
+    } catch (err) {
+      onFailure(err);
+    }
   } else {
-    onFailure(new Error(responseData.error));
+    onFailure(new Error("Offline logout not supported"));
   }
 }

@@ -16,9 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initialiseLoginForm();
   initialiseRegisterForm();
 
-  const loggedIn = await isLoggedIn(
-    (err) => console.error("Error checking login status:", err) // TODO
-  );
+  const loggedIn = await isLoggedIn();
   if (loggedIn) {
     await showCacana();
   } else {

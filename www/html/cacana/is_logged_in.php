@@ -2,18 +2,29 @@
 
 declare(strict_types=1);
 
+require_once '/vendor/autoload.php';
+
+use Relnaggar\Veloz\Config;
+Config::getInstance()->set('sourceDirectory', __DIR__ . '/../../src/');
+
+require_once '/vendor/relnaggar/veloz/autoload.php';
+
+use Cacana\Auth;
+
 header('Content-Type: application/json');
 
-session_start();
-
-if (isset($_SESSION['cacanaUsername'])) {
-  http_response_code(200);
-  echo json_encode([
-    'loggedIn' => true,
-    'username' => $_SESSION['cacanaUsername']
-  ]);
-} else {
-  http_response_code(200);
+$headers = getallheaders();
+$authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+if (!preg_match('/^Bearer\s+(.+)$/i', $authHeader, $matches)) {
   echo json_encode(['loggedIn' => false]);
+  exit();
 }
+
+$auth = new Auth();
+$username = $auth->validateToken($matches[1]);
+
+echo json_encode($username
+  ? ['loggedIn' => true, 'username' => $username]
+  : ['loggedIn' => false]
+);
 exit();

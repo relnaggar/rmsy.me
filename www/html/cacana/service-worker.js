@@ -1,5 +1,5 @@
 const APP_NAME = "Cacana";
-const APP_VERSION = "v2"; // bump when you change the app shell
+const APP_VERSION = "v3"; // bump when you change the app shell
 const BASE = "/" + APP_NAME.toLowerCase() + "/";
 
 // load local Workbox runtime
@@ -42,16 +42,29 @@ const APP_SHELL = [
   revision: APP_VERSION,
 }));
 
+[
+  "/css/cacana.css",
+  "/css/cacana.css.map",
+  "/fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47",
+  "/fonts/bootstrap-icons.woff2?24e3eb84d0bcaf83d77f904c78ac1f47",
+].forEach((path) => {
+  APP_SHELL.push({
+    url: path,
+    revision: APP_VERSION
+  });
+});
+
 // endpoints not to be cached
 const ENDPOINTS = [
-  "/cacana/login.php",
-  "/cacana/logout.php",
-  "/cacana/register.php",
-  "/cacana/is_logged_in.php",
-  "/cacana/sync.php",
-];
+  "login.php",
+  "logout.php",
+  "register.php",
+  "is_logged_in.php",
+  "sync.php",
+].map((path) => BASE + path);
 
-// precache app shell: everything that must exist for the app to load and work offline
+// precache app shell: everything that must exist for the app to load and work
+// offline
 workbox.precaching.precacheAndRoute(APP_SHELL);
 
 // endpoints: network-only
@@ -60,7 +73,8 @@ workbox.routing.registerRoute(
   new workbox.strategies.NetworkOnly()
 );
 
-// runtime caching: network-first for same-origin GET, but only if in the APP_SHELL
+// runtime caching: network-first for same-origin GET, but only if in the
+// APP_SHELL
 workbox.routing.registerRoute(
   ({ url, request }) =>
     request.method === "GET" && url.origin === self.location.origin,

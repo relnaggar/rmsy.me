@@ -8,3 +8,5 @@ secrets
 db/
 seeds/
 uploads/
+.claude/
+CLAUDE.md

@@ -9,24 +9,24 @@ Config::getInstance()->set('sourceDirectory', __DIR__ . '/../../src/');
 
 require_once '/vendor/relnaggar/veloz/autoload.php'; // for Cacana
 
+use Cacana\Auth;
 use Cacana\Database;
 
 header('Content-Type: application/json');
 
-// Check authentication
-session_start();
-if (!isset($_SESSION['cacanaUsername'])) {
+$headers = getallheaders();
+$authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+if (!preg_match('/^Bearer\s+(.+)$/i', $authHeader, $matches)) {
   http_response_code(401);
   echo json_encode(['error' => 'Unauthorized']);
   exit();
 }
-$username = $_SESSION['cacanaUsername'];
 
-try {
-  $database = new Database();
-} catch (PDOException $e) {
-  http_response_code(500);
-  echo json_encode(['error' => 'Database error on connection']);
+$auth = new Auth();
+$username = $auth->validateToken($matches[1]);
+if (!$username) {
+  http_response_code(401);
+  echo json_encode(['error' => 'Invalid or expired token']);
   exit();
 }
 
@@ -93,6 +93,14 @@ foreach ($outbox as $outboxItem) {
     echo json_encode(['error' => 'Invalid outbox item format']);
     exit();
   }
+}
+
+try {
+  $database = new Database();
+} catch (PDOException $e) {
+  http_response_code(500);
+  echo json_encode(['error' => 'Database error on connection']);
+  exit();
 }
 
 try {

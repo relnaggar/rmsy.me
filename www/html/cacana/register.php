@@ -10,6 +10,7 @@ Config::getInstance()->set('sourceDirectory', __DIR__ . '/../../src/');
 require_once '/vendor/relnaggar/veloz/autoload.php';
 
 use Cacana\Database;
+use Cacana\Auth;
 
 header('Content-Type: application/json');
 
@@ -66,7 +67,6 @@ if (
 }
 $password = $request['password'];
 
-// createdAt
 if (
   !isset($request['createdAt'])
   || !is_int($request['createdAt'])
@@ -101,10 +101,13 @@ if (!$success) {
   exit();
 }
 
-// Start session and log user in
-session_start();
-$_SESSION['cacanaUsername'] = $username;
+$auth = new Auth();
+$token = $auth->createToken($username);
 
 http_response_code(201);
-echo json_encode(['success' => true, 'username' => $username]);
+echo json_encode([
+  'success' => true,
+  'username' => $username,
+  'token' => $token
+]);
 exit();

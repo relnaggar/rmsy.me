@@ -3,11 +3,11 @@ import {
   getAllCacasNewestFirst,
   sync,
   deleteCaca,
-  clearLocalData,
   getUserColour,
   setUserColour,
+  getAuthUsername,
 } from "./database.js";
-import { getCurrentUser, logout } from "./auth.js";
+import { logout } from "./auth.js";
 import { showLoginForm } from "./login.js";
 
 
@@ -71,7 +71,6 @@ const renderCacaTable = (cacas, userColour) => {
 }
 
 const onLoggedOut = async () => {
-  await clearLocalData();
   showLoginForm();
 }
 
@@ -142,7 +141,9 @@ const clickAddCacaButton = () => {
 }
 
 const clickLogoutButton = async () => {
-  await logout(onLoggedOut);
+  await logout(onLoggedOut, (err) => {
+    console.error("Error during logout:", err); // TODO handle error properly
+  });
 }
 
 const clickHomeButton = () => {
@@ -221,18 +222,33 @@ export const showCacana = async () => {
   document.getElementById("authContent").classList.add("d-none");
   document.getElementById("appContent").classList.remove("d-none");
   clickSyncButton();
-  const currentUser = await getCurrentUser();
-  document.getElementById("currentUser").textContent = currentUser;
+  const authUsername = await getAuthUsername();
+  document.getElementById("authUsername").textContent = authUsername;
+  if (navigator.onLine) {
+    enableLogoutButton();
+  }
 }
 
 export const isCacanaShown = () => {
   return !(document.getElementById("appContent").classList.contains("d-none"));
 }
 
+const disableLogoutButton = () => {
+  const logoutButton = document.getElementById("logoutButton");
+  logoutButton.disabled = true;
+}
+
+const enableLogoutButton = () => {
+  const logoutButton = document.getElementById("logoutButton");
+  logoutButton.disabled = false;
+}
+
 export const onCacanaOnline = () => {
   clickSyncButton();
+  enableLogoutButton();
 }
 
 export const onCacanaOffline = () => {
   setSyncStatus("offline");
+  disableLogoutButton();
 }
