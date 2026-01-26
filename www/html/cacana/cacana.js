@@ -197,6 +197,7 @@ const initialiseSettingsPage = () => {
       await setUserColour(colour);
       clickSyncButton();
     });
+  document.getElementById("appVersion").textContent = "v" + VERSION_NUMBER;
 }
 
 export const initialiseCacana = () => {

@@ -150,6 +150,7 @@
             value="#000000"
           >
         </div>
+        Cacana <span id="appVersion"></span>
       </div>
 
       <nav class="fixed-bottom bg-light border-top">
@@ -188,6 +189,7 @@
       </nav>
     </div>
 
+    <script src="./version.js" defer></script>
     <script type="module" src="./app.js" defer></script>
   </body>
 </html>

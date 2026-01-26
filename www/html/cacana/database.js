@@ -3,7 +3,7 @@ import { authFetch } from "./auth.js";
 
 const db = new Dexie("cacana-db");
 
-db.version(3).stores({ // change version number when changing db schema e.g. adding stores or indexes
+db.version(window.VERSION_NUMBER).stores({
   cacas: "uuid, createdAt, deletedAt, updatedAt",
   outbox: "++localId, uuid, table, entityUuid, timestamp, action", // for pending operations to sync
   meta: "key, value", // latestTimestamp, userColour, authToken, authUsername

@@ -1,5 +1,7 @@
+importScripts("./version.js");
+
 const APP_NAME = "Cacana";
-const APP_VERSION = "v3"; // bump when you change the app shell
+const APP_VERSION = "v" + VERSION_NUMBER;
 const BASE = "/" + APP_NAME.toLowerCase() + "/";
 
 // load local Workbox runtime
