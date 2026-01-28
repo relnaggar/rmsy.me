@@ -205,8 +205,17 @@ export const initialiseCacana = () => {
     .addEventListener("click", clickLogoutButton);
   document.getElementById("syncButton")
     .addEventListener("click", clickSyncButton);
-  document.getElementById("refreshButton")
-    .addEventListener("click", clickRefreshButton);
+  Array.from(document.getElementsByClassName("refreshButton")).forEach(
+    button => {
+      button.addEventListener("click", clickRefreshButton);
+      button.addEventListener("keypress", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          clickRefreshButton();
+        }
+      });
+    }
+  );
   document.getElementById("homeButton")
     .addEventListener("click", clickHomeButton);
   document.getElementById("statsButton")

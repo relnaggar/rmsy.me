@@ -1,4 +1,4 @@
-importScripts("./version.js");
+importScripts("version.js");
 
 const APP_NAME = "Cacana";
 const APP_VERSION = "v" + VERSION_NUMBER;
@@ -32,6 +32,7 @@ const APP_SHELL = [
   "icons/favicon.ico",
   "icons/apple-touch-icon.png",
   "database.js",
+  "version.js",
   "lib/dexie.min.mjs",
   "lib/workbox/workbox-core.prod.js",
   "lib/workbox/workbox-precaching.prod.js",

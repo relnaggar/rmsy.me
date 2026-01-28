@@ -15,7 +15,13 @@
     <title><?= $APP_NAME ?></title>
   </head>
   <body class="container d-flex flex-column align-items-center py-4">
-    <h1>
+    <h1
+      class="refreshButton"
+      role="button"
+      title="Refresh Page"
+      aria-label="Refresh Page"
+      tabindex="0"
+    >
       <?= $APP_NAME ?>
       <img
         src="./icons/icon-192.png"
@@ -103,20 +109,17 @@
     <div id="appContent" class="d-none pb-5 mb-5">
       <p>Welcome to <?= $APP_NAME ?>, <span id="authUsername"></span>!</p>
       <div class="d-flex justify-content-between">
+        <button id="syncButton" class="btn btn-primary w-50 me-1" type="button">
+          <span id="loadingSpinner"></span>
+          <span id="syncButtonText"></span>
+        </button>
         <button
           id="logoutButton"
-          class="btn btn-secondary"
+          class="btn btn-secondary w-50 ms-1"
           type="button"
           disabled
         >
           Logout
-        </button>
-        <button id="syncButton" class="btn btn-primary flex-grow-1 mx-1" type="button">
-          <span id="loadingSpinner"></span>
-          <span id="syncButtonText"></span>
-        </button>
-        <button id="refreshButton" class="btn btn-success" type="button">
-          Refresh
         </button>
       </div>
 
