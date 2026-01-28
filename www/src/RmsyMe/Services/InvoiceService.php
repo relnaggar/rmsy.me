@@ -183,7 +183,7 @@ class InvoiceService
 
     $dompdf = new Dompdf($options);
     $page = Page::withTemplate(
-      templatePath: 'Client/invoice',
+      templatePath: 'PaymentsController/invoice',
       templateVars: [
         'sellerAddress' => $sellerAddress,
         'buyerAddress' => $buyerAddress,
