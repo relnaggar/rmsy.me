@@ -126,10 +126,34 @@
       <hr>
 
       <div id="homeContainer" class="text-center">
-        <div class="d-grid mb-2">
-          <button id="addCacaButton" class="btn btn-brown" type="button">
-            Add Caca
+        <div
+          class="btn-group mb-2 d-flex"
+          role="group"
+          aria-label="Caca Actions"
+        >
+          <button
+            id="addCacaButton"
+            class="btn btn-brown flex-grow-1 me-1"
+            type="button"
+          >
+            Add Caca (Now)
           </button>
+          <button
+            id="toggleHistoricCacaButton"
+            class="btn btn-brown"
+            type="button"
+            title="Toggle historic caca"
+          >
+            <span class="visually-hidden">Toggle historic caca</span>
+            <i class="bi bi-calendar2-date"></i>
+          </button>
+        </div>
+        <div id="customDateContainer" class="d-none mb-2">
+          <input
+            id="customDateInput"
+            class="form-control"
+            type="datetime-local"
+          >
         </div>
         <table id="cacaTable" class="table">
           <tbody id="cacaTableBody">

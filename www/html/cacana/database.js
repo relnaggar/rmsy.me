@@ -28,15 +28,16 @@ function generateUuid() {
   return crypto.randomUUID();
 }
 
-export async function addCaca() {
+export async function addCaca(createdAt = null) {
   const cacaUuid = generateUuid();
   const now = Date.now();
+  const effectiveCreatedAt = createdAt ?? now;
 
    // idempotent upsert
   console.log("Adding caca...");
   await db.table("cacas").put({
     uuid: cacaUuid,
-    createdAt: now,
+    createdAt: effectiveCreatedAt,
     deletedAt: null,
     updatedAt: now,
   });
@@ -49,6 +50,7 @@ export async function addCaca() {
     entityUuid: cacaUuid,
     timestamp: now,
     action: "create",
+    createdAt: effectiveCreatedAt,
   });
   console.log("Caca creation queued for sync.");
 }

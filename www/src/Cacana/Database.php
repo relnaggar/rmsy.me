@@ -184,13 +184,14 @@ class Database
                     :uuid,
                     :username,
                     :createdAt,
-                    :createdAt
+                    :updatedAt
                   )
                 SQL);
                 $stmt->execute([
                   ':uuid' => $outboxItem['entityUuid'],
                   ':username' => $username,
-                  ':createdAt' => $outboxItem['timestamp'],
+                  ':createdAt' => $outboxItem['createdAt'],
+                  ':updatedAt' => $outboxItem['timestamp'],
                 ]);
                 break;
               case 'delete':

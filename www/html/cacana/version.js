@@ -1,1 +1,1 @@
-const VERSION_NUMBER = 4; // increment this on new releases
+const VERSION_NUMBER = 5; // increment this on new releases

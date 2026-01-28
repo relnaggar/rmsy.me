@@ -12,12 +12,13 @@ import { showLoginForm } from "./login.js";
 
 
 let loadingCount = 0;
+let historicCaca = false;
 
 const formatDateTime = (ms) => {
   const d = new Date(ms);
   const pad = (n) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ` +
-    `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 const clickDeleteCacaButton = (cacaUuid) => {
@@ -133,9 +134,33 @@ const clickRefreshButton = () => {
   window.location.reload();
 }
 
+const clickToggleHistoricCacaButton = () => {
+  historicCaca = !historicCaca;
+  const container = document.getElementById("customDateContainer");
+  const historicCacaButton = document.getElementById("toggleHistoricCacaButton");
+  const addCacaButton = document.getElementById("addCacaButton");
+  const icon = historicCacaButton.querySelector("i");
+  if (historicCaca) {
+    container.classList.remove("d-none");
+    icon.className = "bi bi-calendar2-x";
+    addCacaButton.textContent = "Add Caca (Historic)";
+  } else {
+    container.classList.add("d-none");
+    icon.className = "bi bi-calendar2-date";
+    addCacaButton.textContent = "Add Caca (Now)";
+  }
+}
+
 const clickAddCacaButton = () => {
   withSyncStatus(async () => {
-    await addCaca();
+    const input = document.getElementById("customDateInput");
+    const useCustomDate = historicCaca && input.value;
+    if (useCustomDate) {
+      const createdAt = new Date(input.value).getTime();
+      await addCaca(createdAt);
+    } else {
+      await addCaca();
+    }
     await syncAndRenderCacana();
   });
 }
@@ -185,6 +210,8 @@ const clickSettingsButton = () => {
 const initialiseHomePage = () => {
   document.getElementById("addCacaButton")
     .addEventListener("click", clickAddCacaButton);
+  document.getElementById("toggleHistoricCacaButton")
+    .addEventListener("click", clickToggleHistoricCacaButton);
 }
 
 const initialiseStatsPage = () => {
