@@ -160,6 +160,11 @@ class PaymentRepository extends AbstractRepository
           continue;
         }
 
+        // ignore IDs that don't start with TRANSFER-
+        if (substr($id, 0, 9) !== 'TRANSFER-') {
+          continue;
+        }
+
         // add buyer to buyers table
         $insertIntoBuyers->execute([
           'id' => $buyer_name,
