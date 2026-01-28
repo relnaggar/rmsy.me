@@ -145,16 +145,44 @@ class App extends AbstractApp
             'paymentsSubmit'
           ),
         ],
+        '/portal/payments/clear' => [
+          'POST' => new ControllerAction(
+            Controllers\PaymentsController::class,
+            'clear'
+          ),
+        ],
         '/portal/buyers' => [
           'GET' => new ControllerAction(
             Controllers\BuyersController::class,
             'index'
           ),
         ],
+        '/portal/buyers/clear' => [
+          'POST' => new ControllerAction(
+            Controllers\BuyersController::class,
+            'clear'
+          ),
+        ],
+        '/portal/buyers/<idString>' => [
+          'GET' => new ControllerAction(
+            Controllers\BuyersController::class,
+            'edit'
+          ),
+          'POST' => new ControllerAction(
+            Controllers\BuyersController::class,
+            'editSubmit'
+          ),
+        ],
         '/portal/students' => [
           'GET' => new ControllerAction(
             Controllers\StudentsController::class,
             'index'
+          ),
+        ],
+        '/portal/students/clear' => [
+          'POST' => new ControllerAction(
+            Controllers\StudentsController::class,
+            'clear'
           ),
         ],
         '/portal/students/<idString>' => [
@@ -173,6 +201,12 @@ class App extends AbstractApp
             'index'
           ),
         ],
+        '/portal/clients/clear' => [
+          'POST' => new ControllerAction(
+            Controllers\ClientsController::class,
+            'clear'
+          ),
+        ],
         '/portal/clients/<idString>' => [
           'GET' => new ControllerAction(
             Controllers\ClientsController::class,
@@ -180,16 +214,6 @@ class App extends AbstractApp
           ),
           'POST' => new ControllerAction(
             Controllers\ClientsController::class,
-            'editSubmit'
-          ),
-        ],
-        '/portal/buyers/<idString>' => [
-          'GET' => new ControllerAction(
-            Controllers\BuyersController::class,
-            'edit'
-          ),
-          'POST' => new ControllerAction(
-            Controllers\BuyersController::class,
             'editSubmit'
           ),
         ],
@@ -203,6 +227,16 @@ class App extends AbstractApp
           'GET' => new ControllerAction(
             Controllers\PaymentsController::class,
             'lessons'
+          ),
+          'POST' => new ControllerAction(
+            Controllers\PaymentsController::class,
+            'importLessons'
+          ),
+        ],
+        '/portal/lessons/clear' => [
+          'POST' => new ControllerAction(
+            Controllers\PaymentsController::class,
+            'clearLessons'
           ),
         ],
         '/wise-deposit' => [

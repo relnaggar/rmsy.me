@@ -19,6 +19,9 @@
       <?php endforeach; ?>
     </tbody>
   </table>
+  <form method="POST" action="/portal/clients/clear">
+    <button type="submit" class="btn btn-danger">Delete All Clients</button>
+  </form>
 <?php else: ?>
   <p>No clients found.</p>
 <?php endif; ?>

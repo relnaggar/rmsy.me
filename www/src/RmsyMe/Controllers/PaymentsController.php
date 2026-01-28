@@ -205,7 +205,6 @@ class PaymentsController extends AbstractController
 
   public function lessons(): Page
   {
-    $this->calendarService->importLessonsFromCalendar();
     $lessons = $this->lessonRepository->selectAll();
 
     return $this->getPage(
@@ -215,5 +214,38 @@ class PaymentsController extends AbstractController
         'lessons' => $lessons,
       ]
     );
+  }
+
+  public function importLessons(): Page
+  {
+    try {
+      $this->calendarService->importLessonsFromCalendar();
+    } catch (PDOException $e) {
+      return $this->database->getDatabaseErrorPage($this, $e);
+    }
+    $this->redirect('/portal/lessons', 303);
+    return Page::empty();
+  }
+
+  public function clear(): Page
+  {
+    try {
+      $this->paymentRepository->deleteAll();
+    } catch (PDOException $e) {
+      return $this->database->getDatabaseErrorPage($this, $e);
+    }
+    $this->redirect('/portal/payments', 303);
+    return Page::empty();
+  }
+
+  public function clearLessons(): Page
+  {
+    try {
+      $this->lessonRepository->deleteAll();
+    } catch (PDOException $e) {
+      return $this->database->getDatabaseErrorPage($this, $e);
+    }
+    $this->redirect('/portal/lessons', 303);
+    return Page::empty();
   }
 }

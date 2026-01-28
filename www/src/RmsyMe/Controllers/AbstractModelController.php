@@ -207,4 +207,15 @@ abstract class AbstractModelController extends AbstractController
       ]
     );
   }
+
+  public function clear(): Page
+  {
+    try {
+      $this->getModelRepository()->deleteAll();
+    } catch (PDOException $e) {
+      return $this->database->getDatabaseErrorPage($this, $e);
+    }
+    $this->redirect("/portal/{$this->getModelNamePlural()}", 303);
+    return Page::empty();
+  }
 }

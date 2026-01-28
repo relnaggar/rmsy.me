@@ -38,6 +38,9 @@ use RmsyMe\Components\FormInput;
       <?php endforeach; ?>
     </tbody>
   </table>
+  <form method="POST" action="/portal/payments/clear">
+    <button type="submit" class="btn btn-danger">Delete All Payments</button>
+  </form>
 <?php else: ?>
   <p>No payments found.</p>
 <?php endif; ?>

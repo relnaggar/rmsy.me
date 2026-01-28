@@ -189,7 +189,7 @@ RUN composer require microsoft/microsoft-graph
 RUN composer require firebase/php-jwt
 
 # add framework
-RUN composer require relnaggar/veloz:^1.8
+RUN composer require relnaggar/veloz:^1.9
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"
