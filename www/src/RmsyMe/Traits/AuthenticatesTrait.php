@@ -21,7 +21,7 @@ trait AuthenticatesTrait
   {
     $this->loggedInUserId = $this->getLoginService()->getLoggedInUserId();
     if ($this->loggedInUserId === null) {
-      $this->redirect('/portal/login', 302);
+      $this->redirect('/portal/login', 303);
     }
   }
 

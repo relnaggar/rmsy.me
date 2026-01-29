@@ -106,7 +106,7 @@ class MicrosoftAuthController extends AbstractController
     $_SESSION['MS_EXPIRES_AT'] = time() + (int)($responseData['expires_in']);
     $_SESSION['MS_ID_TOKEN'] = $responseData['id_token'] ?? null;
 
-    $this->redirect('/portal/lessons', 302);
+    $this->redirect('/portal/lessons', 303);
     return Page::empty();
   }
 
@@ -126,7 +126,7 @@ class MicrosoftAuthController extends AbstractController
     ];
     $authorizeUrl = "$this->authority/authorize?" . http_build_query($params);
 
-    $this->redirect($authorizeUrl, 302);
+    $this->redirect($authorizeUrl, 303);
     return Page::empty();
   }
 
@@ -143,7 +143,7 @@ class MicrosoftAuthController extends AbstractController
       empty($_SESSION['MS_ACCESS_TOKEN'])
       || empty($_SESSION['MS_EXPIRES_AT'])
     ) {
-      $this->redirect('/auth/login', 302);
+      $this->redirect('/auth/login', 303);
     }
 
     // valid until 60 seconds before expiry
@@ -156,7 +156,7 @@ class MicrosoftAuthController extends AbstractController
     $refreshToken = $_SESSION['MS_REFRESH_TOKEN'] ?? null;
     // if no refresh token, redirect to login
     if (!$refreshToken) {
-      $this->redirect('/auth/login', 302);
+      $this->redirect('/auth/login', 303);
     }
 
     // use refresh token to get new access token
@@ -175,7 +175,7 @@ class MicrosoftAuthController extends AbstractController
       );
     // if refresh fails, redirect to login
     } catch (ExceptionInterface) {
-      $this->redirect('/auth/login', 302);
+      $this->redirect('/auth/login', 303);
     }
 
     $_SESSION['MS_ACCESS_TOKEN']  = $responseData['access_token'];

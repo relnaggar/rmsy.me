@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace RmsyMe\Models;
 
 use DateTime;
+use Relnaggar\Veloz\Data\AbstractFormData;
 
-class LessonModel
+class LessonModel extends AbstractFormData
 {
   public readonly int $id;
   public readonly string $description;
@@ -52,5 +53,10 @@ class LessonModel
   public function getPriceGbp(): string
   {
     return number_format($this->price_gbp_pence / 100, 2);
+  }
+
+  public function validate(): array
+  {
+    throw new \Exception('not implemented yet');
   }
 }

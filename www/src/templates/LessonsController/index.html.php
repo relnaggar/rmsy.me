@@ -51,15 +51,17 @@
       <?php endforeach; ?>
     </tbody>
   </table>
-  <form method="POST" action="/portal/lessons/clear">
-    <button type="submit" class="btn btn-danger">Delete All Lessons</button>
+  <form method="post" action="/portal/lessons/clear">
+    <input type="submit" class="btn btn-danger" value="Delete All Lessons">
   </form>
 <?php else: ?>
   <p>No lessons found.</p>
 <?php endif; ?>
 <hr>
-<form method="POST" action="/portal/lessons">
-  <button type="submit" class="btn btn-primary">
-    Import Lessons from Calendar
-  </button>
+<form method="post" action="/portal/lessons">
+  <input
+    type="submit"
+    class="btn btn-primary"
+    value="Import Lessons from Calendar"
+  >
 </form>

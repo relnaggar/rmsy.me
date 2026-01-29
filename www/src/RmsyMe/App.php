@@ -37,6 +37,7 @@ class App extends AbstractApp
       Controllers\BuyersController::class => $withSidebar,
       Controllers\StudentsController::class => $withSidebar,
       Controllers\ClientsController::class => $withSidebar,
+      Controllers\LessonsController::class => $withSidebar,
     ];
   }
 
@@ -225,18 +226,18 @@ class App extends AbstractApp
         ],
         '/portal/lessons' => [
           'GET' => new ControllerAction(
-            Controllers\PaymentsController::class,
-            'lessons'
+            Controllers\LessonsController::class,
+            'index'
           ),
           'POST' => new ControllerAction(
-            Controllers\PaymentsController::class,
-            'importLessons'
+            Controllers\LessonsController::class,
+            'importFromCalendar'
           ),
         ],
         '/portal/lessons/clear' => [
           'POST' => new ControllerAction(
-            Controllers\PaymentsController::class,
-            'clearLessons'
+            Controllers\LessonsController::class,
+            'clear'
           ),
         ],
         '/wise-deposit' => [

@@ -46,12 +46,13 @@ RUN a2enmod headers \
 # implement baseline permissive CSP globally
 Header always set Content-Security-Policy: "\\
 default-src 'none';\\
-form-action 'self';\\
+form-action 'self' https://login.microsoftonline.com https://login.live.com;\\
 style-src 'self' https:;\\
-script-src 'self';\\
+script-src 'self' https://challenges.cloudflare.com;\\
 img-src 'self' data: https:;\\
 font-src 'self' https: data:;\\
 frame-ancestors 'self';\\
+frame-src 'self' https://challenges.cloudflare.com;\\
 manifest-src 'self';\\
 connect-src 'self';\\
 worker-src 'self';\\

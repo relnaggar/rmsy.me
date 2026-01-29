@@ -19,8 +19,8 @@
       <?php endforeach; ?>
     </tbody>
   </table>
-  <form method="POST" action="/portal/students/clear">
-    <button type="submit" class="btn btn-danger">Delete All Students</button>
+  <form method="post" action="/portal/students/clear">
+    <input type="submit" class="btn btn-danger" value="Delete All Students">
   </form>
 <?php else: ?>
   <p>No students found.</p>

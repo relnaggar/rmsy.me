@@ -21,8 +21,8 @@
       <?php endforeach; ?>
     </tbody>
   </table>
-  <form method="POST" action="/portal/buyers/clear">
-    <button type="submit" class="btn btn-danger">Delete All Buyers</button>
+  <form method="post" action="/portal/buyers/clear">
+    <input type="submit" class="btn btn-danger" value="Delete All Buyers">
   </form>
 <?php else: ?>
   <p>No buyers found.</p>

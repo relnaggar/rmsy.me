@@ -40,7 +40,7 @@ class LoginController extends AbstractController
 
   private function redirectToPortalDashboard(): Page
   {
-    $this->redirect('/portal/', 302);
+    $this->redirect('/portal/', 303);
     return Page::empty();
   }
 
@@ -118,7 +118,7 @@ class LoginController extends AbstractController
   public function logout(): Page
   {
     $this->loginService->logout();
-    $this->redirect('/portal/login', 302);
+    $this->redirect('/portal/login', 303);
     return Page::empty();
   }
 }

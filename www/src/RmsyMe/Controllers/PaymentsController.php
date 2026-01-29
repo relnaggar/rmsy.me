@@ -13,11 +13,9 @@ use Relnaggar\Veloz\{
 };
 use RmsyMe\{
   Services\InvoiceService,
-  Services\CalendarService,
   Components\Alert,
   Repositories\Database,
   Repositories\PaymentRepository,
-  Repositories\LessonRepository,
   Attributes\RequiresAuth,
   Services\LoginService,
   Traits\AuthenticatesTrait,
@@ -30,20 +28,16 @@ class PaymentsController extends AbstractController
 
   private LoginService $loginService;
   private InvoiceService $invoiceService;
-  private CalendarService $calendarService;
   private RouterInterface $router;
   private Database $database;
   private PaymentRepository $paymentRepository;
-  private LessonRepository $lessonRepository;
 
   public function __construct(
     array $decorators,
     InvoiceService $invoiceService,
-    CalendarService $calendarService,
     RouterInterface $router,
     Database $database,
     PaymentRepository $paymentRepository,
-    LessonRepository $lessonRepository,
     LoginService $loginService,
   )
   {
@@ -51,10 +45,8 @@ class PaymentsController extends AbstractController
     $this->loginService = $loginService;
     $this->database = $database;
     $this->invoiceService = $invoiceService;
-    $this->calendarService = $calendarService;
     $this->router = $router;
     $this->paymentRepository = $paymentRepository;
-    $this->lessonRepository = $lessonRepository;
   }
 
   protected function getLoginService(): LoginService
@@ -203,30 +195,6 @@ class PaymentsController extends AbstractController
     return Page::empty();
   }
 
-  public function lessons(): Page
-  {
-    $lessons = $this->lessonRepository->selectAll();
-
-    return $this->getPage(
-      relativeBodyTemplatePath: __FUNCTION__,
-      templateVars: [
-        'title' => 'Lessons',
-        'lessons' => $lessons,
-      ]
-    );
-  }
-
-  public function importLessons(): Page
-  {
-    try {
-      $this->calendarService->importLessonsFromCalendar();
-    } catch (PDOException $e) {
-      return $this->database->getDatabaseErrorPage($this, $e);
-    }
-    $this->redirect('/portal/lessons', 303);
-    return Page::empty();
-  }
-
   public function clear(): Page
   {
     try {
@@ -238,14 +206,4 @@ class PaymentsController extends AbstractController
     return Page::empty();
   }
 
-  public function clearLessons(): Page
-  {
-    try {
-      $this->lessonRepository->deleteAll();
-    } catch (PDOException $e) {
-      return $this->database->getDatabaseErrorPage($this, $e);
-    }
-    $this->redirect('/portal/lessons', 303);
-    return Page::empty();
-  }
 }
