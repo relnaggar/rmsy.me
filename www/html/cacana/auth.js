@@ -5,6 +5,7 @@ import {
   clearLocalData,
 } from "./database.js";
 
+
 export async function authFetch(url, options = {}) {
   const authToken = await getAuthToken();
   const headers = new Headers(options.headers || {});

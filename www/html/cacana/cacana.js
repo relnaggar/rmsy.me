@@ -9,6 +9,7 @@ import {
 } from "./database.js";
 import { logout } from "./auth.js";
 import { showLoginForm } from "./login.js";
+import { updateServiceWorker } from "./app.js";
 
 
 let loadingCount = 0;
@@ -130,7 +131,8 @@ const clickSyncButton = () => {
   withSyncStatus(() => syncAndRenderCacana());
 }
 
-const clickRefreshButton = () => {
+const clickRefreshButton = async () => {
+  updateServiceWorker();
   window.location.reload();
 }
 

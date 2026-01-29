@@ -1,6 +1,7 @@
 import { Dexie } from "./lib/dexie.min.mjs";
 import { authFetch } from "./auth.js";
 
+
 const db = new Dexie("cacana-db");
 
 db.version(VERSION_NUMBER).stores({
@@ -103,59 +104,65 @@ export async function sync(onUnauthorised) {
   }
 
   console.log("Syncing...");
-  const response = await authFetch("sync.php", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      outbox,
-      latestTimestamp,
-    }),
-  });
-  console.log("Sync response received.");
-
-  if (response.status === 401) {
-    onUnauthorised();
-    return false;
-  }
-
-  const responseData = await response.json();
-  if (responseData.success) {
-    console.log("Sync successful.");
-
-    if (outbox.length > 0) {
-      console.log("Clearing outbox...");
-      await db.table("outbox").bulkDelete(outbox.map(item => item.localId));
-      console.log("Outbox cleared.");
-    }
-
-    for (const caca of responseData.cacas) {
-      console.log("Updating/adding caca from server:", caca);
-      await db.table("cacas").put({
-        uuid: caca.uuid,
-        createdAt: caca.createdAt,
-        deletedAt: caca.deletedAt,
-        updatedAt: caca.updatedAt,
-      });
-      console.log("Caca updated/added.");
-    }
-
-    if (responseData.userColour) {
-      console.log("Updating user colour...");
-      await db.table("meta").put({
-        key: "userColour",
-        value: responseData.userColour,
-      });
-      console.log("User colour updated.");
-    }
-
-    console.log("Updating latest timestamp...");
-    await db.table("meta").put({
-      key: "latestTimestamp",
-      value: responseData.newLatestTimestamp,
+  try {
+    const response = await authFetch("sync.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        outbox,
+        latestTimestamp,
+      }),
     });
-    console.log("Latest timestamp updated.");
+
+    console.log("Sync response received.");
+    if (response.status === 401) {
+      onUnauthorised();
+      return;
+    }
+
+    const responseData = await response.json();
+
+    if (responseData.success) {
+      console.log("Sync successful.");
+
+      if (outbox.length > 0) {
+        console.log("Clearing outbox...");
+        await db.table("outbox").bulkDelete(outbox.map(item => item.localId));
+        console.log("Outbox cleared.");
+      }
+
+      for (const caca of responseData.cacas) {
+        console.log("Updating/adding caca from server:", caca);
+        await db.table("cacas").put({
+          uuid: caca.uuid,
+          createdAt: caca.createdAt,
+          deletedAt: caca.deletedAt,
+          updatedAt: caca.updatedAt,
+        });
+        console.log("Caca updated/added.");
+      }
+
+      if (responseData.userColour) {
+        console.log("Updating user colour...");
+        await db.table("meta").put({
+          key: "userColour",
+          value: responseData.userColour,
+        });
+        console.log("User colour updated.");
+      }
+
+      console.log("Updating latest timestamp...");
+      await db.table("meta").put({
+        key: "latestTimestamp",
+        value: responseData.newLatestTimestamp,
+      });
+      console.log("Latest timestamp updated.");
+    }
+    console.log("Sync complete.");
+  } catch (err) {
+    console.error("Sync failed:", err);
   }
 }
 
