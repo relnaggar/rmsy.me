@@ -185,4 +185,9 @@ class CalendarService
       );
     }
   }
+
+  public function isAuthorised(): bool
+  {
+    return $this->microsoftAuthController->isAuthorised();
+  }
 }

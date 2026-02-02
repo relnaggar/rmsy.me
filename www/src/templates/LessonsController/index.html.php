@@ -62,6 +62,9 @@
   <input
     type="submit"
     class="btn btn-primary"
-    value="Import Lessons from Calendar"
+    value="<?= $calendarAuthorised ?
+      'Import Lessons from Calendar' :
+      'Authorise Calendar Access'
+    ?>"
   >
 </form>

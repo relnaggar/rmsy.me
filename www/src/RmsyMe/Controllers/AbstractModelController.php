@@ -191,6 +191,13 @@ abstract class AbstractModelController extends AbstractController
     return $this->getPage($templatePath, $templateVars);
   }
 
+  protected function getIndexTemplateVars(): array
+  {
+    return [
+      'title' => ucfirst($this->getModelNamePlural()),
+    ];
+  }
+
   public function index(): Page
   {
     try {
@@ -199,12 +206,12 @@ abstract class AbstractModelController extends AbstractController
       return $this->database->getDatabaseErrorPage($this, $e);
     }
 
+    $templateVars = $this->getIndexTemplateVars();
+    $templateVars[$this->getModelNamePlural()] = $modelInstances;
+
     return $this->getPage(
       relativeBodyTemplatePath: __FUNCTION__,
-      templateVars: [
-        'title' => ucfirst($this->getModelNamePlural()),
-        $this->getModelNamePlural() => $modelInstances,
-      ]
+      templateVars: $templateVars,
     );
   }
 

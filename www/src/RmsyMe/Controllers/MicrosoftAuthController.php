@@ -244,4 +244,20 @@ class MicrosoftAuthController extends AbstractController
     $events = $responseData['value'] ?? [];
     return $events;
   }
+
+  public function isAuthorised(): bool
+  {
+    if (
+      empty($_SESSION['MS_ACCESS_TOKEN'])
+      || empty($_SESSION['MS_EXPIRES_AT'])
+    ) {
+      return false;
+    }
+    if (time() >= ($_SESSION['MS_EXPIRES_AT'] - 60)
+      && empty($_SESSION['MS_REFRESH_TOKEN'])
+    ) {
+      return false;
+    }
+    return true;
+  }
 }

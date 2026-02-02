@@ -74,4 +74,11 @@ class LessonsController extends AbstractModelController
     $this->redirect('/portal/lessons', 303);
     return Page::empty();
   }
+
+  protected function getIndexTemplateVars(): array
+  {
+    $templateVars = parent::getIndexTemplateVars();
+    $templateVars['calendarAuthorised'] = $this->calendarService->isAuthorised();
+    return $templateVars;
+  }
 }
