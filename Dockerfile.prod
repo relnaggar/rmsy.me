@@ -1,4 +1,4 @@
-FROM debian:12.7-slim
+FROM debian:13.3-slim
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y \
@@ -21,7 +21,7 @@ RUN apt-get update -y \
   && chmod 750 /etc/ssl/private \
   && chown root:apache2 /etc/ssl/private/ssl-cert-snakeoil.key \
   && chmod 640 /etc/ssl/private/ssl-cert-snakeoil.key \
-  # php (8.2 with debian:12.7)
+  # php (8.4 with debian:13.3)
   && apt-get install -y --no-install-recommends \
   php php-mbstring php-xml php-curl php-zip \
   # apache2 php module
@@ -45,18 +45,9 @@ RUN apt-get update -y \
 # install composer
 COPY --from=composer/composer:2.2-bin /composer /usr/bin/composer
 
-# add composer dependencies
-RUN \
-  # framework
-  composer require relnaggar/veloz:^1.9 \
-  # rmsy.me
-  && composer require phpmailer/phpmailer \
-  && composer require symfony/http-client \
-  && composer require robmorgan/phinx \
-  && composer require prinsfrank/standards \
-  && composer require dompdf/dompdf \
-  && composer require microsoft/microsoft-graph \
-  && composer require firebase/php-jwt
+# install composer dependencies
+COPY composer.json composer.lock /
+RUN composer install --no-dev --optimize-autoloader
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="PRODUCTION"
@@ -91,6 +82,10 @@ COPY config/apache2/ /etc/apache2
 
 # copy contents of public folder to /var/www
 COPY www/ /var/www
+
+# install Laravel dependencies and fix permissions
+RUN composer install --no-dev --optimize-autoloader --working-dir=/var/www/laravel \
+  && chown -R apache2:apache2 /var/www/laravel/storage /var/www/laravel/bootstrap/cache
 
 # copy contents of phinx folders
 COPY phinx/ /var/phinx

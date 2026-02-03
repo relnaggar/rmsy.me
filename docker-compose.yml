@@ -24,6 +24,7 @@ services:
       - MS_CLIENT_ID
       - MS_REDIRECT_URI
       - JWT_SECRET
+      - LARAVEL_APP_KEY
   bundler:
     init: true
     container_name: bundler
@@ -52,3 +53,5 @@ secrets:
     file: ./secrets/MS_REDIRECT_URI
   JWT_SECRET:
     file: ./secrets/JWT_SECRET
+  LARAVEL_APP_KEY:
+    file: ./secrets/LARAVEL_APP_KEY

@@ -1,0 +1,19 @@
+{
+    "name": "relnaggar/rmsy-me",
+    "description": "Personal portfolio website",
+    "type": "project",
+    "require": {
+        "php": "^8.4",
+        "relnaggar/veloz": "^1.9",
+        "phpmailer/phpmailer": "*",
+        "symfony/http-client": "*",
+        "robmorgan/phinx": "*",
+        "prinsfrank/standards": "*",
+        "dompdf/dompdf": "*",
+        "microsoft/microsoft-graph": "*",
+        "firebase/php-jwt": "*"
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

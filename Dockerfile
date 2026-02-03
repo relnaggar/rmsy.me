@@ -1,4 +1,4 @@
-FROM debian:12.7-slim
+FROM debian:13.3-slim
 ENV DEBIAN_FRONTEND=noninteractive
 
 # install apache
@@ -46,7 +46,7 @@ RUN a2enmod headers \
 # implement baseline permissive CSP globally
 Header always set Content-Security-Policy: "\\
 default-src 'none';\\
-form-action 'self' https://login.microsoftonline.com https://login.live.com;\\
+form-action 'self';\\
 style-src 'self' https:;\\
 script-src 'self' https://challenges.cloudflare.com;\\
 img-src 'self' data: https:;\\
@@ -117,11 +117,15 @@ RUN a2enmod headers \
 Header always set X-Content-Type-Options: "nosniff"
 EOF
 
-# install php for apache
+# install php fpm
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends \
-  # php (8.2 with debian:12.7)
-  php php-mbstring php-xml php-curl php-zip \
+  # (8.4 with debian:13.3)
+  php \
+  php-mbstring \
+  php-xml \
+  php-curl \
+  php-zip \
   # apache2 php module
   libapache2-mod-php \
   # cleanup
@@ -180,17 +184,9 @@ RUN apt-get update -y \
   && apt clean \
   && rm -rf /var/lib/apt/lists/*
 
-# add composer dependencies for rmsy.me
-RUN composer require phpmailer/phpmailer
-RUN composer require symfony/http-client
-RUN composer require robmorgan/phinx
-RUN composer require prinsfrank/standards
-RUN composer require dompdf/dompdf
-RUN composer require microsoft/microsoft-graph
-RUN composer require firebase/php-jwt
-
-# add framework
-RUN composer require relnaggar/veloz:^1.9
+# install composer dependencies
+COPY composer.json composer.lock /
+RUN composer install
 
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"
