@@ -100,3 +100,11 @@ To create a new migration:
 ```bash
 docker compose exec app vendor/bin/phinx create <MigrationName> -c /var/phinx/phinx.php
 ```
+
+# Laravel
+
+To run Laravel Artisan commands:
+
+```bash
+docker compose exec -u apache2 app php /var/www/laravel/artisan <command>
+```
