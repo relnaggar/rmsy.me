@@ -1,0 +1,16 @@
+FROM node:20-alpine
+WORKDIR /laravel
+
+# install dependencies
+COPY package.json package-lock.json ./
+RUN npm install
+
+# copy source files needed for build
+COPY vite.config.js ./
+COPY resources/ ./resources/
+
+# build command
+CMD ["npm", "run", "build"]
+
+# output volume
+VOLUME ["/laravel/public/build"]

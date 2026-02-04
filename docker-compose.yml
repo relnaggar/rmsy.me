@@ -34,6 +34,18 @@ services:
       - ./www/html/css:/bundler/dist/css
       - ./www/html/js:/bundler/dist/js
       - ./www/html/fonts:/bundler/dist/fonts
+  laravel-vite:
+    init: true
+    container_name: laravel-vite
+    build:
+      context: ./www/laravel
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./www/laravel/resources:/laravel/resources
+      - ./www/laravel/public:/laravel/public
+      - ./www/laravel/vite.config.js:/laravel/vite.config.js
 secrets:
   SMTP_HOST:
     file: ./secrets/SMTP_HOST

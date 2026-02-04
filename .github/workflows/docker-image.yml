@@ -32,6 +32,13 @@ jobs:
         -v "$(pwd)/www/html/fonts:/bundler/dist/fonts"
         ${{ secrets.DOCKERHUB_USERNAME }}/bundler:${{ env.IMAGE_TAG }};
 
+    - name: Build and run Laravel asset builder
+      run: >
+        docker build ./www/laravel -f www/laravel/Dockerfile.build --tag
+        ${{ secrets.DOCKERHUB_USERNAME }}/laravel-builder:${{ env.IMAGE_TAG }};
+        docker run --rm -v "$(pwd)/www/laravel/public/build:/laravel/public/build"
+        ${{ secrets.DOCKERHUB_USERNAME }}/laravel-builder:${{ env.IMAGE_TAG }};
+
     - name: Build the Docker image with Dockerfile.prod
       run: >
         docker build . -f Dockerfile.prod --tag
