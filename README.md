@@ -105,6 +105,13 @@ docker compose exec app vendor/bin/phinx create <MigrationName> -c /var/phinx/ph
 
 To run Laravel Artisan commands:
 
+In development:
 ```bash
 docker compose exec -u apache2 app php /var/www/laravel/artisan <command>
+```
+
+From within the production container:
+```bash
+su -s /bin/bash apache2
+php /var/www/laravel/artisan <command>
 ```
