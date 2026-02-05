@@ -13,6 +13,7 @@
 /public/build
 /public/hot
 /public/storage
+/resources/fonts/*.woff*
 /storage/*.key
 /storage/pail
 /vendor

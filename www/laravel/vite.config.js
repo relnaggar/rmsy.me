@@ -1,27 +1,17 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 
-export default defineConfig({
-    build: {
-        rollupOptions: {
-            output: {
-                // Keep font filenames predictable for preloading
-                assetFileNames: (assetInfo) => {
-                    if (/\.(woff2?|ttf|otf|eot)$/.test(assetInfo.name)) {
-                        return 'assets/fonts/[name][extname]';
-                    }
-                    return 'assets/[name]-[hash][extname]';
-                },
-            },
-        },
-    },
+
+export default defineConfig(({ command }) => ({
+    base: command === 'build' ? '/laravel/build/' : '/',
     plugins: [
         laravel({
             input: [
                 'resources/scss/styles.scss',
                 'resources/scss/cacana.scss',
                 'resources/scss/invoice.scss',
-                'resources/js/main.js'
+                'resources/js/main.js',
+                'resources/fonts/bootstrap-icons.woff2'
             ],
             refresh: true,
         }),
@@ -43,4 +33,4 @@ export default defineConfig({
             usePolling: true,
         },
     },
-});
+}));

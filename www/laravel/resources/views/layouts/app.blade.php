@@ -15,16 +15,13 @@
 
     <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon" />
     @vite(['resources/scss/styles.scss', 'resources/js/main.js'])
-
-    @production
     <link
       rel="preload"
-      href="{{ asset('build/assets/fonts/bootstrap-icons.woff2') }}"
+      href="{{ Vite::asset('resources/fonts/bootstrap-icons.woff2') }}"
       as="font"
       type="font/woff2"
       crossorigin
     >
-    @endproduction
     @stack('preload')
     <link rel="canonical" href="{{ url()->current() }}">
   </head>

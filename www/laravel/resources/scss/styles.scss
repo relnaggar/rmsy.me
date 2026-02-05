@@ -1,5 +1,12 @@
 @import 'bootstrap-common';
 
+// Bootstrap Icons (font files copied into resources/fonts at build time)
+$bootstrap-icons-font-dir: "../fonts";
+$bootstrap-icons-font-src:
+  url("#{$bootstrap-icons-font-dir}/bootstrap-icons.woff2") format("woff2"),
+  url("#{$bootstrap-icons-font-dir}/bootstrap-icons.woff") format("woff");
+@import "bootstrap-icons/font/bootstrap-icons";
+
 // 6. Optionally include any other parts as needed
 @import "bootstrap/scss/utilities";
 @import "bootstrap/scss/reboot";
