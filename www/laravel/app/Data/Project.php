@@ -72,6 +72,6 @@ class Project
 
     public function getPath(): string
     {
-        return "/projects/{$this->slug}";
+        return route('projects.show', $this->slug);
     }
 }

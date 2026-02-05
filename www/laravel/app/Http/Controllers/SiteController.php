@@ -28,7 +28,7 @@ class SiteController extends Controller
 
         // define the roles data
         $freeMeetingCallToAction = [
-        'href' => '/free-meeting',
+        'href' => url('/free-meeting'),
         'external' => true,
         'text' => 'Book a free meeting',
         'btn-type' => 'cta',
@@ -45,14 +45,14 @@ class SiteController extends Controller
                 'callsToAction' => [
                 [
                     // 'href' => '/services/engineer',
-                    'href' => '/projects/',
+                    'href' => route('projects.index'),
                     'external' => false,
                     // 'text' => 'Learn more about my engineering services',
                     'text' => 'Learn more about my engineering projects',
                     'btn-type' => 'primary',
                 ],
                 [
-                    'href' => '/resumes/full-stack-developer',
+                    'href' => url('/resumes/full-stack-developer'),
                     'external' => true,
                     'text' => 'View my full stack developer resume',
                     'btn-type' => 'success',
@@ -78,7 +78,7 @@ class SiteController extends Controller
                     'btn-type' => 'primary',
                 ],
                 [
-                    'href' => '/resumes/educator',
+                    'href' => url('/resumes/educator'),
                     'external' => true,
                     'text' => 'View my educator resume',
                     'btn-type' => 'success',

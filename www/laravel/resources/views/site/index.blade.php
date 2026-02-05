@@ -71,7 +71,7 @@ Hi, I'm Ramsey 👋. Welcome to my slice of the internet pie!
                 @include('components.external-link', [
                   'href' => $cta['href'],
                   'class' => $cta['class'],
-                  'slot' => $cta['text'],
+                  'html' => $cta['text'],
                 ])
               <?php else: ?>
                 <a

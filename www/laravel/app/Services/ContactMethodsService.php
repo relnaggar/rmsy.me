@@ -14,7 +14,7 @@ class ContactMethodsService
             [
                 'title' => 'Free meeting',
                 'icon' => 'calendar3',
-                'href' => '/free-meeting',
+                'href' => url('/free-meeting'),
                 'html' => 'rmsy.me/free-meeting',
                 'external' => true,
                 'inMenu' => false,
@@ -33,7 +33,7 @@ class ContactMethodsService
             [
                 'title' => 'GitHub',
                 'icon' => 'github',
-                'href' => '/github',
+                'href' => url('/github'),
                 'html' => 'rmsy.me/github',
                 'external' => true,
                 'inMenu' => true,
@@ -42,7 +42,7 @@ class ContactMethodsService
             [
                 'title' => 'LinkedIn',
                 'icon' => 'linkedin',
-                'href' => '/linkedin',
+                'href' => url('/linkedin'),
                 'html' => 'rmsy.me/linkedin',
                 'external' => true,
                 'inMenu' => true,

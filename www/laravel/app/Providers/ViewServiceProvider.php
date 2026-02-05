@@ -17,10 +17,10 @@ class ViewServiceProvider extends ServiceProvider
     {
         View::composer('*', function ($view) {
             $navService = app(NavService::class);
-            $currentPath = request()->getPathInfo();
+            $currentUrl = request()->url();
 
-            $view->with('menuNav', $navService->getNavForPath($currentPath));
-            $view->with('sidebarNav', $navService->getSidebarNav($currentPath));
+            $view->with('menuNav', $navService->getNavForPath($currentUrl));
+            $view->with('sidebarNav', $navService->getSidebarNav($currentUrl));
         });
     }
 }

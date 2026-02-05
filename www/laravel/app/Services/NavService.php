@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Exception;
 use App\Data\Nav;
 use App\Data\NavItem;
-use Exception;
 
 class NavService
 {
@@ -25,41 +25,43 @@ class NavService
         // projects dropdown
         $projectsItem = new NavItem(
             text: 'Projects',
-            path: '/projects',
+            path: route('projects.index'),
             previousNextButtonsEnabled: true,
         );
         $projectsItem->addDropdownItem(new NavItem(
             text: 'All Projects',
-            path: '/',
+            path: route('projects.index'),
         ));
         foreach ($this->projectsService->getProjects() as $project) {
             $projectsItem->addDropdownItem(new NavItem(
                 text: $project->title,
-                path: "/{$project->slug}",
+                path: route('projects.show', $project->slug),
             ));
         }
 
         // resumes dropdown
-        $resumesItem = new NavItem(text: 'Resumes', path: '/resumes');
+        $resumesItem = new NavItem(text: 'Resumes', path: url('/resumes'));
         $resumesItem->addDropdownItem(new NavItem(
             text: 'Full Stack Developer',
-            path: '/full-stack-developer',
+            path: url('/resumes/full-stack-developer'),
             external: true,
         ));
         $resumesItem->addDropdownItem(new NavItem(
             text: 'CS & SE Educator',
-            path: '/educator',
+            path: url('/resumes/educator'),
             external: true,
         ));
 
         // nav items
-        $this->addNavItem(new NavItem(text: 'Home', path: '/'));
-        $this->addNavItem(new NavItem(text: 'About', path: '/about'));
+        $this->addNavItem(new NavItem(text: 'Home', path: route('home')));
+        $this->addNavItem(new NavItem(text: 'About', path: route('about')));
         $this->addNavItem($projectsItem);
         $this->addNavItem($resumesItem);
 
         // add each contact method to the nav
-        foreach ($this->contactMethodsService->getContactMethods() as $contactMethod) {
+        foreach (
+            $this->contactMethodsService->getContactMethods() as $contactMethod
+        ) {
             $this->addNavItem(new NavItem(
                 text: $contactMethod['title'],
                 path: $contactMethod['href'],
@@ -72,31 +74,49 @@ class NavService
 
         $this->addNavItem(new NavItem(
             text: 'Contact',
-            path: '/contact',
+            path: route('contact.show'),
             icon: 'envelope',
             inFooter: true
         ));
 
         $this->addNavItem(new NavItem(
             text: 'Portal Login',
-            path: '/portal/login',
+            path: route('login'),
             alignEnd: true,
         ));
 
         // portal nav (not in main menu)
-        $portalItem = new NavItem(text: 'Portal', path: '/portal', inMenu: false);
-        $portalItem->addDropdownItem(new NavItem(text: 'Dashboard', path: '/'));
-        $portalItem->addDropdownItem(new NavItem(text: 'Payments', path: '/payments'));
-        $portalItem->addDropdownItem(new NavItem(text: 'Buyers', path: '/buyers'));
-        $portalItem->addDropdownItem(new NavItem(text: 'Clients', path: '/clients'));
-        $portalItem->addDropdownItem(new NavItem(text: 'Students', path: '/students'));
-        $portalItem->addDropdownItem(new NavItem(text: 'Lessons', path: '/lessons'));
-        $portalItem->addDropdownItem(new NavItem(text: 'Logout', path: '/logout'));
+        $portalItem = new NavItem(
+            text: 'Portal',
+            path: route('portal.dashboard'),
+            inMenu: false
+        );
+        $portalItem->addDropdownItem(
+            new NavItem(text: 'Dashboard', path: route('portal.dashboard'))
+        );
+        $portalItem->addDropdownItem(
+            new NavItem(text: 'Payments', path: route('portal.payments.index'))
+        );
+        $portalItem->addDropdownItem(
+            new NavItem(text: 'Buyers', path: route('portal.buyers.index'))
+        );
+        $portalItem->addDropdownItem(
+            new NavItem(text: 'Clients', path: route('portal.clients.index'))
+        );
+        $portalItem->addDropdownItem(
+            new NavItem(text: 'Students', path: route('portal.students.index'))
+        );
+        $portalItem->addDropdownItem(
+            new NavItem(text: 'Lessons', path: route('portal.lessons.index'))
+        );
+        $portalItem->addDropdownItem(
+            new NavItem(text: 'Logout', path: route('logout'))
+        );
         $this->addNavItem($portalItem);
 
         // nav
         $this->nav = new Nav(
-            homePath: '/',
+            homePath: route('home'),
             title: 'Software Engineer & Educator',
             items: $this->navItems,
         );
@@ -134,7 +154,10 @@ class NavService
     {
         // Check if path matches a nav item with dropdown
         foreach ($this->nav->items as $navItem) {
-            if ($navItem->isDropdown() && str_starts_with($path, $navItem->getPath())) {
+            if (
+                $navItem->isDropdown() &&
+                str_starts_with($path, $navItem->getPath())
+            ) {
                 $sidebarNav = $navItem->getAsNav();
                 $sidebarNav->setActiveItem($path);
 

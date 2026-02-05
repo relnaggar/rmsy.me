@@ -44,11 +44,6 @@ class NavItem
         return $this->path;
     }
 
-    public function addBasePath(string $basePath): void
-    {
-        $this->path = $basePath.$this->path;
-    }
-
     public function isActive(): bool
     {
         return $this->active;
@@ -80,9 +75,10 @@ class NavItem
     public function addDropdownItem(NavItem $item): void
     {
         if ($item->isDropdown()) {
-            throw new Exception('Cannot add a dropdown item to a dropdown item');
+            throw new Exception(
+                'Cannot add a dropdown item to a dropdown item'
+            );
         }
-        $item->addBasePath($this->path);
         $this->dropdownItems[] = $item;
     }
 

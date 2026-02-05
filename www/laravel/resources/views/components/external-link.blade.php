@@ -9,7 +9,7 @@ $isButton = str_contains($class, 'btn');
     target="_blank"
     rel="noopener noreferrer"
 >
-    {{ $slot }}
+    {!! $html !!}
     @if ($isButton)
         <i class="bi bi-box-arrow-up-right"></i>
     @endif
