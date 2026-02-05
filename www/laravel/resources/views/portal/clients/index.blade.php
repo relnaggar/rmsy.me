@@ -1,0 +1,40 @@
+@extends('layouts.app')
+
+@section('title', 'Clients')
+@section('heading', 'Clients')
+
+@section('content')
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    @forelse($clients as $client)
+      <tr>
+        <td>{{ $client->id }}</td>
+        <td>{{ $client->name }}</td>
+        <td>
+          <a href="{{ route('portal.clients.edit', $client) }}" class="btn btn-sm btn-primary">Edit</a>
+        </td>
+      </tr>
+    @empty
+      <tr>
+        <td colspan="3" class="text-center">No clients found.</td>
+      </tr>
+    @endforelse
+  </tbody>
+</table>
+
+@if($clients->count() > 0)
+  <form action="{{ route('portal.clients.clear') }}" method="POST" class="mt-3"
+        onsubmit="return confirm('Are you sure you want to delete all clients?')">
+    @csrf
+    @method('DELETE')
+    <button type="submit" class="btn btn-danger">Delete All Clients</button>
+  </form>
+@endif
+@endsection

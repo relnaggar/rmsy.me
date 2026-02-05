@@ -1,0 +1,62 @@
+.navbar {
+  padding: 0 !important;
+  align-items: normal !important; // for navbar items with background
+  user-select: none !important;
+}
+
+.navbar-horizontal {
+  box-shadow: 0 0 1rem rgba(0,0,0,0.2);
+}
+
+.navbar-brand {
+  white-space: normal !important; // allow brand to wrap on resize
+}
+
+.navbar-brand-custom {
+  @extend .navbar-brand;
+  padding: 13px 16px 13px;
+  margin: 0;
+}
+
+.navbar-brand-right-banner {
+  background-color: color-contrast($primary);
+  color: $primary !important;
+  &:hover, &:focus {
+    color: if(color-contrast($primary) == $color-contrast-light, shade-color($primary, $link-shade-percentage), tint-color($primary, $link-shade-percentage)) !important;
+  }
+}
+
+.navbar-toggler-custom {
+  @extend .navbar-toggler;
+  margin-right: 12px;
+  box-shadow: none !important;
+  border-width: 2px;
+}
+
+.navbar-nav {
+  margin-bottom: 0 !important;
+}
+
+.navbar-nav .nav-link, .dropdown-item {
+  .navbar-horizontal & {
+    @include media-breakpoint-up(sm) {
+      padding: 16px 16px;
+    }
+    @include media-breakpoint-only(xs) {
+      padding: 8px 16px;
+    }
+  }
+  .navbar-vertical & {
+    padding-left: 16px;
+  }
+
+  &:hover, &:focus, &.active:hover, &.active:focus  {
+    background-color: $black !important;
+    color: $white !important;
+  }
+
+  &.active {
+    background-color: $primary !important;
+    color: color-contrast($primary) !important;
+  }
+}
