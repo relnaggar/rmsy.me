@@ -56,32 +56,35 @@ Hi, I'm Ramsey 👋. Welcome to my slice of the internet pie!
       <div class="card mb-3">
         <div class="card-header pt-3">
           <div class="h5">
-            <?= $role['header'] ?>
-            <i class="bi bi-<?= $role['icon'] ?>"></i>
+            {{ $role['header'] }}
+            <i class="bi bi-{{ $role['icon'] }}"></i>
           </div>
         </div>
         <div class="card-body">
           <p>
-            <?= $role['content'] ?>
+            {{ $role['content'] }}
           </p>
           <p>
-            <?php foreach ($role['callsToAction'] as $cta): ?>
-              <?php $cta['class'] = 'btn btn-' . $cta['btn-type'] . ' mb-2'; ?>
-              <?php if (!empty($cta['external'])): ?>
-                @include('components.external-link', [
-                  'href' => $cta['href'],
-                  'class' => $cta['class'],
-                  'html' => $cta['text'],
-                ])
-              <?php else: ?>
-                <a
-                  href="<?= $cta['href'] ?>"
-                  class="<?= $cta['class'] ?>"
+            @foreach ($role['callsToAction'] as $cta)
+              @php
+                $cta['class'] = 'btn btn-' . $cta['btn-type'] . ' mb-2';
+              @endphp
+              @if (!empty($cta['external']))
+                <x-external-link
+                  href="{{ $cta['href'] }}"
+                  class="{{ $cta['class'] }}"
                 >
-                  <?= $cta['text'] ?>
+                  {{ $cta['text'] }}
+                </x-external-link>
+              @else
+                <a
+                  href="{{ $cta['href'] }}"
+                  class="{{ $cta['class'] }}"
+                >
+                  {{ $cta['text'] }}
                 </a>
-              <?php endif; ?>
-            <?php endforeach; ?>
+              @endif
+            @endforeach
           </p>
         </div>
       </div>

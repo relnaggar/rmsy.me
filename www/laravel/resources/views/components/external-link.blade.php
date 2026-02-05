@@ -1,5 +1,3 @@
-@props(['href', 'class' => ''])
-
 @php
 $isButton = str_contains($class, 'btn');
 @endphp
@@ -9,7 +7,7 @@ $isButton = str_contains($class, 'btn');
     target="_blank"
     rel="noopener noreferrer"
 >
-    {!! $html !!}
+    {{ $slot }}
     @if ($isButton)
         <i class="bi bi-box-arrow-up-right"></i>
     @endif
