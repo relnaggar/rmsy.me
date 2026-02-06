@@ -1,54 +1,94 @@
 @extends('layouts.app')
 
+@push('preload')
+<link
+  rel="preload"
+  href="{{ media('img/profile.jpg') }}"
+  as="image"
+  type="image/jpeg"
+>
+@endpush
+
 @section('title', 'About')
-@section('heading', 'About Me')
-@section('metaDescription', 'Learn more about Ramsey El-Naggar, a software engineer and educator based in the UK.')
+@section('heading', 'About')
+@section('metaDescription')
+I'm a software engineer. My specialty?
+Well, I dive into the depths of full-stack web application development.
+@endsection
 
 @section('content')
-<div class="row">
-  <div class="col-md-8">
-    <p class="lead">
-      I'm Ramsey El-Naggar, a software engineer and educator with a passion for
-      building great software and helping others learn to code.
-    </p>
+<figure class="figure col-sm-6 float-end m-3 col-12">
+  <img
+    src="{{ media('img/profile.jpg') }}"
+    class="figure-img img-fluid"
+    alt="Ramsey El-Naggar"
+  >
+</figure>
 
-    <section id="experience" class="mb-4">
-      <h2>Experience</h2>
-      <hr>
-      <p>
-        I have experience working as a full-stack developer, building web applications
-        using modern technologies including PHP, Laravel, JavaScript, and more.
-      </p>
-    </section>
-
-    <section id="tutoring" class="mb-4">
-      <h2>Tutoring</h2>
-      <hr>
-      <p>
-        I've been tutoring computer science and software engineering for many years,
-        helping students at all levels understand complex concepts and build their skills.
-      </p>
-    </section>
-
-    <section id="education" class="mb-4">
-      <h2>Education</h2>
-      <hr>
-      <p>
-        I hold a Master of Informatics (Computer Science & Intelligent Robotics)
-        with First Class Honours from the University of Edinburgh.
-      </p>
-    </section>
-  </div>
-  <div class="col-md-4">
-    <img
-      src="{{ $mediaRoot }}/profile.jpg"
-      alt="Ramsey El-Naggar"
-      class="img-fluid rounded"
-    >
-  </div>
-</div>
-
-<p class="text-muted mt-4">
-  <small>Last updated: {{ $lastModifiedDateFormatted }}</small>
+<p class="lead">
+  I'm a software engineer.
 </p>
+
+<p>
+  My specialty? Well, I dive into the depths of full-stack web application
+  development.
+  My journey has taken me from sprucing up hefty existing codebases, to crafting
+  a reusable back-end framework   from scratch -- and all the nitty-gritty
+  coding challenges in between.
+</p>
+
+<p data-nosnippet>
+  Not too long ago, my curiosity and drive for innovation led me to build a
+  <a href="{{ route('projects.show', 'beetle') }}">dung beetle biorobot</a>
+  -- yes, you read that right!
+  It was a fascinating adventure that took me from plumbing the profound depths
+  of the insect neuroscience literature to stretching the concept of "playing
+  with LEGO" to new and extreme heights.
+  Believe it or not, I even received a grant to fly out to South Africa and test
+  the robot against real dung beetles (spoiler alert: the robot won).
+</p>
+
+<p data-nosnippet>
+  But wait, there's more to my story.
+  You see, I believe that knowledge shared is knowledge multiplied, and I
+  absolutely love sharing my knowledge and passion for programming.
+  As an
+  <x-external-link href="https://www.mytutor.co.uk/tutors/24851/">
+    educator
+  </x-external-link>
+  I've had the joy of introducing undergraduate students to the vast world of
+  computer science.
+  From the magic of web development, to the elegance of OOP, to the intellectual
+  puzzles in algorithms and data structures: we've journeyed through it all,
+  there and back again.
+</p>
+
+<p data-nosnippet>
+  Don't worry though, it's not all work and no play.
+  I've also embraced the thrill of the unknown by hitchhiking from London to
+  Vienna in 4 days, and honed my warrior spirit through 3 months of intense Muay
+   Thai training in Thailand.
+  Plus, my university a capella group reached the semi-final of national
+  competition Voice Festival UK -- it was Pitch Perfect!
+  Currently, I'm mixing syntax with salsa, living a spicy adventure in Valencia
+  where my Spanish is improving one bachata beat at a time.
+</p>
+
+<p data-nosnippet>
+  Still curious?
+  Check out
+  <x-external-link href="{{ url('/linkedin') }}">
+    my LinkedIn
+  </x-external-link>
+  , which is the story of my professional life in all its glory.
+  Or better yet, feel free to
+  <a href="{{ route('contact.show') }}">reach out for a chat</a>
+  -- I'm always game to talk tech, education, or even dung beetles!
+</p>
+
+<blockquote class="blockquote pt-3">
+  <p class="blockquote-footer">
+    Ramsey El-Naggar, {{ $lastModifiedDateFormatted }}
+  </p>
+</blockquote>
 @endsection

@@ -104,7 +104,6 @@ class SiteController extends Controller
 
         return view('site.about', [
             'lastModifiedDateFormatted' => $lastModifiedDateFormatted,
-            'mediaRoot' => '/img',
         ]);
     }
 }

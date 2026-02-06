@@ -6,12 +6,10 @@ $isButton = str_contains($class, 'btn');
     class="{{ $class }}"
     target="_blank"
     rel="noopener noreferrer"
->
-    {{ $slot }}
-    @if ($isButton)
-        <i class="bi bi-box-arrow-up-right"></i>
-    @endif
-</a>
+>{{ $slot }}{!! $isButton ?
+    ' <i class="bi bi-box-arrow-up-right"></i>' :
+    ''
+!!}</a>
 @if (!$isButton)
     <i class="bi bi-box-arrow-up-right"></i>
 @endif
