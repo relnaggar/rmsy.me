@@ -24,6 +24,7 @@
   <div class="mt-3">
     @yield('content')
   </div>
+  @include('partials.on-this-page-fixed')
   @yield('sections')
   @include('partials.previous-next-buttons')
 </main>

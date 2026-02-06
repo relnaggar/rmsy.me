@@ -62,7 +62,7 @@ Hi, I'm Ramsey 👋. Welcome to my slice of the internet pie!
         </div>
         <div class="card-body">
           <p>
-            {{ $role['content'] }}
+            {!! $role['content'] !!}
           </p>
           <p>
             @foreach ($role['callsToAction'] as $cta)

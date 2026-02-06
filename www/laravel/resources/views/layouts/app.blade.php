@@ -49,9 +49,7 @@
         @include('partials.main')
         @include('partials.fixed')
         <div class="col-lg-2 col-md-1 d-none d-lg-block">
-          @if(isset($onThisPage) && count($onThisPage) > 0)
-            @include('partials.on-this-page-side')
-          @endif
+        @include('partials.on-this-page-side')
         </div>
       </div>
       @include('partials.footer')
