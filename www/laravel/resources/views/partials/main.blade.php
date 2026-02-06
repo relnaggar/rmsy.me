@@ -1,5 +1,4 @@
 <main class="flex-grow-1 m-5 d-flex flex-column min-vh-100" id="main">
-  <!-- TODO alert not tested -->
   @if(session('success'))
     <x-alert type="success" :message="session('success')" />
   @endif
@@ -21,10 +20,10 @@
       @yield('subtitle')
     </div>
   @endif
-  @yield('previousNextButtons')
+  @include('partials.previous-next-buttons')
   <div class="mt-3">
     @yield('content')
   </div>
   @yield('sections')
-  @yield('previousNextButtons')
+  @include('partials.previous-next-buttons')
 </main>

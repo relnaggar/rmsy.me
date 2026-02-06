@@ -1,3 +1,5 @@
+@props(['href', 'class' => ''])
+
 @php
 $isButton = str_contains($class, 'btn');
 @endphp

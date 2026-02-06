@@ -12,7 +12,7 @@
     flex-nowrap
   "
 >
-  <span class="navbar-brand p-3 m-0">On this page</span>
+  <span class="border-bottom w-100 text-muted p-3">On this page</span>
   <ul class="navbar-nav w-100">
     @foreach($onThisPage as $section)
       <li class="nav-item">

@@ -1,24 +1,23 @@
 @extends('layouts.app')
 
+@if($preloadImage !== null)
+@push('preload')
+<link
+  rel="preload"
+  href="{{ media('img/' . $preloadImage->href) }}"
+  as="image"
+  type="{{ $preloadImage->getMimeType() }}"
+>
+@endpush
+@endif
+
 @section('title', $project->title)
 @section('heading', $project->title)
 @section('metaDescription', $project->metaDescription)
 
-@section('content')
-@if($project->sources)
-  <div class="mb-4">
-    @foreach($project->sources as $source)
-      <a href="{{ $source->href }}" class="btn btn-outline-primary me-2" target="_blank" rel="noopener noreferrer">
-        <i class="bi bi-{{ $source->icon }}"></i> {{ $source->title }}
-      </a>
-    @endforeach
-  </div>
-@endif
-@endsection
-
 @section('sections')
 @foreach($sections as $section)
-  <section id="{{ $section->id }}" class="mb-4">
+  <section id="{{ $section->id }}" class="mb-3">
     <h2>{{ $section->title }}</h2>
     <hr>
     {!! $section->getHtmlContent() !!}

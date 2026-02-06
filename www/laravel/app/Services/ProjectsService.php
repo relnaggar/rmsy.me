@@ -16,7 +16,8 @@ class ProjectsService
         $this->addProject(new Project(
             'rmsy.me',
             '🖼 My Mona Lisa: A Personal Website',
-            '',
+            'Find out how I gave birth to this technological tapestry. '
+                .'Curiosity is better than regret!',
             'Find out how I gave birth to this technological tapestry. '
                 .'Curiosity is better than regret!',
             'thumbnail.webp',
@@ -37,7 +38,7 @@ class ProjectsService
         $this->addProject(new Project(
             'veloz',
             '⚡ Veloz: Yet Another PHP Mini-Framework',
-            '',
+            'Could this be the next big drop in the PHP ocean? Dive in and find out!',
             'Could this be the next big drop in the PHP ocean? Dive in and find out!',
             'thumbnail.webp',
             sections: [
@@ -62,7 +63,8 @@ class ProjectsService
         $this->addProject(new Project(
             'webploy',
             '🚀 WebPloy: From Apache 2 Production',
-            '',
+            'Drama-free deployment for your Apache 2 projects. '
+                .'Avoid the chaos and focus on the code!',
             'Drama-free deployment for your Apache 2 projects. '
                 .'Avoid the chaos and focus on the code!',
             'thumbnail.webp',
@@ -96,6 +98,7 @@ class ProjectsService
                 .'robotics alike.',
             'Robot vs beetle: who will be the ultimate fighting champion?',
             'vs-robot.webp',
+            preloadImageFile: 'beetles-fighting.jpg',
             featured: true,
             sections: [
                 ['summary', 'Executive Summary'],
@@ -109,11 +112,12 @@ class ProjectsService
 
         $this->addProject(new Project(
             'sdp',
-            'Robo-Messi: When Silicon Met Soccer',
+            '⚽ Robo-Messi: When Silicon Met Soccer',
             'Join the journey of building Robo-Messi, the football-playing LEGO '
                 .'robot that changed robo-football forever.',
-            '⚽ Robo-Messi wants a hug. Will you give him one?',
+            'Robo-Messi wants a hug. Will you give him one?',
             'hug.jpg',
+            preloadImageFile: 'initial-front.jpg',
             sections: [
                 ['summary', 'Executive Summary'],
                 ['introduction', 'SDP: The Third-Year Frontier'],

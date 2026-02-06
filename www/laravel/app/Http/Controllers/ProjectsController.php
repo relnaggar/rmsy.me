@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Services\ProjectsService;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ProjectsController extends Controller
@@ -14,9 +13,17 @@ class ProjectsController extends Controller
 
     public function index(): View
     {
+        $projects = $this->projectsService->getProjects();
+
+        $preloadImages = array_slice(
+            array_map(fn($project) => $project->thumbnail, $projects),
+            0,
+            2,
+        );
+
         return view('projects.index', [
-            'projects' => $this->projectsService->getProjects(),
-            'mediaRoot' => '/img',
+            'projects' => $projects,
+            'preloadImages' => $preloadImages,
         ]);
     }
 
@@ -28,13 +35,13 @@ class ProjectsController extends Controller
             abort(404);
         }
 
-        // Render section content
         $sections = $project->getSections();
         foreach ($sections as $section) {
             $viewName = "projects.{$project->slug}.{$section->id}";
             if (view()->exists($viewName)) {
-                $html = view($viewName, ['mediaRoot' => '/img'])->render();
-                $section->setHtmlContent($html);
+                $section->setHtmlContent(view($viewName, [
+                    'sources' => $project->sources,
+                ])->render());
             }
         }
 
@@ -42,7 +49,7 @@ class ProjectsController extends Controller
             'project' => $project,
             'sections' => $sections,
             'onThisPage' => $sections,
-            'mediaRoot' => '/img',
+            'preloadImage' => $project->preloadImage,
         ]);
     }
 }

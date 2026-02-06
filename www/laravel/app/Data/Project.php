@@ -13,6 +13,7 @@ class Project
     public readonly string $metaDescription;
     public readonly string $thumbnailDescription;
     public readonly Image $thumbnail;
+    public readonly ?Image $preloadImage;
     public readonly bool $featured;
     private array $sections;
     public readonly array $sources;
@@ -23,6 +24,7 @@ class Project
         string $metaDescription,
         string $thumbnailDescription,
         string $thumbnailFile,
+        ?string $preloadImageFile = null,
         bool $featured = false,
         array $sections = [],
         array $sources = [],
@@ -32,6 +34,9 @@ class Project
         $this->metaDescription = $metaDescription;
         $this->thumbnailDescription = $thumbnailDescription;
         $this->thumbnail = new Image($this->slug.'/'.$thumbnailFile);
+        $this->preloadImage = $preloadImageFile !== null
+            ? new Image($this->slug.'/'.$preloadImageFile)
+            : null;
         $this->featured = $featured;
 
         // validate the sections array and add each section
@@ -59,9 +64,8 @@ class Project
     private function addSection(string $id, string $title): void
     {
         $this->sections[] = new Section(
-            id: $id,
-            templateDirectory: $this->slug,
-            title: $title,
+            $id,
+            $title,
         );
     }
 

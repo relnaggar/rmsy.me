@@ -96,27 +96,24 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
             ->group($resourceGroupCallback('client'));
 
         // Lessons
-        Route::get(
-            '/lessons', [LessonController::class, 'index']
-        )->name('lessons.index');
-        Route::post(
-            '/lessons/import',
-            [LessonController::class, 'importFromCalendar']
-        )->name('lessons.import');
-        Route::delete(
-            '/lessons', [LessonController::class, 'clear']
-        )->name('lessons.clear');
+        Route::controller(LessonController::class)
+            ->prefix('lessons')
+            ->name('lessons.')
+            ->group(function () {
+                 Route::get('/', 'index')->name('index');
+                 Route::post('/import', 'importFromCalendar')->name('import');
+                 Route::delete('/', 'clear')->name('clear');
+            });
 
         // Payments
-        Route::get(
-            '/payments', [PaymentController::class, 'index']
-        )->name('payments.index');
-        Route::post(
-            '/payments', [PaymentController::class, 'import']
-        )->name('payments.import');
-        Route::delete(
-            '/payments', [PaymentController::class, 'clear']
-        )->name('payments.clear');
+        Route::controller(PaymentController::class)
+            ->prefix('payments')
+            ->name('payments.')
+            ->group(function () {
+                 Route::get('/', 'index')->name('index');
+                 Route::post('/import', 'import')->name('import');
+                 Route::delete('/', 'clear')->name('clear');
+            });
 
         // Invoices
         Route::get(
