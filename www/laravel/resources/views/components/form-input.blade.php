@@ -9,10 +9,14 @@
     'rows' => null,
     'options' => null,
     'placeholder' => null,
+    'invalidFeedback' => null,
+    'formText' => null,
+    'honeypot' => false,
+    'autocomplete' => null,
 ])
 
-<div class="mb-3">
-    <label for="{{ $name }}" class="form-label">{{ $label }}</label>
+<div class="mb-3 {{ $honeypot ? 'subject' : '' }}">
+    <label for="{{ $name }}" class="col-form-label">{{ $label }}</label>
 
     @if($type === 'textarea')
         <textarea
@@ -24,6 +28,8 @@
             @if($maxlength) maxlength="{{ $maxlength }}" @endif
             @if($rows) rows="{{ $rows }}" @endif
             @if($placeholder) placeholder="{{ $placeholder }}" @endif
+            @if($autocomplete) autocomplete="{{ $autocomplete }}" @endif
+            @if($honeypot) tabindex="-1" aria-hidden="true" @endif
         >{{ old($name, $value) }}</textarea>
     @elseif($type === 'select')
         <select
@@ -32,6 +38,7 @@
             name="{{ $name }}"
             @if($required) required @endif
             @if($readonly) disabled @endif
+            @if($autocomplete) autocomplete="{{ $autocomplete }}" @endif
         >
             @foreach($options as $optionValue => $optionLabel)
                 <option value="{{ $optionValue }}" @if(old($name, $value) == $optionValue) selected @endif>
@@ -50,10 +57,19 @@
             @if($readonly) readonly @endif
             @if($maxlength) maxlength="{{ $maxlength }}" @endif
             @if($placeholder) placeholder="{{ $placeholder }}" @endif
+            @if($autocomplete) autocomplete="{{ $autocomplete }}" @endif
+            @if($honeypot) tabindex="-1" aria-hidden="true" @endif
         >
     @endif
 
-    @error($name)
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
+    @if($invalidFeedback)
+        <div class="invalid-feedback">{{ $invalidFeedback }}</div>
+    @else
+        @error($name)
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    @endif
+    @if($formText)
+        <div class="form-text">{{ $formText }}</div>
+    @endif
 </div>

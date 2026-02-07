@@ -1,5 +1,5 @@
 <main class="flex-grow-1 m-5 d-flex flex-column min-vh-100" id="main">
-  @if(session('success'))
+  {{-- @if(session('success'))
     <x-alert type="success" :message="session('success')" />
   @endif
   @if(session('error'))
@@ -13,7 +13,7 @@
         @endforeach
       </ul>
     </x-alert>
-  @endif
+  @endif --}}
   <h1>@yield('heading')</h1>
   @hasSection('subtitle')
     <div class="text-body-secondary h3">

@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Contracts\Validation\Validator;
+use \Illuminate\Http\Client\Response;
 
 class ContactRequest extends FormRequest
 {
@@ -15,19 +19,22 @@ class ContactRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:254'],
-            'subject' => ['nullable', 'string'], // honeypot field
-            'message' => ['required', 'string', 'max:5000'],
+            'name' => ['required', 'string', 'max:254'],
+            'email' => ['required', 'email:rfc,dns', 'max:254'],
+            'subject' => [], // honeypot field
+            'message' => ['required', 'string', 'max:65534'],
             'cf-turnstile-response' => ['required', 'string'],
         ];
     }
 
-    public function withValidator($validator): void
+    public function withValidator(Validator $validator): void
     {
-        $validator->after(function ($validator) {
+        $validator->after(function (Validator $validator) {
             if (! $this->verifyTurnstile()) {
-                $validator->errors()->add('cf-turnstile-response', 'CAPTCHA verification failed. Please try again.');
+                $validator->errors()->add(
+                    'cf-turnstile-response',
+                    'CAPTCHA verification failed. Please try again.'
+                );
             }
         });
     }
@@ -37,16 +44,15 @@ class ContactRequest extends FormRequest
         $token = $this->input('cf-turnstile-response');
         $secretKey = config('services.turnstile.secret_key');
 
-        if (empty($secretKey)) {
-            // Skip verification in development if no key configured
-            return true;
-        }
-
-        $response = Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
-            'secret' => $secretKey,
-            'response' => $token,
-            'remoteip' => $this->ip(),
-        ]);
+        /** @var Response $response */
+        $response = Http::asForm()->post(
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+            [
+                'secret' => $secretKey,
+                'response' => $token,
+                'remoteip' => $this->ip(),
+            ]
+        );
 
         return $response->json('success', false);
     }
@@ -54,7 +60,8 @@ class ContactRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'cf-turnstile-response.required' => 'Please complete the CAPTCHA verification.',
+            'cf-turnstile-response.required' =>
+                'Please complete the CAPTCHA verification.',
         ];
     }
 }

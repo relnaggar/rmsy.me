@@ -14,25 +14,31 @@ return [
     |
     */
 
-    'postmark' => [
-        'key' => env('POSTMARK_API_KEY'),
+    'turnstile' => [
+        // 'site_key' => '2x00000000000000000000AB', // simulate always fail
+        'site_key' => '0x4AAAAAAA0I76BgLIpOMLLa',
+        'secret_key' => trim(@file_get_contents('/run/secrets/TURNSTILE_SECRET_KEY') ?: ''),
     ],
 
-    'resend' => [
-        'key' => env('RESEND_API_KEY'),
-    ],
+    // 'postmark' => [
+    //     'key' => env('POSTMARK_API_KEY'),
+    // ],
 
-    'ses' => [
-        'key' => env('AWS_ACCESS_KEY_ID'),
-        'secret' => env('AWS_SECRET_ACCESS_KEY'),
-        'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
-    ],
+    // 'resend' => [
+    //     'key' => env('RESEND_API_KEY'),
+    // ],
 
-    'slack' => [
-        'notifications' => [
-            'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
-            'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
-        ],
-    ],
+    // 'ses' => [
+    //     'key' => env('AWS_ACCESS_KEY_ID'),
+    //     'secret' => env('AWS_SECRET_ACCESS_KEY'),
+    //     'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+    // ],
+
+    // 'slack' => [
+    //     'notifications' => [
+    //         'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
+    //         'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
+    //     ],
+    // ],
 
 ];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactRequest;
@@ -14,12 +16,18 @@ class ContactController extends Controller
         private ContactMethodsService $contactMethodsService,
     ) {}
 
+    private function viewData(): array
+    {
+        return [
+            'contactMethods' =>
+                $this->contactMethodsService->getContactMethods(),
+            'turnstileSiteKey' => config('services.turnstile.site_key'),
+        ];
+    }
+
     public function show(): View
     {
-        return view('contact.show', [
-            'contactMethods' => $this->contactMethodsService->getContactMethods(),
-            'turnstileSiteKey' => config('services.turnstile.site_key'),
-        ]);
+        return view('contact.show', $this->viewData());
     }
 
     public function submit(ContactRequest $request): RedirectResponse
@@ -29,22 +37,45 @@ class ContactController extends Controller
         // Check honeypot field
         if (! empty($validated['subject'])) {
             // Bot detected, pretend success
-            return redirect()->route('contact.show')
-                ->with('success', 'Thank you for your message! I will get back to you soon.');
+            return redirect()->route('contact.show')->with('alert', [
+                'type' => 'success',
+                'title' => 'Message sent!',
+            ]);
         }
 
         // Send email
-        Mail::raw(
-            "Name: {$validated['name']}\nEmail: {$validated['email']}\n\nMessage:\n{$validated['message']}",
-            function ($message) use ($validated) {
-                $message->to(config('mail.contact_recipient', 'ramsey.el-naggar@outlook.com'))
-                    ->from(config('mail.from.address'), config('mail.from.name'))
-                    ->replyTo($validated['email'], $validated['name'])
-                    ->subject('Contact Form: '.$validated['name']);
-            }
-        );
+        try {
+            Mail::html(
+                nl2br($validated['message'], false),
+                function ($mail) use ($validated) {
+                    $mail->to(
+                            config('mail.contact_recipient.address'),
+                            config('mail.contact_recipient.name'),
+                        )
+                        ->replyTo($validated['email'], $validated['name'])
+                        ->subject(
+                            "From {$validated['name']} <{$validated['email']}>"
+                        );
+                }
+            );
+        } catch (\Exception $e) {
+            report($e);
 
-        return redirect()->route('contact.show')
-            ->with('success', 'Thank you for your message! I will get back to you soon.');
+            return redirect()->route('contact.show')
+                ->withInput()
+                ->with('alert', [
+                    'type' => 'danger',
+                    'title' => 'Message send failure!',
+                ]);
+        }
+
+        // Success
+        return redirect()->route('contact.show')->with([
+            'alert' => [
+                'type' => 'success',
+                'title' => 'Message sent!',
+            ],
+            'submitted' => $request->only(['name', 'email', 'message']),
+        ]);
     }
 }

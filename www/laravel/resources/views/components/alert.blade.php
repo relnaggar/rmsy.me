@@ -1,11 +1,11 @@
-@props(['type' => 'info', 'title' => null, 'message' => null, 'dismissible' => true])
+@props(['type' => 'info', 'title' => null, 'message' => null, 'dismissible' => false])
 
 <div class="alert alert-{{ $type }} {{ $dismissible ? 'alert-dismissible fade show' : '' }}" role="alert">
     @if($title)
-        <strong>{{ $title }}</strong>
+        <h4 class="alert-heading">{{ $title }}</h4>
     @endif
     @if($message)
-        {{ $message }}
+        <p>{!! $message !!}</p>
     @endif
     {{ $slot }}
     @if($dismissible)
