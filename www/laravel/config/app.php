@@ -99,7 +99,7 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-    'key' => env('APP_KEY'),
+    'key' => trim(@file_get_contents('/run/secrets/LARAVEL_APP_KEY') ?: ''),
 
     'previous_keys' => [
         ...array_filter(
