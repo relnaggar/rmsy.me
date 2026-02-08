@@ -110,7 +110,7 @@ class NavService
             new NavItem(text: 'Lessons', path: route('portal.lessons.index'))
         );
         $portalItem->addDropdownItem(
-            new NavItem(text: 'Logout', path: route('logout'))
+            new NavItem(text: 'Logout', path: route('logout'), method: 'POST')
         );
         $this->addNavItem($portalItem);
 

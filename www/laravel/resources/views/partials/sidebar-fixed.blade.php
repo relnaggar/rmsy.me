@@ -17,13 +17,25 @@
     <ul class="navbar-nav w-100">
       @foreach($sidebarNav->items as $sidebarNavItem)
         <li class="nav-item">
-          <a
-            class="nav-link pe-3 {{ $sidebarNavItem->isActive() ? 'active' : '' }}"
-            @if($sidebarNavItem->isActive()) aria-current="page" @endif
-            href="{{ $sidebarNavItem->getPath() }}"
-          >
-            {{ $sidebarNavItem->text }}
-          </a>
+          @if($sidebarNavItem->method === 'POST')
+            <form method="POST" action="{{ $sidebarNavItem->getPath() }}">
+              @csrf
+              <button
+                type="submit"
+                class="nav-link pe-3 border-0 bg-transparent w-100 text-start"
+              >
+                {{ $sidebarNavItem->text }}
+              </button>
+            </form>
+          @else
+            <a
+              class="nav-link pe-3 {{ $sidebarNavItem->isActive() ? 'active' : '' }}"
+              @if($sidebarNavItem->isActive()) aria-current="page" @endif
+              href="{{ $sidebarNavItem->getPath() }}"
+            >
+              {{ $sidebarNavItem->text }}
+            </a>
+          @endif
         </li>
       @endforeach
     </ul>

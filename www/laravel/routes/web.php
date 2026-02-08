@@ -47,11 +47,11 @@ Route::redirect(
 
 // Authentication
 Route::get(
-    '/portal/login', [AuthController::class, 'showLogin']
+    '/login', [AuthController::class, 'showLogin']
 )->name('login');
-Route::post('/portal/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login']);
 Route::post(
-    '/portal/logout', [AuthController::class, 'logout']
+    '/logout', [AuthController::class, 'logout']
 )->name('logout');
 
 // Microsoft OAuth
