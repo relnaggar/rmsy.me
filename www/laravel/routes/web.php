@@ -70,8 +70,8 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
         $resourceGroupCallback = function ($resource): callable {
             return function () use ($resource) {
                 Route::get('/', 'index')->name('index');
-                Route::get("/{$resource}/edit", 'edit')->name('edit');
-                Route::put("/{$resource}", 'update')->name('update');
+                Route::get('/{' . $resource . '}/edit', 'edit')->name('edit');
+                Route::put('/{' . $resource . '}', 'update')->name('update');
                 Route::delete('/', 'clear')->name('clear');
             };
         };

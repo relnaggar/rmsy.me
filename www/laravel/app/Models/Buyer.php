@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use PrinsFrank\Standards\Country\CountryAlpha2;
+use PrinsFrank\Standards\Language\LanguageAlpha2;
 
 class Buyer extends Model
 {
@@ -41,6 +42,6 @@ class Buyer extends Model
     {
         $countryAlpha2 = CountryAlpha2::tryFrom($this->country);
 
-        return $countryAlpha2?->name ?? $this->country;
+        return $countryAlpha2?->getNameInLanguage(LanguageAlpha2::English) ?? $this->country;
     }
 }

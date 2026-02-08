@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
@@ -52,22 +54,30 @@ class PaymentController extends Controller
                 }
 
                 $id = $row[0];
-                $datetime = $row[1];
-                $amount = (int) (floatval($row[2]) * 100); // Convert to pence
-                $currency = $row[3];
-                $reference = $row[4];
-                $buyerName = $row[5];
-
+                // Skip if TransferWise ID doesn't start with "TRANSFER-"
+                if (! str_starts_with($id, 'TRANSFER-')) {
+                    continue;
+                }
                 // Skip if payment already exists
                 if (Payment::find($id)) {
                     $skipped++;
-
                     continue;
                 }
 
+                $amount = (int) (floatval($row[3]) * 100); // Convert to pence
+                // Skip negative amounts (payouts)
+                if (floatval($row[3]) < 0) {
+                    continue;
+                }
+
+                $datetime = $row[2];
+                $currency = $row[4];
+                $reference = $row[6];
+                $buyerName = $row[11];
+
                 // Find or create buyer
                 $buyer = Buyer::firstOrCreate(
-                    ['id' => $buyerName],
+                    ['id' => $buyerName], // ID for buyer is the same as the name
                     ['name' => $buyerName]
                 );
 

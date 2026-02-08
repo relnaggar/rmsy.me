@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
@@ -8,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use PrinsFrank\Standards\Country\CountryAlpha2;
+use PrinsFrank\Standards\Language\LanguageAlpha2;
 
 class BuyerController extends Controller
 {
@@ -22,7 +25,9 @@ class BuyerController extends Controller
     {
         $countries = [];
         foreach (CountryAlpha2::cases() as $country) {
-            $countries[$country->value] = $country->name;
+            $countries[$country->value] = $country->getNameInLanguage(
+                LanguageAlpha2::English
+            );
         }
 
         return view('portal.buyers.edit', [
