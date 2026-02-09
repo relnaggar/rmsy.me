@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use App\Data\Nav;
 use App\Data\NavItem;
 
@@ -80,7 +81,7 @@ class NavService
         ));
 
         $this->addNavItem(new NavItem(
-            text: 'Portal Login',
+            text: Auth::check() ? 'Portal' : 'Login',
             path: route('login'),
             alignEnd: true,
         ));
