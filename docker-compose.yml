@@ -25,6 +25,8 @@ services:
       - MS_REDIRECT_URI
       - JWT_SECRET
       - LARAVEL_APP_KEY
+      - ADMIN_EMAIL
+      - ADMIN_PASSWORD
   bundler:
     init: true
     container_name: bundler
@@ -67,3 +69,7 @@ secrets:
     file: ./secrets/JWT_SECRET
   LARAVEL_APP_KEY:
     file: ./secrets/LARAVEL_APP_KEY
+  ADMIN_EMAIL:
+    file: ./secrets/ADMIN_EMAIL
+  ADMIN_PASSWORD:
+    file: ./secrets/ADMIN_PASSWORD

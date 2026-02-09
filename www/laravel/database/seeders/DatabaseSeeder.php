@@ -15,11 +15,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $email = trim(@file_get_contents('/run/secrets/ADMIN_EMAIL') ?: '');
+        $password = trim(@file_get_contents('/run/secrets/ADMIN_PASSWORD') ?: '');
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        if ($email === '' || $password === '') {
+            $this->command->warn('ADMIN_EMAIL or ADMIN_PASSWORD secret not found, skipping admin user seed.');
+            return;
+        }
+
+        User::updateOrCreate(
+            ['email' => $email],
+            ['name' => 'Admin', 'password' => $password],
+        );
     }
 }
