@@ -1,18 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
-use App\Models\ExchangeRate;
 use App\Models\Payment;
+use App\Services\ExchangeRateService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
+use PrinsFrank\Standards\Country\CountryAlpha2;
+use PrinsFrank\Standards\Language\LanguageAlpha2;
 
 class InvoiceController extends Controller
 {
+    public function __construct(
+        private ExchangeRateService $exchangeRateService,
+    ) {}
+
     public function show(string $invoiceNumber): Response
     {
-        // Parse invoice number (format: YYYY-NNN)
         if (! preg_match('/^(\d{4})-(\d{3})$/', $invoiceNumber, $matches)) {
             abort(404, 'Invalid invoice number format.');
         }
@@ -25,22 +32,78 @@ class InvoiceController extends Controller
             ->with('buyer')
             ->first();
 
-        if (! $payment) {
+        if (! $payment || ! $payment->buyer) {
             abort(404, 'Invoice not found.');
         }
 
-        // Get exchange rate for the payment date
-        $exchangeRate = ExchangeRate::where('date', $payment->datetime->format('Y-m-d'))->first();
+        // Build seller address
+        $sellerAddress = array_map(
+            fn ($line) => trim($line),
+            explode('|', config('services.seller_address')),
+        );
+        if (isset($sellerAddress[5])) {
+            $sellerAddress[5] = CountryAlpha2::from(
+                $sellerAddress[5]
+            )?->getNameInLanguage(
+                LanguageAlpha2::Spanish_Castilian
+            ) ?? $sellerAddress[5];
+        }
 
-        $sellerAddress = config('services.seller_address', "Ramsey El-Naggar\nLondon, UK");
+        // Build buyer address
+        $buyer = $payment->buyer;
+        $buyerAddress = array_values(array_filter(
+            [
+                $buyer->name,
+                $buyer->address1,
+                $buyer->address2,
+                $buyer->address3,
+                $buyer->town_city,
+                $buyer->state_province_county,
+                $buyer->zip_postal_code,
+                $buyer->getCountryNameInSpanish(),
+                $buyer->extra,
+            ],
+            fn ($line) => $line !== null && $line !== '',
+        ));
+
+        // Get exchange rate
+        $issueDate = $payment->getDate();
+        $exchangeRate = $this->exchangeRateService->getRateForDate($issueDate);
+
+        $invoice = [
+            'number' => $invoiceNumber,
+            'issue_date' => $issueDate,
+            'exchange_rate' => $exchangeRate,
+            'notes' => 'Factura exenta de IVA según artículo 20. Uno. 10º - Ley 37/1992',
+        ];
+
+        $qty = 1;
+        $items = [
+            [
+                'date' => $issueDate,
+                'service' => 'Clases online de informática',
+                'qty' => $qty,
+                'unit_price' => intdiv($payment->amount_gbp_pence, $qty),
+            ],
+        ];
+
+        $manifest = json_decode(file_get_contents(public_path('build/manifest.json')), true);
+        $cssFile = $manifest['resources/scss/invoice.scss']['file'];
+        $cssPath = 'file://'.public_path("build/$cssFile");
 
         $pdf = Pdf::loadView('invoices.pdf', [
-            'payment' => $payment,
-            'invoiceNumber' => $invoiceNumber,
             'sellerAddress' => $sellerAddress,
-            'exchangeRate' => $exchangeRate?->gbpeur,
+            'buyerAddress' => $buyerAddress,
+            'invoice' => $invoice,
+            'items' => $items,
+            'cssPath' => $cssPath,
         ]);
 
-        return $pdf->download("invoice-{$invoiceNumber}.pdf");
+        $pdf->setPaper('A4', 'portrait');
+        $pdf->setOption('defaultFont', 'DejaVu Sans');
+        $pdf->setOption('isRemoteEnabled', true);
+        $pdf->setOption('chroot', public_path('build'));
+
+        return $pdf->stream("invoice-{$invoiceNumber}.pdf");
     }
 }

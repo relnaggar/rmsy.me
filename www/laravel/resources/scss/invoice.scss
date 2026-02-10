@@ -1,28 +1,62 @@
-@import 'bootstrap-common';
+$primary: #6f42c1;
 
-@import "bootstrap/scss/utilities";
-@import "bootstrap/scss/tables";
-
-@import "bootstrap/scss/utilities/api";
+body {
+  font-family: "DejaVu Sans", Arial, sans-serif;
+  font-size: 12px;
+}
 
 h1 {
   color: $primary;
 }
+
+h4 {
+  margin-bottom: 0;
+}
+
 hr {
   clear: both;
 }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  padding-bottom: 1rem;
+  color: $primary;
+}
+
 .left-column {
   float: left;
   width: 50%;
 }
+
 .right-column {
   float: right;
   width: 50%;
 }
-h4 {
-  margin-bottom: 0;
+
+.text-start {
+  text-align: left;
 }
-th {
-  padding-bottom: 1rem;
+
+.text-end {
+  text-align: right;
+}
+
+.text-primary {
   color: $primary;
+}
+
+.fw-bold {
+  font-weight: bold;
+}
+
+.bg-body-secondary td {
+  background-color: #f8f9fa;
+}
+
+.pb-3 {
+  padding-bottom: 1rem;
 }

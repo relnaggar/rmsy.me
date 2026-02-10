@@ -21,6 +21,8 @@ return [
         'tenant' => 'consumers',
     ],
 
+    'seller_address' => trim(@file_get_contents('/run/secrets/SELLER_ADDRESS') ?: ''),
+
     'turnstile' => [
         // 'site_key' => '2x00000000000000000000AB', // simulate always fail
         'site_key' => '0x4AAAAAAA0I76BgLIpOMLLa',

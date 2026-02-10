@@ -42,6 +42,7 @@ class PaymentController extends Controller
 
         $imported = 0;
         $skipped = 0;
+        $affectedYears = [];
 
         DB::beginTransaction();
 
@@ -81,7 +82,7 @@ class PaymentController extends Controller
                     ['name' => $buyerName]
                 );
 
-                Payment::create([
+                $payment = Payment::create([
                     'id' => $id,
                     'datetime' => $datetime,
                     'amount_gbp_pence' => $amount,
@@ -90,8 +91,16 @@ class PaymentController extends Controller
                     'buyer_id' => $buyer->id,
                 ]);
 
+                $year = $payment->getYear();
+                if (! in_array($year, $affectedYears)) {
+                    $affectedYears[] = $year;
+                }
+
                 $imported++;
             }
+
+            // Assign sequence numbers for affected years
+            $this->updateSequenceNumbers($affectedYears);
 
             DB::commit();
         } catch (\Exception $e) {
@@ -105,6 +114,34 @@ class PaymentController extends Controller
 
         return redirect()->route('portal.payments.index')
             ->with('success', "Imported {$imported} payments. Skipped {$skipped} duplicates.");
+    }
+
+    private function updateSequenceNumbers(array $years): void
+    {
+        $payments = Payment::orderBy('datetime', 'asc')->get();
+        $sequenceNumbers = [];
+
+        foreach ($payments as $payment) {
+            $year = $payment->getYear();
+
+            if (! in_array($year, $years)) {
+                continue;
+            }
+
+            if (! isset($sequenceNumbers[$year])) {
+                $sequenceNumbers[$year] = 1;
+            } else {
+                $sequenceNumbers[$year]++;
+            }
+
+            $sequenceNumberStr = str_pad((string) $sequenceNumbers[$year], 3, '0', STR_PAD_LEFT);
+
+            if ($payment->sequence_number === $sequenceNumberStr) {
+                continue;
+            }
+
+            $payment->update(['sequence_number' => $sequenceNumberStr]);
+        }
     }
 
     public function clear(): RedirectResponse

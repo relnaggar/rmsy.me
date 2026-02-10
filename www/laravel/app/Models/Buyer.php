@@ -44,4 +44,11 @@ class Buyer extends Model
 
         return $countryAlpha2?->getNameInLanguage(LanguageAlpha2::English) ?? $this->country;
     }
+
+    public function getCountryNameInSpanish(): string
+    {
+        $countryAlpha2 = CountryAlpha2::tryFrom($this->country);
+
+        return $countryAlpha2?->getNameInLanguage(LanguageAlpha2::Spanish_Castilian) ?? $this->country;
+    }
 }
