@@ -14,6 +14,13 @@ return [
     |
     */
 
+    'microsoft' => [
+        'client_id' => trim(@file_get_contents('/run/secrets/MS_CLIENT_ID') ?: ''),
+        'client_secret' => trim(@file_get_contents('/run/secrets/MS_CLIENT_SECRET') ?: ''),
+        'redirect_uri' => trim(@file_get_contents('/run/secrets/MS_REDIRECT_URI') ?: ''),
+        'tenant' => 'consumers',
+    ],
+
     'turnstile' => [
         // 'site_key' => '2x00000000000000000000AB', // simulate always fail
         'site_key' => '0x4AAAAAAA0I76BgLIpOMLLa',

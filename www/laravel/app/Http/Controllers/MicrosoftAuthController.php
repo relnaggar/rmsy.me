@@ -4,23 +4,32 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\PendingRequest;
 
 class MicrosoftAuthController extends Controller
 {
+    private string $tenant;
+    private string $scope;
+    private string $authority;
+
+    public function __construct()
+    {
+        $this->tenant = config('services.microsoft.tenant', 'consumers');
+        $this->scope = 'offline_access Calendars.Read';
+        $this->authority = "https://login.microsoftonline.com/{$this->tenant}/oauth2/v2.0";
+    }
+
     public function redirect(): RedirectResponse
     {
-        $clientId = config('services.microsoft.client_id');
-        $redirectUri = config('services.microsoft.redirect_uri');
-        $scope = 'openid profile email Calendars.Read';
-
         $state = bin2hex(random_bytes(16));
         session(['oauth_state' => $state]);
 
-        $authUrl = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?'.http_build_query([
-            'client_id' => $clientId,
+        $authUrl = "{$this->authority}/authorize?" . http_build_query([
+            'client_id' => config('services.microsoft.client_id'),
             'response_type' => 'code',
-            'redirect_uri' => $redirectUri,
-            'scope' => $scope,
+            'redirect_uri' => config('services.microsoft.redirect_uri'),
+            'scope' => $this->scope,
             'state' => $state,
             'response_mode' => 'query',
         ]);
@@ -34,24 +43,25 @@ class MicrosoftAuthController extends Controller
         $code = $request->query('code');
 
         if ($state !== session('oauth_state')) {
-            return redirect()->route('portal.dashboard')
+            return redirect()->route('portal.lessons.index')
                 ->with('error', 'Invalid OAuth state. Please try again.');
         }
 
         session()->forget('oauth_state');
 
-        // Exchange code for tokens
-        $response = \Illuminate\Support\Facades\Http::asForm()
-            ->post('https://login.microsoftonline.com/common/oauth2/v2.0/token', [
+        /** @var PendingRequest $response */
+        $response = Http::asForm()
+            ->post("{$this->authority}/token", [
                 'client_id' => config('services.microsoft.client_id'),
                 'client_secret' => config('services.microsoft.client_secret'),
                 'code' => $code,
                 'redirect_uri' => config('services.microsoft.redirect_uri'),
                 'grant_type' => 'authorization_code',
+                'scope' => $this->scope,
             ]);
 
         if ($response->failed()) {
-            return redirect()->route('portal.dashboard')
+            return redirect()->route('portal.lessons.index')
                 ->with('error', 'Failed to authenticate with Microsoft.');
         }
 
@@ -62,7 +72,7 @@ class MicrosoftAuthController extends Controller
             'ms_token_expires' => now()->addSeconds($tokens['expires_in']),
         ]);
 
-        return redirect()->route('portal.dashboard')
+        return redirect()->route('portal.lessons.index')
             ->with('success', 'Successfully connected to Microsoft Calendar.');
     }
 }

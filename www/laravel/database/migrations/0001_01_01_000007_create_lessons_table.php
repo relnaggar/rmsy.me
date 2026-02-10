@@ -19,14 +19,14 @@ return new class extends Migration
             $table->integer('repeat_weeks')->default(0);
             $table->integer('price_gbp_pence');
             $table->boolean('paid')->default(false);
-            $table->foreignId('student_id')->nullable()->constrained('students')->onDelete('no action')->onUpdate('no action');
-            $table->foreignId('client_id')->nullable()->constrained('clients')->onDelete('no action')->onUpdate('no action');
+            $table->foreignId('student_id')->nullable()->constrained('students')->onDelete('set null')->onUpdate('no action');
+            $table->foreignId('client_id')->nullable()->constrained('clients')->onDelete('set null')->onUpdate('no action');
             $table->string('buyer_id', 100)->nullable();
 
             $table->foreign('buyer_id')
                 ->references('id')
                 ->on('buyers')
-                ->onDelete('no action')
+                ->onDelete('set null')
                 ->onUpdate('no action');
         });
     }

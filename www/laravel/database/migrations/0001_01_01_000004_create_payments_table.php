@@ -23,7 +23,7 @@ return new class extends Migration
             $table->foreign('buyer_id')
                 ->references('id')
                 ->on('buyers')
-                ->onDelete('no action')
+                ->onDelete('set null')
                 ->onUpdate('no action');
         });
     }

@@ -2,6 +2,9 @@
   @if(session('success'))
     <x-alert type="success" :message="session('success')" title="Success!" />
   @endif
+  @if(session('info'))
+    <x-alert type="info" :message="session('info')" title="Info" />
+  @endif
   @if(session('error'))
     <x-alert type="danger" :message="session('error')" title="Error!" />
   @endif
