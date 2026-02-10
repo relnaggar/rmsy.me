@@ -5,15 +5,15 @@ services:
       - "80:80"
       - "443:443"
     container_name: apache2
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     volumes:
       - ./www:/var/www
+      - ./cacana:/var/cacana
       - ./config/apache2:/etc/apache2
       - ./config/php:/etc/php
       - ./db:/var/db
-      - ./phinx:/var/phinx
-      - ./migrations:/var/migrations
-      - ./seeds:/var/seeds
     secrets:
       - SMTP_HOST
       - SMTP_USERNAME
@@ -27,27 +27,28 @@ services:
       - LARAVEL_APP_KEY
       - ADMIN_EMAIL
       - ADMIN_PASSWORD
-  bundler:
-    init: true
-    container_name: bundler
-    build: ./bundler
-    volumes:
-      - ./bundler/src:/bundler/src
-      - ./www/html/css:/bundler/dist/css
-      - ./www/html/js:/bundler/dist/js
-      - ./www/html/fonts:/bundler/dist/fonts
   laravel-vite:
     init: true
     container_name: laravel-vite
     build:
-      context: ./www/laravel
+      context: ./www
       dockerfile: Dockerfile.dev
     ports:
       - "5173:5173"
     volumes:
-      - ./www/laravel/resources:/laravel/resources
-      - ./www/laravel/public:/laravel/public
-      - ./www/laravel/vite.config.js:/laravel/vite.config.js
+      - ./www/resources:/laravel/resources
+      - ./www/public:/laravel/public
+      - ./www/vite.config.js:/laravel/vite.config.js
+  cacana-sass:
+    init: true
+    container_name: cacana-sass
+    build:
+      context: ./cacana
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./cacana/scss:/cacana/scss
+      - ./cacana/public/css:/cacana/public/css
+      - ./cacana/public/fonts:/cacana/public/fonts
 secrets:
   SMTP_HOST:
     file: ./secrets/SMTP_HOST

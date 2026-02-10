@@ -1,13 +1,8 @@
-default-apache-config
-www/html/css/*.css*
-www/html/js/*.js*
-www/html/fonts/*.woff*
+default-*-config
 *.jpg
 *.jpeg
-secrets
+secrets/
 db/
-seeds/
-uploads/
 .claude/
 CLAUDE.md
 AGENTS.md

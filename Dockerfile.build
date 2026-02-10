@@ -1,0 +1,90 @@
+FROM debian:13.3-slim
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends \
+  # for docker-entrypoint.sh
+  gosu \
+  # install apache
+  apache2 \
+  # make apache run as custom user for better permission control
+  && groupadd -r -g 999 apache2 && useradd -r -m -g apache2 -u 999 apache2 \
+  && mkdir -p /var/run/apache2 \
+  && chown -R apache2:apache2 /var/run/apache2 /var/log/apache2 \
+  # SSL certificates
+  && apt-get install -y --no-install-recommends \
+  ssl-cert \
+  certbot \
+  python3-certbot-apache \
+  # fix ssl-cert permissions
+  && chown root:apache2 /etc/ssl/private \
+  && chmod 750 /etc/ssl/private \
+  && chown root:apache2 /etc/ssl/private/ssl-cert-snakeoil.key \
+  && chmod 640 /etc/ssl/private/ssl-cert-snakeoil.key \
+  # php (8.4 with debian:13.3)
+  && apt-get install -y --no-install-recommends \
+  php php-mbstring php-xml php-curl php-zip \
+  # apache2 php module
+  libapache2-mod-php \
+  # composer dependencies
+  ca-certificates \
+  git \
+  unzip \
+  # sqlite3
+  php-sqlite3 \
+  # for rmsy.me
+  php-intl \
+  # cleanup
+  && apt autoremove -y \
+  && apt clean \
+  && rm -rf /var/lib/apt/lists/* \
+  # database setup
+  && mkdir /var/db \
+  && chown -R apache2:apache2 /var/db
+
+# install composer
+COPY --from=composer/composer:2.2-bin /composer /usr/bin/composer
+
+# entrypoint
+ENV APP_ENVIRONMENT_MODE="PRODUCTION"
+COPY docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["apache2"]
+
+# ports
+EXPOSE 80 443
+
+# volumes
+VOLUME ["/etc/apache2/sites-available", "/etc/letsencrypt"]
+
+# remove default files
+RUN rm -rf /etc/php/* \
+  && rm -rf /etc/apache2/* \
+  && rm -rf /var/www/*
+
+# copy contents of php-config folder
+COPY config/php/ /etc/php
+
+# remove development_ini.php
+RUN PHP_VERSION=$(php -r "echo PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;") \
+  && sed -i \
+  "s/^auto_prepend_file.*/auto_prepend_file = /" \
+  "/etc/php/${PHP_VERSION}/apache2/php.ini" \
+  && rm "/etc/php/${PHP_VERSION}/apache2/development_ini.php"
+
+# copy contents of apache-config folder
+COPY config/apache2/ /etc/apache2
+
+# copy Laravel app to /var/www
+COPY www/ /var/www
+
+# install Laravel dependencies and fix permissions
+RUN composer install --no-dev --optimize-autoloader --working-dir=/var/www \
+  && chown -R apache2:apache2 /var/www/storage /var/www/bootstrap/cache
+
+# copy Cacana PWA to /var/cacana
+COPY cacana/ /var/cacana
+
+# install Cacana dependencies
+RUN composer install --no-dev --optimize-autoloader --working-dir=/var/cacana

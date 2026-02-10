@@ -1,0 +1,16 @@
+{
+    "private": true,
+    "scripts": {
+        "build:fonts": "cp node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff* public/fonts/",
+        "build:css": "sass --style compressed --source-map --embed-sources --load-path=node_modules scss/cacana.scss public/css/cacana.css",
+        "build": "npm run build:fonts && npm run build:css",
+        "dev": "npm run build:fonts && sass --watch --source-map --embed-sources --load-path=node_modules scss/cacana.scss:public/css/cacana.css"
+    },
+    "devDependencies": {
+        "sass": "^1.79.4"
+    },
+    "dependencies": {
+        "bootstrap": "^5.3.3",
+        "bootstrap-icons": "^1.11.3"
+    }
+}

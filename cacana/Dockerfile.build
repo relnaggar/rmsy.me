@@ -1,0 +1,15 @@
+FROM node:20-alpine
+WORKDIR /cacana
+
+# install dependencies
+COPY package.json ./
+RUN npm install
+
+# copy source files needed for build
+COPY scss/ ./scss/
+
+# build command
+CMD ["npm", "run", "build"]
+
+# output volumes
+VOLUME ["/cacana/public/css", "/cacana/public/fonts"]

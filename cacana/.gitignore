@@ -1,0 +1,4 @@
+/node_modules
+/vendor
+/public/css/*.css*
+/public/fonts/*.woff*

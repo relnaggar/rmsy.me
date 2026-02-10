@@ -1,0 +1,12 @@
+{
+    "name": "relnaggar/cacana",
+    "description": "Cacana PWA backend",
+    "type": "project",
+    "require": {
+        "php": "^8.4",
+        "firebase/php-jwt": "^6.0"
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}
