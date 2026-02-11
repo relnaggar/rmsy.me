@@ -52,7 +52,7 @@ class Payment extends Model
             return null;
         }
 
-        return $this->getYear() . '-' . $this->sequence_number;
+        return $this->getYear().'-'.$this->sequence_number;
     }
 
     public function getFormattedAmount(): string

@@ -19,8 +19,7 @@ class ContactController extends Controller
     private function viewData(): array
     {
         return [
-            'contactMethods' =>
-                $this->contactMethodsService->getContactMethods(),
+            'contactMethods' => $this->contactMethodsService->getContactMethods(),
             'turnstileSiteKey' => config('services.turnstile.site_key'),
         ];
     }
@@ -49,9 +48,9 @@ class ContactController extends Controller
                 nl2br($validated['message'], false),
                 function ($mail) use ($validated) {
                     $mail->to(
-                            config('mail.contact_recipient.address'),
-                            config('mail.contact_recipient.name'),
-                        )
+                        config('mail.contact_recipient.address'),
+                        config('mail.contact_recipient.name'),
+                    )
                         ->replyTo($validated['email'], $validated['name'])
                         ->subject(
                             "From {$validated['name']} <{$validated['email']}>"

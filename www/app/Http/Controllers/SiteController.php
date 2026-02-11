@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Services\ProjectsService;
 use DateTime;
-use NumberFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
-use App\Services\ProjectsService;
+use NumberFormatter;
 
 class SiteController extends Controller
 {
@@ -20,75 +20,75 @@ class SiteController extends Controller
     public function index(): View
     {
         // calculate the number of years tutoring
-        $currentDate = new DateTime();
+        $currentDate = new DateTime;
         $tutoringStartDate = new DateTime('2019-01-01');
         $numberOfYearsTutoring = $currentDate->diff($tutoringStartDate)->y;
-        $formatter = new NumberFormatter("en", NumberFormatter::SPELLOUT);
+        $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);
         $numberOfYearsTutoringAsWord = ucfirst(
-        $formatter->format($numberOfYearsTutoring)
+            $formatter->format($numberOfYearsTutoring)
         );
 
         // define the roles data
         $freeMeetingCallToAction = [
-        'href' => url('/free-meeting'),
-        'external' => true,
-        'text' => 'Book a free meeting',
-        'btn-type' => 'cta',
+            'href' => url('/free-meeting'),
+            'external' => true,
+            'text' => 'Book a free meeting',
+            'btn-type' => 'cta',
         ];
         $roles = [
             [
                 'header' => 'Ramsey the Engineer',
-                'content' => <<<HTML
+                'content' => <<<'HTML'
                 I'm a software engineer, specialising in
                 <strong>full-stack web application development</strong>.
                 That means I can take your wildest web dreams and turn them into
                 reality, quickly.
                 HTML,
                 'callsToAction' => [
-                [
-                    // 'href' => '/services/engineer',
-                    'href' => route('projects.index'),
-                    'external' => false,
-                    // 'text' => 'Learn more about my engineering services',
-                    'text' => 'Learn more about my engineering projects',
-                    'btn-type' => 'primary',
-                ],
-                [
-                    'href' => url('/resumes/full-stack-developer'),
-                    'external' => true,
-                    'text' => 'View my full stack developer resume',
-                    'btn-type' => 'success',
-                ],
-                $freeMeetingCallToAction,
+                    [
+                        // 'href' => '/services/engineer',
+                        'href' => route('projects.index'),
+                        'external' => false,
+                        // 'text' => 'Learn more about my engineering services',
+                        'text' => 'Learn more about my engineering projects',
+                        'btn-type' => 'primary',
+                    ],
+                    [
+                        'href' => url('/resumes/full-stack-developer'),
+                        'external' => true,
+                        'text' => 'View my full stack developer resume',
+                        'btn-type' => 'success',
+                    ],
+                    $freeMeetingCallToAction,
                 ],
                 'icon' => 'terminal-fill',
             ], [
                 'header' => 'Ramsey the Educator',
-                'content' => <<<HTML
+                'content' => <<<'HTML'
                 As an educator, I love to
                 <strong>share my knowledge and passion for programming</strong>.
                 From beginner to code conjurer, I can help boost your confidence
                 and results.
                 HTML,
                 'callsToAction' => [
-                [
-                    // 'href' => '/services/educator',
-                    // 'external' => false,
-                    'href' => 'https://www.mytutor.co.uk/tutors/24851/',
-                    'external' => true,
-                    'text' => 'Learn more about my educational services',
-                    'btn-type' => 'primary',
-                ],
-                [
-                    'href' => url('/resumes/educator'),
-                    'external' => true,
-                    'text' => 'View my educator resume',
-                    'btn-type' => 'success',
-                ],
-                $freeMeetingCallToAction,
+                    [
+                        // 'href' => '/services/educator',
+                        // 'external' => false,
+                        'href' => 'https://www.mytutor.co.uk/tutors/24851/',
+                        'external' => true,
+                        'text' => 'Learn more about my educational services',
+                        'btn-type' => 'primary',
+                    ],
+                    [
+                        'href' => url('/resumes/educator'),
+                        'external' => true,
+                        'text' => 'View my educator resume',
+                        'btn-type' => 'success',
+                    ],
+                    $freeMeetingCallToAction,
                 ],
                 'icon' => 'mortarboard-fill',
-            ]
+            ],
         ];
 
         return view('site.index', [
@@ -114,6 +114,7 @@ class SiteController extends Controller
         error_log('Received Wise deposit webhook v2');
         error_log($request->getContent());
         error_log(print_r($request->headers->all(), true));
+
         return response('', 200);
     }
 }

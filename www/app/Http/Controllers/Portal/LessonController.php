@@ -35,7 +35,7 @@ class LessonController extends Controller
             $this->calendarService->importLessonsFromCalendar();
         } catch (RuntimeException $e) {
             return redirect()->route('portal.lessons.index')
-                ->with('error', 'Calendar import failed: ' . $e->getMessage());
+                ->with('error', 'Calendar import failed: '.$e->getMessage());
         }
 
         return redirect()->route('portal.lessons.index')

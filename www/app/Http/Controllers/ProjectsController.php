@@ -16,7 +16,7 @@ class ProjectsController extends Controller
         $projects = $this->projectsService->getProjects();
 
         $preloadImages = array_slice(
-            array_map(fn($project) => $project->thumbnail, $projects),
+            array_map(fn ($project) => $project->thumbnail, $projects),
             0,
             2,
         );

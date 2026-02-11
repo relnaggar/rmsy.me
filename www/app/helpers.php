@@ -13,7 +13,7 @@ if (! function_exists('formatCurrency')) {
     }
 }
 
-if (!function_exists('media')) {
+if (! function_exists('media')) {
     /**
      * Generate a URL for a media asset.
      */
@@ -25,6 +25,6 @@ if (!function_exists('media')) {
             return $baseUrl;
         }
 
-        return $baseUrl . '/' . ltrim($path, '/');
+        return $baseUrl.'/'.ltrim($path, '/');
     }
 }

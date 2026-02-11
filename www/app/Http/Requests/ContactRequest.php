@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Contracts\Validation\Validator;
-use \Illuminate\Http\Client\Response;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Http;
 
 class ContactRequest extends FormRequest
 {
@@ -60,8 +60,7 @@ class ContactRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'cf-turnstile-response.required' =>
-                'Please complete the CAPTCHA verification.',
+            'cf-turnstile-response.required' => 'Please complete the CAPTCHA verification.',
         ];
     }
 }

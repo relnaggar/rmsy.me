@@ -9,15 +9,25 @@ use Exception;
 class NavItem
 {
     public readonly string $text;
+
     private string $path;
+
     public readonly bool $external;
+
     private bool $active = false;
+
     private array $dropdownItems = [];
+
     public readonly string $icon;
+
     public readonly bool $inMenu;
+
     public readonly bool $inFooter;
+
     public readonly bool $alignEnd;
+
     public readonly bool $previousNextButtonsEnabled;
+
     public readonly string $method;
 
     public function __construct(

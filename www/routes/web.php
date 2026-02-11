@@ -75,8 +75,8 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
         $resourceGroupCallback = function ($resource): callable {
             return function () use ($resource) {
                 Route::get('/', 'index')->name('index');
-                Route::get('/{' . $resource . '}/edit', 'edit')->name('edit');
-                Route::put('/{' . $resource . '}', 'update')->name('update');
+                Route::get('/{'.$resource.'}/edit', 'edit')->name('edit');
+                Route::put('/{'.$resource.'}', 'update')->name('update');
                 Route::delete('/', 'clear')->name('clear');
             };
         };
@@ -86,7 +86,6 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
             ->prefix('buyers')
             ->name('buyers.')
             ->group($resourceGroupCallback('buyer'));
-
 
         // Students
         Route::controller(StudentController::class)
@@ -105,9 +104,9 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
             ->prefix('lessons')
             ->name('lessons.')
             ->group(function () {
-                 Route::get('/', 'index')->name('index');
-                 Route::post('/import', 'importFromCalendar')->name('import');
-                 Route::delete('/', 'clear')->name('clear');
+                Route::get('/', 'index')->name('index');
+                Route::post('/import', 'importFromCalendar')->name('import');
+                Route::delete('/', 'clear')->name('clear');
             });
 
         // Payments
@@ -115,9 +114,9 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
             ->prefix('payments')
             ->name('payments.')
             ->group(function () {
-                 Route::get('/', 'index')->name('index');
-                 Route::post('/import', 'import')->name('import');
-                 Route::delete('/', 'clear')->name('clear');
+                Route::get('/', 'index')->name('index');
+                Route::post('/import', 'import')->name('import');
+                Route::delete('/', 'clear')->name('clear');
             });
 
         // Invoices

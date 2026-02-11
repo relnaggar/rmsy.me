@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Http\Client\PendingRequest;
 
 class MicrosoftAuthController extends Controller
 {
     private string $tenant;
+
     private string $scope;
+
     private string $authority;
 
     public function __construct()
@@ -25,7 +27,7 @@ class MicrosoftAuthController extends Controller
         $state = bin2hex(random_bytes(16));
         session(['oauth_state' => $state]);
 
-        $authUrl = "{$this->authority}/authorize?" . http_build_query([
+        $authUrl = "{$this->authority}/authorize?".http_build_query([
             'client_id' => config('services.microsoft.client_id'),
             'response_type' => 'code',
             'redirect_uri' => config('services.microsoft.redirect_uri'),

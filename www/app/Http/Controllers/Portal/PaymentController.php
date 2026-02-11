@@ -62,6 +62,7 @@ class PaymentController extends Controller
                 // Skip if payment already exists
                 if (Payment::find($id)) {
                     $skipped++;
+
                     continue;
                 }
 

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
 
         if ($email === '' || $password === '') {
             $this->command->warn('ADMIN_EMAIL or ADMIN_PASSWORD secret not found, skipping admin user seed.');
+
             return;
         }
 

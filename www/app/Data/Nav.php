@@ -9,8 +9,11 @@ use Exception;
 class Nav
 {
     public readonly string $homePath;
+
     public readonly string $title;
+
     public readonly array $items;
+
     public readonly bool $previousNextButtonsEnabled;
 
     public function __construct(

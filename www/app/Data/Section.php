@@ -7,7 +7,9 @@ namespace App\Data;
 class Section
 {
     public readonly string $id;
+
     public readonly string $title;
+
     private string $htmlContent = '';
 
     public function __construct(

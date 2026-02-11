@@ -135,7 +135,7 @@ class CalendarService
 
     private function findOrCreateStudent(string $name): int
     {
-        $existing = Student::whereRaw('name LIKE ?', [$name . '%'])->first();
+        $existing = Student::whereRaw('name LIKE ?', [$name.'%'])->first();
         if ($existing) {
             return $existing->id;
         }
@@ -145,7 +145,7 @@ class CalendarService
 
     private function findOrCreateClient(string $name): int
     {
-        $existing = Client::whereRaw('name LIKE ?', [$name . '%'])->first();
+        $existing = Client::whereRaw('name LIKE ?', [$name.'%'])->first();
         if ($existing) {
             return $existing->id;
         }

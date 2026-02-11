@@ -9,13 +9,21 @@ use InvalidArgumentException;
 class Project
 {
     public readonly string $slug;
+
     public readonly string $title;
+
     public readonly string $metaDescription;
+
     public readonly string $thumbnailDescription;
+
     public readonly Image $thumbnail;
+
     public readonly ?Image $preloadImage;
+
     public readonly bool $featured;
+
     private array $sections;
+
     public readonly array $sources;
 
     public function __construct(

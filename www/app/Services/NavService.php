@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use Exception;
-use Illuminate\Support\Facades\Auth;
 use App\Data\Nav;
 use App\Data\NavItem;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class NavService
 {
     private array $navItems = [];
+
     private Nav $nav;
 
     public function __construct(

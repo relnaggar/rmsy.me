@@ -7,8 +7,11 @@ namespace App\Data;
 class Source
 {
     public readonly string $title;
+
     public readonly string $icon;
+
     public readonly string $href;
+
     public readonly string $html;
 
     public function __construct(
