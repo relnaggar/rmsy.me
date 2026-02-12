@@ -107,11 +107,11 @@ To run Laravel Artisan commands:
 
 In development:
 ```bash
-docker compose exec -u apache2 app php /var/www/laravel/artisan <command>
+docker compose exec -u apache2 app php /var/www/artisan <command>
 ```
 
 From within the production container:
 ```bash
 su -s /bin/bash apache2
-php /var/www/laravel/artisan <command>
+php /var/www/artisan <command>
 ```
