@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Payment extends Model
 {
@@ -19,6 +20,7 @@ class Payment extends Model
         'amount_gbp_pence',
         'currency',
         'payment_reference',
+        'payer',
         'buyer_id',
         'sequence_number',
     ];
@@ -60,5 +62,10 @@ class Payment extends Model
         $amount = $this->amount_gbp_pence / 100;
 
         return number_format($amount, 2);
+    }
+
+    public function lessons(): BelongsToMany
+    {
+        return $this->belongsToMany(Lesson::class);
     }
 }

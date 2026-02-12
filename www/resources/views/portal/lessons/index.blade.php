@@ -6,9 +6,17 @@
 @section('content')
 <div class="mb-3">
   @if($calendarAuthorised)
-    <form action="{{ route('portal.lessons.import') }}" method="POST" class="d-inline">
+    <form action="{{ route('portal.lessons.import') }}" method="POST" class="d-flex gap-2 align-items-end">
       @csrf
-      <button type="submit" class="btn btn-primary">Import Lessons from Calendar</button>
+      <div>
+        <label for="start_date" class="form-label mb-0">From</label>
+        <input type="date" id="start_date" name="start_date" class="form-control" value="{{ now()->subDays(90)->format('Y-m-d') }}" required>
+      </div>
+      <div>
+        <label for="end_date" class="form-label mb-0">To</label>
+        <input type="date" id="end_date" name="end_date" class="form-control" value="{{ now()->format('Y-m-d') }}" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Import from Calendar</button>
     </form>
   @else
     <a href="{{ route('auth.microsoft') }}" class="btn btn-primary">Authorise Calendar Access</a>
@@ -25,6 +33,7 @@
       <th>Buyer</th>
       <th>Price</th>
       <th>Paid</th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -55,10 +64,19 @@
         </td>
         <td>&pound;{{ number_format($lesson->price_gbp_pence / 100, 2) }}</td>
         <td>{{ $lesson->paid ? 'Yes' : 'No' }}</td>
+        <td>
+          <a href="{{ route('portal.lessons.edit', $lesson) }}" class="btn btn-sm btn-primary">Edit</a>
+          <form action="{{ route('portal.lessons.destroy', $lesson) }}" method="POST" class="d-inline"
+                onsubmit="return confirm('Are you sure you want to delete this lesson?')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </td>
       </tr>
     @empty
       <tr>
-        <td colspan="7" class="text-center">No lessons found.</td>
+        <td colspan="8" class="text-center">No lessons found.</td>
       </tr>
     @endforelse
   </tbody>

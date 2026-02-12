@@ -36,6 +36,14 @@ class ClientController extends Controller
             ->with('success', 'Client updated successfully.');
     }
 
+    public function destroy(Client $client): RedirectResponse
+    {
+        $client->delete();
+
+        return redirect()->route('portal.clients.index')
+            ->with('success', 'Client deleted successfully.');
+    }
+
     public function clear(): RedirectResponse
     {
         Client::truncate();

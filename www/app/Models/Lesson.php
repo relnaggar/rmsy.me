@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Lesson extends Model
 {
@@ -45,5 +46,19 @@ class Lesson extends Model
     public function buyer(): BelongsTo
     {
         return $this->belongsTo(Buyer::class);
+    }
+
+    public function payments(): BelongsToMany
+    {
+        return $this->belongsToMany(Payment::class);
+    }
+
+    private const SPANISH_DESCRIPTIONS = [
+        'Online computer science classes' => 'Clases online de informática',
+    ];
+
+    public function getSpanishDescription(): string
+    {
+        return self::SPANISH_DESCRIPTIONS[$this->description] ?? $this->description;
     }
 }

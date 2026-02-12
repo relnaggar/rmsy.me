@@ -20,7 +20,6 @@ class CalendarService
         'Spires' => 'SOTC LTD',
         'TutorRecruiter' => 'TUTORCRUNCHER LTD',
         'Superprof' => 'PAYPAL',
-        'private' => 'PRIVATE',
     ];
 
     public function isAuthorised(): bool
@@ -42,9 +41,9 @@ class CalendarService
         return true;
     }
 
-    public function importLessonsFromCalendar(): int
+    public function importLessonsFromCalendar(string $startDate, string $endDate): int
     {
-        $events = $this->getCalendarEvents();
+        $events = $this->getCalendarEvents($startDate, $endDate);
         $imported = 0;
 
         foreach ($events as $event) {
@@ -81,6 +80,7 @@ class CalendarService
 
             if (count($studentClientParts) < 2) {
                 $name = trim($studentClientParts[0]);
+                $clientName = $name;
                 $studentId = $this->findOrCreateStudent($name);
                 $clientId = $this->findOrCreateClient($name);
             } elseif (count($studentClientParts) === 2) {
@@ -93,13 +93,15 @@ class CalendarService
             }
 
             // determine buyer
-            $buyerId = self::SOURCE_TO_BUYER[$source] ?? null;
-            if ($buyerId === null) {
-                continue;
+            if ($source === 'private') {
+                $buyerId = $this->findOrCreateBuyer($clientName);
+            } else {
+                $buyerId = self::SOURCE_TO_BUYER[$source] ?? null;
+                if ($buyerId === null) {
+                    continue;
+                }
+                Buyer::firstOrCreate(['id' => $buyerId], ['name' => $buyerId]);
             }
-
-            // ensure buyer exists
-            Buyer::firstOrCreate(['id' => $buyerId], ['name' => $buyerId]);
 
             // extract start time and calculate duration
             $startDateTime = $event['start']['dateTime'];
@@ -151,6 +153,18 @@ class CalendarService
         }
 
         return Client::create(['name' => $name])->id;
+    }
+
+    private function findOrCreateBuyer(string $clientName): string
+    {
+        $name = mb_substr($clientName, 0, 100);
+
+        $existing = Buyer::whereRaw('name LIKE ?', [$name.'%'])->first();
+        if ($existing) {
+            return $existing->id;
+        }
+
+        return Buyer::create(['id' => $name, 'name' => $name])->id;
     }
 
     private function ensureAccessToken(): string
@@ -226,21 +240,21 @@ class CalendarService
         throw new RuntimeException("Calendar '{$calendarName}' not found.");
     }
 
-    private function getCalendarEvents(): array
+    private function getCalendarEvents(string $startDate, string $endDate): array
     {
         $accessToken = $this->ensureAccessToken();
         $calendarId = $this->getCalendarId('Tutoring');
 
-        $now = (new DateTimeImmutable('now', new DateTimeZone('UTC')))
+        $start = (new DateTimeImmutable($startDate, new DateTimeZone('UTC')))
             ->format(DateTimeInterface::ATOM);
-        $start = (new DateTimeImmutable('-90 days', new DateTimeZone('UTC')))
+        $end = (new DateTimeImmutable($endDate.' 23:59:59', new DateTimeZone('UTC')))
             ->format(DateTimeInterface::ATOM);
 
         $endpoint = "https://graph.microsoft.com/v1.0/me/calendars/{$calendarId}/calendarView";
 
         $response = Http::withToken($accessToken)->get($endpoint, [
             'startDateTime' => $start,
-            'endDateTime' => $now,
+            'endDateTime' => $end,
             '$top' => 1000,
             '$orderby' => 'start/dateTime desc',
             '$select' => 'subject,start,end,type',

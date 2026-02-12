@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Buyer;
+use App\Models\Lesson;
 use App\Models\Payment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class PaymentController extends Controller
     {
         return view('portal.payments.index', [
             'payments' => Payment::with('buyer')
+                ->withCount('lessons')
                 ->orderBy('datetime', 'desc')
                 ->get(),
         ]);
@@ -89,6 +91,7 @@ class PaymentController extends Controller
                     'amount_gbp_pence' => $amount,
                     'currency' => $currency,
                     'payment_reference' => $reference,
+                    'payer' => $buyerName,
                     'buyer_id' => $buyer->id,
                 ]);
 
@@ -143,6 +146,101 @@ class PaymentController extends Controller
 
             $payment->update(['sequence_number' => $sequenceNumberStr]);
         }
+    }
+
+    public function edit(Payment $payment): View
+    {
+        $buyers = ['' => '- None -'] + Buyer::orderBy('name')->pluck('name', 'id')->toArray();
+
+        return view('portal.payments.edit', [
+            'payment' => $payment->load('buyer'),
+            'buyers' => $buyers,
+        ]);
+    }
+
+    public function update(Request $request, Payment $payment): RedirectResponse
+    {
+        $validated = $request->validate([
+            'buyer_id' => ['nullable', 'string', 'max:100', 'exists:buyers,id'],
+        ]);
+
+        $payment->update($validated);
+
+        return redirect()->route('portal.payments.index')
+            ->with('success', 'Payment buyer updated successfully.');
+    }
+
+    public function matchNext(): RedirectResponse
+    {
+        $payment = Payment::doesntHave('lessons')
+            ->orderBy('datetime', 'asc')
+            ->first();
+
+        if (! $payment) {
+            return redirect()->route('portal.dashboard')
+                ->with('success', 'All payments have been matched.');
+        }
+
+        return redirect()->route('portal.payments.match', ['payment' => $payment, 'next' => 1]);
+    }
+
+    public function match(Request $request, Payment $payment): View
+    {
+        $payment->load('buyer', 'lessons');
+        $matchedLessonIds = $payment->lessons->pluck('id')->toArray();
+
+        $lessons = Lesson::with('student', 'client')
+            ->where('buyer_id', $payment->buyer_id)
+            ->where(function ($query) use ($matchedLessonIds) {
+                $query->where('paid', false)
+                    ->orWhereIn('id', $matchedLessonIds);
+            })
+            ->orderBy('datetime', 'asc')
+            ->get();
+
+        $suggestedIds = $lessons
+            ->filter(fn ($lesson) => $lesson->datetime->lte($payment->datetime) || in_array($lesson->id, $matchedLessonIds))
+            ->pluck('id')
+            ->toArray();
+
+        return view('portal.payments.match', [
+            'payment' => $payment,
+            'lessons' => $lessons,
+            'suggestedIds' => $suggestedIds,
+            'next' => $request->has('next'),
+        ]);
+    }
+
+    public function storeMatches(Request $request, Payment $payment): RedirectResponse
+    {
+        $validated = $request->validate([
+            'lesson_ids' => ['nullable', 'array'],
+            'lesson_ids.*' => ['integer', 'exists:lessons,id'],
+        ]);
+
+        $newIds = $validated['lesson_ids'] ?? [];
+        $previousIds = $payment->lessons->pluck('id')->toArray();
+
+        DB::transaction(function () use ($payment, $newIds, $previousIds) {
+            $payment->lessons()->sync($newIds);
+
+            Lesson::whereIn('id', $newIds)->update(['paid' => true]);
+
+            $removedIds = array_diff($previousIds, $newIds);
+            if ($removedIds) {
+                Lesson::whereIn('id', $removedIds)->update(['paid' => false]);
+            }
+        });
+
+        $count = count($newIds);
+
+        if ($request->has('next')) {
+            return redirect()->route('portal.payments.matchNext')
+                ->with('success', "Matched {$count} lesson(s) to payment.");
+        }
+
+        return redirect()->route('portal.payments.index')
+            ->with('success', "Matched {$count} lesson(s) to payment.");
     }
 
     public function clear(): RedirectResponse

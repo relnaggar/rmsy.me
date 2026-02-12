@@ -77,6 +77,7 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
                 Route::get('/', 'index')->name('index');
                 Route::get('/{'.$resource.'}/edit', 'edit')->name('edit');
                 Route::put('/{'.$resource.'}', 'update')->name('update');
+                Route::delete('/{'.$resource.'}', 'destroy')->name('destroy');
                 Route::delete('/', 'clear')->name('clear');
             };
         };
@@ -86,6 +87,18 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
             ->prefix('buyers')
             ->name('buyers.')
             ->group($resourceGroupCallback('buyer'));
+        Route::get(
+            'buyers/create',
+            [BuyerController::class, 'create']
+        )->name('buyers.create');
+        Route::post(
+            'buyers',
+            [BuyerController::class, 'store']
+        )->name('buyers.store');
+        Route::post(
+            'buyers/reassign',
+            [BuyerController::class, 'reassign']
+        )->name('buyers.reassign');
 
         // Students
         Route::controller(StudentController::class)
@@ -106,6 +119,9 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
             ->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::post('/import', 'importFromCalendar')->name('import');
+                Route::get('/{lesson}/edit', 'edit')->name('edit');
+                Route::put('/{lesson}', 'update')->name('update');
+                Route::delete('/{lesson}', 'destroy')->name('destroy');
                 Route::delete('/', 'clear')->name('clear');
             });
 
@@ -116,6 +132,11 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
             ->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::post('/import', 'import')->name('import');
+                Route::get('/match-next', 'matchNext')->name('matchNext');
+                Route::get('/{payment}/edit', 'edit')->name('edit');
+                Route::put('/{payment}', 'update')->name('update');
+                Route::get('/{payment}/match', 'match')->name('match');
+                Route::post('/{payment}/match', 'storeMatches')->name('storeMatches');
                 Route::delete('/', 'clear')->name('clear');
             });
 

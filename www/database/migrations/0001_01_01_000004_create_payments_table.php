@@ -17,7 +17,8 @@ return new class extends Migration
             $table->integer('amount_gbp_pence');
             $table->string('currency', 3);
             $table->string('payment_reference', 150);
-            $table->string('buyer_id', 100);
+            $table->string('payer', 255)->nullable();
+            $table->string('buyer_id', 100)->nullable();
             $table->string('sequence_number', 3)->nullable();
 
             $table->foreign('buyer_id')

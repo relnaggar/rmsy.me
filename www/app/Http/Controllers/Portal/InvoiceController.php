@@ -29,7 +29,7 @@ class InvoiceController extends Controller
 
         $payment = Payment::where('sequence_number', $sequenceNumber)
             ->whereYear('datetime', $year)
-            ->with('buyer')
+            ->with('buyer', 'lessons.student', 'lessons.client')
             ->first();
 
         if (! $payment || ! $payment->buyer) {
@@ -77,15 +77,29 @@ class InvoiceController extends Controller
             'notes' => 'Factura exenta de IVA según artículo 20. Uno. 10º - Ley 37/1992',
         ];
 
-        $qty = 1;
-        $items = [
-            [
-                'date' => $issueDate,
-                'service' => 'Clases online de informática',
-                'qty' => $qty,
-                'unit_price' => intdiv($payment->amount_gbp_pence, $qty),
-            ],
-        ];
+        if ($payment->lessons->isNotEmpty()) {
+            $items = $payment->lessons
+                ->sortBy('datetime')
+                ->map(fn ($lesson) => [
+                    'date' => $lesson->datetime->format('Y-m-d'),
+                    'service' => $lesson->getSpanishDescription(),
+                    'qty' => 1,
+                    'unit_price' => $lesson->price_gbp_pence,
+                    'student' => $lesson->student?->name,
+                    'client' => $lesson->client?->name,
+                ])
+                ->values()
+                ->toArray();
+        } else {
+            $items = [
+                [
+                    'date' => $issueDate,
+                    'service' => 'Clases online de informática',
+                    'qty' => 1,
+                    'unit_price' => $payment->amount_gbp_pence,
+                ],
+            ];
+        }
 
         $manifest = json_decode(file_get_contents(public_path('build/manifest.json')), true);
         $cssFile = $manifest['resources/scss/invoice.scss']['file'];

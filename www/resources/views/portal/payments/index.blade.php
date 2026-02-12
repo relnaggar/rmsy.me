@@ -25,8 +25,10 @@
       <th>Amount</th>
       <th>Currency</th>
       <th>Reference</th>
+      <th>Payer</th>
       <th>Buyer</th>
       <th>Invoice</th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -37,6 +39,7 @@
         <td>{{ $payment->getFormattedAmount() }}</td>
         <td>{{ $payment->currency }}</td>
         <td>{{ Str::limit($payment->payment_reference, 30) }}</td>
+        <td>{{ $payment->payer ?? '-' }}</td>
         <td>
           @if($payment->buyer)
             <a href="{{ route('portal.buyers.edit', $payment->buyer) }}">{{ $payment->buyer->name }}</a>
@@ -46,17 +49,25 @@
         </td>
         <td>
           @if($payment->getInvoiceNumber())
-            <a href="{{ route('portal.invoices.show', $payment->getInvoiceNumber()) }}">
+            <x-external-link :href="route('portal.invoices.show', $payment->getInvoiceNumber())">
               {{ $payment->getInvoiceNumber() }}
-            </a>
+            </x-external-link>
           @else
             -
+          @endif
+        </td>
+        <td>
+          <a href="{{ route('portal.payments.edit', $payment) }}" class="btn btn-sm btn-primary">Edit</a>
+          @if($payment->lessons_count > 0)
+            <a href="{{ route('portal.payments.match', $payment) }}" class="btn btn-sm btn-outline-secondary">Matched ({{ $payment->lessons_count }})</a>
+          @else
+            <a href="{{ route('portal.payments.match', $payment) }}" class="btn btn-sm btn-warning">Match</a>
           @endif
         </td>
       </tr>
     @empty
       <tr>
-        <td colspan="7" class="text-center">No payments found.</td>
+        <td colspan="9" class="text-center">No payments found.</td>
       </tr>
     @endforelse
   </tbody>

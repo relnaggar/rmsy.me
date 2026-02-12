@@ -19,6 +19,12 @@
         <td>{{ $client->name }}</td>
         <td>
           <a href="{{ route('portal.clients.edit', $client) }}" class="btn btn-sm btn-primary">Edit</a>
+          <form action="{{ route('portal.clients.destroy', $client) }}" method="POST" class="d-inline"
+                onsubmit="return confirm('Are you sure you want to delete this client?')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
         </td>
       </tr>
     @empty

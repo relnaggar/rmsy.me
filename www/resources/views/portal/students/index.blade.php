@@ -19,6 +19,12 @@
         <td>{{ $student->name }}</td>
         <td>
           <a href="{{ route('portal.students.edit', $student) }}" class="btn btn-sm btn-primary">Edit</a>
+          <form action="{{ route('portal.students.destroy', $student) }}" method="POST" class="d-inline"
+                onsubmit="return confirm('Are you sure you want to delete this student?')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
         </td>
       </tr>
     @empty
