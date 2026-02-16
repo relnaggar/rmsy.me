@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LessonFilterRequest;
 use App\Models\Buyer;
 use App\Models\Client;
 use App\Models\Lesson;
 use App\Models\Student;
 use App\Services\CalendarService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 use RuntimeException;
 
@@ -32,16 +32,8 @@ class LessonController extends Controller
         ]);
     }
 
-    public function importFromCalendar(Request $request): RedirectResponse
+    public function importFromCalendar(LessonFilterRequest $request): RedirectResponse
     {
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'buyer_id' => ['nullable', 'string', 'max:100', 'exists:buyers,id'],
-            'student_id' => ['nullable', 'integer', 'exists:students,id'],
-            'client_id' => ['nullable', 'integer', 'exists:clients,id'],
-        ]);
-
         if (! $this->calendarService->isAuthorised()) {
             return redirect()->route('auth.microsoft');
         }
@@ -65,6 +57,29 @@ class LessonController extends Controller
 
         return redirect()->route('portal.lessons.index')
             ->with('success', "Imported {$imported} lesson(s) from calendar.");
+    }
+
+    public function deleteFiltered(LessonFilterRequest $request): RedirectResponse
+    {
+        $query = Lesson::whereBetween('datetime', [
+            $request->start_date.' 00:00:00',
+            $request->end_date.' 23:59:59',
+        ]);
+
+        if ($request->filled('buyer_id')) {
+            $query->where('buyer_id', $request->buyer_id);
+        }
+        if ($request->filled('student_id')) {
+            $query->where('student_id', (int) $request->student_id);
+        }
+        if ($request->filled('client_id')) {
+            $query->where('client_id', (int) $request->client_id);
+        }
+
+        $deleted = $query->delete();
+
+        return redirect()->route('portal.lessons.index')
+            ->with('success', "Deleted {$deleted} lesson(s).");
     }
 
     public function edit(Lesson $lesson): View

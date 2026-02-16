@@ -127,6 +127,7 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
             ->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::post('/import', 'importFromCalendar')->name('import');
+                Route::post('/delete-filtered', 'deleteFiltered')->name('deleteFiltered');
                 Route::get('/{lesson}/edit', 'edit')->name('edit');
                 Route::put('/{lesson}', 'update')->name('update');
                 Route::delete('/{lesson}', 'destroy')->name('destroy');

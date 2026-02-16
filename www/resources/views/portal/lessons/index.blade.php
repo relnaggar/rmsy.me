@@ -5,48 +5,50 @@
 
 @section('content')
 <div class="mb-3">
-  @if($calendarAuthorised)
-    <form action="{{ route('portal.lessons.import') }}" method="POST" class="row g-2 align-items-end">
-      @csrf
-      <div class="col-auto">
-        <label for="start_date" class="form-label mb-0">From</label>
-        <input type="date" id="start_date" name="start_date" class="form-control" value="{{ now()->subDays(90)->format('Y-m-d') }}" required>
-      </div>
-      <div class="col-auto">
-        <label for="end_date" class="form-label mb-0">To</label>
-        <input type="date" id="end_date" name="end_date" class="form-control" value="{{ now()->format('Y-m-d') }}" required>
-      </div>
-      <div class="col-auto">
-        <label for="buyer_id" class="form-label mb-0">Buyer</label>
-        <select id="buyer_id" name="buyer_id" class="form-select">
-          @foreach($buyerOptions as $value => $label)
-            <option value="{{ $value }}">{{ $label }}</option>
-          @endforeach
-        </select>
-      </div>
-      <div class="col-auto">
-        <label for="student_id" class="form-label mb-0">Student</label>
-        <select id="student_id" name="student_id" class="form-select">
-          @foreach($studentOptions as $value => $label)
-            <option value="{{ $value }}">{{ $label }}</option>
-          @endforeach
-        </select>
-      </div>
-      <div class="col-auto">
-        <label for="client_id" class="form-label mb-0">Client</label>
-        <select id="client_id" name="client_id" class="form-select">
-          @foreach($clientOptions as $value => $label)
-            <option value="{{ $value }}">{{ $label }}</option>
-          @endforeach
-        </select>
-      </div>
-      <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Import from Calendar</button>
-      </div>
-    </form>
-  @else
-    <a href="{{ route('auth.microsoft') }}" class="btn btn-primary">Authorise Calendar Access</a>
-  @endif
+  <form action="{{ route('portal.lessons.deleteFiltered') }}" method="POST" class="row g-2 align-items-end">
+    @csrf
+    <div class="col-auto">
+      <label for="start_date" class="form-label mb-0">From</label>
+      <input type="date" id="start_date" name="start_date" class="form-control" value="{{ now()->subDays(90)->format('Y-m-d') }}" required>
+    </div>
+    <div class="col-auto">
+      <label for="end_date" class="form-label mb-0">To</label>
+      <input type="date" id="end_date" name="end_date" class="form-control" value="{{ now()->format('Y-m-d') }}" required>
+    </div>
+    <div class="col-auto">
+      <label for="buyer_id" class="form-label mb-0">Buyer</label>
+      <select id="buyer_id" name="buyer_id" class="form-select">
+        @foreach($buyerOptions as $value => $label)
+          <option value="{{ $value }}">{{ $label }}</option>
+        @endforeach
+      </select>
+    </div>
+    <div class="col-auto">
+      <label for="student_id" class="form-label mb-0">Student</label>
+      <select id="student_id" name="student_id" class="form-select">
+        @foreach($studentOptions as $value => $label)
+          <option value="{{ $value }}">{{ $label }}</option>
+        @endforeach
+      </select>
+    </div>
+    <div class="col-auto">
+      <label for="client_id" class="form-label mb-0">Client</label>
+      <select id="client_id" name="client_id" class="form-select">
+        @foreach($clientOptions as $value => $label)
+          <option value="{{ $value }}">{{ $label }}</option>
+        @endforeach
+      </select>
+    </div>
+    <div class="col-auto">
+      @if($calendarAuthorised)
+        <button type="submit" formaction="{{ route('portal.lessons.import') }}" class="btn btn-primary">Import from Calendar</button>
+      @else
+        <a href="{{ route('auth.microsoft') }}" class="btn btn-primary">Authorise Calendar Access</a>
+      @endif
+      <button type="submit" class="btn btn-danger"
+              data-confirm="Are you sure you want to delete lessons matching these filters?">Delete Lessons</button>
+    </div>
+  </form>
 </div>
 
 <table class="table table-striped">
