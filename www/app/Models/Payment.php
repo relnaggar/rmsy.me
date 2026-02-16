@@ -23,6 +23,7 @@ class Payment extends Model
         'payer',
         'buyer_id',
         'sequence_number',
+        'lesson_pending',
     ];
 
     protected function casts(): array
@@ -30,6 +31,7 @@ class Payment extends Model
         return [
             'datetime' => 'datetime',
             'amount_gbp_pence' => 'integer',
+            'lesson_pending' => 'boolean',
         ];
     }
 

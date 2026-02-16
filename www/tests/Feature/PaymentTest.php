@@ -361,6 +361,93 @@ class PaymentTest extends TestCase
         $response->assertDontSee(route('portal.payments.show', $pOther), false);
     }
 
+    public function test_toggle_lesson_pending_marks_payment_as_pending(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $this->assertFalse($payment->fresh()->lesson_pending);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('portal.payments.toggleLessonPending', $payment));
+
+        $response->assertRedirect(route('portal.payments.show', $payment));
+        $this->assertTrue($payment->fresh()->lesson_pending);
+    }
+
+    public function test_toggle_lesson_pending_removes_pending_flag(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+            'lesson_pending' => true,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('portal.payments.toggleLessonPending', $payment));
+
+        $response->assertRedirect(route('portal.payments.show', $payment));
+        $this->assertFalse($payment->fresh()->lesson_pending);
+    }
+
+    public function test_match_next_skips_lesson_pending_payments(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $pendingPayment = $this->createPayment('PAY-PENDING', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-10 10:00',
+            'lesson_pending' => true,
+        ]);
+        $normalPayment = $this->createPayment('PAY-NORMAL', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.matchNext'));
+
+        $response->assertRedirect(route('portal.payments.show', [
+            'payment' => $normalPayment,
+            'next' => 1,
+        ]));
+    }
+
+    public function test_match_next_all_done_when_only_pending_remain(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $this->createPayment('PAY-PENDING', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-10 10:00',
+            'lesson_pending' => true,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.matchNext'));
+
+        $response->assertRedirect(route('portal.dashboard'));
+        $response->assertSessionHas('success');
+    }
+
+    public function test_index_shows_lesson_pending_label(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $this->createPayment('PAY-PENDING', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-10 10:00',
+            'lesson_pending' => true,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Lesson Pending');
+    }
+
     public function test_free_meeting_button_hidden_on_portal(): void
     {
         $response = $this->actingAs($this->user)

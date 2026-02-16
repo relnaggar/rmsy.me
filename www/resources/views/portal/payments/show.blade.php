@@ -56,6 +56,16 @@
   <button type="submit" class="btn btn-primary">Update Buyer</button>
 </form>
 
+<form method="POST" action="{{ route('portal.payments.toggleLessonPending', $payment) }}" class="mb-4">
+  @csrf
+  @if($payment->lesson_pending)
+    <button type="submit" class="btn btn-warning">Remove Lesson Pending</button>
+    <span class="ms-2 text-muted">This payment is marked as lesson pending and will be skipped during match-next.</span>
+  @else
+    <button type="submit" class="btn btn-outline-warning">Mark as Lesson Pending</button>
+  @endif
+</form>
+
 @if($errors->any())
   <div class="alert alert-danger">
     @foreach($errors->all() as $error)

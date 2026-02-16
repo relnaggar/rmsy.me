@@ -144,6 +144,7 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
                 Route::get('/match-next', 'matchNext')->name('matchNext');
                 Route::get('/{payment}', 'show')->name('show');
                 Route::put('/{payment}', 'update')->name('update');
+                Route::post('/{payment}/toggle-lesson-pending', 'toggleLessonPending')->name('toggleLessonPending');
                 Route::post('/{payment}/match', 'storeMatches')->name('storeMatches');
                 Route::delete('/{payment}/match', 'destroyMatches')->name('destroyMatches');
                 Route::delete('/{payment}', 'destroy')->name('destroy');

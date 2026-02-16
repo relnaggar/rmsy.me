@@ -195,9 +195,20 @@ class PaymentController extends Controller
             ->with('success', 'Payment buyer updated successfully.');
     }
 
+    public function toggleLessonPending(Payment $payment): RedirectResponse
+    {
+        $payment->update(['lesson_pending' => ! $payment->lesson_pending]);
+
+        $status = $payment->lesson_pending ? 'marked as lesson pending' : 'no longer lesson pending';
+
+        return redirect()->route('portal.payments.show', $payment)
+            ->with('success', "Payment {$status}.");
+    }
+
     public function matchNext(): RedirectResponse
     {
         $payment = Payment::doesntHave('lessons')
+            ->where('lesson_pending', false)
             ->orderBy('datetime', 'asc')
             ->first();
 
