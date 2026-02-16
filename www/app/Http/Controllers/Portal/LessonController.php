@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Buyer;
+use App\Models\Client;
 use App\Models\Lesson;
+use App\Models\Student;
 use App\Services\CalendarService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,6 +26,9 @@ class LessonController extends Controller
                 ->orderBy('datetime', 'desc')
                 ->get(),
             'calendarAuthorised' => $this->calendarService->isAuthorised(),
+            'buyerOptions' => ['' => '- All -'] + Buyer::orderBy('name')->pluck('name', 'id')->toArray(),
+            'studentOptions' => ['' => '- All -'] + Student::orderBy('name')->pluck('name', 'id')->toArray(),
+            'clientOptions' => ['' => '- All -'] + Client::orderBy('name')->pluck('name', 'id')->toArray(),
         ]);
     }
 
@@ -32,21 +37,34 @@ class LessonController extends Controller
         $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
+            'buyer_id' => ['nullable', 'string', 'max:100', 'exists:buyers,id'],
+            'student_id' => ['nullable', 'integer', 'exists:students,id'],
+            'client_id' => ['nullable', 'integer', 'exists:clients,id'],
         ]);
 
         if (! $this->calendarService->isAuthorised()) {
             return redirect()->route('auth.microsoft');
         }
 
+        $filters = array_filter([
+            'buyer_id' => $request->buyer_id,
+            'student_id' => $request->student_id ? (int) $request->student_id : null,
+            'client_id' => $request->client_id ? (int) $request->client_id : null,
+        ]);
+
         try {
-            $this->calendarService->importLessonsFromCalendar($request->start_date, $request->end_date);
+            $imported = $this->calendarService->importLessonsFromCalendar(
+                $request->start_date,
+                $request->end_date,
+                $filters,
+            );
         } catch (RuntimeException $e) {
             return redirect()->route('portal.lessons.index')
                 ->with('error', 'Calendar import failed: '.$e->getMessage());
         }
 
         return redirect()->route('portal.lessons.index')
-            ->with('success', 'Lessons imported from calendar.');
+            ->with('success', "Imported {$imported} lesson(s) from calendar.");
     }
 
     public function edit(Lesson $lesson): View

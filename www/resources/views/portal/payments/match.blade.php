@@ -59,7 +59,7 @@
       @forelse($lessons as $lesson)
         <tr class="{{ in_array($lesson->id, $suggestedIds) ? 'table-info' : '' }}">
           <td>
-            <input type="checkbox" name="lesson_ids[]" value="{{ $lesson->id }}">
+            <input type="checkbox" name="lesson_ids[]" value="{{ $lesson->id }}" {{ in_array($lesson->id, $matchedLessonIds) ? 'checked' : '' }}>
           </td>
           <td>{{ $lesson->datetime->format('Y-m-d H:i') }}</td>
           <td>

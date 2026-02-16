@@ -20,7 +20,7 @@
         <td>
           <a href="{{ route('portal.students.edit', $student) }}" class="btn btn-sm btn-primary">Edit</a>
           <form action="{{ route('portal.students.destroy', $student) }}" method="POST" class="d-inline"
-                onsubmit="return confirm('Are you sure you want to delete this student?')">
+                data-confirm="Are you sure you want to delete this student?">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
@@ -37,7 +37,7 @@
 
 @if($students->count() > 0)
   <form action="{{ route('portal.students.clear') }}" method="POST" class="mt-3"
-        onsubmit="return confirm('Are you sure you want to delete all students?')">
+        data-confirm="Are you sure you want to delete all students?">
     @csrf
     @method('DELETE')
     <button type="submit" class="btn btn-danger">Delete All Students</button>

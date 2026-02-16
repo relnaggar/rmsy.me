@@ -6,7 +6,10 @@ namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Buyer;
+use App\Models\Client;
 use App\Models\Lesson;
+use App\Models\Payment;
+use App\Models\Student;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -18,10 +21,21 @@ class BuyerController extends Controller
     public function index(): View
     {
         $buyers = Buyer::orderBy('name')->get();
+        $students = Student::orderBy('name')->get();
+        $clients = Client::orderBy('name')->get();
+
+        $payers = Payment::whereNotNull('payer')
+            ->distinct()
+            ->orderBy('payer')
+            ->pluck('payer');
+        $payerOptions = $payers->mapWithKeys(fn ($payer) => [$payer => $payer])->toArray();
 
         return view('portal.buyers.index', [
             'buyers' => $buyers,
             'buyerOptions' => $buyers->pluck('name', 'id')->toArray(),
+            'studentOptions' => $students->pluck('name', 'id')->toArray(),
+            'clientOptions' => $clients->pluck('name', 'id')->toArray(),
+            'payerOptions' => $payerOptions,
         ]);
     }
 
@@ -110,6 +124,44 @@ class BuyerController extends Controller
 
         return redirect()->route('portal.buyers.index')
             ->with('success', "Reassigned {$count} lesson(s) from {$fromBuyer->name} to {$toBuyer->name}.");
+    }
+
+    public function assign(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'filter_type' => ['required', 'string', 'in:student,client'],
+            'filter_id' => ['required', 'integer'],
+            'buyer_id' => ['required', 'string', 'max:100', 'exists:buyers,id'],
+        ]);
+
+        $filterType = $validated['filter_type'];
+        $filterModel = $filterType === 'student'
+            ? Student::findOrFail($validated['filter_id'])
+            : Client::findOrFail($validated['filter_id']);
+
+        $count = Lesson::where($filterType.'_id', $validated['filter_id'])
+            ->update(['buyer_id' => $validated['buyer_id']]);
+
+        $buyer = Buyer::find($validated['buyer_id']);
+
+        return redirect()->route('portal.buyers.index')
+            ->with('success', "Assigned {$count} lesson(s) for {$filterType} {$filterModel->name} to {$buyer->name}.");
+    }
+
+    public function assignPayments(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'payer' => ['required', 'string', 'max:255'],
+            'buyer_id' => ['required', 'string', 'max:100', 'exists:buyers,id'],
+        ]);
+
+        $count = Payment::where('payer', $validated['payer'])
+            ->update(['buyer_id' => $validated['buyer_id']]);
+
+        $buyer = Buyer::find($validated['buyer_id']);
+
+        return redirect()->route('portal.buyers.index')
+            ->with('success', "Assigned {$count} payment(s) from payer {$validated['payer']} to {$buyer->name}.");
     }
 
     public function destroy(Buyer $buyer): RedirectResponse

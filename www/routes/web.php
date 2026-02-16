@@ -99,6 +99,14 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
             'buyers/reassign',
             [BuyerController::class, 'reassign']
         )->name('buyers.reassign');
+        Route::post(
+            'buyers/assign',
+            [BuyerController::class, 'assign']
+        )->name('buyers.assign');
+        Route::post(
+            'buyers/assign-payments',
+            [BuyerController::class, 'assignPayments']
+        )->name('buyers.assignPayments');
 
         // Students
         Route::controller(StudentController::class)
@@ -137,6 +145,7 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
                 Route::put('/{payment}', 'update')->name('update');
                 Route::get('/{payment}/match', 'match')->name('match');
                 Route::post('/{payment}/match', 'storeMatches')->name('storeMatches');
+                Route::delete('/{payment}', 'destroy')->name('destroy');
                 Route::delete('/', 'clear')->name('clear');
             });
 

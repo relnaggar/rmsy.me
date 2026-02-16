@@ -1,3 +1,4 @@
+@unless(request()->is('portal*'))
 <div class="position-fixed bottom-1 end-1 z-3">
   <x-external-link
     href="{{ url('/free-meeting') }}"
@@ -6,3 +7,4 @@
     Book a free<br>meeting
   </x-external-link>
 </div>
+@endunless

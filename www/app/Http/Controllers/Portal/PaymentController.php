@@ -206,6 +206,7 @@ class PaymentController extends Controller
         return view('portal.payments.match', [
             'payment' => $payment,
             'lessons' => $lessons,
+            'matchedLessonIds' => $matchedLessonIds,
             'suggestedIds' => $suggestedIds,
             'next' => $request->has('next'),
         ]);
@@ -241,6 +242,16 @@ class PaymentController extends Controller
 
         return redirect()->route('portal.payments.index')
             ->with('success', "Matched {$count} lesson(s) to payment.");
+    }
+
+    public function destroy(Payment $payment): RedirectResponse
+    {
+        $year = $payment->getYear();
+        $payment->delete();
+        $this->updateSequenceNumbers([$year]);
+
+        return redirect()->route('portal.payments.index')
+            ->with('success', 'Payment deleted successfully.');
     }
 
     public function clear(): RedirectResponse

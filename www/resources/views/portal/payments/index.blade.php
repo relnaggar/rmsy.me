@@ -63,6 +63,12 @@
           @else
             <a href="{{ route('portal.payments.match', $payment) }}" class="btn btn-sm btn-warning">Match</a>
           @endif
+          <form action="{{ route('portal.payments.destroy', $payment) }}" method="POST" class="d-inline"
+                data-confirm="Are you sure you want to delete this payment?">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
         </td>
       </tr>
     @empty
@@ -75,7 +81,7 @@
 
 @if($payments->count() > 0)
   <form action="{{ route('portal.payments.clear') }}" method="POST" class="mt-3"
-        onsubmit="return confirm('Are you sure you want to delete all payments?')">
+        data-confirm="Are you sure you want to delete all payments?">
     @csrf
     @method('DELETE')
     <button type="submit" class="btn btn-danger">Delete All Payments</button>

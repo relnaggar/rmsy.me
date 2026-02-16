@@ -8,6 +8,60 @@
   <a href="{{ route('portal.buyers.create') }}" class="btn btn-primary">Add Buyer</a>
 </div>
 
+@if($buyers->count() > 1)
+  <x-bulk-assign-card
+    title="Reassign Lessons Between Buyers"
+    :action="route('portal.buyers.reassign')"
+    confirmMessage="Are you sure you want to reassign all lessons from the selected buyer to the other?"
+    buttonLabel="Reassign All Lessons"
+    :fields="[
+      ['name' => 'from_buyer_id', 'label' => 'From Buyer', 'options' => $buyerOptions],
+      ['name' => 'to_buyer_id', 'label' => 'To Buyer', 'options' => $buyerOptions],
+    ]"
+  />
+@endif
+
+@if($buyers->count() > 0 && count($studentOptions) > 0)
+  <x-bulk-assign-card
+    title="Assign Student's Lessons to Buyer"
+    :action="route('portal.buyers.assign')"
+    confirmMessage="Are you sure you want to assign all lessons for this student to the selected buyer?"
+    buttonLabel="Assign Lessons"
+    :hiddenFields="['filter_type' => 'student']"
+    :fields="[
+      ['name' => 'filter_id', 'label' => 'Student', 'options' => $studentOptions],
+      ['name' => 'buyer_id', 'label' => 'To Buyer', 'options' => $buyerOptions],
+    ]"
+  />
+@endif
+
+@if($buyers->count() > 0 && count($clientOptions) > 0)
+  <x-bulk-assign-card
+    title="Assign Client's Lessons to Buyer"
+    :action="route('portal.buyers.assign')"
+    confirmMessage="Are you sure you want to assign all lessons for this client to the selected buyer?"
+    buttonLabel="Assign Lessons"
+    :hiddenFields="['filter_type' => 'client']"
+    :fields="[
+      ['name' => 'filter_id', 'label' => 'Client', 'options' => $clientOptions],
+      ['name' => 'buyer_id', 'label' => 'To Buyer', 'options' => $buyerOptions],
+    ]"
+  />
+@endif
+
+@if($buyers->count() > 0 && count($payerOptions) > 0)
+  <x-bulk-assign-card
+    title="Assign Payer's Payments to Buyer"
+    :action="route('portal.buyers.assignPayments')"
+    confirmMessage="Are you sure you want to assign all payments from this payer to the selected buyer?"
+    buttonLabel="Assign Payments"
+    :fields="[
+      ['name' => 'payer', 'label' => 'Payer', 'options' => $payerOptions],
+      ['name' => 'buyer_id', 'label' => 'To Buyer', 'options' => $buyerOptions],
+    ]"
+  />
+@endif
+
 <table class="table table-striped">
   <thead>
     <tr>
@@ -26,7 +80,7 @@
         <td>
           <a href="{{ route('portal.buyers.edit', $buyer) }}" class="btn btn-sm btn-primary">Edit</a>
           <form action="{{ route('portal.buyers.destroy', $buyer) }}" method="POST" class="d-inline"
-                onsubmit="return confirm('Are you sure you want to delete this buyer?')">
+                data-confirm="Are you sure you want to delete this buyer?">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
@@ -41,32 +95,9 @@
   </tbody>
 </table>
 
-@if($buyers->count() > 1)
-  <div class="card mt-3">
-    <div class="card-body">
-      <h5 class="card-title">Reassign Lessons Between Buyers</h5>
-      <form action="{{ route('portal.buyers.reassign') }}" method="POST"
-            onsubmit="return confirm('Are you sure you want to reassign all lessons from the selected buyer to the other?')">
-        @csrf
-        <div class="row g-3 align-items-end">
-          <div class="col-auto">
-            <x-form-input name="from_buyer_id" label="From Buyer" type="select" :options="$buyerOptions" required />
-          </div>
-          <div class="col-auto">
-            <x-form-input name="to_buyer_id" label="To Buyer" type="select" :options="$buyerOptions" required />
-          </div>
-          <div class="col-auto">
-            <button type="submit" class="btn btn-warning">Reassign All Lessons</button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-@endif
-
 @if($buyers->count() > 0)
   <form action="{{ route('portal.buyers.clear') }}" method="POST" class="mt-3"
-        onsubmit="return confirm('Are you sure you want to delete all buyers?')">
+        data-confirm="Are you sure you want to delete all buyers?">
     @csrf
     @method('DELETE')
     <button type="submit" class="btn btn-danger">Delete All Buyers</button>

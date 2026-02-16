@@ -41,7 +41,7 @@ class CalendarService
         return true;
     }
 
-    public function importLessonsFromCalendar(string $startDate, string $endDate): int
+    public function importLessonsFromCalendar(string $startDate, string $endDate, array $filters = []): int
     {
         $events = $this->getCalendarEvents($startDate, $endDate);
         $imported = 0;
@@ -101,6 +101,17 @@ class CalendarService
                     continue;
                 }
                 Buyer::firstOrCreate(['id' => $buyerId], ['name' => $buyerId]);
+            }
+
+            // apply filters
+            if (isset($filters['buyer_id']) && $buyerId !== $filters['buyer_id']) {
+                continue;
+            }
+            if (isset($filters['student_id']) && $studentId !== $filters['student_id']) {
+                continue;
+            }
+            if (isset($filters['client_id']) && $clientId !== $filters['client_id']) {
+                continue;
             }
 
             // extract start time and calculate duration
@@ -240,7 +251,7 @@ class CalendarService
         throw new RuntimeException("Calendar '{$calendarName}' not found.");
     }
 
-    private function getCalendarEvents(string $startDate, string $endDate): array
+    protected function getCalendarEvents(string $startDate, string $endDate): array
     {
         $accessToken = $this->ensureAccessToken();
         $calendarId = $this->getCalendarId('Tutoring');
