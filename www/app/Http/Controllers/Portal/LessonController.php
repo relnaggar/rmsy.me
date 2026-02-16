@@ -85,11 +85,11 @@ class LessonController extends Controller
 
     public function edit(Lesson $lesson): View
     {
-        $buyers = ['' => '- None -'] + Buyer::orderBy('name')->pluck('name', 'id')->toArray();
-
         return view('portal.lessons.edit', [
             'lesson' => $lesson->load(['student', 'client', 'buyer']),
-            'buyers' => $buyers,
+            'students' => ['' => '- None -'] + Student::orderBy('name')->pluck('name', 'id')->toArray(),
+            'clients' => ['' => '- None -'] + Client::orderBy('name')->pluck('name', 'id')->toArray(),
+            'buyers' => ['' => '- None -'] + Buyer::orderBy('name')->pluck('name', 'id')->toArray(),
         ]);
     }
 
@@ -97,11 +97,15 @@ class LessonController extends Controller
     {
         $validated = $request->validate([
             'price_gbp' => ['required', 'numeric', 'min:0'],
+            'student_id' => ['nullable', 'integer', 'exists:students,id'],
+            'client_id' => ['nullable', 'integer', 'exists:clients,id'],
             'buyer_id' => ['nullable', 'string', 'max:100', 'exists:buyers,id'],
         ]);
 
         $data = [
             'price_gbp_pence' => poundsToPence((float) $validated['price_gbp']),
+            'student_id' => $validated['student_id'] ?? null,
+            'client_id' => $validated['client_id'] ?? null,
             'buyer_id' => $validated['buyer_id'] ?? null,
         ];
 

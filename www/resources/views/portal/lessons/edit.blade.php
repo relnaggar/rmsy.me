@@ -9,14 +9,6 @@
     <th>Date/Time</th>
     <td>{{ $lesson->datetime->format('l jS F Y H:i') }}-{{ $lesson->datetime->copy()->addMinutes($lesson->duration_minutes)->format('H:i') }}</td>
   </tr>
-  <tr>
-    <th>Student</th>
-    <td>{{ $lesson->student?->name ?? '-' }}</td>
-  </tr>
-  <tr>
-    <th>Client</th>
-    <td>{{ $lesson->client?->name ?? '-' }}</td>
-  </tr>
 </table>
 
 <form method="POST" action="{{ route('portal.lessons.update', $lesson) }}">
@@ -24,6 +16,8 @@
   @method('PUT')
 
   <x-form-input name="price_gbp" label="Price (£)" :value="penceToPounds($lesson->price_gbp_pence)" required />
+  <x-form-input name="student_id" label="Student" type="select" :value="$lesson->student_id" :options="$students" />
+  <x-form-input name="client_id" label="Client" type="select" :value="$lesson->client_id" :options="$clients" />
   <x-form-input name="buyer_id" label="Buyer" type="select" :value="$lesson->buyer_id" :options="$buyers" />
 
   <button type="submit" class="btn btn-primary">Update Lesson</button>
