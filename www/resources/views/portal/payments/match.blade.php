@@ -61,17 +61,17 @@
           <td>
             <input type="checkbox" name="lesson_ids[]" value="{{ $lesson->id }}" {{ in_array($lesson->id, $matchedLessonIds) ? 'checked' : '' }}>
           </td>
-          <td>{{ $lesson->datetime->format('Y-m-d H:i') }}</td>
+          <td><a href="{{ route('portal.lessons.edit', $lesson) }}">{{ $lesson->datetime->format('Y-m-d H:i') }}</a></td>
           <td>
             @if($lesson->student)
-              {{ $lesson->student->name }}
+              <a href="{{ route('portal.students.edit', $lesson->student) }}">{{ $lesson->student->name }}</a>
             @else
               -
             @endif
           </td>
           <td>
             @if($lesson->client)
-              {{ $lesson->client->name }}
+              <a href="{{ route('portal.clients.edit', $lesson->client) }}">{{ $lesson->client->name }}</a>
             @else
               -
             @endif
