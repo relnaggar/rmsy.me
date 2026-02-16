@@ -53,6 +53,11 @@ class Lesson extends Model
         return $this->belongsToMany(Payment::class);
     }
 
+    public function getFormattedPrice(): string
+    {
+        return penceToPounds($this->price_gbp_pence);
+    }
+
     private const SPANISH_DESCRIPTIONS = [
         'Online computer science classes' => 'Clases online de informática',
     ];

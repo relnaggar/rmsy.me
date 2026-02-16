@@ -140,6 +140,85 @@ class PaymentTest extends TestCase
         $response->assertDontSee('checked');
     }
 
+    public function test_store_matches_succeeds_when_totals_match(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $student = Student::create(['name' => 'Alice']);
+        $lesson1 = Lesson::create([
+            'datetime' => '2025-01-10 10:00',
+            'price_gbp_pence' => 3000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+        ]);
+        $lesson2 = Lesson::create([
+            'datetime' => '2025-01-12 10:00',
+            'price_gbp_pence' => 2000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+        ]);
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'amount_gbp_pence' => 5000,
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('portal.payments.storeMatches', $payment), [
+                'lesson_ids' => [$lesson1->id, $lesson2->id],
+            ]);
+
+        $response->assertRedirect(route('portal.payments.index'));
+        $response->assertSessionHas('success');
+        $this->assertTrue($lesson1->fresh()->paid);
+        $this->assertTrue($lesson2->fresh()->paid);
+        $this->assertCount(2, $payment->fresh()->lessons);
+    }
+
+    public function test_store_matches_fails_when_totals_do_not_match(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $student = Student::create(['name' => 'Alice']);
+        $lesson = Lesson::create([
+            'datetime' => '2025-01-10 10:00',
+            'price_gbp_pence' => 3000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+        ]);
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'amount_gbp_pence' => 5000,
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('portal.payments.storeMatches', $payment), [
+                'lesson_ids' => [$lesson->id],
+            ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('lesson_ids');
+        $this->assertFalse($lesson->fresh()->paid);
+        $this->assertCount(0, $payment->fresh()->lessons);
+    }
+
+    public function test_store_matches_fails_with_no_lessons_selected(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'amount_gbp_pence' => 5000,
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('portal.payments.storeMatches', $payment), [
+                'lesson_ids' => [],
+            ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('lesson_ids');
+    }
+
     public function test_free_meeting_button_hidden_on_portal(): void
     {
         $response = $this->actingAs($this->user)

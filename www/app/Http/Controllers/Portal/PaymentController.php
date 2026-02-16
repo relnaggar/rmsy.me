@@ -68,7 +68,7 @@ class PaymentController extends Controller
                     continue;
                 }
 
-                $amount = (int) (floatval($row[3]) * 100); // Convert to pence
+                $amount = poundsToPence(floatval($row[3]));
                 // Skip negative amounts (payouts)
                 if (floatval($row[3]) < 0) {
                     continue;
@@ -220,6 +220,12 @@ class PaymentController extends Controller
         ]);
 
         $newIds = $validated['lesson_ids'] ?? [];
+
+        $selectedTotal = (int) Lesson::whereIn('id', $newIds)->sum('price_gbp_pence');
+        if ($selectedTotal !== $payment->amount_gbp_pence) {
+            return back()->withErrors(['lesson_ids' => 'Selected lessons total (£'.penceToPounds($selectedTotal).') does not match payment amount (£'.penceToPounds($payment->amount_gbp_pence).').']);
+        }
+
         $previousIds = $payment->lessons->pluck('id')->toArray();
 
         DB::transaction(function () use ($payment, $newIds, $previousIds) {

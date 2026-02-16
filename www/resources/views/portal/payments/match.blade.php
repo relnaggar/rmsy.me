@@ -41,7 +41,15 @@
   </table>
 </div>
 
-<form action="{{ route('portal.payments.storeMatches', $payment) }}{{ $next ? '?next=1' : '' }}" method="POST">
+@if($errors->any())
+  <div class="alert alert-danger">
+    @foreach($errors->all() as $error)
+      <p class="mb-0">{{ $error }}</p>
+    @endforeach
+  </div>
+@endif
+
+<form action="{{ route('portal.payments.storeMatches', $payment) }}{{ $next ? '?next=1' : '' }}" method="POST" data-match-payment="{{ $payment->amount_gbp_pence }}">
   @csrf
 
   <table class="table table-striped">
@@ -59,7 +67,7 @@
       @forelse($lessons as $lesson)
         <tr class="{{ in_array($lesson->id, $suggestedIds) ? 'table-info' : '' }}">
           <td>
-            <input type="checkbox" name="lesson_ids[]" value="{{ $lesson->id }}" {{ in_array($lesson->id, $matchedLessonIds) ? 'checked' : '' }}>
+            <input type="checkbox" name="lesson_ids[]" value="{{ $lesson->id }}" data-price="{{ $lesson->price_gbp_pence }}" {{ in_array($lesson->id, $matchedLessonIds) ? 'checked' : '' }}>
           </td>
           <td><a href="{{ route('portal.lessons.edit', $lesson) }}">{{ $lesson->datetime->format('Y-m-d H:i') }}</a></td>
           <td>
@@ -77,7 +85,7 @@
             @endif
           </td>
           <td>{{ $lesson->duration_minutes }} min</td>
-          <td>&pound;{{ number_format($lesson->price_gbp_pence / 100, 2) }}</td>
+          <td>&pound;{{ $lesson->getFormattedPrice() }}</td>
         </tr>
       @empty
         <tr>
@@ -87,9 +95,10 @@
     </tbody>
   </table>
 
-  <div class="mt-3">
+  <div class="mt-3 d-flex align-items-center gap-3">
     <button type="submit" class="btn btn-primary">Confirm Matches</button>
     <a href="{{ $next ? route('portal.dashboard') : route('portal.payments.index') }}" class="btn btn-secondary">Cancel</a>
+    <span>Selected total: <strong id="match-total"></strong> / &pound;{{ $payment->getFormattedAmount() }}</span>
   </div>
 </form>
 @endsection

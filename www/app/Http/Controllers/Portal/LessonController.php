@@ -10,6 +10,7 @@ use App\Models\Lesson;
 use App\Models\Student;
 use App\Services\CalendarService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 use RuntimeException;
 
@@ -95,13 +96,26 @@ class LessonController extends Controller
     public function update(Request $request, Lesson $lesson): RedirectResponse
     {
         $validated = $request->validate([
+            'price_gbp' => ['required', 'numeric', 'min:0'],
             'buyer_id' => ['nullable', 'string', 'max:100', 'exists:buyers,id'],
         ]);
 
-        $lesson->update($validated);
+        $data = [
+            'price_gbp_pence' => poundsToPence((float) $validated['price_gbp']),
+            'buyer_id' => $validated['buyer_id'] ?? null,
+        ];
+
+        if ($request->has('apply_to_student') && $lesson->student_id) {
+            Lesson::where('student_id', $lesson->student_id)->update($data);
+
+            return redirect()->route('portal.lessons.index')
+                ->with('success', 'All lessons for '.$lesson->student->name.' updated successfully.');
+        }
+
+        $lesson->update($data);
 
         return redirect()->route('portal.lessons.index')
-            ->with('success', 'Lesson buyer updated successfully.');
+            ->with('success', 'Lesson updated successfully.');
     }
 
     public function destroy(Lesson $lesson): RedirectResponse

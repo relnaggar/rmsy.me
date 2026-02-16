@@ -59,9 +59,7 @@ class Payment extends Model
 
     public function getFormattedAmount(): string
     {
-        $amount = $this->amount_gbp_pence / 100;
-
-        return number_format($amount, 2);
+        return penceToPounds($this->amount_gbp_pence);
     }
 
     public function lessons(): BelongsToMany

@@ -70,7 +70,7 @@ class CalendarService
             if (! preg_match('/£([0-9]+(\.[0-9]{1,2})?)/', $subject, $matches)) {
                 continue;
             }
-            $priceGbpPence = (int) round(floatval($matches[1]) * 100);
+            $priceGbpPence = poundsToPence(floatval($matches[1]));
 
             // determine student/client
             $secondPart = trim($parts[1]);

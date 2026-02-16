@@ -90,7 +90,7 @@
             -
           @endif
         </td>
-        <td>&pound;{{ number_format($lesson->price_gbp_pence / 100, 2) }}</td>
+        <td>&pound;{{ $lesson->getFormattedPrice() }}</td>
         <td>{{ $lesson->paid ? 'Yes' : 'No' }}</td>
         <td>
           <a href="{{ route('portal.lessons.edit', $lesson) }}" class="btn btn-sm btn-primary">Edit</a>
