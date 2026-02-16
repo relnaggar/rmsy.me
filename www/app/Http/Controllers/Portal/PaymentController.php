@@ -250,6 +250,22 @@ class PaymentController extends Controller
             ->with('success', "Matched {$count} lesson(s) to payment.");
     }
 
+    public function destroyMatches(Payment $payment): RedirectResponse
+    {
+        $lessonIds = $payment->lessons->pluck('id')->toArray();
+
+        DB::transaction(function () use ($payment, $lessonIds) {
+            $payment->lessons()->detach();
+
+            if ($lessonIds) {
+                Lesson::whereIn('id', $lessonIds)->update(['paid' => false]);
+            }
+        });
+
+        return redirect()->route('portal.payments.index')
+            ->with('success', 'Payment unmatched successfully.');
+    }
+
     public function destroy(Payment $payment): RedirectResponse
     {
         $year = $payment->getYear();

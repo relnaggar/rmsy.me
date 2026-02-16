@@ -146,6 +146,7 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
                 Route::put('/{payment}', 'update')->name('update');
                 Route::get('/{payment}/match', 'match')->name('match');
                 Route::post('/{payment}/match', 'storeMatches')->name('storeMatches');
+                Route::delete('/{payment}/match', 'destroyMatches')->name('destroyMatches');
                 Route::delete('/{payment}', 'destroy')->name('destroy');
                 Route::delete('/', 'clear')->name('clear');
             });

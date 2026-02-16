@@ -23,7 +23,7 @@ class LessonController extends Controller
     public function index(): View
     {
         return view('portal.lessons.index', [
-            'lessons' => Lesson::with(['student', 'client', 'buyer'])
+            'lessons' => Lesson::with(['student', 'client', 'buyer', 'payments'])
                 ->orderBy('datetime', 'desc')
                 ->get(),
             'calendarAuthorised' => $this->calendarService->isAuthorised(),

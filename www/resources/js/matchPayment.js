@@ -23,6 +23,25 @@ if (form) {
     submitBtn.disabled = !matches;
   }
 
+  // Auto-check suggested lessons until total matches payment amount
+  let runningTotal = 0;
+  checkboxes.forEach((cb) => {
+    if (cb.checked) {
+      runningTotal += parseInt(cb.dataset.price, 10);
+    }
+  });
+  if (runningTotal < paymentAmount) {
+    checkboxes.forEach((cb) => {
+      if (!cb.checked && cb.hasAttribute('data-suggested')) {
+        const price = parseInt(cb.dataset.price, 10);
+        if (runningTotal + price <= paymentAmount) {
+          cb.checked = true;
+          runningTotal += price;
+        }
+      }
+    });
+  }
+
   checkboxes.forEach((cb) => cb.addEventListener('change', update));
   update();
 }

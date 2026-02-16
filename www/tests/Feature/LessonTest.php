@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Buyer;
 use App\Models\Client;
 use App\Models\Lesson;
+use App\Models\Payment;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -238,5 +240,49 @@ class LessonTest extends TestCase
             ]);
 
         $response->assertSessionHasErrors('client_id');
+    }
+
+    public function test_index_shows_payment_link_for_paid_matched_lesson(): void
+    {
+        $buyer = Buyer::create(['id' => 'acme', 'name' => 'Acme']);
+        $lesson = $this->createLesson(['buyer_id' => 'acme', 'paid' => true]);
+        $payment = Payment::create([
+            'id' => 'PAY-1',
+            'datetime' => '2025-01-20 10:00',
+            'amount_gbp_pence' => 5000,
+            'currency' => 'GBP',
+            'payment_reference' => 'ref',
+            'buyer_id' => 'acme',
+        ]);
+        $payment->lessons()->attach($lesson->id);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee(route('portal.payments.match', $payment), false);
+    }
+
+    public function test_index_shows_plain_yes_for_paid_lesson_without_payment(): void
+    {
+        $lesson = $this->createLesson(['paid' => true]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index'));
+
+        $response->assertStatus(200);
+        $response->assertSeeInOrder(['Yes']);
+        $response->assertDontSee(route('portal.payments.match', 'PAY'), false);
+    }
+
+    public function test_index_shows_no_for_unpaid_lesson(): void
+    {
+        $lesson = $this->createLesson(['paid' => false]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('No');
     }
 }

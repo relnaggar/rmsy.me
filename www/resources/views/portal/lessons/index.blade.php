@@ -94,7 +94,14 @@
           @endif
         </td>
         <td>&pound;{{ $lesson->getFormattedPrice() }}</td>
-        <td>{{ $lesson->paid ? 'Yes' : 'No' }}</td>
+        @php($payment = $lesson->payments->first())
+        <td>
+          @if($lesson->paid && $payment)
+            <a href="{{ route('portal.payments.match', $payment) }}">Yes</a>
+          @else
+            {{ $lesson->paid ? 'Yes' : 'No' }}
+          @endif
+        </td>
         <td>
           <a href="{{ route('portal.lessons.edit', $lesson) }}" class="btn btn-sm btn-primary">Edit</a>
           <form action="{{ route('portal.lessons.destroy', $lesson) }}" method="POST" class="d-inline"

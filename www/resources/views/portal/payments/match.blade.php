@@ -67,7 +67,7 @@
       @forelse($lessons as $lesson)
         <tr class="{{ in_array($lesson->id, $suggestedIds) ? 'table-info' : '' }}">
           <td>
-            <input type="checkbox" name="lesson_ids[]" value="{{ $lesson->id }}" data-price="{{ $lesson->price_gbp_pence }}" {{ in_array($lesson->id, $matchedLessonIds) ? 'checked' : '' }}>
+            <input type="checkbox" name="lesson_ids[]" value="{{ $lesson->id }}" data-price="{{ $lesson->price_gbp_pence }}" {{ in_array($lesson->id, $matchedLessonIds) ? 'checked' : '' }} {{ in_array($lesson->id, $suggestedIds) ? 'data-suggested' : '' }}>
           </td>
           <td><a href="{{ route('portal.lessons.edit', $lesson) }}">{{ $lesson->datetime->format('Y-m-d H:i') }}</a></td>
           <td>

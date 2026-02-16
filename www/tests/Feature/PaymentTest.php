@@ -219,6 +219,69 @@ class PaymentTest extends TestCase
         $response->assertSessionHasErrors('lesson_ids');
     }
 
+    public function test_unmatch_removes_lessons_and_marks_unpaid(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $student = Student::create(['name' => 'Alice']);
+        $lesson1 = Lesson::create([
+            'datetime' => '2025-01-10 10:00',
+            'price_gbp_pence' => 3000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+            'paid' => true,
+        ]);
+        $lesson2 = Lesson::create([
+            'datetime' => '2025-01-12 10:00',
+            'price_gbp_pence' => 2000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+            'paid' => true,
+        ]);
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'amount_gbp_pence' => 5000,
+            'datetime' => '2025-01-20 10:00',
+        ]);
+        $payment->lessons()->attach([$lesson1->id, $lesson2->id]);
+
+        $response = $this->actingAs($this->user)
+            ->delete(route('portal.payments.destroyMatches', $payment));
+
+        $response->assertRedirect(route('portal.payments.index'));
+        $response->assertSessionHas('success');
+        $this->assertFalse($lesson1->fresh()->paid);
+        $this->assertFalse($lesson2->fresh()->paid);
+        $this->assertCount(0, $payment->fresh()->lessons);
+    }
+
+    public function test_unmatch_succeeds_with_no_matches(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->delete(route('portal.payments.destroyMatches', $payment));
+
+        $response->assertRedirect(route('portal.payments.index'));
+        $response->assertSessionHas('success');
+    }
+
+    public function test_unmatch_requires_authentication(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->delete(route('portal.payments.destroyMatches', $payment));
+
+        $response->assertRedirect(route('login'));
+    }
+
     public function test_free_meeting_button_hidden_on_portal(): void
     {
         $response = $this->actingAs($this->user)
