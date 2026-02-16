@@ -445,7 +445,7 @@ class PaymentTest extends TestCase
             ->get(route('portal.payments.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Lesson Pending');
+        $response->assertSee('Lesson(s) Pending');
     }
 
     public function test_free_meeting_button_hidden_on_portal(): void

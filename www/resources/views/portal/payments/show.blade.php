@@ -59,10 +59,10 @@
 <form method="POST" action="{{ route('portal.payments.toggleLessonPending', $payment) }}" class="mb-4">
   @csrf
   @if($payment->lesson_pending)
-    <button type="submit" class="btn btn-warning">Remove Lesson Pending</button>
-    <span class="ms-2 text-muted">This payment is marked as lesson pending and will be skipped during match-next.</span>
+    <button type="submit" class="btn btn-warning">Remove Lesson(s) Pending</button>
+    <span class="ms-2 text-muted">This payment is marked as lesson(s) pending and will be skipped during match-next.</span>
   @else
-    <button type="submit" class="btn btn-outline-warning">Mark as Lesson Pending</button>
+    <button type="submit" class="btn btn-outline-warning">Mark as Lesson(s) Pending</button>
   @endif
 </form>
 

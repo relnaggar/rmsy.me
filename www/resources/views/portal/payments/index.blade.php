@@ -58,7 +58,7 @@
         </td>
         <td>
           <a href="{{ route('portal.payments.show', $payment) }}" class="btn btn-sm {{ $payment->lessons_count > 0 ? 'btn-outline-secondary' : ($payment->lesson_pending ? 'btn-outline-info' : 'btn-warning') }}">
-            {{ $payment->lessons_count > 0 ? 'Matched ('.$payment->lessons_count.')' : ($payment->lesson_pending ? 'Lesson Pending' : 'Unmatched') }}
+            {{ $payment->lessons_count > 0 ? 'Matched ('.$payment->lessons_count.')' : ($payment->lesson_pending ? 'Lesson(s) Pending' : 'Unmatched') }}
           </a>
           <form action="{{ route('portal.payments.destroy', $payment) }}" method="POST" class="d-inline"
                 data-confirm="Are you sure you want to delete this payment?">

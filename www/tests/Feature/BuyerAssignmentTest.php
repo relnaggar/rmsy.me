@@ -159,6 +159,73 @@ class BuyerAssignmentTest extends TestCase
         $response->assertSessionHasErrors('buyer_id');
     }
 
+    public function test_edit_buyer_with_slash_in_id(): void
+    {
+        $buyer = $this->createBuyer('John / Jane', 'John / Jane');
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.buyers.edit', $buyer));
+
+        $response->assertStatus(200);
+        $response->assertSee('John / Jane');
+    }
+
+    public function test_update_buyer_with_slash_in_id(): void
+    {
+        $buyer = $this->createBuyer('John / Jane', 'John / Jane');
+
+        $response = $this->actingAs($this->user)
+            ->put(route('portal.buyers.update', $buyer), [
+                'name' => 'John and Jane',
+                'country' => 'GB',
+            ]);
+
+        $response->assertRedirect(route('portal.buyers.index'));
+        $this->assertEquals('John and Jane', $buyer->fresh()->name);
+    }
+
+    public function test_delete_buyer_with_slash_in_id(): void
+    {
+        $buyer = $this->createBuyer('John / Jane', 'John / Jane');
+
+        $response = $this->actingAs($this->user)
+            ->delete(route('portal.buyers.destroy', $buyer));
+
+        $response->assertRedirect(route('portal.buyers.index'));
+        $this->assertNull(Buyer::find('John / Jane'));
+    }
+
+    public function test_index_renders_edit_link_for_buyer_with_slash_in_id(): void
+    {
+        $buyer = $this->createBuyer('John / Jane', 'John / Jane');
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.buyers.index'));
+
+        $response->assertStatus(200);
+
+        $editUrl = route('portal.buyers.edit', $buyer);
+        $response->assertSee($editUrl, false);
+    }
+
+    public function test_index_edit_link_for_buyer_with_slash_reaches_correct_buyer(): void
+    {
+        $buyer = $this->createBuyer('John / Jane', 'John / Jane');
+
+        // Get the index page and extract the edit URL
+        $indexResponse = $this->actingAs($this->user)
+            ->get(route('portal.buyers.index'));
+
+        $editUrl = route('portal.buyers.edit', $buyer);
+
+        // Follow the generated link
+        $editResponse = $this->actingAs($this->user)
+            ->get($editUrl);
+
+        $editResponse->assertStatus(200);
+        $editResponse->assertSee('John / Jane');
+    }
+
     public function test_all_endpoints_require_authentication(): void
     {
         $this->post(route('portal.buyers.reassign'))->assertRedirect(route('login'));

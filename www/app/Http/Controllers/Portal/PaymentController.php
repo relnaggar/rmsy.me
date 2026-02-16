@@ -199,7 +199,7 @@ class PaymentController extends Controller
     {
         $payment->update(['lesson_pending' => ! $payment->lesson_pending]);
 
-        $status = $payment->lesson_pending ? 'marked as lesson pending' : 'no longer lesson pending';
+        $status = $payment->lesson_pending ? 'marked as lesson(s) pending' : 'no longer lesson(s) pending';
 
         return redirect()->route('portal.payments.show', $payment)
             ->with('success', "Payment {$status}.");

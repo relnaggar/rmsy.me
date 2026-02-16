@@ -86,6 +86,7 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
         Route::controller(BuyerController::class)
             ->prefix('buyers')
             ->name('buyers.')
+            ->where(['buyer' => '.*'])
             ->group($resourceGroupCallback('buyer'));
         Route::get(
             'buyers/create',
