@@ -142,9 +142,8 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
                 Route::get('/', 'index')->name('index');
                 Route::post('/import', 'import')->name('import');
                 Route::get('/match-next', 'matchNext')->name('matchNext');
-                Route::get('/{payment}/edit', 'edit')->name('edit');
+                Route::get('/{payment}', 'show')->name('show');
                 Route::put('/{payment}', 'update')->name('update');
-                Route::get('/{payment}/match', 'match')->name('match');
                 Route::post('/{payment}/match', 'storeMatches')->name('storeMatches');
                 Route::delete('/{payment}/match', 'destroyMatches')->name('destroyMatches');
                 Route::delete('/{payment}', 'destroy')->name('destroy');

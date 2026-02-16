@@ -57,18 +57,9 @@
           @endif
         </td>
         <td>
-          <a href="{{ route('portal.payments.edit', $payment) }}" class="btn btn-sm btn-primary">Edit</a>
-          @if($payment->lessons_count > 0)
-            <a href="{{ route('portal.payments.match', $payment) }}" class="btn btn-sm btn-outline-secondary">Matched ({{ $payment->lessons_count }})</a>
-            <form action="{{ route('portal.payments.destroyMatches', $payment) }}" method="POST" class="d-inline"
-                  data-confirm="Are you sure you want to unmatch this payment?">
-              @csrf
-              @method('DELETE')
-              <button type="submit" class="btn btn-sm btn-outline-danger">Unmatch</button>
-            </form>
-          @else
-            <a href="{{ route('portal.payments.match', $payment) }}" class="btn btn-sm btn-warning">Match</a>
-          @endif
+          <a href="{{ route('portal.payments.show', $payment) }}" class="btn btn-sm {{ $payment->lessons_count > 0 ? 'btn-outline-secondary' : 'btn-warning' }}">
+            {{ $payment->lessons_count > 0 ? 'Matched ('.$payment->lessons_count.')' : 'Unmatched' }}
+          </a>
           <form action="{{ route('portal.payments.destroy', $payment) }}" method="POST" class="d-inline"
                 data-confirm="Are you sure you want to delete this payment?">
             @csrf

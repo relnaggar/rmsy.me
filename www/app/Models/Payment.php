@@ -66,4 +66,28 @@ class Payment extends Model
     {
         return $this->belongsToMany(Lesson::class);
     }
+
+    public function previousForBuyer(): ?self
+    {
+        if (! $this->buyer_id) {
+            return null;
+        }
+
+        return static::where('buyer_id', $this->buyer_id)
+            ->where('datetime', '<', $this->datetime)
+            ->orderBy('datetime', 'desc')
+            ->first();
+    }
+
+    public function nextForBuyer(): ?self
+    {
+        if (! $this->buyer_id) {
+            return null;
+        }
+
+        return static::where('buyer_id', $this->buyer_id)
+            ->where('datetime', '>', $this->datetime)
+            ->orderBy('datetime', 'asc')
+            ->first();
+    }
 }

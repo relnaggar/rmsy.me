@@ -112,7 +112,7 @@ class PaymentTest extends TestCase
         $payment->lessons()->attach($lesson->id);
 
         $response = $this->actingAs($this->user)
-            ->get(route('portal.payments.match', $payment));
+            ->get(route('portal.payments.show', $payment));
 
         $response->assertStatus(200);
         $response->assertSee('checked');
@@ -134,7 +134,7 @@ class PaymentTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-            ->get(route('portal.payments.match', $payment));
+            ->get(route('portal.payments.show', $payment));
 
         $response->assertStatus(200);
         $response->assertDontSee('checked');
@@ -167,7 +167,7 @@ class PaymentTest extends TestCase
                 'lesson_ids' => [$lesson1->id, $lesson2->id],
             ]);
 
-        $response->assertRedirect(route('portal.payments.index'));
+        $response->assertRedirect(route('portal.payments.show', $payment));
         $response->assertSessionHas('success');
         $this->assertTrue($lesson1->fresh()->paid);
         $this->assertTrue($lesson2->fresh()->paid);
@@ -247,7 +247,7 @@ class PaymentTest extends TestCase
         $response = $this->actingAs($this->user)
             ->delete(route('portal.payments.destroyMatches', $payment));
 
-        $response->assertRedirect(route('portal.payments.index'));
+        $response->assertRedirect(route('portal.payments.show', $payment));
         $response->assertSessionHas('success');
         $this->assertFalse($lesson1->fresh()->paid);
         $this->assertFalse($lesson2->fresh()->paid);
@@ -265,7 +265,7 @@ class PaymentTest extends TestCase
         $response = $this->actingAs($this->user)
             ->delete(route('portal.payments.destroyMatches', $payment));
 
-        $response->assertRedirect(route('portal.payments.index'));
+        $response->assertRedirect(route('portal.payments.show', $payment));
         $response->assertSessionHas('success');
     }
 
@@ -280,6 +280,85 @@ class PaymentTest extends TestCase
         $response = $this->delete(route('portal.payments.destroyMatches', $payment));
 
         $response->assertRedirect(route('login'));
+    }
+
+    public function test_show_has_prev_and_next_links_for_same_buyer(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $p1 = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-10 10:00',
+        ]);
+        $p2 = $this->createPayment('PAY-2', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+        ]);
+        $p3 = $this->createPayment('PAY-3', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-30 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.show', $p2));
+
+        $response->assertStatus(200);
+        $response->assertSee(route('portal.payments.show', $p1), false);
+        $response->assertSee(route('portal.payments.show', $p3), false);
+    }
+
+    public function test_show_no_prev_next_links_for_single_payment(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.show', $payment));
+
+        $response->assertStatus(200);
+        $response->assertDontSee('Prev', false);
+        $response->assertDontSee('Next', false);
+    }
+
+    public function test_show_no_prev_next_links_without_buyer(): void
+    {
+        $payment = $this->createPayment('PAY-1', [
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.show', $payment));
+
+        $response->assertStatus(200);
+        $response->assertDontSee('Prev', false);
+        $response->assertDontSee('Next', false);
+    }
+
+    public function test_show_prev_next_ignores_other_buyers(): void
+    {
+        $acme = $this->createBuyer('acme', 'Acme');
+        $other = $this->createBuyer('other', 'Other');
+        $p1 = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-10 10:00',
+        ]);
+        $pOther = $this->createPayment('PAY-OTHER', [
+            'buyer_id' => 'other',
+            'datetime' => '2025-01-15 10:00',
+        ]);
+        $p2 = $this->createPayment('PAY-2', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.show', $p1));
+
+        $response->assertStatus(200);
+        $response->assertSee(route('portal.payments.show', $p2), false);
+        $response->assertDontSee(route('portal.payments.show', $pOther), false);
     }
 
     public function test_free_meeting_button_hidden_on_portal(): void

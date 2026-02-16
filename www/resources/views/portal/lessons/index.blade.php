@@ -97,7 +97,7 @@
         @php($payment = $lesson->payments->first())
         <td>
           @if($lesson->paid && $payment)
-            <a href="{{ route('portal.payments.match', $payment) }}">Yes</a>
+            <a href="{{ route('portal.payments.show', $payment) }}">Yes</a>
           @else
             {{ $lesson->paid ? 'Yes' : 'No' }}
           @endif

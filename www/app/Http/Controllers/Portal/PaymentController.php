@@ -148,13 +148,38 @@ class PaymentController extends Controller
         }
     }
 
-    public function edit(Payment $payment): View
+    public function show(Request $request, Payment $payment): View
     {
+        $payment->load('buyer', 'lessons');
         $buyers = ['' => '- None -'] + Buyer::orderBy('name')->pluck('name', 'id')->toArray();
 
-        return view('portal.payments.edit', [
-            'payment' => $payment->load('buyer'),
+        $matchedLessonIds = $payment->lessons->pluck('id')->toArray();
+
+        $lessons = $payment->buyer_id
+            ? Lesson::with('student', 'client')
+                ->where('buyer_id', $payment->buyer_id)
+                ->where(function ($query) use ($matchedLessonIds) {
+                    $query->where('paid', false)
+                        ->orWhereIn('id', $matchedLessonIds);
+                })
+                ->orderBy('datetime', 'asc')
+                ->get()
+            : collect();
+
+        $suggestedIds = $lessons
+            ->filter(fn ($lesson) => $lesson->datetime->lte($payment->datetime) || in_array($lesson->id, $matchedLessonIds))
+            ->pluck('id')
+            ->toArray();
+
+        return view('portal.payments.show', [
+            'payment' => $payment,
             'buyers' => $buyers,
+            'lessons' => $lessons,
+            'matchedLessonIds' => $matchedLessonIds,
+            'suggestedIds' => $suggestedIds,
+            'next' => $request->has('next'),
+            'prevByBuyer' => $payment->previousForBuyer(),
+            'nextByBuyer' => $payment->nextForBuyer(),
         ]);
     }
 
@@ -166,7 +191,7 @@ class PaymentController extends Controller
 
         $payment->update($validated);
 
-        return redirect()->route('portal.payments.index')
+        return redirect()->route('portal.payments.show', $payment)
             ->with('success', 'Payment buyer updated successfully.');
     }
 
@@ -181,35 +206,7 @@ class PaymentController extends Controller
                 ->with('success', 'All payments have been matched.');
         }
 
-        return redirect()->route('portal.payments.match', ['payment' => $payment, 'next' => 1]);
-    }
-
-    public function match(Request $request, Payment $payment): View
-    {
-        $payment->load('buyer', 'lessons');
-        $matchedLessonIds = $payment->lessons->pluck('id')->toArray();
-
-        $lessons = Lesson::with('student', 'client')
-            ->where('buyer_id', $payment->buyer_id)
-            ->where(function ($query) use ($matchedLessonIds) {
-                $query->where('paid', false)
-                    ->orWhereIn('id', $matchedLessonIds);
-            })
-            ->orderBy('datetime', 'asc')
-            ->get();
-
-        $suggestedIds = $lessons
-            ->filter(fn ($lesson) => $lesson->datetime->lte($payment->datetime) || in_array($lesson->id, $matchedLessonIds))
-            ->pluck('id')
-            ->toArray();
-
-        return view('portal.payments.match', [
-            'payment' => $payment,
-            'lessons' => $lessons,
-            'matchedLessonIds' => $matchedLessonIds,
-            'suggestedIds' => $suggestedIds,
-            'next' => $request->has('next'),
-        ]);
+        return redirect()->route('portal.payments.show', ['payment' => $payment, 'next' => 1]);
     }
 
     public function storeMatches(Request $request, Payment $payment): RedirectResponse
@@ -246,7 +243,7 @@ class PaymentController extends Controller
                 ->with('success', "Matched {$count} lesson(s) to payment.");
         }
 
-        return redirect()->route('portal.payments.index')
+        return redirect()->route('portal.payments.show', $payment)
             ->with('success', "Matched {$count} lesson(s) to payment.");
     }
 
@@ -262,7 +259,7 @@ class PaymentController extends Controller
             }
         });
 
-        return redirect()->route('portal.payments.index')
+        return redirect()->route('portal.payments.show', $payment)
             ->with('success', 'Payment unmatched successfully.');
     }
 

@@ -260,7 +260,7 @@ class LessonTest extends TestCase
             ->get(route('portal.lessons.index'));
 
         $response->assertStatus(200);
-        $response->assertSee(route('portal.payments.match', $payment), false);
+        $response->assertSee(route('portal.payments.show', $payment), false);
     }
 
     public function test_index_shows_plain_yes_for_paid_lesson_without_payment(): void
@@ -272,7 +272,7 @@ class LessonTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSeeInOrder(['Yes']);
-        $response->assertDontSee(route('portal.payments.match', 'PAY'), false);
+        $response->assertDontSee(route('portal.payments.show', 'PAY'), false);
     }
 
     public function test_index_shows_no_for_unpaid_lesson(): void
