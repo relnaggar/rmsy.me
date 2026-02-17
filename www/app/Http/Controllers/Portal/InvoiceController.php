@@ -17,7 +17,8 @@ class InvoiceController extends Controller
 {
     public function __construct(
         private ExchangeRateService $exchangeRateService,
-    ) {}
+    ) {
+    }
 
     public function index(): View
     {

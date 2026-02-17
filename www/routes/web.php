@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MicrosoftAuthController;
@@ -18,26 +20,32 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [SiteController::class, 'index'])->name('home');
 Route::get('/about', [SiteController::class, 'about'])->name('about');
 Route::get(
-    '/projects', [ProjectsController::class, 'index']
+    '/projects',
+    [ProjectsController::class, 'index']
 )->name('projects.index');
 Route::get(
-    '/projects/{slug}', [ProjectsController::class, 'show']
+    '/projects/{slug}',
+    [ProjectsController::class, 'show']
 )->name('projects.show');
 Route::get(
-    '/contact', [ContactController::class, 'show']
+    '/contact',
+    [ContactController::class, 'show']
 )->name('contact.show');
 Route::post(
-    '/contact', [ContactController::class, 'submit']
+    '/contact',
+    [ContactController::class, 'submit']
 )->name('contact.submit')->middleware('throttle:3,1');
 
 // Webhooks
 Route::post(
-    '/wise-deposit', [SiteController::class, 'wiseDeposit']
+    '/wise-deposit',
+    [SiteController::class, 'wiseDeposit']
 )->name('wise-deposit');
 
 // API
 Route::post(
-    '/api/payments/import', [PaymentController::class, 'apiImport']
+    '/api/payments/import',
+    [PaymentController::class, 'apiImport']
 )->name('api.payments.import');
 
 // External redirects
@@ -57,20 +65,24 @@ Route::redirect(
 
 // Authentication
 Route::get(
-    '/login', [AuthController::class, 'showLogin']
+    '/login',
+    [AuthController::class, 'showLogin']
 )->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
 Route::post(
-    '/logout', [AuthController::class, 'logout']
+    '/logout',
+    [AuthController::class, 'logout']
 )->name('logout');
 
 // Microsoft OAuth (authenticated)
 Route::middleware('auth')->group(function () {
     Route::get(
-        '/auth/login', [MicrosoftAuthController::class, 'redirect']
+        '/auth/login',
+        [MicrosoftAuthController::class, 'redirect']
     )->name('auth.microsoft');
     Route::get(
-        '/auth/callback', [MicrosoftAuthController::class, 'callback']
+        '/auth/callback',
+        [MicrosoftAuthController::class, 'callback']
     )->name('auth.microsoft.callback');
 });
 

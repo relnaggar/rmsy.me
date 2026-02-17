@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Services\ProjectsService;
@@ -9,7 +11,8 @@ class ProjectsController extends Controller
 {
     public function __construct(
         private ProjectsService $projectsService,
-    ) {}
+    ) {
+    }
 
     public function index(): View
     {

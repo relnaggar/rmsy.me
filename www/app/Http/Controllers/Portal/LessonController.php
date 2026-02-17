@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
@@ -18,7 +20,8 @@ class LessonController extends Controller
 {
     public function __construct(
         private CalendarService $calendarService,
-    ) {}
+    ) {
+    }
 
     public function index(): View
     {

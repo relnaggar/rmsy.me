@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use App\Models\Client;
@@ -39,9 +41,10 @@ class CalendarImportFilterTest extends TestCase
 
     private function createServiceWithFakeEvents(array $events): CalendarService
     {
-        return new class($events) extends CalendarService
-        {
-            public function __construct(private readonly array $fakeEvents) {}
+        return new class ($events) extends CalendarService {
+            public function __construct(private readonly array $fakeEvents)
+            {
+            }
 
             protected function getCalendarEvents(string $startDate, string $endDate): array
             {

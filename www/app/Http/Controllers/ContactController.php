@@ -14,7 +14,8 @@ class ContactController extends Controller
 {
     public function __construct(
         private ContactMethodsService $contactMethodsService,
-    ) {}
+    ) {
+    }
 
     private function viewData(): array
     {

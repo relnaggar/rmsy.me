@@ -16,12 +16,13 @@ class SiteController extends Controller
 {
     public function __construct(
         private ProjectsService $projectsService,
-    ) {}
+    ) {
+    }
 
     public function index(): View
     {
         // calculate the number of years tutoring
-        $currentDate = new DateTime;
+        $currentDate = new DateTime();
         $tutoringStartDate = new DateTime('2019-01-01');
         $numberOfYearsTutoring = $currentDate->diff($tutoringStartDate)->y;
         $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);

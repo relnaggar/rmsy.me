@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PublicPageTest extends TestCase
@@ -46,7 +49,28 @@ class PublicPageTest extends TestCase
 
     public function test_external_redirects(): void
     {
+        $this->get('/free-meeting')->assertRedirect('https://calendly.com/relnaggar/free-meeting');
         $this->get('/github')->assertRedirect('https://github.com/relnaggar');
         $this->get('/linkedin')->assertRedirect('https://www.linkedin.com/in/relnaggar');
+        $this->get('/resumes/full-stack-developer')->assertRedirect(media('/resumes/ramsey-el-naggar-full-stack-developer.pdf'));
+        $this->get('/resumes/educator')->assertRedirect(media('/resumes/ramsey-el-naggar-educator.pdf'));
+    }
+
+    public function test_health_check_route_renders(): void
+    {
+        $this->get('/up')->assertOk();
+    }
+
+    public function test_storage_local_route_requires_signature(): void
+    {
+        $this->get(route('storage.local', ['path' => 'missing-test-file.txt']))
+            ->assertForbidden();
+    }
+
+    public function test_storage_local_route_signed_request_returns_404_for_missing_file(): void
+    {
+        $url = Storage::disk('local')->temporaryUrl('missing-test-file.txt', now()->addMinutes(5));
+
+        $this->get($url)->assertNotFound();
     }
 }

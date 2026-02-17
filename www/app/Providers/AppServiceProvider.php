@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
@@ -23,7 +25,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('login', function (Request $request) {
-            $key = mb_strtolower($request->string('email')).'|'.$request->ip();
+            $email = (string) $request->string('email');
+            $key = mb_strtolower($email).'|'.$request->ip();
 
             return Limit::perMinute(5)->by($key);
         });

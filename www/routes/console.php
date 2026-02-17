@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\Buyer;
 use App\Models\Lesson;
 use App\Models\Payment;

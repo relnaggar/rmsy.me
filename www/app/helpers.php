@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 if (! function_exists('formatCurrency')) {
     function formatCurrency(int $amountInCents, string $currency): string
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use App\Models\Buyer;
@@ -65,8 +67,7 @@ class CalendarAuthFlowTest extends TestCase
             'ms_token_expires' => now()->addHour(),
         ]);
 
-        $fakeService = new class extends CalendarService
-        {
+        $fakeService = new class () extends CalendarService {
             protected function getCalendarEvents(string $startDate, string $endDate): array
             {
                 return [];
@@ -91,8 +92,7 @@ class CalendarAuthFlowTest extends TestCase
             'ms_token_expires' => now()->addHour(),
         ]);
 
-        $fakeService = new class extends CalendarService
-        {
+        $fakeService = new class () extends CalendarService {
             protected function getCalendarEvents(string $startDate, string $endDate): array
             {
                 return [
@@ -264,7 +264,7 @@ class CalendarAuthFlowTest extends TestCase
 
     public function test_is_authorised_returns_false_when_no_tokens(): void
     {
-        $service = new CalendarService;
+        $service = new CalendarService();
 
         $this->actingAs($this->user);
         $this->assertFalse($service->isAuthorised());
@@ -278,7 +278,7 @@ class CalendarAuthFlowTest extends TestCase
             'ms_token_expires' => now()->addHour(),
         ]);
 
-        $service = new CalendarService;
+        $service = new CalendarService();
 
         $this->actingAs($this->user);
         $this->assertTrue($service->isAuthorised());
@@ -292,7 +292,7 @@ class CalendarAuthFlowTest extends TestCase
             'ms_token_expires' => now()->subMinutes(5),
         ]);
 
-        $service = new CalendarService;
+        $service = new CalendarService();
 
         $this->actingAs($this->user);
         $this->assertTrue($service->isAuthorised());
@@ -306,7 +306,7 @@ class CalendarAuthFlowTest extends TestCase
             'ms_token_expires' => now()->subMinutes(5),
         ]);
 
-        $service = new CalendarService;
+        $service = new CalendarService();
 
         $this->actingAs($this->user);
         $this->assertFalse($service->isAuthorised());
