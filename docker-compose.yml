@@ -27,6 +27,7 @@ services:
       - LARAVEL_APP_KEY
       - ADMIN_EMAIL
       - ADMIN_PASSWORD
+      - RMSYME_API_TOKEN
   laravel-vite:
     init: true
     container_name: laravel-vite
@@ -74,3 +75,5 @@ secrets:
     file: ./secrets/ADMIN_EMAIL
   ADMIN_PASSWORD:
     file: ./secrets/ADMIN_PASSWORD
+  RMSYME_API_TOKEN:
+    file: ./secrets/RMSYME_API_TOKEN

@@ -35,6 +35,11 @@ Route::post(
     '/wise-deposit', [SiteController::class, 'wiseDeposit']
 )->name('wise-deposit');
 
+// API
+Route::post(
+    '/api/payments/import', [PaymentController::class, 'apiImport']
+)->name('api.payments.import');
+
 // External redirects
 Route::redirect('/free-meeting', 'https://calendly.com/relnaggar/free-meeting');
 Route::redirect('/github', 'https://github.com/relnaggar', 301);

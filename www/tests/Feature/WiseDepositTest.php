@@ -2,8 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Buyer;
-use App\Models\Payment;
 use App\Models\User;
 use App\Models\WiseDeposit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -115,7 +113,7 @@ class WiseDepositTest extends TestCase
         ]);
 
         $csv = "id,type,datetime,amount,currency,description,reference,running_balance,exchange_from,exchange_to,exchange_rate,payer_name,payee_name,payment_reference\n";
-        $csv .= "TRANSFER-123,CREDIT,2026-02-17 10:30:00,50.00,GBP,Payment,,1000.00,,,,,John Doe,ref\n";
+        $csv .= "TRANSFER-123,CREDIT,2026-02-17 10:30:00,50.00,GBP,Payment,,1000.00,,,,John Doe,,ref\n";
         $file = UploadedFile::fake()->createWithContent('statement.csv', $csv);
 
         $response = $this->actingAs($this->user)
@@ -136,7 +134,7 @@ class WiseDepositTest extends TestCase
         ]);
 
         $csv = "id,type,datetime,amount,currency,description,reference,running_balance,exchange_from,exchange_to,exchange_rate,payer_name,payee_name,payment_reference\n";
-        $csv .= "TRANSFER-123,CREDIT,2026-02-17 10:30:00,50.00,GBP,Payment,,1000.00,,,,,John Doe,ref\n";
+        $csv .= "TRANSFER-123,CREDIT,2026-02-17 10:30:00,50.00,GBP,Payment,,1000.00,,,,John Doe,,ref\n";
         $file = UploadedFile::fake()->createWithContent('statement.csv', $csv);
 
         $response = $this->actingAs($this->user)
@@ -156,7 +154,7 @@ class WiseDepositTest extends TestCase
         ]);
 
         $csv = "id,type,datetime,amount,currency,description,reference,running_balance,exchange_from,exchange_to,exchange_rate,payer_name,payee_name,payment_reference\n";
-        $csv .= "TRANSFER-123,CREDIT,2026-02-17 10:30:00,50.00,GBP,Payment,,1000.00,,,,,John Doe,ref\n";
+        $csv .= "TRANSFER-123,CREDIT,2026-02-17 10:30:00,50.00,GBP,Payment,,1000.00,,,,John Doe,,ref\n";
         $file = UploadedFile::fake()->createWithContent('statement.csv', $csv);
 
         $response = $this->actingAs($this->user)

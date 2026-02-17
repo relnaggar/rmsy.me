@@ -9,6 +9,7 @@ use App\Models\Buyer;
 use App\Models\Lesson;
 use App\Models\Payment;
 use App\Models\WiseDeposit;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,12 +33,48 @@ class PaymentController extends Controller
             'csv_file' => ['required', 'file', 'mimes:csv,txt'],
         ]);
 
-        $file = $request->file('csv_file');
-        $path = $file->getRealPath();
+        $path = $request->file('csv_file')->getRealPath();
 
+        try {
+            $result = $this->importFromCsv($path);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Import failed: '.$e->getMessage());
+        }
+
+        return redirect()->route('portal.payments.index')
+            ->with('success', "Imported {$result['imported']} payments. Skipped {$result['skipped']} duplicates.");
+    }
+
+    public function apiImport(Request $request): JsonResponse
+    {
+        $token = config('services.api_token');
+        if (empty($token) || $request->bearerToken() !== $token) {
+            return response()->json(['error' => 'Unauthorized.'], 401);
+        }
+
+        $request->validate([
+            'csv_file' => ['required', 'file', 'mimes:csv,txt'],
+        ]);
+
+        $path = $request->file('csv_file')->getRealPath();
+
+        try {
+            $result = $this->importFromCsv($path);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Import failed: '.$e->getMessage()], 500);
+        }
+
+        return response()->json($result);
+    }
+
+    /**
+     * @return array{imported: int, skipped: int}
+     */
+    private function importFromCsv(string $path): array
+    {
         $handle = fopen($path, 'r');
         if (! $handle) {
-            return back()->with('error', 'Could not open the file.');
+            throw new \RuntimeException('Could not open the file.');
         }
 
         // Skip header row
@@ -114,13 +151,12 @@ class PaymentController extends Controller
             DB::rollBack();
             fclose($handle);
 
-            return back()->with('error', 'Import failed: '.$e->getMessage());
+            throw $e;
         }
 
         fclose($handle);
 
-        return redirect()->route('portal.payments.index')
-            ->with('success', "Imported {$imported} payments. Skipped {$skipped} duplicates.");
+        return ['imported' => $imported, 'skipped' => $skipped];
     }
 
     private function updateSequenceNumbers(array $years): void
