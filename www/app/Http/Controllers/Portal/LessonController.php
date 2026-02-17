@@ -83,10 +83,10 @@ class LessonController extends Controller
             ->with('success', "Deleted {$deleted} lesson(s).");
     }
 
-    public function edit(Lesson $lesson): View
+    public function show(Lesson $lesson): View
     {
-        return view('portal.lessons.edit', [
-            'lesson' => $lesson->load(['student', 'client', 'buyer']),
+        return view('portal.lessons.show', [
+            'lesson' => $lesson->load(['student', 'client', 'buyer', 'payments']),
             'students' => ['' => '- None -'] + Student::orderBy('name')->pluck('name', 'id')->toArray(),
             'clients' => ['' => '- None -'] + Client::orderBy('name')->pluck('name', 'id')->toArray(),
             'buyers' => ['' => '- None -'] + Buyer::orderBy('name')->pluck('name', 'id')->toArray(),
@@ -96,30 +96,57 @@ class LessonController extends Controller
     public function update(Request $request, Lesson $lesson): RedirectResponse
     {
         $validated = $request->validate([
-            'price_gbp' => ['required', 'numeric', 'min:0'],
-            'student_id' => ['nullable', 'integer', 'exists:students,id'],
-            'client_id' => ['nullable', 'integer', 'exists:clients,id'],
-            'buyer_id' => ['nullable', 'string', 'max:100', 'exists:buyers,id'],
+            'price_gbp' => ['sometimes', 'required', 'numeric', 'min:0'],
+            'student_id' => ['sometimes', 'nullable', 'integer', 'exists:students,id'],
+            'client_id' => ['sometimes', 'nullable', 'integer', 'exists:clients,id'],
+            'buyer_id' => ['sometimes', 'nullable', 'string', 'max:100', 'exists:buyers,id'],
         ]);
 
-        $data = [
-            'price_gbp_pence' => poundsToPence((float) $validated['price_gbp']),
-            'student_id' => $validated['student_id'] ?? null,
-            'client_id' => $validated['client_id'] ?? null,
-            'buyer_id' => $validated['buyer_id'] ?? null,
-        ];
-
-        if ($request->has('apply_to_student') && $lesson->student_id) {
-            Lesson::where('student_id', $lesson->student_id)->update($data);
-
-            return redirect()->route('portal.lessons.index')
-                ->with('success', 'All lessons for '.$lesson->student->name.' updated successfully.');
+        $data = [];
+        if (array_key_exists('price_gbp', $validated)) {
+            $data['price_gbp_pence'] = poundsToPence((float) $validated['price_gbp']);
+        }
+        if (array_key_exists('student_id', $validated)) {
+            $data['student_id'] = $validated['student_id'] ?? null;
+        }
+        if (array_key_exists('client_id', $validated)) {
+            $data['client_id'] = $validated['client_id'] ?? null;
+        }
+        if (array_key_exists('buyer_id', $validated)) {
+            $data['buyer_id'] = $validated['buyer_id'] ?? null;
         }
 
         $lesson->update($data);
 
-        return redirect()->route('portal.lessons.index')
+        return redirect()->route('portal.lessons.show', $lesson)
             ->with('success', 'Lesson updated successfully.');
+    }
+
+    public function applyToStudent(Request $request, Lesson $lesson): RedirectResponse
+    {
+        if (! $lesson->student_id) {
+            return redirect()->route('portal.lessons.show', $lesson);
+        }
+
+        $data = [
+            'price_gbp_pence' => $lesson->price_gbp_pence,
+            'student_id' => $lesson->student_id,
+            'client_id' => $lesson->client_id,
+            'buyer_id' => $lesson->buyer_id,
+        ];
+
+        $query = Lesson::where('student_id', $lesson->student_id);
+
+        if ($request->has('unmatched_only')) {
+            $query->where('paid', false);
+        }
+
+        $query->update($data);
+
+        $scope = $request->has('unmatched_only') ? 'Unmatched lessons' : 'All lessons';
+
+        return redirect()->route('portal.lessons.show', $lesson)
+            ->with('success', $scope.' for '.$lesson->student->name.' updated successfully.');
     }
 
     public function destroy(Lesson $lesson): RedirectResponse

@@ -58,6 +58,11 @@ class Lesson extends Model
         return penceToPounds($this->price_gbp_pence);
     }
 
+    public function getFormattedDatetime(): string
+    {
+        return $this->datetime->format('Y-m-d D H:i');
+    }
+
     private const SPANISH_DESCRIPTIONS = [
         'Online computer science classes' => 'Clases online de informática',
     ];

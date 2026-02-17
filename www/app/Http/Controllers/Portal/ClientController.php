@@ -17,9 +17,11 @@ class ClientController extends Controller
         ]);
     }
 
-    public function edit(Client $client): View
+    public function show(Client $client): View
     {
-        return view('portal.clients.edit', [
+        $client->load(['lessons' => fn ($q) => $q->with(['student', 'buyer', 'payments'])->orderBy('datetime')]);
+
+        return view('portal.clients.show', [
             'client' => $client,
         ]);
     }
@@ -27,12 +29,12 @@ class ClientController extends Controller
     public function update(Request $request, Client $client): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
         ]);
 
         $client->update($validated);
 
-        return redirect()->route('portal.clients.index')
+        return redirect()->route('portal.clients.show', $client)
             ->with('success', 'Client updated successfully.');
     }
 

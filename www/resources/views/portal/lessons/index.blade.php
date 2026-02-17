@@ -57,6 +57,7 @@
 <table class="table table-striped">
   <thead>
     <tr>
+      <th>ID</th>
       <th>Date/Time</th>
       <th>Repeat (Weeks)</th>
       <th>Student</th>
@@ -64,53 +65,37 @@
       <th>Buyer</th>
       <th>Price</th>
       <th>Paid</th>
-      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     @forelse($lessons as $lesson)
       <tr>
-        <td>{{ $lesson->datetime->format('l jS F Y H:i') }}-{{ $lesson->datetime->copy()->addMinutes($lesson->duration_minutes)->format('H:i') }}</td>
+        <td><a href="{{ route('portal.lessons.show', $lesson) }}">{{ $lesson->id }}</a></td>
+        <td>{{ $lesson->getFormattedDatetime() }}-{{ $lesson->datetime->copy()->addMinutes($lesson->duration_minutes)->format('H:i') }}</td>
         <td>{{ $lesson->repeat_weeks }}</td>
         <td>
           @if($lesson->student)
-            <a href="{{ route('portal.students.edit', $lesson->student) }}">{{ $lesson->student->name }}</a>
+            <a href="{{ route('portal.students.show', $lesson->student) }}">{{ $lesson->student->name }}</a>
           @else
             -
           @endif
         </td>
         <td>
           @if($lesson->client)
-            <a href="{{ route('portal.clients.edit', $lesson->client) }}">{{ $lesson->client->name }}</a>
+            <a href="{{ route('portal.clients.show', $lesson->client) }}">{{ $lesson->client->name }}</a>
           @else
             -
           @endif
         </td>
         <td>
           @if($lesson->buyer)
-            <a href="{{ route('portal.buyers.edit', $lesson->buyer) }}">{{ $lesson->buyer->name }}</a>
+            <a href="{{ route('portal.buyers.show', $lesson->buyer) }}">{{ $lesson->buyer->name }}</a>
           @else
             -
           @endif
         </td>
         <td>&pound;{{ $lesson->getFormattedPrice() }}</td>
-        @php($payment = $lesson->payments->first())
-        <td>
-          @if($lesson->paid && $payment)
-            <a href="{{ route('portal.payments.show', $payment) }}">Yes</a>
-          @else
-            {{ $lesson->paid ? 'Yes' : 'No' }}
-          @endif
-        </td>
-        <td>
-          <a href="{{ route('portal.lessons.edit', $lesson) }}" class="btn btn-sm btn-primary">Edit</a>
-          <form action="{{ route('portal.lessons.destroy', $lesson) }}" method="POST" class="d-inline"
-                data-confirm="Are you sure you want to delete this lesson?">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-          </form>
-        </td>
+        <td><x-paid-status :lesson="$lesson" /></td>
       </tr>
     @empty
       <tr>

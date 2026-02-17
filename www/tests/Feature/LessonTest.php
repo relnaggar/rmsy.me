@@ -36,7 +36,7 @@ class LessonTest extends TestCase
         $lesson = $this->createLesson(['price_gbp_pence' => 2500]);
 
         $response = $this->actingAs($this->user)
-            ->get(route('portal.lessons.edit', $lesson));
+            ->get(route('portal.lessons.show', $lesson));
 
         $response->assertStatus(200);
         $response->assertSee('Price');
@@ -52,7 +52,7 @@ class LessonTest extends TestCase
                 'price_gbp' => '30.00',
             ]);
 
-        $response->assertRedirect(route('portal.lessons.index'));
+        $response->assertRedirect(route('portal.lessons.show', $lesson));
         $response->assertSessionHas('success');
         $this->assertEquals(3000, $lesson->fresh()->price_gbp_pence);
     }
@@ -66,7 +66,7 @@ class LessonTest extends TestCase
                 'price_gbp' => '40',
             ]);
 
-        $response->assertRedirect(route('portal.lessons.index'));
+        $response->assertRedirect(route('portal.lessons.show', $lesson));
         $this->assertEquals(4000, $lesson->fresh()->price_gbp_pence);
     }
 
@@ -116,17 +116,39 @@ class LessonTest extends TestCase
         $lesson2 = $this->createLesson(['student_id' => $student->id, 'price_gbp_pence' => 2500, 'datetime' => '2025-01-20 10:00']);
         $otherLesson = $this->createLesson(['price_gbp_pence' => 2500, 'datetime' => '2025-01-25 10:00']);
 
-        $response = $this->actingAs($this->user)
-            ->put(route('portal.lessons.update', $lesson1), [
-                'price_gbp' => '35.00',
-                'apply_to_student' => '1',
-            ]);
+        // Update lesson1's price first
+        $this->actingAs($this->user)
+            ->put(route('portal.lessons.update', $lesson1), ['price_gbp' => '35.00']);
 
-        $response->assertRedirect(route('portal.lessons.index'));
+        $response = $this->actingAs($this->user)
+            ->post(route('portal.lessons.applyToStudent', $lesson1));
+
+        $response->assertRedirect(route('portal.lessons.show', $lesson1));
         $response->assertSessionHas('success');
         $this->assertEquals(3500, $lesson1->fresh()->price_gbp_pence);
         $this->assertEquals(3500, $lesson2->fresh()->price_gbp_pence);
         $this->assertEquals(2500, $otherLesson->fresh()->price_gbp_pence);
+    }
+
+    public function test_apply_to_student_unmatched_only_skips_paid_lessons(): void
+    {
+        $student = Student::create(['name' => 'Alice']);
+        $lesson1 = $this->createLesson(['student_id' => $student->id, 'price_gbp_pence' => 2500]);
+        $paidLesson = $this->createLesson(['student_id' => $student->id, 'price_gbp_pence' => 2500, 'paid' => true, 'datetime' => '2025-01-20 10:00']);
+        $unpaidLesson = $this->createLesson(['student_id' => $student->id, 'price_gbp_pence' => 2500, 'datetime' => '2025-01-25 10:00']);
+
+        // Update lesson1's price first
+        $this->actingAs($this->user)
+            ->put(route('portal.lessons.update', $lesson1), ['price_gbp' => '40.00']);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('portal.lessons.applyToStudent', $lesson1), ['unmatched_only' => '1']);
+
+        $response->assertRedirect(route('portal.lessons.show', $lesson1));
+        $response->assertSessionHas('success');
+        $this->assertEquals(4000, $lesson1->fresh()->price_gbp_pence);
+        $this->assertEquals(2500, $paidLesson->fresh()->price_gbp_pence);
+        $this->assertEquals(4000, $unpaidLesson->fresh()->price_gbp_pence);
     }
 
     public function test_apply_to_student_button_shown_when_student_exists(): void
@@ -135,10 +157,11 @@ class LessonTest extends TestCase
         $lesson = $this->createLesson(['student_id' => $student->id]);
 
         $response = $this->actingAs($this->user)
-            ->get(route('portal.lessons.edit', $lesson));
+            ->get(route('portal.lessons.show', $lesson));
 
         $response->assertStatus(200);
         $response->assertSee('Update All for Alice');
+        $response->assertSee('Update Unmatched for Alice');
     }
 
     public function test_apply_to_student_button_hidden_when_no_student(): void
@@ -146,10 +169,22 @@ class LessonTest extends TestCase
         $lesson = $this->createLesson();
 
         $response = $this->actingAs($this->user)
-            ->get(route('portal.lessons.edit', $lesson));
+            ->get(route('portal.lessons.show', $lesson));
 
         $response->assertStatus(200);
         $response->assertDontSee('Update All for');
+        $response->assertDontSee('Update Unmatched for');
+    }
+
+    public function test_show_displays_delete_button(): void
+    {
+        $lesson = $this->createLesson();
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.show', $lesson));
+
+        $response->assertStatus(200);
+        $response->assertSee('Delete Lesson');
     }
 
     public function test_edit_page_shows_student_and_client_selects(): void
@@ -159,7 +194,7 @@ class LessonTest extends TestCase
         $lesson = $this->createLesson(['student_id' => $student->id, 'client_id' => $client->id]);
 
         $response = $this->actingAs($this->user)
-            ->get(route('portal.lessons.edit', $lesson));
+            ->get(route('portal.lessons.show', $lesson));
 
         $response->assertStatus(200);
         $response->assertSee('Alice');
@@ -178,7 +213,7 @@ class LessonTest extends TestCase
                 'student_id' => $student2->id,
             ]);
 
-        $response->assertRedirect(route('portal.lessons.index'));
+        $response->assertRedirect(route('portal.lessons.show', $lesson));
         $this->assertEquals($student2->id, $lesson->fresh()->student_id);
     }
 
@@ -194,7 +229,7 @@ class LessonTest extends TestCase
                 'client_id' => $client2->id,
             ]);
 
-        $response->assertRedirect(route('portal.lessons.index'));
+        $response->assertRedirect(route('portal.lessons.show', $lesson));
         $this->assertEquals($client2->id, $lesson->fresh()->client_id);
     }
 
@@ -211,7 +246,7 @@ class LessonTest extends TestCase
                 'client_id' => '',
             ]);
 
-        $response->assertRedirect(route('portal.lessons.index'));
+        $response->assertRedirect(route('portal.lessons.show', $lesson));
         $this->assertNull($lesson->fresh()->student_id);
         $this->assertNull($lesson->fresh()->client_id);
     }

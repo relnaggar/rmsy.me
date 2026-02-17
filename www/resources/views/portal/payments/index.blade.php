@@ -42,7 +42,7 @@
         <td>{{ $payment->payer ?? '-' }}</td>
         <td>
           @if($payment->buyer)
-            <a href="{{ route('portal.buyers.edit', $payment->buyer) }}">{{ $payment->buyer->name }}</a>
+            <a href="{{ route('portal.buyers.show', $payment->buyer) }}">{{ $payment->buyer->name }}</a>
           @else
             -
           @endif

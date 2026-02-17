@@ -9,27 +9,17 @@
     <tr>
       <th>ID</th>
       <th>Name</th>
-      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     @forelse($students as $student)
       <tr>
-        <td>{{ $student->id }}</td>
+        <td><a href="{{ route('portal.students.show', $student) }}">{{ $student->id }}</a></td>
         <td>{{ $student->name }}</td>
-        <td>
-          <a href="{{ route('portal.students.edit', $student) }}" class="btn btn-sm btn-primary">Edit</a>
-          <form action="{{ route('portal.students.destroy', $student) }}" method="POST" class="d-inline"
-                data-confirm="Are you sure you want to delete this student?">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-          </form>
-        </td>
       </tr>
     @empty
       <tr>
-        <td colspan="3" class="text-center">No students found.</td>
+        <td colspan="2" class="text-center">No students found.</td>
       </tr>
     @endforelse
   </tbody>

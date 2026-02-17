@@ -72,53 +72,44 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
     function () {
         Route::get('/', [PortalController::class, 'index'])->name('dashboard');
 
-        $resourceGroupCallback = function ($resource): callable {
-            return function () use ($resource) {
-                Route::get('/', 'index')->name('index');
-                Route::get('/{'.$resource.'}/edit', 'edit')->name('edit');
-                Route::put('/{'.$resource.'}', 'update')->name('update');
-                Route::delete('/{'.$resource.'}', 'destroy')->name('destroy');
-            };
-        };
-
         // Buyers
         Route::controller(BuyerController::class)
             ->prefix('buyers')
             ->name('buyers.')
             ->where(['buyer' => '.*'])
-            ->group($resourceGroupCallback('buyer'));
-        Route::get(
-            'buyers/create',
-            [BuyerController::class, 'create']
-        )->name('buyers.create');
-        Route::post(
-            'buyers',
-            [BuyerController::class, 'store']
-        )->name('buyers.store');
-        Route::post(
-            'buyers/reassign',
-            [BuyerController::class, 'reassign']
-        )->name('buyers.reassign');
-        Route::post(
-            'buyers/assign',
-            [BuyerController::class, 'assign']
-        )->name('buyers.assign');
-        Route::post(
-            'buyers/assign-payments',
-            [BuyerController::class, 'assignPayments']
-        )->name('buyers.assignPayments');
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/create', 'create')->name('create');
+                Route::post('/', 'store')->name('store');
+                Route::get('/{buyer}', 'show')->name('show');
+                Route::put('/{buyer}', 'update')->name('update');
+                Route::delete('/{buyer}', 'destroy')->name('destroy');
+                Route::post('/reassign', 'reassign')->name('reassign');
+                Route::post('/assign', 'assign')->name('assign');
+                Route::post('/assign-payments', 'assignPayments')->name('assignPayments');
+            });
 
         // Students
         Route::controller(StudentController::class)
             ->prefix('students')
             ->name('students.')
-            ->group($resourceGroupCallback('student'));
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/{student}', 'show')->name('show');
+                Route::put('/{student}', 'update')->name('update');
+                Route::delete('/{student}', 'destroy')->name('destroy');
+            });
 
         // Clients
         Route::controller(ClientController::class)
             ->prefix('clients')
             ->name('clients.')
-            ->group($resourceGroupCallback('client'));
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/{client}', 'show')->name('show');
+                Route::put('/{client}', 'update')->name('update');
+                Route::delete('/{client}', 'destroy')->name('destroy');
+            });
 
         // Lessons
         Route::controller(LessonController::class)
@@ -128,8 +119,9 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
                 Route::get('/', 'index')->name('index');
                 Route::post('/import', 'importFromCalendar')->name('import');
                 Route::post('/delete-filtered', 'deleteFiltered')->name('deleteFiltered');
-                Route::get('/{lesson}/edit', 'edit')->name('edit');
+                Route::get('/{lesson}', 'show')->name('show');
                 Route::put('/{lesson}', 'update')->name('update');
+                Route::post('/{lesson}/apply-to-student', 'applyToStudent')->name('applyToStudent');
                 Route::delete('/{lesson}', 'destroy')->name('destroy');
             });
 

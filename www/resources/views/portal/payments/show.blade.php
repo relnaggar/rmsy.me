@@ -35,7 +35,7 @@
     <td>
       <x-inline-edit-select name="buyer_id" :action="route('portal.payments.update', $payment)" :value="$payment->buyer_id" :options="$buyers">
         @if($payment->buyer)
-          <a href="{{ route('portal.buyers.edit', $payment->buyer) }}">{{ $payment->buyer->name }}</a>
+          <a href="{{ route('portal.buyers.show', $payment->buyer) }}">{{ $payment->buyer->name }}</a>
         @else
           <span class="text-muted">-</span>
         @endif
@@ -115,17 +115,17 @@
     <tbody>
       @foreach($payment->lessons as $lesson)
         <tr>
-          <td><a href="{{ route('portal.lessons.edit', $lesson) }}">{{ $lesson->datetime->format('Y-m-d H:i') }}</a></td>
+          <td><a href="{{ route('portal.lessons.show', $lesson) }}">{{ $lesson->getFormattedDatetime() }}</a></td>
           <td>
             @if($lesson->student)
-              <a href="{{ route('portal.students.edit', $lesson->student) }}">{{ $lesson->student->name }}</a>
+              <a href="{{ route('portal.students.show', $lesson->student) }}">{{ $lesson->student->name }}</a>
             @else
               -
             @endif
           </td>
           <td>
             @if($lesson->client)
-              <a href="{{ route('portal.clients.edit', $lesson->client) }}">{{ $lesson->client->name }}</a>
+              <a href="{{ route('portal.clients.show', $lesson->client) }}">{{ $lesson->client->name }}</a>
             @else
               -
             @endif
@@ -157,17 +157,17 @@
             <td>
               <input type="checkbox" name="lesson_ids[]" value="{{ $lesson->id }}" data-price="{{ $lesson->price_gbp_pence }}" {{ in_array($lesson->id, $suggestedIds) ? 'data-suggested' : '' }}>
             </td>
-            <td><a href="{{ route('portal.lessons.edit', $lesson) }}">{{ $lesson->datetime->format('Y-m-d H:i') }}</a></td>
+            <td><a href="{{ route('portal.lessons.show', $lesson) }}">{{ $lesson->getFormattedDatetime() }}</a></td>
             <td>
               @if($lesson->student)
-                <a href="{{ route('portal.students.edit', $lesson->student) }}">{{ $lesson->student->name }}</a>
+                <a href="{{ route('portal.students.show', $lesson->student) }}">{{ $lesson->student->name }}</a>
               @else
                 -
               @endif
             </td>
             <td>
               @if($lesson->client)
-                <a href="{{ route('portal.clients.edit', $lesson->client) }}">{{ $lesson->client->name }}</a>
+                <a href="{{ route('portal.clients.show', $lesson->client) }}">{{ $lesson->client->name }}</a>
               @else
                 -
               @endif

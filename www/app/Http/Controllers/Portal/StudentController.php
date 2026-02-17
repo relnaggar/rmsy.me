@@ -17,9 +17,11 @@ class StudentController extends Controller
         ]);
     }
 
-    public function edit(Student $student): View
+    public function show(Student $student): View
     {
-        return view('portal.students.edit', [
+        $student->load(['lessons' => fn ($q) => $q->with(['client', 'buyer', 'payments'])->orderBy('datetime')]);
+
+        return view('portal.students.show', [
             'student' => $student,
         ]);
     }
@@ -27,12 +29,12 @@ class StudentController extends Controller
     public function update(Request $request, Student $student): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
         ]);
 
         $student->update($validated);
 
-        return redirect()->route('portal.students.index')
+        return redirect()->route('portal.students.show', $student)
             ->with('success', 'Student updated successfully.');
     }
 

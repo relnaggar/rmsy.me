@@ -74,8 +74,10 @@ class BuyerController extends Controller
             ->with('success', 'Buyer created successfully.');
     }
 
-    public function edit(Buyer $buyer): View
+    public function show(Buyer $buyer): View
     {
+        $buyer->load(['lessons' => fn ($q) => $q->with(['student', 'client', 'payments'])->orderBy('datetime')]);
+
         $countries = [];
         foreach (CountryAlpha2::cases() as $country) {
             $countries[$country->value] = $country->getNameInLanguage(
@@ -83,7 +85,7 @@ class BuyerController extends Controller
             );
         }
 
-        return view('portal.buyers.edit', [
+        return view('portal.buyers.show', [
             'buyer' => $buyer,
             'countries' => $countries,
         ]);
@@ -92,20 +94,20 @@ class BuyerController extends Controller
     public function update(Request $request, Buyer $buyer): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'address1' => ['nullable', 'string', 'max:255'],
-            'address2' => ['nullable', 'string', 'max:255'],
-            'address3' => ['nullable', 'string', 'max:255'],
-            'town_city' => ['nullable', 'string', 'max:100'],
-            'state_province_county' => ['nullable', 'string', 'max:100'],
-            'zip_postal_code' => ['nullable', 'string', 'max:20'],
-            'country' => ['required', 'string', 'size:2'],
-            'extra' => ['nullable', 'string', 'max:255'],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'address1' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'address2' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'address3' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'town_city' => ['sometimes', 'nullable', 'string', 'max:100'],
+            'state_province_county' => ['sometimes', 'nullable', 'string', 'max:100'],
+            'zip_postal_code' => ['sometimes', 'nullable', 'string', 'max:20'],
+            'country' => ['sometimes', 'required', 'string', 'size:2'],
+            'extra' => ['sometimes', 'nullable', 'string', 'max:255'],
         ]);
 
         $buyer->update($validated);
 
-        return redirect()->route('portal.buyers.index')
+        return redirect()->route('portal.buyers.show', $buyer)
             ->with('success', 'Buyer updated successfully.');
     }
 

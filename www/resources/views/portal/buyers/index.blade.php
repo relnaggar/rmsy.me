@@ -68,28 +68,18 @@
       <th>ID</th>
       <th>Name</th>
       <th>Country</th>
-      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     @forelse($buyers as $buyer)
       <tr>
-        <td>{{ $buyer->id }}</td>
+        <td><a href="{{ route('portal.buyers.show', $buyer) }}">{{ $buyer->id }}</a></td>
         <td>{{ $buyer->name }}</td>
         <td>{{ $buyer->getCountryName() }}</td>
-        <td>
-          <a href="{{ route('portal.buyers.edit', $buyer) }}" class="btn btn-sm btn-primary">Edit</a>
-          <form action="{{ route('portal.buyers.destroy', $buyer) }}" method="POST" class="d-inline"
-                data-confirm="Are you sure you want to delete this buyer?">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-          </form>
-        </td>
       </tr>
     @empty
       <tr>
-        <td colspan="4" class="text-center">No buyers found.</td>
+        <td colspan="3" class="text-center">No buyers found.</td>
       </tr>
     @endforelse
   </tbody>

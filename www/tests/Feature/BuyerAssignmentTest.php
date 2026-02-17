@@ -164,7 +164,7 @@ class BuyerAssignmentTest extends TestCase
         $buyer = $this->createBuyer('John / Jane', 'John / Jane');
 
         $response = $this->actingAs($this->user)
-            ->get(route('portal.buyers.edit', $buyer));
+            ->get(route('portal.buyers.show', $buyer));
 
         $response->assertStatus(200);
         $response->assertSee('John / Jane');
@@ -180,7 +180,7 @@ class BuyerAssignmentTest extends TestCase
                 'country' => 'GB',
             ]);
 
-        $response->assertRedirect(route('portal.buyers.index'));
+        $response->assertRedirect(route('portal.buyers.show', $buyer));
         $this->assertEquals('John and Jane', $buyer->fresh()->name);
     }
 
@@ -204,7 +204,7 @@ class BuyerAssignmentTest extends TestCase
 
         $response->assertStatus(200);
 
-        $editUrl = route('portal.buyers.edit', $buyer);
+        $editUrl = route('portal.buyers.show', $buyer);
         $response->assertSee($editUrl, false);
     }
 
@@ -216,7 +216,7 @@ class BuyerAssignmentTest extends TestCase
         $indexResponse = $this->actingAs($this->user)
             ->get(route('portal.buyers.index'));
 
-        $editUrl = route('portal.buyers.edit', $buyer);
+        $editUrl = route('portal.buyers.show', $buyer);
 
         // Follow the generated link
         $editResponse = $this->actingAs($this->user)
