@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Services\ExchangeRateService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
+use Illuminate\View\View;
 use PrinsFrank\Standards\Country\CountryAlpha2;
 use PrinsFrank\Standards\Language\LanguageAlpha2;
 
@@ -17,6 +18,61 @@ class InvoiceController extends Controller
     public function __construct(
         private ExchangeRateService $exchangeRateService,
     ) {}
+
+    public function index(): View
+    {
+        $payments = Payment::whereNotNull('sequence_number')
+            ->with('buyer')
+            ->orderByDesc('datetime')
+            ->get();
+
+        $invoices = $payments->map(function ($payment) {
+            $exchangeRate = $this->exchangeRateService->getRateForDate($payment->getDate());
+
+            return [
+                'number' => $payment->getInvoiceNumber(),
+                'issue_date' => $payment->getDate(),
+                'gbp_pence' => $payment->amount_gbp_pence,
+                'eur_cents' => (int) ceil($payment->amount_gbp_pence / ($exchangeRate / 100000)),
+                'exchange_rate' => $exchangeRate / 100000,
+                'buyer' => $payment->buyer,
+                'payment_id' => $payment->id,
+            ];
+        });
+
+        $years = [];
+        foreach ($invoices as $invoice) {
+            $year = (int) substr($invoice['issue_date'], 0, 4);
+            $month = (int) substr($invoice['issue_date'], 5, 2);
+            $trimestre = (int) ceil($month / 3);
+
+            if (! isset($years[$year])) {
+                $years[$year] = [
+                    'total_gbp_pence' => 0,
+                    'total_eur_cents' => 0,
+                    'trimestres' => [],
+                ];
+            }
+
+            if (! isset($years[$year]['trimestres'][$trimestre])) {
+                $years[$year]['trimestres'][$trimestre] = [
+                    'total_gbp_pence' => 0,
+                    'total_eur_cents' => 0,
+                ];
+            }
+
+            $years[$year]['total_gbp_pence'] += $invoice['gbp_pence'];
+            $years[$year]['total_eur_cents'] += $invoice['eur_cents'];
+            $years[$year]['trimestres'][$trimestre]['total_gbp_pence'] += $invoice['gbp_pence'];
+            $years[$year]['trimestres'][$trimestre]['total_eur_cents'] += $invoice['eur_cents'];
+        }
+        krsort($years);
+
+        return view('portal.invoices', [
+            'invoices' => $invoices,
+            'years' => $years,
+        ]);
+    }
 
     public function show(string $invoiceNumber): Response
     {

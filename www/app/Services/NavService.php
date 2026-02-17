@@ -112,6 +112,9 @@ class NavService
             new NavItem(text: 'Lessons', path: route('portal.lessons.index'))
         );
         $portalItem->addDropdownItem(
+            new NavItem(text: 'Invoices', path: route('portal.invoices.index'))
+        );
+        $portalItem->addDropdownItem(
             new NavItem(text: 'Logout', path: route('logout'), method: 'POST')
         );
         $this->addNavItem($portalItem);

@@ -12,10 +12,17 @@ class PortalController extends Controller
 {
     public function index(): View
     {
-        $unmatchedPaymentCount = Payment::doesntHave('lessons')
+        $unmatchedPayments = Payment::doesntHave('lessons')
             ->where('lesson_pending', false)
-            ->count();
-        $pendingPaymentCount = Payment::where('lesson_pending', true)->count();
+            ->with('buyer')
+            ->withCount('lessons')
+            ->orderByDesc('datetime')
+            ->get();
+        $pendingPayments = Payment::where('lesson_pending', true)
+            ->with('buyer')
+            ->withCount('lessons')
+            ->orderByDesc('datetime')
+            ->get();
 
         $unpaidLessonConstraint = fn ($q) => $q->where('paid', false);
 
@@ -27,8 +34,8 @@ class PortalController extends Controller
 
         return view('portal.dashboard', [
             'userEmail' => Auth::user()->email,
-            'unmatchedPaymentCount' => $unmatchedPaymentCount,
-            'pendingPaymentCount' => $pendingPaymentCount,
+            'unmatchedPayments' => $unmatchedPayments,
+            'pendingPayments' => $pendingPayments,
             'buyersWithUnpaidLessons' => $buyersWithUnpaidLessons,
         ]);
     }

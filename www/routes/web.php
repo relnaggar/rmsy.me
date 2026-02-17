@@ -142,6 +142,7 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
             });
 
         // Invoices
+        Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
         Route::get(
             '/invoices/{invoiceNumber}',
             [InvoiceController::class, 'show']

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\ExchangeRate;
-use DateTime;
+use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class ExchangeRateService
@@ -85,21 +85,39 @@ class ExchangeRateService
      * Get the GBP/EUR exchange rate for a given date as an integer multiplied by 100,000.
      *
      * Walks backward day-by-day if no rate exists for the exact date.
+     * Only imports from BDE if no rate can be found in the database.
      */
     public function getRateForDate(string $date): int
     {
+        $rate = $this->lookupRate($date);
+        if ($rate !== null) {
+            return $rate;
+        }
+
         $this->importFromBde($date);
 
-        $currentDate = $date;
-        while (true) {
-            $rate = ExchangeRate::where('date', $currentDate)->first();
-            if ($rate) {
-                return (int) round($rate->gbpeur * 100000);
-            }
-
-            $dateTime = new DateTime($currentDate);
-            $dateTime->modify('-1 day');
-            $currentDate = $dateTime->format('Y-m-d');
+        $rate = $this->lookupRate($date);
+        if ($rate !== null) {
+            return $rate;
         }
+
+        throw new RuntimeException("No exchange rate found for date: $date");
+    }
+
+    /**
+     * Look up the nearest exchange rate from the database, walking backward.
+     */
+    private function lookupRate(string $date): ?int
+    {
+        $rate = DB::table('exchange_rates')
+            ->whereDate('date', '<=', $date)
+            ->orderByDesc('date')
+            ->value('gbpeur');
+
+        if ($rate !== null) {
+            return (int) round($rate * 100000);
+        }
+
+        return null;
     }
 }
