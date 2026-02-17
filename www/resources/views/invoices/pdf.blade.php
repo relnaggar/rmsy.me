@@ -45,7 +45,7 @@
       <table>
         <thead>
           <tr>
-            <th class="text-start">Fecha</th>
+            <th class="text-start">Fecha y hora</th>
             <th class="text-start">Descripción de servicio</th>
             <th class="text-end">Cantidad</th>
             <th class="text-end">Precio unitario</th>

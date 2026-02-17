@@ -81,7 +81,7 @@ class InvoiceController extends Controller
             $items = $payment->lessons
                 ->sortBy('datetime')
                 ->map(fn ($lesson) => [
-                    'date' => $lesson->datetime->format('Y-m-d'),
+                    'date' => $lesson->datetime->format('Y-m-d H:i').' (GMT)',
                     'service' => $lesson->getSpanishDescription(),
                     'qty' => 1,
                     'unit_price' => $lesson->price_gbp_pence,
