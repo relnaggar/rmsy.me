@@ -10,6 +10,7 @@ use App\Models\User;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -44,10 +45,14 @@ class CalendarService
         return true;
     }
 
-    public function importLessonsFromCalendar(string $startDate, string $endDate, array $filters = []): int
+    /**
+     * @return array{imported: int, skipped: int}
+     */
+    public function importLessonsFromCalendar(string $startDate, string $endDate, array $filters = []): array
     {
         $events = $this->getCalendarEvents($startDate, $endDate);
         $imported = 0;
+        $skipped = 0;
 
         foreach ($events as $event) {
             $subject = $event['subject'];
@@ -131,22 +136,31 @@ class CalendarService
             // determine if recurring
             $repeatWeeks = strtolower($event['type'] ?? '') === 'occurrence' ? 1 : 0;
 
-            // insert lesson (ignore if datetime already exists)
-            Lesson::firstOrCreate(
-                ['datetime' => $startDateTime],
-                [
-                    'duration_minutes' => $durationMinutes,
-                    'repeat_weeks' => $repeatWeeks,
-                    'price_gbp_pence' => $priceGbpPence,
-                    'student_id' => $studentId,
-                    'client_id' => $clientId,
-                    'buyer_id' => $buyerId,
-                ]
-            );
-            $imported++;
+            // insert lesson (skip if datetime already exists)
+            try {
+                $lesson = Lesson::firstOrCreate(
+                    ['datetime' => $startDateTime],
+                    [
+                        'duration_minutes' => $durationMinutes,
+                        'repeat_weeks' => $repeatWeeks,
+                        'price_gbp_pence' => $priceGbpPence,
+                        'student_id' => $studentId,
+                        'client_id' => $clientId,
+                        'buyer_id' => $buyerId,
+                    ]
+                );
+
+                if ($lesson->wasRecentlyCreated) {
+                    $imported++;
+                } else {
+                    $skipped++;
+                }
+            } catch (UniqueConstraintViolationException) {
+                $skipped++;
+            }
         }
 
-        return $imported;
+        return ['imported' => $imported, 'skipped' => $skipped];
     }
 
     private function findOrCreateStudent(string $name): int

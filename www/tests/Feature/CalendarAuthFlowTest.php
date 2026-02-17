@@ -80,7 +80,7 @@ class CalendarAuthFlowTest extends TestCase
         ]);
 
         $response->assertRedirectToRoute('portal.lessons.index');
-        $response->assertSessionHas('success', 'Imported 0 lesson(s) from calendar.');
+        $response->assertSessionHas('success', 'Imported 0 lesson(s).');
     }
 
     public function test_complete_import_after_auth_performs_import(): void
@@ -115,7 +115,7 @@ class CalendarAuthFlowTest extends TestCase
             ->get(route('portal.lessons.importComplete'));
 
         $response->assertRedirectToRoute('portal.lessons.index');
-        $response->assertSessionHas('success', 'Imported 1 lesson(s) from calendar.');
+        $response->assertSessionHas('success', 'Imported 1 lesson(s).');
         $this->assertDatabaseCount('lessons', 1);
     }
 

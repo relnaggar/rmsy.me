@@ -46,7 +46,7 @@ class LessonController extends Controller
         ]);
 
         try {
-            $imported = $this->calendarService->importLessonsFromCalendar(
+            $result = $this->calendarService->importLessonsFromCalendar(
                 $pendingImport['start_date'],
                 $pendingImport['end_date'],
                 $filters,
@@ -57,7 +57,7 @@ class LessonController extends Controller
         }
 
         return redirect()->route('portal.lessons.index')
-            ->with('success', "Imported {$imported} lesson(s) from calendar.");
+            ->with('success', $this->importSuccessMessage($result));
     }
 
     public function importFromCalendar(LessonFilterRequest $request): RedirectResponse
@@ -77,7 +77,7 @@ class LessonController extends Controller
         ]);
 
         try {
-            $imported = $this->calendarService->importLessonsFromCalendar(
+            $result = $this->calendarService->importLessonsFromCalendar(
                 $request->start_date,
                 $request->end_date,
                 $filters,
@@ -88,7 +88,7 @@ class LessonController extends Controller
         }
 
         return redirect()->route('portal.lessons.index')
-            ->with('success', "Imported {$imported} lesson(s) from calendar.");
+            ->with('success', $this->importSuccessMessage($result));
     }
 
     public function deleteFiltered(LessonFilterRequest $request): RedirectResponse
@@ -178,6 +178,20 @@ class LessonController extends Controller
 
         return redirect()->route('portal.lessons.show', $lesson)
             ->with('success', $scope.' for '.$lesson->student->name.' updated successfully.');
+    }
+
+    /**
+     * @param  array{imported: int, skipped: int}  $result
+     */
+    private function importSuccessMessage(array $result): string
+    {
+        $parts = [];
+        $parts[] = "Imported {$result['imported']} lesson(s)";
+        if ($result['skipped'] > 0) {
+            $parts[] = "skipped {$result['skipped']} duplicate(s)";
+        }
+
+        return implode(', ', $parts).'.';
     }
 
     public function destroy(Lesson $lesson): RedirectResponse

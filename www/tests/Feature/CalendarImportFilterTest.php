@@ -56,7 +56,7 @@ class CalendarImportFilterTest extends TestCase
 
         $imported = $service->importLessonsFromCalendar('2025-03-01', '2025-03-31');
 
-        $this->assertEquals(3, $imported);
+        $this->assertEquals(3, $imported['imported']);
         $this->assertEquals(3, Lesson::count());
     }
 
@@ -68,7 +68,7 @@ class CalendarImportFilterTest extends TestCase
             'buyer_id' => 'MYTUTORWEB LIMITED',
         ]);
 
-        $this->assertEquals(1, $imported);
+        $this->assertEquals(1, $imported['imported']);
         $this->assertEquals(1, Lesson::count());
         $this->assertEquals('MYTUTORWEB LIMITED', Lesson::first()->buyer_id);
     }
@@ -87,7 +87,7 @@ class CalendarImportFilterTest extends TestCase
             'student_id' => $bobId,
         ]);
 
-        $this->assertEquals(1, $imported);
+        $this->assertEquals(1, $imported['imported']);
         $this->assertEquals(1, Lesson::count());
         $this->assertEquals($bobId, Lesson::first()->student_id);
     }
@@ -106,9 +106,24 @@ class CalendarImportFilterTest extends TestCase
             'client_id' => $clientAId,
         ]);
 
-        $this->assertEquals(2, $imported);
+        $this->assertEquals(2, $imported['imported']);
         $this->assertEquals(2, Lesson::count());
         $this->assertTrue(Lesson::get()->every(fn ($l) => $l->client_id === $clientAId));
+    }
+
+    public function test_import_skips_already_imported_lessons(): void
+    {
+        $service = $this->createServiceWithFakeEvents($this->makeEvents());
+
+        $first = $service->importLessonsFromCalendar('2025-03-01', '2025-03-31');
+        $this->assertEquals(3, $first['imported']);
+        $this->assertEquals(0, $first['skipped']);
+
+        $service = $this->createServiceWithFakeEvents($this->makeEvents());
+        $second = $service->importLessonsFromCalendar('2025-03-01', '2025-03-31');
+        $this->assertEquals(0, $second['imported']);
+        $this->assertEquals(3, $second['skipped']);
+        $this->assertEquals(3, Lesson::count());
     }
 
     public function test_import_filter_by_multiple_criteria(): void
@@ -127,7 +142,7 @@ class CalendarImportFilterTest extends TestCase
             'client_id' => $clientAId,
         ]);
 
-        $this->assertEquals(1, $imported);
+        $this->assertEquals(1, $imported['imported']);
         $this->assertEquals(1, Lesson::count());
     }
 }
