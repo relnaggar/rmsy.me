@@ -18,7 +18,7 @@ class Database
     */
   public function __construct()
   {
-    $this->pdo = new PDO('sqlite:/var/db/cacana.sqlite3');
+    $this->pdo = new PDO('sqlite:/var/db/cacana.sqlite');
     // throw exceptions on errors
     $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 

@@ -2,7 +2,7 @@ default-*-config
 *.jpg
 *.jpeg
 secrets/
-db/
+*.sqlite
 .claude/
 CLAUDE.md
 AGENTS.md

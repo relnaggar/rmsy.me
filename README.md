@@ -1,117 +1,93 @@
-# [🖼 My Mona Lisa: A Personal Website](https://rmsy.me) 
-[![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade-score/rmsy.me?publish)](https://observatory.mozilla.org/analyze/rmsy.me) [![30 day uptime ratio (Uptime Robot)](https://img.shields.io/uptimerobot/ratio/30/m784796051-da0b2757e43473b1f9d676b0)](https://stats.uptimerobot.com/KjJ317wYaG) [![Docker image size](https://img.shields.io/docker/image-size/relnaggar/rmsy.me)](https://hub.docker.com/r/relnaggar/rmsy.me) [![W3C Validation](https://img.shields.io/w3c-validation/html?targetUrl=https%3A%2F%2Frmsy.me)](https://validator.nu/?doc=https%3A%2F%2Frmsy.me) [![PageSpeed Insights](https://img.shields.io/badge/pagespeed_insights-99_100_100_100-43cc11
-)](https://pagespeed.web.dev/analysis/https-rmsy-me/xz200iqpci?form_factor=desktop)
+# [🖼 My Mona Lisa: A Personal Website](https://rmsy.me)
+[![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade-score/rmsy.me?publish)](https://observatory.mozilla.org/analyze/rmsy.me) [![30 day uptime ratio (Uptime Robot)](https://img.shields.io/uptimerobot/ratio/30/m784796051-da0b2757e43473b1f9d676b0)](https://stats.uptimerobot.com/KjJ317wYaG) [![Docker image size](https://img.shields.io/docker/image-size/relnaggar/rmsy.me)](https://hub.docker.com/r/relnaggar/rmsy.me) [![W3C Validation](https://img.shields.io/w3c-validation/html?targetUrl=https%3A%2F%2Frmsy.me)](https://validator.nu/?doc=https%3A%2F%2Frmsy.me) [![PageSpeed Insights](https://img.shields.io/badge/pagespeed_insights-99_100_100_100-43cc11)](https://pagespeed.web.dev/analysis/https-rmsy-me/xz200iqpci?form_factor=desktop)
+
+## Project Overview
+rmsy.me is a personal portfolio website with an authenticated portal for managing Ramsey's freelance tutoring business. It runs with two Docker services: a PHP/Apache app server, and a Node.js Vite dev server for frontend asset hot-reloading.
 
 ## Quick Start
-
-Start the development server:
-
+Start the local development services:
 ```bash
 docker compose up
 ```
+Access at `https://localhost/` (run `script/trust-self-signed-certificate-locally.sh` first for HTTPS).
 
-Access the development server:
-
-```bash
-curl http://localhost
-```
-
-Access the development server via HTTPS:
-
-```bash
-script/trust-self-signed-certificate-locally.sh
-curl https://localhost
-```
-
-Modifiable folders
-* `www`: files placed in this directory are copied to the development server (maps to `/var/www/`)
-* `www/html`: files placed in this directory are served to users who access the server via a web browser (maps to `/var/www/html/`)
-* `config/apache2`: files placed in this directory are used to configure the Apache server (maps to `/etc/apache2`)
-    * changes to these files require a restart of the development server
-* `bundler/src/scss`: files placed in this directory are compiled to CSS and copied to the development server (`/var/www/html/css`)
-    * changes to these files are detected automatically
-* `bundler/src/js`: files placed in this directory are bundled to `/var/www/html/js`
-    * changes to these files are detected automatically
-* `config/php`: files placed in this directory are used to configure PHP (maps to `/etc/php`)
-  * * changes to these files require a restart of the development server
-
-Stop the development server:
-
+Stop the services:
 ```bash
 docker compose down
 ```
 
-# Debugging
+## Development Commands
+Seed the database with sample data:
+```bash
+docker compose exec -u apache2 app bash -c "cd /var/www && php artisan db:seed"
+```
 
-Get a shell inside the running container:
+This includes a test user for the portal:
+- Email: `q@q`
+- Password: `q`
+
+Migrate the database:
+```bash
+docker compose exec -u apache2 app bash -c "cd /var/www && php artisan migrate"
+```
+
+Run linting:
+```bash
+docker compose exec app bash -c "cd /var/www && vendor/bin/pint"
+```
+
+Run unit tests:
+```bash
+docker compose exec app bash -c "cd /var/www && php artisan test"
+```
+
+Run E2E tests:
+```bash
+npm --prefix www run e2e
+```
+
+Get a shell in the app container:
 
 ```bash
 docker compose exec app bash
 ```
 
-This is often preceeded by the following command to keep the container running if it fails on start:
-
+## Rebuild and Restart Rules
+Rebuild images after changes to:
+- `Dockerfile.dev`
+- `docker-compose.yml`
 ```bash
-docker compose run -d app tail -f /dev/null
+docker compose build
 ```
 
-# Advanced
-
-If you want to fetch the default configuration files for apache or php:
-
+Restart services after changes to:
+- `config/` (Apache/PHP config changes)
 ```bash
-script/get-default-config.sh
+docker compose restart
 ```
 
-Changes to the following files require rebuilding with `docker compose build`:
-* `Dockerfile`
-* `docker-compose.yml`
-* `bundler/Dockerfile`
-* `bundler/package.json`
+## Architecture
 
-# Database
+### Docker Services
+- `app`: serves the Laravel 12 app from `www/` at `/var/www/` (DocumentRoot: `/var/www/public`).
+- `laravel-vite`: runs the Vite dev server for frontend asset hot-reloading during development.
 
-The application uses a SQLite database located at `/var/db/database.sqlite3`
-inside the container. Phinx is used for database migrations and seeding. In
-general, phinx commands can be run inside the container using
-`docker compose exec`, and providing the path to the phinx configuration file
-`/var/phinx/phinx.php` with the `-c` option. Common commands are listed below.
+### Laravel Application (`www/`)
+Standard Laravel directory structure. Key custom components:
+- `app/Data/` - Data classes (`Nav`, `NavItem`, `Project`, `Section`, `Source`, `Image`)
+- `app/Providers/ViewServiceProvider.php` - Injects `$menuNav` and `$sidebarNav` into all Blade views via `NavService`
 
-To check the status of migrations:
+### Frontend Assets (`www/resources/`)
+- SCSS: `scss/styles.scss` is the main entry point (imports Bootstrap 5 and custom partials). `scss/invoice.scss` is a separate entry for PDF invoice styling, which is not compatible with Bootstrap.
+- JS: `js/main.js` is the main entry point (imports Bootstrap 5 JS).
+- Built with Vite (`www/vite.config.js`). Build output goes to `www/public/build/`.
+- CSP restriction: Inline `<script>` tags and styles are blocked by CSP. All JS must go in `www/resources/js/` and be loaded via Vite. All CSS must go in `www/resources/scss/` and be compiled by Vite.
 
-```bash
-docker compose exec app vendor/bin/phinx status -c /var/phinx/phinx.php
-```
+## Database
+SQLite database `laravel.sqlite` is stored in `db/` (mounted to `/var/db/` in the container).
 
-To run database migrations:
+## CI/CD
+GitHub Actions (`.github/workflows/docker-image.yml`) builds Laravel assets (via `www/Dockerfile.build`), builds the production Docker image (`Dockerfile.build`), and pushes to Docker Hub on push to `main`.
 
-```bash
-docker compose exec app vendor/bin/phinx migrate -c /var/phinx/phinx.php
-```
-
-To seed the database:
-
-```bash
-docker compose exec app vendor/bin/phinx seed:run -c /var/phinx/phinx.php
-```
-
-To create a new migration:
-
-```bash
-docker compose exec app vendor/bin/phinx create <MigrationName> -c /var/phinx/phinx.php
-```
-
-# Laravel
-
-To run Laravel Artisan commands:
-
-In development:
-```bash
-docker compose exec -u apache2 app php /var/www/artisan <command>
-```
-
-From within the production container:
-```bash
-su -s /bin/bash apache2
-php /var/www/artisan <command>
-```
+## Secrets
+Docker secrets live in `secrets/` and are referenced in `docker-compose.yml`.
