@@ -22,36 +22,79 @@ class PaymentTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    private function createBuyer(string $id, string $name): Buyer
+    public function test_index_requires_authentication(): void
     {
-        return Buyer::create(['id' => $id, 'name' => $name]);
+        $this->get(route('portal.payments.index'))
+            ->assertRedirect(route('login'));
     }
 
-    private function createPayment(string $id, array $attributes): Payment
+    public function test_show_requires_authentication(): void
     {
-        return Payment::create(array_merge([
-            'id' => $id,
-            'datetime' => now(),
+        $payment = Payment::factory()->create(['id' => 'PAY-1', 'datetime' => '2025-01-20 10:00']);
+
+        $this->get(route('portal.payments.show', $payment))
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_update_requires_authentication(): void
+    {
+        $payment = Payment::factory()->create(['id' => 'PAY-1', 'datetime' => '2025-01-20 10:00']);
+
+        $this->put(route('portal.payments.update', $payment), ['buyer_id' => ''])
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_destroy_requires_authentication(): void
+    {
+        $payment = Payment::factory()->create(['id' => 'PAY-1', 'datetime' => '2025-01-20 10:00']);
+
+        $this->delete(route('portal.payments.destroy', $payment))
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_index_renders_payments_list(): void
+    {
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        Payment::factory()->create([
+            'id' => 'PAY-1',
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-10 10:00',
             'amount_gbp_pence' => 5000,
-            'currency' => 'GBP',
-            'payment_reference' => 'ref',
-        ], $attributes));
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('PAY-1');
+        $response->assertSee('Acme');
+    }
+
+    public function test_index_renders_empty_state(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.index'));
+
+        $response->assertStatus(200);
     }
 
     public function test_delete_payment_resequences_invoice_numbers(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $p1 = $this->createPayment('PAY-1', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-10 10:00',
             'sequence_number' => '001',
         ]);
-        $p2 = $this->createPayment('PAY-2', [
+        $p2 = Payment::factory()->create([
+            'id' => 'PAY-2',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
             'sequence_number' => '002',
         ]);
-        $p3 = $this->createPayment('PAY-3', [
+        Payment::factory()->create([
+            'id' => 'PAY-3',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-30 10:00',
             'sequence_number' => '003',
@@ -68,18 +111,21 @@ class PaymentTest extends TestCase
 
     public function test_delete_payment_only_resequences_same_year(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $p2024 = $this->createPayment('PAY-2024', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        Payment::factory()->create([
+            'id' => 'PAY-2024',
             'buyer_id' => 'acme',
             'datetime' => '2024-06-15 10:00',
             'sequence_number' => '001',
         ]);
-        $p2025a = $this->createPayment('PAY-2025-1', [
+        $p2025a = Payment::factory()->create([
+            'id' => 'PAY-2025-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-03-01 10:00',
             'sequence_number' => '001',
         ]);
-        $p2025b = $this->createPayment('PAY-2025-2', [
+        Payment::factory()->create([
+            'id' => 'PAY-2025-2',
             'buyer_id' => 'acme',
             'datetime' => '2025-06-01 10:00',
             'sequence_number' => '002',
@@ -96,7 +142,8 @@ class PaymentTest extends TestCase
 
     public function test_show_displays_payment_id(): void
     {
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'datetime' => '2025-01-20 10:00',
         ]);
 
@@ -109,16 +156,17 @@ class PaymentTest extends TestCase
 
     public function test_show_displays_matched_status_when_lessons_matched(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson = Lesson::factory()->create([
             'datetime' => '2025-01-15 10:00',
             'price_gbp_pence' => 5000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
             'paid' => true,
         ]);
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
         ]);
@@ -134,8 +182,9 @@ class PaymentTest extends TestCase
 
     public function test_show_displays_unmatched_status_when_no_lessons_matched(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $payment = $this->createPayment('PAY-1', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
         ]);
@@ -150,8 +199,9 @@ class PaymentTest extends TestCase
 
     public function test_show_displays_lesson_pending_status(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $payment = $this->createPayment('PAY-1', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
             'lesson_pending' => true,
@@ -167,16 +217,17 @@ class PaymentTest extends TestCase
 
     public function test_show_matched_payment_shows_lessons_read_only(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson = Lesson::factory()->create([
             'datetime' => '2025-01-15 10:00',
             'price_gbp_pence' => 5000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
             'paid' => true,
         ]);
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
         ]);
@@ -193,15 +244,16 @@ class PaymentTest extends TestCase
 
     public function test_show_unmatched_payment_shows_matching_form(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        Lesson::factory()->create([
             'datetime' => '2025-01-15 10:00',
             'price_gbp_pence' => 2500,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
         ]);
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
         ]);
@@ -216,15 +268,16 @@ class PaymentTest extends TestCase
 
     public function test_show_lesson_pending_payment_still_shows_matching_form(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        Lesson::factory()->create([
             'datetime' => '2025-01-15 10:00',
             'price_gbp_pence' => 2500,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
         ]);
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
             'lesson_pending' => true,
@@ -240,21 +293,22 @@ class PaymentTest extends TestCase
 
     public function test_store_matches_succeeds_when_totals_match(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson1 = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson1 = Lesson::factory()->create([
             'datetime' => '2025-01-10 10:00',
             'price_gbp_pence' => 3000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
         ]);
-        $lesson2 = Lesson::create([
+        $lesson2 = Lesson::factory()->create([
             'datetime' => '2025-01-12 10:00',
             'price_gbp_pence' => 2000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
         ]);
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'amount_gbp_pence' => 5000,
             'datetime' => '2025-01-20 10:00',
@@ -274,15 +328,16 @@ class PaymentTest extends TestCase
 
     public function test_store_matches_fails_when_total_exceeds_payment_amount(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson = Lesson::factory()->create([
             'datetime' => '2025-01-10 10:00',
             'price_gbp_pence' => 6000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
         ]);
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'amount_gbp_pence' => 5000,
             'datetime' => '2025-01-20 10:00',
@@ -301,8 +356,9 @@ class PaymentTest extends TestCase
 
     public function test_store_matches_fails_with_no_lessons_selected(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $payment = $this->createPayment('PAY-1', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'amount_gbp_pence' => 5000,
             'datetime' => '2025-01-20 10:00',
@@ -319,23 +375,24 @@ class PaymentTest extends TestCase
 
     public function test_unmatch_removes_lessons_and_marks_unpaid(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson1 = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson1 = Lesson::factory()->create([
             'datetime' => '2025-01-10 10:00',
             'price_gbp_pence' => 3000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
             'paid' => true,
         ]);
-        $lesson2 = Lesson::create([
+        $lesson2 = Lesson::factory()->create([
             'datetime' => '2025-01-12 10:00',
             'price_gbp_pence' => 2000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
             'paid' => true,
         ]);
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'amount_gbp_pence' => 5000,
             'datetime' => '2025-01-20 10:00',
@@ -354,8 +411,9 @@ class PaymentTest extends TestCase
 
     public function test_unmatch_succeeds_with_no_matches(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $payment = $this->createPayment('PAY-1', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
         ]);
@@ -369,8 +427,9 @@ class PaymentTest extends TestCase
 
     public function test_unmatch_requires_authentication(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $payment = $this->createPayment('PAY-1', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
         ]);
@@ -382,19 +441,10 @@ class PaymentTest extends TestCase
 
     public function test_show_has_prev_and_next_links_for_same_buyer(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $p1 = $this->createPayment('PAY-1', [
-            'buyer_id' => 'acme',
-            'datetime' => '2025-01-10 10:00',
-        ]);
-        $p2 = $this->createPayment('PAY-2', [
-            'buyer_id' => 'acme',
-            'datetime' => '2025-01-20 10:00',
-        ]);
-        $p3 = $this->createPayment('PAY-3', [
-            'buyer_id' => 'acme',
-            'datetime' => '2025-01-30 10:00',
-        ]);
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $p1 = Payment::factory()->create(['id' => 'PAY-1', 'buyer_id' => 'acme', 'datetime' => '2025-01-10 10:00']);
+        $p2 = Payment::factory()->create(['id' => 'PAY-2', 'buyer_id' => 'acme', 'datetime' => '2025-01-20 10:00']);
+        $p3 = Payment::factory()->create(['id' => 'PAY-3', 'buyer_id' => 'acme', 'datetime' => '2025-01-30 10:00']);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.payments.show', $p2));
@@ -406,11 +456,8 @@ class PaymentTest extends TestCase
 
     public function test_show_no_prev_next_links_for_single_payment(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $payment = $this->createPayment('PAY-1', [
-            'buyer_id' => 'acme',
-            'datetime' => '2025-01-20 10:00',
-        ]);
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $payment = Payment::factory()->create(['id' => 'PAY-1', 'buyer_id' => 'acme', 'datetime' => '2025-01-20 10:00']);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.payments.show', $payment));
@@ -422,9 +469,7 @@ class PaymentTest extends TestCase
 
     public function test_show_no_prev_next_links_without_buyer(): void
     {
-        $payment = $this->createPayment('PAY-1', [
-            'datetime' => '2025-01-20 10:00',
-        ]);
+        $payment = Payment::factory()->create(['id' => 'PAY-1', 'datetime' => '2025-01-20 10:00']);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.payments.show', $payment));
@@ -436,20 +481,11 @@ class PaymentTest extends TestCase
 
     public function test_show_prev_next_ignores_other_buyers(): void
     {
-        $acme = $this->createBuyer('acme', 'Acme');
-        $other = $this->createBuyer('other', 'Other');
-        $p1 = $this->createPayment('PAY-1', [
-            'buyer_id' => 'acme',
-            'datetime' => '2025-01-10 10:00',
-        ]);
-        $pOther = $this->createPayment('PAY-OTHER', [
-            'buyer_id' => 'other',
-            'datetime' => '2025-01-15 10:00',
-        ]);
-        $p2 = $this->createPayment('PAY-2', [
-            'buyer_id' => 'acme',
-            'datetime' => '2025-01-20 10:00',
-        ]);
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        Buyer::factory()->create(['id' => 'other', 'name' => 'Other']);
+        $p1 = Payment::factory()->create(['id' => 'PAY-1', 'buyer_id' => 'acme', 'datetime' => '2025-01-10 10:00']);
+        $pOther = Payment::factory()->create(['id' => 'PAY-OTHER', 'buyer_id' => 'other', 'datetime' => '2025-01-15 10:00']);
+        $p2 = Payment::factory()->create(['id' => 'PAY-2', 'buyer_id' => 'acme', 'datetime' => '2025-01-20 10:00']);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.payments.show', $p1));
@@ -461,11 +497,8 @@ class PaymentTest extends TestCase
 
     public function test_toggle_lesson_pending_marks_payment_as_pending(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $payment = $this->createPayment('PAY-1', [
-            'buyer_id' => 'acme',
-            'datetime' => '2025-01-20 10:00',
-        ]);
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $payment = Payment::factory()->create(['id' => 'PAY-1', 'buyer_id' => 'acme', 'datetime' => '2025-01-20 10:00']);
 
         $this->assertFalse($payment->fresh()->lesson_pending);
 
@@ -478,8 +511,9 @@ class PaymentTest extends TestCase
 
     public function test_toggle_lesson_pending_removes_pending_flag(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $payment = $this->createPayment('PAY-1', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
             'lesson_pending' => true,
@@ -494,13 +528,15 @@ class PaymentTest extends TestCase
 
     public function test_match_next_skips_lesson_pending_payments(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $pendingPayment = $this->createPayment('PAY-PENDING', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        Payment::factory()->create([
+            'id' => 'PAY-PENDING',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-10 10:00',
             'lesson_pending' => true,
         ]);
-        $normalPayment = $this->createPayment('PAY-NORMAL', [
+        $normalPayment = Payment::factory()->create([
+            'id' => 'PAY-NORMAL',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
         ]);
@@ -516,8 +552,9 @@ class PaymentTest extends TestCase
 
     public function test_match_next_all_done_when_only_pending_remain(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $this->createPayment('PAY-PENDING', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        Payment::factory()->create([
+            'id' => 'PAY-PENDING',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-10 10:00',
             'lesson_pending' => true,
@@ -532,8 +569,9 @@ class PaymentTest extends TestCase
 
     public function test_index_shows_lesson_pending_label(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $this->createPayment('PAY-PENDING', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        Payment::factory()->create([
+            'id' => 'PAY-PENDING',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-10 10:00',
             'lesson_pending' => true,
@@ -548,9 +586,7 @@ class PaymentTest extends TestCase
 
     public function test_show_displays_delete_button(): void
     {
-        $payment = $this->createPayment('PAY-1', [
-            'datetime' => '2025-01-20 10:00',
-        ]);
+        $payment = Payment::factory()->create(['id' => 'PAY-1', 'datetime' => '2025-01-20 10:00']);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.payments.show', $payment));
@@ -561,10 +597,8 @@ class PaymentTest extends TestCase
 
     public function test_update_buyer_via_inline_form(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $payment = $this->createPayment('PAY-1', [
-            'datetime' => '2025-01-20 10:00',
-        ]);
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $payment = Payment::factory()->create(['id' => 'PAY-1', 'datetime' => '2025-01-20 10:00']);
 
         $this->assertNull($payment->buyer_id);
 
@@ -579,8 +613,9 @@ class PaymentTest extends TestCase
 
     public function test_update_buyer_to_none(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $payment = $this->createPayment('PAY-1', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
         ]);
@@ -613,15 +648,16 @@ class PaymentTest extends TestCase
 
     public function test_store_matches_succeeds_with_partial_match(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson = Lesson::factory()->create([
             'datetime' => '2025-01-10 10:00',
             'price_gbp_pence' => 3000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
         ]);
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'amount_gbp_pence' => 5000,
             'datetime' => '2025-01-20 10:00',
@@ -641,21 +677,22 @@ class PaymentTest extends TestCase
 
     public function test_full_match_sets_lesson_pending_false(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson1 = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson1 = Lesson::factory()->create([
             'datetime' => '2025-01-10 10:00',
             'price_gbp_pence' => 3000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
         ]);
-        $lesson2 = Lesson::create([
+        $lesson2 = Lesson::factory()->create([
             'datetime' => '2025-01-12 10:00',
             'price_gbp_pence' => 2000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
         ]);
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'amount_gbp_pence' => 5000,
             'datetime' => '2025-01-20 10:00',
@@ -671,21 +708,22 @@ class PaymentTest extends TestCase
 
     public function test_second_partial_match_adds_to_existing(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson1 = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson1 = Lesson::factory()->create([
             'datetime' => '2025-01-10 10:00',
             'price_gbp_pence' => 3000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
         ]);
-        $lesson2 = Lesson::create([
+        $lesson2 = Lesson::factory()->create([
             'datetime' => '2025-01-12 10:00',
             'price_gbp_pence' => 2000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
         ]);
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'amount_gbp_pence' => 5000,
             'datetime' => '2025-01-20 10:00',
@@ -710,22 +748,23 @@ class PaymentTest extends TestCase
 
     public function test_show_partially_matched_shows_both_tables(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson1 = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson1 = Lesson::factory()->create([
             'datetime' => '2025-01-10 10:00',
             'price_gbp_pence' => 3000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
             'paid' => true,
         ]);
-        $lesson2 = Lesson::create([
+        Lesson::factory()->create([
             'datetime' => '2025-01-12 10:00',
             'price_gbp_pence' => 2000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
         ]);
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'amount_gbp_pence' => 5000,
             'datetime' => '2025-01-20 10:00',
@@ -745,16 +784,17 @@ class PaymentTest extends TestCase
 
     public function test_unmatch_all_resets_lesson_pending(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson = Lesson::factory()->create([
             'datetime' => '2025-01-10 10:00',
             'price_gbp_pence' => 3000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
             'paid' => true,
         ]);
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'amount_gbp_pence' => 5000,
             'datetime' => '2025-01-20 10:00',
@@ -771,16 +811,17 @@ class PaymentTest extends TestCase
 
     public function test_match_next_skips_partially_matched_payments(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson = Lesson::factory()->create([
             'datetime' => '2025-01-10 10:00',
             'price_gbp_pence' => 3000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
             'paid' => true,
         ]);
-        $partialPayment = $this->createPayment('PAY-PARTIAL', [
+        $partialPayment = Payment::factory()->create([
+            'id' => 'PAY-PARTIAL',
             'buyer_id' => 'acme',
             'amount_gbp_pence' => 5000,
             'datetime' => '2025-01-10 10:00',
@@ -788,7 +829,8 @@ class PaymentTest extends TestCase
         ]);
         $partialPayment->lessons()->attach($lesson->id);
 
-        $normalPayment = $this->createPayment('PAY-NORMAL', [
+        $normalPayment = Payment::factory()->create([
+            'id' => 'PAY-NORMAL',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
         ]);
@@ -804,16 +846,17 @@ class PaymentTest extends TestCase
 
     public function test_toggle_lesson_pending_blocked_when_lessons_matched(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $student = Student::create(['name' => 'Alice']);
-        $lesson = Lesson::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson = Lesson::factory()->create([
             'datetime' => '2025-01-10 10:00',
             'price_gbp_pence' => 3000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
             'paid' => true,
         ]);
-        $payment = $this->createPayment('PAY-1', [
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'amount_gbp_pence' => 5000,
             'datetime' => '2025-01-20 10:00',

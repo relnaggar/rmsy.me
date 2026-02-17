@@ -21,35 +21,11 @@ class DashboardTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    private function createBuyer(string $id, string $name): Buyer
-    {
-        return Buyer::create(['id' => $id, 'name' => $name]);
-    }
-
-    private function createPayment(string $id, array $attributes = []): Payment
-    {
-        return Payment::create(array_merge([
-            'id' => $id,
-            'datetime' => now(),
-            'amount_gbp_pence' => 5000,
-            'currency' => 'GBP',
-            'payment_reference' => 'ref',
-        ], $attributes));
-    }
-
-    private function createLesson(array $attributes): Lesson
-    {
-        return Lesson::create(array_merge([
-            'datetime' => now(),
-            'price_gbp_pence' => 5000,
-        ], $attributes));
-    }
-
     public function test_dashboard_shows_unpaid_lessons_table(): void
     {
-        $buyer = $this->createBuyer('alice', 'Alice Smith');
-        $this->createLesson(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'alice', 'price_gbp_pence' => 3000, 'paid' => false]);
-        $this->createLesson(['datetime' => '2025-01-12 10:00', 'buyer_id' => 'alice', 'price_gbp_pence' => 2000, 'paid' => false]);
+        Buyer::factory()->create(['id' => 'alice', 'name' => 'Alice Smith']);
+        Lesson::factory()->create(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'alice', 'price_gbp_pence' => 3000, 'paid' => false]);
+        Lesson::factory()->create(['datetime' => '2025-01-12 10:00', 'buyer_id' => 'alice', 'price_gbp_pence' => 2000, 'paid' => false]);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.dashboard'));
@@ -72,8 +48,8 @@ class DashboardTest extends TestCase
 
     public function test_dashboard_excludes_buyer_with_only_one_unpaid_lesson(): void
     {
-        $buyer = $this->createBuyer('bob', 'Bob Jones');
-        $this->createLesson(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'bob', 'price_gbp_pence' => 3000, 'paid' => false]);
+        Buyer::factory()->create(['id' => 'bob', 'name' => 'Bob Jones']);
+        Lesson::factory()->create(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'bob', 'price_gbp_pence' => 3000, 'paid' => false]);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.dashboard'));
@@ -84,10 +60,10 @@ class DashboardTest extends TestCase
 
     public function test_dashboard_excludes_paid_lessons_from_count(): void
     {
-        $buyer = $this->createBuyer('carol', 'Carol White');
-        $this->createLesson(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'carol', 'price_gbp_pence' => 3000, 'paid' => true]);
-        $this->createLesson(['datetime' => '2025-01-12 10:00', 'buyer_id' => 'carol', 'price_gbp_pence' => 2000, 'paid' => true]);
-        $this->createLesson(['datetime' => '2025-01-14 10:00', 'buyer_id' => 'carol', 'price_gbp_pence' => 1000, 'paid' => false]);
+        Buyer::factory()->create(['id' => 'carol', 'name' => 'Carol White']);
+        Lesson::factory()->create(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'carol', 'price_gbp_pence' => 3000, 'paid' => true]);
+        Lesson::factory()->create(['datetime' => '2025-01-12 10:00', 'buyer_id' => 'carol', 'price_gbp_pence' => 2000, 'paid' => true]);
+        Lesson::factory()->create(['datetime' => '2025-01-14 10:00', 'buyer_id' => 'carol', 'price_gbp_pence' => 1000, 'paid' => false]);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.dashboard'));
@@ -98,8 +74,9 @@ class DashboardTest extends TestCase
 
     public function test_dashboard_shows_unmatched_payments_table(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $this->createPayment('PAY-1', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-10 10:00',
             'payer' => 'John Doe',
@@ -119,7 +96,8 @@ class DashboardTest extends TestCase
 
     public function test_dashboard_shows_pending_payments(): void
     {
-        $this->createPayment('PAY-2', [
+        Payment::factory()->create([
+            'id' => 'PAY-2',
             'datetime' => '2025-02-15 10:00',
             'lesson_pending' => true,
         ]);
@@ -135,13 +113,14 @@ class DashboardTest extends TestCase
 
     public function test_dashboard_hides_unmatched_section_when_all_matched(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $payment = $this->createPayment('PAY-1', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-10 10:00',
             'amount_gbp_pence' => 3000,
         ]);
-        $lesson = $this->createLesson([
+        $lesson = Lesson::factory()->create([
             'datetime' => '2025-01-08 10:00',
             'buyer_id' => 'acme',
             'price_gbp_pence' => 3000,
@@ -158,7 +137,7 @@ class DashboardTest extends TestCase
 
     public function test_dashboard_shows_match_button_for_unmatched(): void
     {
-        $this->createPayment('PAY-1', ['datetime' => '2025-01-10 10:00']);
+        Payment::factory()->create(['id' => 'PAY-1', 'datetime' => '2025-01-10 10:00']);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.dashboard'));
@@ -169,7 +148,8 @@ class DashboardTest extends TestCase
 
     public function test_dashboard_hides_match_button_when_only_pending(): void
     {
-        $this->createPayment('PAY-1', [
+        Payment::factory()->create([
+            'id' => 'PAY-1',
             'datetime' => '2025-01-10 10:00',
             'lesson_pending' => true,
         ]);

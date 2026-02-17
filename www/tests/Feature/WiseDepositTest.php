@@ -76,12 +76,12 @@ class WiseDepositTest extends TestCase
 
     public function test_dashboard_shows_deposit_alert(): void
     {
-        WiseDeposit::create([
+        WiseDeposit::factory()->create([
             'amount_cents' => 5000,
             'currency' => 'GBP',
             'occurred_at' => '2026-02-17T10:00:00Z',
         ]);
-        WiseDeposit::create([
+        WiseDeposit::factory()->create([
             'amount_cents' => 3000,
             'currency' => 'EUR',
             'occurred_at' => '2026-02-17T11:00:00Z',
@@ -106,7 +106,7 @@ class WiseDepositTest extends TestCase
 
     public function test_import_clears_matching_wise_deposit(): void
     {
-        WiseDeposit::create([
+        WiseDeposit::factory()->create([
             'amount_cents' => 5000,
             'currency' => 'GBP',
             'occurred_at' => '2026-02-17T10:00:00Z',
@@ -127,7 +127,7 @@ class WiseDepositTest extends TestCase
     public function test_import_leaves_non_matching_wise_deposit(): void
     {
         // Different amount — should not be cleared
-        WiseDeposit::create([
+        WiseDeposit::factory()->create([
             'amount_cents' => 9999,
             'currency' => 'GBP',
             'occurred_at' => '2026-02-17T10:00:00Z',
@@ -147,7 +147,7 @@ class WiseDepositTest extends TestCase
     public function test_import_does_not_clear_deposit_outside_24h_window(): void
     {
         // Same amount and currency, but 2 days apart
-        WiseDeposit::create([
+        WiseDeposit::factory()->create([
             'amount_cents' => 5000,
             'currency' => 'GBP',
             'occurred_at' => '2026-02-15T10:00:00Z',

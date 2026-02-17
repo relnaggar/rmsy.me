@@ -129,7 +129,7 @@ class PaymentApiImportTest extends TestCase
     {
         config(['services.api_token' => 'test-token']);
 
-        WiseDeposit::create([
+        WiseDeposit::factory()->create([
             'amount_cents' => 5000,
             'currency' => 'GBP',
             'occurred_at' => '2026-02-17T10:00:00Z',

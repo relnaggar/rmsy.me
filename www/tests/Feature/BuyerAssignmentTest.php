@@ -23,37 +23,13 @@ class BuyerAssignmentTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    private function createBuyer(string $id, string $name): Buyer
-    {
-        return Buyer::create(['id' => $id, 'name' => $name]);
-    }
-
-    private function createLesson(array $attributes): Lesson
-    {
-        return Lesson::create(array_merge([
-            'datetime' => now(),
-            'price_gbp_pence' => 5000,
-        ], $attributes));
-    }
-
-    private function createPayment(string $id, array $attributes): Payment
-    {
-        return Payment::create(array_merge([
-            'id' => $id,
-            'datetime' => now(),
-            'amount_gbp_pence' => 5000,
-            'currency' => 'GBP',
-            'payment_reference' => 'ref',
-        ], $attributes));
-    }
-
     public function test_reassign_moves_lessons_between_buyers(): void
     {
-        $from = $this->createBuyer('from-co', 'From Co');
-        $to = $this->createBuyer('to-co', 'To Co');
-        $this->createLesson(['buyer_id' => 'from-co', 'datetime' => '2025-01-01 10:00']);
-        $this->createLesson(['buyer_id' => 'from-co', 'datetime' => '2025-01-02 10:00']);
-        $this->createLesson(['buyer_id' => 'to-co', 'datetime' => '2025-01-03 10:00']);
+        Buyer::factory()->create(['id' => 'from-co', 'name' => 'From Co']);
+        Buyer::factory()->create(['id' => 'to-co', 'name' => 'To Co']);
+        Lesson::factory()->create(['buyer_id' => 'from-co', 'datetime' => '2025-01-01 10:00']);
+        Lesson::factory()->create(['buyer_id' => 'from-co', 'datetime' => '2025-01-02 10:00']);
+        Lesson::factory()->create(['buyer_id' => 'to-co', 'datetime' => '2025-01-03 10:00']);
 
         $response = $this->actingAs($this->user)->post(route('portal.buyers.reassign'), [
             'from_buyer_id' => 'from-co',
@@ -68,7 +44,7 @@ class BuyerAssignmentTest extends TestCase
 
     public function test_reassign_requires_different_buyers(): void
     {
-        $this->createBuyer('same-co', 'Same Co');
+        Buyer::factory()->create(['id' => 'same-co', 'name' => 'Same Co']);
 
         $response = $this->actingAs($this->user)->post(route('portal.buyers.reassign'), [
             'from_buyer_id' => 'same-co',
@@ -80,12 +56,12 @@ class BuyerAssignmentTest extends TestCase
 
     public function test_assign_by_student(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme Corp');
-        $student = Student::create(['name' => 'Alice']);
-        $otherStudent = Student::create(['name' => 'Bob']);
-        $this->createLesson(['student_id' => $student->id, 'datetime' => '2025-01-01 10:00']);
-        $this->createLesson(['student_id' => $student->id, 'datetime' => '2025-01-02 10:00']);
-        $this->createLesson(['student_id' => $otherStudent->id, 'datetime' => '2025-01-03 10:00']);
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme Corp']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $otherStudent = Student::factory()->create(['name' => 'Bob']);
+        Lesson::factory()->create(['student_id' => $student->id, 'datetime' => '2025-01-01 10:00']);
+        Lesson::factory()->create(['student_id' => $student->id, 'datetime' => '2025-01-02 10:00']);
+        Lesson::factory()->create(['student_id' => $otherStudent->id, 'datetime' => '2025-01-03 10:00']);
 
         $response = $this->actingAs($this->user)->post(route('portal.buyers.assign'), [
             'filter_type' => 'student',
@@ -101,11 +77,11 @@ class BuyerAssignmentTest extends TestCase
 
     public function test_assign_by_client(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme Corp');
-        $client = Client::create(['name' => 'ClientA']);
-        $otherClient = Client::create(['name' => 'ClientB']);
-        $this->createLesson(['client_id' => $client->id, 'datetime' => '2025-01-01 10:00']);
-        $this->createLesson(['client_id' => $otherClient->id, 'datetime' => '2025-01-02 10:00']);
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme Corp']);
+        $client = Client::factory()->create(['name' => 'ClientA']);
+        $otherClient = Client::factory()->create(['name' => 'ClientB']);
+        Lesson::factory()->create(['client_id' => $client->id, 'datetime' => '2025-01-01 10:00']);
+        Lesson::factory()->create(['client_id' => $otherClient->id, 'datetime' => '2025-01-02 10:00']);
 
         $response = $this->actingAs($this->user)->post(route('portal.buyers.assign'), [
             'filter_type' => 'client',
@@ -120,7 +96,7 @@ class BuyerAssignmentTest extends TestCase
 
     public function test_assign_rejects_invalid_filter_type(): void
     {
-        $this->createBuyer('acme', 'Acme Corp');
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme Corp']);
 
         $response = $this->actingAs($this->user)->post(route('portal.buyers.assign'), [
             'filter_type' => 'invalid',
@@ -133,10 +109,10 @@ class BuyerAssignmentTest extends TestCase
 
     public function test_assign_payments_by_payer(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme Corp');
-        $this->createPayment('PAY-1', ['payer' => 'John Smith']);
-        $this->createPayment('PAY-2', ['payer' => 'John Smith']);
-        $this->createPayment('PAY-3', ['payer' => 'Jane Doe']);
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme Corp']);
+        Payment::factory()->create(['id' => 'PAY-1', 'payer' => 'John Smith']);
+        Payment::factory()->create(['id' => 'PAY-2', 'payer' => 'John Smith']);
+        Payment::factory()->create(['id' => 'PAY-3', 'payer' => 'Jane Doe']);
 
         $response = $this->actingAs($this->user)->post(route('portal.buyers.assignPayments'), [
             'payer' => 'John Smith',
@@ -161,7 +137,7 @@ class BuyerAssignmentTest extends TestCase
 
     public function test_edit_buyer_with_slash_in_id(): void
     {
-        $buyer = $this->createBuyer('John / Jane', 'John / Jane');
+        $buyer = Buyer::factory()->create(['id' => 'John / Jane', 'name' => 'John / Jane']);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.buyers.show', $buyer));
@@ -172,7 +148,7 @@ class BuyerAssignmentTest extends TestCase
 
     public function test_update_buyer_with_slash_in_id(): void
     {
-        $buyer = $this->createBuyer('John / Jane', 'John / Jane');
+        $buyer = Buyer::factory()->create(['id' => 'John / Jane', 'name' => 'John / Jane']);
 
         $response = $this->actingAs($this->user)
             ->put(route('portal.buyers.update', $buyer), [
@@ -186,7 +162,7 @@ class BuyerAssignmentTest extends TestCase
 
     public function test_delete_buyer_with_slash_in_id(): void
     {
-        $buyer = $this->createBuyer('John / Jane', 'John / Jane');
+        $buyer = Buyer::factory()->create(['id' => 'John / Jane', 'name' => 'John / Jane']);
 
         $response = $this->actingAs($this->user)
             ->delete(route('portal.buyers.destroy', $buyer));
@@ -197,7 +173,7 @@ class BuyerAssignmentTest extends TestCase
 
     public function test_index_renders_edit_link_for_buyer_with_slash_in_id(): void
     {
-        $buyer = $this->createBuyer('John / Jane', 'John / Jane');
+        $buyer = Buyer::factory()->create(['id' => 'John / Jane', 'name' => 'John / Jane']);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.buyers.index'));
@@ -210,7 +186,7 @@ class BuyerAssignmentTest extends TestCase
 
     public function test_index_edit_link_for_buyer_with_slash_reaches_correct_buyer(): void
     {
-        $buyer = $this->createBuyer('John / Jane', 'John / Jane');
+        $buyer = Buyer::factory()->create(['id' => 'John / Jane', 'name' => 'John / Jane']);
 
         // Get the index page and extract the edit URL
         $indexResponse = $this->actingAs($this->user)

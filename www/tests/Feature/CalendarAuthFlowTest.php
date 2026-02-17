@@ -35,9 +35,9 @@ class CalendarAuthFlowTest extends TestCase
 
     public function test_import_stores_form_data_in_session_before_oauth_redirect(): void
     {
-        $buyer = Buyer::create(['id' => 'ACME', 'name' => 'Acme Co']);
-        $student = Student::create(['name' => 'Alice']);
-        $client = Client::create(['name' => 'ClientA']);
+        $buyer = Buyer::factory()->create(['id' => 'ACME', 'name' => 'Acme Co']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $client = Client::factory()->create(['name' => 'ClientA']);
 
         $response = $this->actingAs($this->user)->post(route('portal.lessons.import'), [
             'start_date' => '2025-03-01',

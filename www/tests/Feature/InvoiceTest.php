@@ -21,27 +21,6 @@ class InvoiceTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    private function createBuyer(string $id, string $name): Buyer
-    {
-        return Buyer::create(['id' => $id, 'name' => $name]);
-    }
-
-    private function createPayment(string $id, array $attributes = []): Payment
-    {
-        return Payment::create(array_merge([
-            'id' => $id,
-            'datetime' => now(),
-            'amount_gbp_pence' => 5000,
-            'currency' => 'GBP',
-            'payment_reference' => 'ref',
-        ], $attributes));
-    }
-
-    private function createRate(string $date, float $gbpeur): void
-    {
-        ExchangeRate::create(['date' => $date, 'gbpeur' => $gbpeur]);
-    }
-
     public function test_invoices_index_requires_authentication(): void
     {
         $response = $this->get(route('portal.invoices.index'));
@@ -60,9 +39,10 @@ class InvoiceTest extends TestCase
 
     public function test_invoices_index_lists_invoices_with_amounts(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $this->createRate('2025-01-10', 0.84000);
-        $this->createPayment('PAY-1', [
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        ExchangeRate::factory()->create(['date' => '2025-01-10', 'gbpeur' => 0.84000]);
+        Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-10 10:00',
             'amount_gbp_pence' => 10000,
@@ -84,8 +64,9 @@ class InvoiceTest extends TestCase
 
     public function test_invoices_index_excludes_payments_without_sequence_number(): void
     {
-        $this->createRate('2025-01-10', 0.84000);
-        $this->createPayment('PAY-NO-SEQ', [
+        ExchangeRate::factory()->create(['date' => '2025-01-10', 'gbpeur' => 0.84000]);
+        Payment::factory()->create([
+            'id' => 'PAY-NO-SEQ',
             'datetime' => '2025-01-10 10:00',
         ]);
 
@@ -99,17 +80,19 @@ class InvoiceTest extends TestCase
 
     public function test_invoices_index_shows_trimestre_grouping(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $this->createRate('2025-01-15', 0.84000);
-        $this->createRate('2025-04-15', 0.86000);
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        ExchangeRate::factory()->create(['date' => '2025-01-15', 'gbpeur' => 0.84000]);
+        ExchangeRate::factory()->create(['date' => '2025-04-15', 'gbpeur' => 0.86000]);
 
-        $this->createPayment('PAY-T1', [
+        Payment::factory()->create([
+            'id' => 'PAY-T1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-15 10:00',
             'amount_gbp_pence' => 5000,
             'sequence_number' => '001',
         ]);
-        $this->createPayment('PAY-T2', [
+        Payment::factory()->create([
+            'id' => 'PAY-T2',
             'buyer_id' => 'acme',
             'datetime' => '2025-04-15 10:00',
             'amount_gbp_pence' => 6000,
@@ -127,17 +110,19 @@ class InvoiceTest extends TestCase
 
     public function test_invoices_index_groups_by_year(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $this->createRate('2024-06-15', 0.84000);
-        $this->createRate('2025-03-10', 0.86000);
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        ExchangeRate::factory()->create(['date' => '2024-06-15', 'gbpeur' => 0.84000]);
+        ExchangeRate::factory()->create(['date' => '2025-03-10', 'gbpeur' => 0.86000]);
 
-        $this->createPayment('PAY-2024', [
+        Payment::factory()->create([
+            'id' => 'PAY-2024',
             'buyer_id' => 'acme',
             'datetime' => '2024-06-15 10:00',
             'amount_gbp_pence' => 5000,
             'sequence_number' => '001',
         ]);
-        $this->createPayment('PAY-2025', [
+        Payment::factory()->create([
+            'id' => 'PAY-2025',
             'buyer_id' => 'acme',
             'datetime' => '2025-03-10 10:00',
             'amount_gbp_pence' => 6000,
@@ -154,10 +139,11 @@ class InvoiceTest extends TestCase
 
     public function test_invoices_index_uses_nearest_prior_exchange_rate(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
         // Rate on Friday, payment on Saturday — should use Friday's rate
-        $this->createRate('2025-01-10', 0.84000);
-        $this->createPayment('PAY-SAT', [
+        ExchangeRate::factory()->create(['date' => '2025-01-10', 'gbpeur' => 0.84000]);
+        Payment::factory()->create([
+            'id' => 'PAY-SAT',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-11 10:00',
             'amount_gbp_pence' => 10000,
@@ -175,17 +161,19 @@ class InvoiceTest extends TestCase
 
     public function test_invoices_index_year_totals_match_sum_of_invoices(): void
     {
-        $buyer = $this->createBuyer('acme', 'Acme');
-        $this->createRate('2025-01-10', 0.84000);
-        $this->createRate('2025-01-20', 0.85000);
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        ExchangeRate::factory()->create(['date' => '2025-01-10', 'gbpeur' => 0.84000]);
+        ExchangeRate::factory()->create(['date' => '2025-01-20', 'gbpeur' => 0.85000]);
 
-        $this->createPayment('PAY-1', [
+        Payment::factory()->create([
+            'id' => 'PAY-1',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-10 10:00',
             'amount_gbp_pence' => 5000,
             'sequence_number' => '001',
         ]);
-        $this->createPayment('PAY-2', [
+        Payment::factory()->create([
+            'id' => 'PAY-2',
             'buyer_id' => 'acme',
             'datetime' => '2025-01-20 10:00',
             'amount_gbp_pence' => 7000,

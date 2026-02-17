@@ -23,17 +23,31 @@ class LessonTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    private function createLesson(array $attributes = []): Lesson
+    public function test_index_requires_authentication(): void
     {
-        return Lesson::create(array_merge([
-            'datetime' => '2025-01-15 10:00',
-            'price_gbp_pence' => 5000,
-        ], $attributes));
+        $this->get(route('portal.lessons.index'))
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_show_requires_authentication(): void
+    {
+        $lesson = Lesson::factory()->create();
+
+        $this->get(route('portal.lessons.show', $lesson))
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_update_requires_authentication(): void
+    {
+        $lesson = Lesson::factory()->create();
+
+        $this->put(route('portal.lessons.update', $lesson), ['price_gbp' => '50.00'])
+            ->assertRedirect(route('login'));
     }
 
     public function test_edit_page_shows_price_field(): void
     {
-        $lesson = $this->createLesson(['price_gbp_pence' => 2500]);
+        $lesson = Lesson::factory()->create(['price_gbp_pence' => 2500]);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.lessons.show', $lesson));
@@ -45,7 +59,7 @@ class LessonTest extends TestCase
 
     public function test_update_price(): void
     {
-        $lesson = $this->createLesson(['price_gbp_pence' => 2500]);
+        $lesson = Lesson::factory()->create(['price_gbp_pence' => 2500]);
 
         $response = $this->actingAs($this->user)
             ->put(route('portal.lessons.update', $lesson), [
@@ -59,7 +73,7 @@ class LessonTest extends TestCase
 
     public function test_update_price_with_whole_number(): void
     {
-        $lesson = $this->createLesson(['price_gbp_pence' => 2500]);
+        $lesson = Lesson::factory()->create(['price_gbp_pence' => 2500]);
 
         $response = $this->actingAs($this->user)
             ->put(route('portal.lessons.update', $lesson), [
@@ -72,7 +86,7 @@ class LessonTest extends TestCase
 
     public function test_update_price_rejects_negative(): void
     {
-        $lesson = $this->createLesson(['price_gbp_pence' => 2500]);
+        $lesson = Lesson::factory()->create(['price_gbp_pence' => 2500]);
 
         $response = $this->actingAs($this->user)
             ->put(route('portal.lessons.update', $lesson), [
@@ -85,7 +99,7 @@ class LessonTest extends TestCase
 
     public function test_update_price_rejects_non_numeric(): void
     {
-        $lesson = $this->createLesson(['price_gbp_pence' => 2500]);
+        $lesson = Lesson::factory()->create(['price_gbp_pence' => 2500]);
 
         $response = $this->actingAs($this->user)
             ->put(route('portal.lessons.update', $lesson), [
@@ -98,7 +112,7 @@ class LessonTest extends TestCase
 
     public function test_update_price_is_required(): void
     {
-        $lesson = $this->createLesson(['price_gbp_pence' => 2500]);
+        $lesson = Lesson::factory()->create(['price_gbp_pence' => 2500]);
 
         $response = $this->actingAs($this->user)
             ->put(route('portal.lessons.update', $lesson), [
@@ -111,10 +125,10 @@ class LessonTest extends TestCase
 
     public function test_apply_to_student_updates_all_lessons_for_student(): void
     {
-        $student = Student::create(['name' => 'Alice']);
-        $lesson1 = $this->createLesson(['student_id' => $student->id, 'price_gbp_pence' => 2500]);
-        $lesson2 = $this->createLesson(['student_id' => $student->id, 'price_gbp_pence' => 2500, 'datetime' => '2025-01-20 10:00']);
-        $otherLesson = $this->createLesson(['price_gbp_pence' => 2500, 'datetime' => '2025-01-25 10:00']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson1 = Lesson::factory()->create(['student_id' => $student->id, 'price_gbp_pence' => 2500]);
+        $lesson2 = Lesson::factory()->create(['student_id' => $student->id, 'price_gbp_pence' => 2500, 'datetime' => '2025-01-20 10:00']);
+        $otherLesson = Lesson::factory()->create(['price_gbp_pence' => 2500, 'datetime' => '2025-01-25 10:00']);
 
         // Update lesson1's price first
         $this->actingAs($this->user)
@@ -132,10 +146,10 @@ class LessonTest extends TestCase
 
     public function test_apply_to_student_unmatched_only_skips_paid_lessons(): void
     {
-        $student = Student::create(['name' => 'Alice']);
-        $lesson1 = $this->createLesson(['student_id' => $student->id, 'price_gbp_pence' => 2500]);
-        $paidLesson = $this->createLesson(['student_id' => $student->id, 'price_gbp_pence' => 2500, 'paid' => true, 'datetime' => '2025-01-20 10:00']);
-        $unpaidLesson = $this->createLesson(['student_id' => $student->id, 'price_gbp_pence' => 2500, 'datetime' => '2025-01-25 10:00']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson1 = Lesson::factory()->create(['student_id' => $student->id, 'price_gbp_pence' => 2500]);
+        $paidLesson = Lesson::factory()->create(['student_id' => $student->id, 'price_gbp_pence' => 2500, 'paid' => true, 'datetime' => '2025-01-20 10:00']);
+        $unpaidLesson = Lesson::factory()->create(['student_id' => $student->id, 'price_gbp_pence' => 2500, 'datetime' => '2025-01-25 10:00']);
 
         // Update lesson1's price first
         $this->actingAs($this->user)
@@ -153,8 +167,8 @@ class LessonTest extends TestCase
 
     public function test_apply_to_student_button_shown_when_student_exists(): void
     {
-        $student = Student::create(['name' => 'Alice']);
-        $lesson = $this->createLesson(['student_id' => $student->id]);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson = Lesson::factory()->create(['student_id' => $student->id]);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.lessons.show', $lesson));
@@ -166,7 +180,7 @@ class LessonTest extends TestCase
 
     public function test_apply_to_student_button_hidden_when_no_student(): void
     {
-        $lesson = $this->createLesson();
+        $lesson = Lesson::factory()->create();
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.lessons.show', $lesson));
@@ -178,7 +192,7 @@ class LessonTest extends TestCase
 
     public function test_show_displays_delete_button(): void
     {
-        $lesson = $this->createLesson();
+        $lesson = Lesson::factory()->create();
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.lessons.show', $lesson));
@@ -189,9 +203,9 @@ class LessonTest extends TestCase
 
     public function test_edit_page_shows_student_and_client_selects(): void
     {
-        $student = Student::create(['name' => 'Alice']);
-        $client = Client::create(['name' => 'Acme Corp']);
-        $lesson = $this->createLesson(['student_id' => $student->id, 'client_id' => $client->id]);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $client = Client::factory()->create(['name' => 'Acme Corp']);
+        $lesson = Lesson::factory()->create(['student_id' => $student->id, 'client_id' => $client->id]);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.lessons.show', $lesson));
@@ -203,9 +217,9 @@ class LessonTest extends TestCase
 
     public function test_update_student(): void
     {
-        $student1 = Student::create(['name' => 'Alice']);
-        $student2 = Student::create(['name' => 'Bob']);
-        $lesson = $this->createLesson(['student_id' => $student1->id]);
+        $student1 = Student::factory()->create(['name' => 'Alice']);
+        $student2 = Student::factory()->create(['name' => 'Bob']);
+        $lesson = Lesson::factory()->create(['student_id' => $student1->id]);
 
         $response = $this->actingAs($this->user)
             ->put(route('portal.lessons.update', $lesson), [
@@ -219,9 +233,9 @@ class LessonTest extends TestCase
 
     public function test_update_client(): void
     {
-        $client1 = Client::create(['name' => 'Acme Corp']);
-        $client2 = Client::create(['name' => 'Globex']);
-        $lesson = $this->createLesson(['client_id' => $client1->id]);
+        $client1 = Client::factory()->create(['name' => 'Acme Corp']);
+        $client2 = Client::factory()->create(['name' => 'Globex']);
+        $lesson = Lesson::factory()->create(['client_id' => $client1->id]);
 
         $response = $this->actingAs($this->user)
             ->put(route('portal.lessons.update', $lesson), [
@@ -235,9 +249,9 @@ class LessonTest extends TestCase
 
     public function test_update_can_clear_student_and_client(): void
     {
-        $student = Student::create(['name' => 'Alice']);
-        $client = Client::create(['name' => 'Acme Corp']);
-        $lesson = $this->createLesson(['student_id' => $student->id, 'client_id' => $client->id]);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $client = Client::factory()->create(['name' => 'Acme Corp']);
+        $lesson = Lesson::factory()->create(['student_id' => $student->id, 'client_id' => $client->id]);
 
         $response = $this->actingAs($this->user)
             ->put(route('portal.lessons.update', $lesson), [
@@ -253,7 +267,7 @@ class LessonTest extends TestCase
 
     public function test_update_rejects_invalid_student(): void
     {
-        $lesson = $this->createLesson();
+        $lesson = Lesson::factory()->create();
 
         $response = $this->actingAs($this->user)
             ->put(route('portal.lessons.update', $lesson), [
@@ -266,7 +280,7 @@ class LessonTest extends TestCase
 
     public function test_update_rejects_invalid_client(): void
     {
-        $lesson = $this->createLesson();
+        $lesson = Lesson::factory()->create();
 
         $response = $this->actingAs($this->user)
             ->put(route('portal.lessons.update', $lesson), [
@@ -279,14 +293,12 @@ class LessonTest extends TestCase
 
     public function test_index_shows_payment_link_for_paid_matched_lesson(): void
     {
-        $buyer = Buyer::create(['id' => 'acme', 'name' => 'Acme']);
-        $lesson = $this->createLesson(['buyer_id' => 'acme', 'paid' => true]);
-        $payment = Payment::create([
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $lesson = Lesson::factory()->create(['buyer_id' => 'acme', 'paid' => true]);
+        $payment = Payment::factory()->create([
             'id' => 'PAY-1',
             'datetime' => '2025-01-20 10:00',
             'amount_gbp_pence' => 5000,
-            'currency' => 'GBP',
-            'payment_reference' => 'ref',
             'buyer_id' => 'acme',
         ]);
         $payment->lessons()->attach($lesson->id);
@@ -300,7 +312,7 @@ class LessonTest extends TestCase
 
     public function test_index_shows_plain_yes_for_paid_lesson_without_payment(): void
     {
-        $lesson = $this->createLesson(['paid' => true]);
+        Lesson::factory()->create(['paid' => true]);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.lessons.index'));
@@ -312,8 +324,8 @@ class LessonTest extends TestCase
 
     public function test_index_defaults_start_date_to_latest_lesson(): void
     {
-        $this->createLesson(['datetime' => '2025-06-10 14:00']);
-        $this->createLesson(['datetime' => '2025-09-20 09:00']);
+        Lesson::factory()->create(['datetime' => '2025-06-10 14:00']);
+        Lesson::factory()->create(['datetime' => '2025-09-20 09:00']);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.lessons.index'));
@@ -333,7 +345,7 @@ class LessonTest extends TestCase
 
     public function test_index_shows_no_for_unpaid_lesson(): void
     {
-        $lesson = $this->createLesson(['paid' => false]);
+        Lesson::factory()->create(['paid' => false]);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.lessons.index'));
