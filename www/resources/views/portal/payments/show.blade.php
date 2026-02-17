@@ -5,6 +5,11 @@
 
 @section('content')
 <table class="table table-bordered mb-4">
+  <col style="width: 1%">
+  <tr>
+    <th class="text-nowrap">ID</th>
+    <td>{{ $payment->id }}</td>
+  </tr>
   <tr>
     <th>Date</th>
     <td>{{ $payment->datetime->format('Y-m-d') }}</td>
@@ -28,11 +33,13 @@
   <tr>
     <th>Buyer</th>
     <td>
-      @if($payment->buyer)
-        <a href="{{ route('portal.buyers.edit', $payment->buyer) }}">{{ $payment->buyer->name }}</a>
-      @else
-        -
-      @endif
+      <x-inline-edit-select name="buyer_id" :action="route('portal.payments.update', $payment)" :value="$payment->buyer_id" :options="$buyers">
+        @if($payment->buyer)
+          <a href="{{ route('portal.buyers.edit', $payment->buyer) }}">{{ $payment->buyer->name }}</a>
+        @else
+          <span class="text-muted">-</span>
+        @endif
+      </x-inline-edit-select>
     </td>
   </tr>
   <tr>
@@ -45,26 +52,43 @@
       @endif
     </td>
   </tr>
+  <tr>
+    <th class="text-nowrap">Status</th>
+    <td class="d-flex align-items-center gap-2">
+      @if($payment->lessons->count() > 0)
+        <span class="badge bg-success">Matched</span>
+        <form method="POST" action="{{ route('portal.payments.destroyMatches', $payment) }}" class="d-inline"
+              data-confirm="Are you sure you want to unmatch all lessons from this payment?">
+          @csrf
+          @method('DELETE')
+          <button type="submit" class="btn btn-outline-danger btn-sm">Unmatch All</button>
+        </form>
+      @else
+        <form method="POST" action="{{ route('portal.payments.toggleLessonPending', $payment) }}" class="d-inline">
+          @csrf
+          @if($payment->lesson_pending)
+            <span class="badge bg-warning text-dark">Lesson(s) Pending</span>
+            <button type="submit" class="btn btn-outline-warning btn-sm ms-2">Remove</button>
+          @else
+            <span class="badge bg-secondary">Unmatched</span>
+            <button type="submit" class="btn btn-outline-warning btn-sm ms-2">Mark Lesson(s) Pending</button>
+          @endif
+        </form>
+      @endif
+    </td>
+  </tr>
+  <tr>
+    <th>Actions</th>
+    <td>
+      <form action="{{ route('portal.payments.destroy', $payment) }}" method="POST" class="d-inline"
+            data-confirm="Are you sure you want to delete this payment?">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-danger btn-sm">Delete Payment</button>
+      </form>
+    </td>
+  </tr>
 </table>
-
-<form method="POST" action="{{ route('portal.payments.update', $payment) }}" class="mb-4">
-  @csrf
-  @method('PUT')
-
-  <x-form-input name="buyer_id" label="Buyer" type="select" :value="$payment->buyer_id" :options="$buyers" />
-
-  <button type="submit" class="btn btn-primary">Update Buyer</button>
-</form>
-
-<form method="POST" action="{{ route('portal.payments.toggleLessonPending', $payment) }}" class="mb-4">
-  @csrf
-  @if($payment->lesson_pending)
-    <button type="submit" class="btn btn-warning">Remove Lesson(s) Pending</button>
-    <span class="ms-2 text-muted">This payment is marked as lesson(s) pending and will be skipped during match-next.</span>
-  @else
-    <button type="submit" class="btn btn-outline-warning">Mark as Lesson(s) Pending</button>
-  @endif
-</form>
 
 @if($errors->any())
   <div class="alert alert-danger">
@@ -77,13 +101,10 @@
 @if($payment->buyer_id)
 <h2>Lessons</h2>
 
-<form action="{{ route('portal.payments.storeMatches', $payment) }}{{ $next ? '?next=1' : '' }}" method="POST" data-match-payment="{{ $payment->amount_gbp_pence }}">
-  @csrf
-
+@if($payment->lessons->count() > 0)
   <table class="table table-striped">
     <thead>
       <tr>
-        <th></th>
         <th>Date</th>
         <th>Student</th>
         <th>Client</th>
@@ -92,11 +113,8 @@
       </tr>
     </thead>
     <tbody>
-      @forelse($lessons as $lesson)
-        <tr class="{{ in_array($lesson->id, $suggestedIds) ? 'table-info' : '' }}">
-          <td>
-            <input type="checkbox" name="lesson_ids[]" value="{{ $lesson->id }}" data-price="{{ $lesson->price_gbp_pence }}" {{ in_array($lesson->id, $matchedLessonIds) ? 'checked' : '' }} {{ in_array($lesson->id, $suggestedIds) ? 'data-suggested' : '' }}>
-          </td>
+      @foreach($payment->lessons as $lesson)
+        <tr>
           <td><a href="{{ route('portal.lessons.edit', $lesson) }}">{{ $lesson->datetime->format('Y-m-d H:i') }}</a></td>
           <td>
             @if($lesson->student)
@@ -115,28 +133,63 @@
           <td>{{ $lesson->duration_minutes }} min</td>
           <td>&pound;{{ $lesson->getFormattedPrice() }}</td>
         </tr>
-      @empty
-        <tr>
-          <td colspan="6" class="text-center">No lessons found for this buyer.</td>
-        </tr>
-      @endforelse
+      @endforeach
     </tbody>
   </table>
-
-  <div class="mt-3 d-flex align-items-center gap-3">
-    <button type="submit" class="btn btn-primary">Confirm Matches</button>
-    <span>Selected total: <strong id="match-total"></strong> / &pound;{{ $payment->getFormattedAmount() }}</span>
-  </div>
-</form>
-
-@if($payment->lessons->count() > 0)
-  <form action="{{ route('portal.payments.destroyMatches', $payment) }}" method="POST" class="mt-3"
-        data-confirm="Are you sure you want to unmatch all lessons from this payment?">
+@else
+  <form action="{{ route('portal.payments.storeMatches', $payment) }}{{ $next ? '?next=1' : '' }}" method="POST" data-match-payment="{{ $payment->amount_gbp_pence }}">
     @csrf
-    @method('DELETE')
-    <button type="submit" class="btn btn-outline-danger">Unmatch All</button>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Date</th>
+          <th>Student</th>
+          <th>Client</th>
+          <th>Duration</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        @forelse($lessons as $lesson)
+          <tr class="{{ in_array($lesson->id, $suggestedIds) ? 'table-info' : '' }}">
+            <td>
+              <input type="checkbox" name="lesson_ids[]" value="{{ $lesson->id }}" data-price="{{ $lesson->price_gbp_pence }}" {{ in_array($lesson->id, $suggestedIds) ? 'data-suggested' : '' }}>
+            </td>
+            <td><a href="{{ route('portal.lessons.edit', $lesson) }}">{{ $lesson->datetime->format('Y-m-d H:i') }}</a></td>
+            <td>
+              @if($lesson->student)
+                <a href="{{ route('portal.students.edit', $lesson->student) }}">{{ $lesson->student->name }}</a>
+              @else
+                -
+              @endif
+            </td>
+            <td>
+              @if($lesson->client)
+                <a href="{{ route('portal.clients.edit', $lesson->client) }}">{{ $lesson->client->name }}</a>
+              @else
+                -
+              @endif
+            </td>
+            <td>{{ $lesson->duration_minutes }} min</td>
+            <td>&pound;{{ $lesson->getFormattedPrice() }}</td>
+          </tr>
+        @empty
+          <tr>
+            <td colspan="6" class="text-center">No lessons found for this buyer.</td>
+          </tr>
+        @endforelse
+      </tbody>
+    </table>
+
+    <div class="mt-3 d-flex align-items-center gap-3">
+      <button type="submit" class="btn btn-primary" {{ $payment->lesson_pending ? 'disabled data-disabled' : '' }}>Confirm Matches</button>
+      <span>Selected total: <strong id="match-total"></strong> / &pound;{{ $payment->getFormattedAmount() }}</span>
+    </div>
   </form>
 @endif
+
 @endif
 
 @if($prevByBuyer || $nextByBuyer)

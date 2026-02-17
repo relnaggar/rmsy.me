@@ -20,7 +20,7 @@ if (form) {
     const matches = total === paymentAmount;
     totalDisplay.classList.toggle('text-success', matches);
     totalDisplay.classList.toggle('text-danger', !matches);
-    submitBtn.disabled = !matches;
+    submitBtn.disabled = !matches || submitBtn.hasAttribute('data-disabled');
   }
 
   // Auto-check suggested lessons until total matches payment amount

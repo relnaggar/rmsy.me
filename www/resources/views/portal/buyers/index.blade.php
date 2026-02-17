@@ -94,13 +94,4 @@
     @endforelse
   </tbody>
 </table>
-
-@if($buyers->count() > 0)
-  <form action="{{ route('portal.buyers.clear') }}" method="POST" class="mt-3"
-        data-confirm="Are you sure you want to delete all buyers?">
-    @csrf
-    @method('DELETE')
-    <button type="submit" class="btn btn-danger">Delete All Buyers</button>
-  </form>
-@endif
 @endsection

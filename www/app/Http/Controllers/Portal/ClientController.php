@@ -43,12 +43,4 @@ class ClientController extends Controller
         return redirect()->route('portal.clients.index')
             ->with('success', 'Client deleted successfully.');
     }
-
-    public function clear(): RedirectResponse
-    {
-        Client::truncate();
-
-        return redirect()->route('portal.clients.index')
-            ->with('success', 'All clients have been deleted.');
-    }
 }

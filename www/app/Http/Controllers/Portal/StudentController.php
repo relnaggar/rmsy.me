@@ -43,12 +43,4 @@ class StudentController extends Controller
         return redirect()->route('portal.students.index')
             ->with('success', 'Student deleted successfully.');
     }
-
-    public function clear(): RedirectResponse
-    {
-        Student::truncate();
-
-        return redirect()->route('portal.students.index')
-            ->with('success', 'All students have been deleted.');
-    }
 }

@@ -94,13 +94,26 @@ class PaymentTest extends TestCase
         $this->assertEquals('001', Payment::find('PAY-2025-2')->sequence_number);
     }
 
-    public function test_match_page_prechecks_matched_lessons(): void
+    public function test_show_displays_payment_id(): void
+    {
+        $payment = $this->createPayment('PAY-1', [
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.show', $payment));
+
+        $response->assertStatus(200);
+        $response->assertSee('PAY-1');
+    }
+
+    public function test_show_displays_matched_status_when_lessons_matched(): void
     {
         $buyer = $this->createBuyer('acme', 'Acme');
         $student = Student::create(['name' => 'Alice']);
         $lesson = Lesson::create([
             'datetime' => '2025-01-15 10:00',
-            'price_gbp_pence' => 2500,
+            'price_gbp_pence' => 5000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
             'paid' => true,
@@ -115,10 +128,70 @@ class PaymentTest extends TestCase
             ->get(route('portal.payments.show', $payment));
 
         $response->assertStatus(200);
-        $response->assertSee('checked');
+        $response->assertSee('Matched');
+        $response->assertSee('Unmatch All');
     }
 
-    public function test_match_page_does_not_precheck_unmatched_lessons(): void
+    public function test_show_displays_unmatched_status_when_no_lessons_matched(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.show', $payment));
+
+        $response->assertStatus(200);
+        $response->assertSee('Unmatched');
+        $response->assertSee('Mark Lesson(s) Pending');
+    }
+
+    public function test_show_displays_lesson_pending_status(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+            'lesson_pending' => true,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.show', $payment));
+
+        $response->assertStatus(200);
+        $response->assertSee('Lesson(s) Pending');
+        $response->assertSee('Remove');
+    }
+
+    public function test_show_matched_payment_shows_lessons_read_only(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $student = Student::create(['name' => 'Alice']);
+        $lesson = Lesson::create([
+            'datetime' => '2025-01-15 10:00',
+            'price_gbp_pence' => 5000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+            'paid' => true,
+        ]);
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+        ]);
+        $payment->lessons()->attach($lesson->id);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.show', $payment));
+
+        $response->assertStatus(200);
+        $response->assertSee('Alice');
+        $response->assertDontSee('Confirm Matches');
+        $response->assertDontSee('checkbox', false);
+    }
+
+    public function test_show_unmatched_payment_shows_matching_form(): void
     {
         $buyer = $this->createBuyer('acme', 'Acme');
         $student = Student::create(['name' => 'Alice']);
@@ -137,7 +210,31 @@ class PaymentTest extends TestCase
             ->get(route('portal.payments.show', $payment));
 
         $response->assertStatus(200);
-        $response->assertDontSee('checked');
+        $response->assertSee('Confirm Matches');
+        $response->assertSee('checkbox', false);
+    }
+
+    public function test_show_lesson_pending_payment_disables_confirm_matches(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $student = Student::create(['name' => 'Alice']);
+        $lesson = Lesson::create([
+            'datetime' => '2025-01-15 10:00',
+            'price_gbp_pence' => 2500,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+        ]);
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+            'lesson_pending' => true,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.show', $payment));
+
+        $response->assertStatus(200);
+        $response->assertSee('data-disabled', false);
     }
 
     public function test_store_matches_succeeds_when_totals_match(): void
@@ -446,6 +543,54 @@ class PaymentTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Lesson(s) Pending');
+    }
+
+    public function test_show_displays_delete_button(): void
+    {
+        $payment = $this->createPayment('PAY-1', [
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.show', $payment));
+
+        $response->assertStatus(200);
+        $response->assertSee('Delete Payment');
+    }
+
+    public function test_update_buyer_via_inline_form(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $payment = $this->createPayment('PAY-1', [
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $this->assertNull($payment->buyer_id);
+
+        $response = $this->actingAs($this->user)
+            ->put(route('portal.payments.update', $payment), [
+                'buyer_id' => 'acme',
+            ]);
+
+        $response->assertRedirect(route('portal.payments.show', $payment));
+        $this->assertEquals('acme', $payment->fresh()->buyer_id);
+    }
+
+    public function test_update_buyer_to_none(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->put(route('portal.payments.update', $payment), [
+                'buyer_id' => '',
+            ]);
+
+        $response->assertRedirect(route('portal.payments.show', $payment));
+        $this->assertNull($payment->fresh()->buyer_id);
     }
 
     public function test_free_meeting_button_hidden_on_portal(): void

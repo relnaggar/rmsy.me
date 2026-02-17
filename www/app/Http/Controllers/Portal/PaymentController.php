@@ -283,12 +283,4 @@ class PaymentController extends Controller
         return redirect()->route('portal.payments.index')
             ->with('success', 'Payment deleted successfully.');
     }
-
-    public function clear(): RedirectResponse
-    {
-        Payment::truncate();
-
-        return redirect()->route('portal.payments.index')
-            ->with('success', 'All payments have been deleted.');
-    }
 }

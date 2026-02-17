@@ -34,13 +34,4 @@
     @endforelse
   </tbody>
 </table>
-
-@if($clients->count() > 0)
-  <form action="{{ route('portal.clients.clear') }}" method="POST" class="mt-3"
-        data-confirm="Are you sure you want to delete all clients?">
-    @csrf
-    @method('DELETE')
-    <button type="submit" class="btn btn-danger">Delete All Clients</button>
-  </form>
-@endif
 @endsection

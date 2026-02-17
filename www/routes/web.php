@@ -78,7 +78,6 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
                 Route::get('/{'.$resource.'}/edit', 'edit')->name('edit');
                 Route::put('/{'.$resource.'}', 'update')->name('update');
                 Route::delete('/{'.$resource.'}', 'destroy')->name('destroy');
-                Route::delete('/', 'clear')->name('clear');
             };
         };
 
@@ -132,7 +131,6 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
                 Route::get('/{lesson}/edit', 'edit')->name('edit');
                 Route::put('/{lesson}', 'update')->name('update');
                 Route::delete('/{lesson}', 'destroy')->name('destroy');
-                Route::delete('/', 'clear')->name('clear');
             });
 
         // Payments
@@ -149,7 +147,6 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
                 Route::post('/{payment}/match', 'storeMatches')->name('storeMatches');
                 Route::delete('/{payment}/match', 'destroyMatches')->name('destroyMatches');
                 Route::delete('/{payment}', 'destroy')->name('destroy');
-                Route::delete('/', 'clear')->name('clear');
             });
 
         // Invoices

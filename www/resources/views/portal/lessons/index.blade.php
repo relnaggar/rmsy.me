@@ -119,13 +119,4 @@
     @endforelse
   </tbody>
 </table>
-
-@if($lessons->count() > 0)
-  <form action="{{ route('portal.lessons.clear') }}" method="POST" class="mt-3"
-        data-confirm="Are you sure you want to delete all lessons?">
-    @csrf
-    @method('DELETE')
-    <button type="submit" class="btn btn-danger">Delete All Lessons</button>
-  </form>
-@endif
 @endsection

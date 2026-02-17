@@ -34,13 +34,4 @@
     @endforelse
   </tbody>
 </table>
-
-@if($students->count() > 0)
-  <form action="{{ route('portal.students.clear') }}" method="POST" class="mt-3"
-        data-confirm="Are you sure you want to delete all students?">
-    @csrf
-    @method('DELETE')
-    <button type="submit" class="btn btn-danger">Delete All Students</button>
-  </form>
-@endif
 @endsection

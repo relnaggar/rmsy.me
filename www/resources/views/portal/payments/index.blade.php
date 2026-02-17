@@ -28,13 +28,13 @@
       <th>Payer</th>
       <th>Buyer</th>
       <th>Invoice</th>
-      <th>Actions</th>
+      <th>Status</th>
     </tr>
   </thead>
   <tbody>
     @forelse($payments as $payment)
       <tr>
-        <td>{{ $payment->id }}</td>
+        <td><a href="{{ route('portal.payments.show', $payment) }}">{{ $payment->id }}</a></td>
         <td>{{ $payment->datetime->format('Y-m-d') }}</td>
         <td>{{ $payment->getFormattedAmount() }}</td>
         <td>{{ $payment->currency }}</td>
@@ -57,15 +57,13 @@
           @endif
         </td>
         <td>
-          <a href="{{ route('portal.payments.show', $payment) }}" class="btn btn-sm {{ $payment->lessons_count > 0 ? 'btn-outline-secondary' : ($payment->lesson_pending ? 'btn-outline-info' : 'btn-warning') }}">
-            {{ $payment->lessons_count > 0 ? 'Matched ('.$payment->lessons_count.')' : ($payment->lesson_pending ? 'Lesson(s) Pending' : 'Unmatched') }}
-          </a>
-          <form action="{{ route('portal.payments.destroy', $payment) }}" method="POST" class="d-inline"
-                data-confirm="Are you sure you want to delete this payment?">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-          </form>
+          @if($payment->lessons_count > 0)
+            <span class="badge bg-success">Matched ({{ $payment->lessons_count }})</span>
+          @elseif($payment->lesson_pending)
+            <span class="badge bg-warning text-dark">Lesson(s) Pending</span>
+          @else
+            <span class="badge bg-secondary">Unmatched</span>
+          @endif
         </td>
       </tr>
     @empty
@@ -75,13 +73,4 @@
     @endforelse
   </tbody>
 </table>
-
-@if($payments->count() > 0)
-  <form action="{{ route('portal.payments.clear') }}" method="POST" class="mt-3"
-        data-confirm="Are you sure you want to delete all payments?">
-    @csrf
-    @method('DELETE')
-    <button type="submit" class="btn btn-danger">Delete All Payments</button>
-  </form>
-@endif
 @endsection

@@ -129,12 +129,4 @@ class LessonController extends Controller
         return redirect()->route('portal.lessons.index')
             ->with('success', 'Lesson deleted successfully.');
     }
-
-    public function clear(): RedirectResponse
-    {
-        Lesson::truncate();
-
-        return redirect()->route('portal.lessons.index')
-            ->with('success', 'All lessons have been deleted.');
-    }
 }

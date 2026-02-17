@@ -3,5 +3,6 @@ import { applyBootstrapValidation } from "./formValidation.js";
 import "./confirmSubmit.js";
 import "./matchPayment.js";
 import "./syncDateRange.js";
+import "./inlineEdit.js";
 
 applyBootstrapValidation();

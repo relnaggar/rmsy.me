@@ -171,12 +171,4 @@ class BuyerController extends Controller
         return redirect()->route('portal.buyers.index')
             ->with('success', 'Buyer deleted successfully.');
     }
-
-    public function clear(): RedirectResponse
-    {
-        Buyer::truncate();
-
-        return redirect()->route('portal.buyers.index')
-            ->with('success', 'All buyers have been deleted.');
-    }
 }
