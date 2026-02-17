@@ -54,9 +54,26 @@
   </tr>
   <tr>
     <th class="text-nowrap">Status</th>
-    <td class="d-flex align-items-center gap-2">
+    <td>
       @if($payment->lessons->count() > 0)
         <span class="badge bg-success">Matched</span>
+      @elseif($payment->lesson_pending)
+        <span class="badge bg-warning text-dark">Lesson(s) Pending</span>
+      @else
+        <span class="badge bg-secondary">Unmatched</span>
+      @endif
+    </td>
+  </tr>
+  <tr>
+    <th>Actions</th>
+    <td class="d-flex align-items-center gap-2">
+      <form action="{{ route('portal.payments.destroy', $payment) }}" method="POST" class="d-inline"
+            data-confirm="Are you sure you want to delete this payment?">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-danger btn-sm">Delete Payment</button>
+      </form>
+      @if($payment->lessons->count() > 0)
         <form method="POST" action="{{ route('portal.payments.destroyMatches', $payment) }}" class="d-inline"
               data-confirm="Are you sure you want to unmatch all lessons from this payment?">
           @csrf
@@ -67,25 +84,12 @@
         <form method="POST" action="{{ route('portal.payments.toggleLessonPending', $payment) }}" class="d-inline">
           @csrf
           @if($payment->lesson_pending)
-            <span class="badge bg-warning text-dark">Lesson(s) Pending</span>
-            <button type="submit" class="btn btn-outline-warning btn-sm ms-2">Remove</button>
+            <button type="submit" class="btn btn-outline-warning btn-sm">Remove Lesson(s) Pending</button>
           @else
-            <span class="badge bg-secondary">Unmatched</span>
-            <button type="submit" class="btn btn-outline-warning btn-sm ms-2">Mark Lesson(s) Pending</button>
+            <button type="submit" class="btn btn-outline-warning btn-sm">Mark Lesson(s) Pending</button>
           @endif
         </form>
       @endif
-    </td>
-  </tr>
-  <tr>
-    <th>Actions</th>
-    <td>
-      <form action="{{ route('portal.payments.destroy', $payment) }}" method="POST" class="d-inline"
-            data-confirm="Are you sure you want to delete this payment?">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-danger btn-sm">Delete Payment</button>
-      </form>
     </td>
   </tr>
 </table>
