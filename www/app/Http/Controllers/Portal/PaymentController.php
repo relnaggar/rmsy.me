@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Buyer;
 use App\Models\Lesson;
 use App\Models\Payment;
+use App\Models\WiseDeposit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -95,6 +96,8 @@ class PaymentController extends Controller
                     'buyer_id' => $buyer->id,
                 ]);
 
+                $this->clearMatchingWiseDeposit($payment);
+
                 $year = $payment->getYear();
                 if (! in_array($year, $affectedYears)) {
                     $affectedYears[] = $year;
@@ -146,6 +149,20 @@ class PaymentController extends Controller
 
             $payment->update(['sequence_number' => $sequenceNumberStr]);
         }
+    }
+
+    private function clearMatchingWiseDeposit(Payment $payment): void
+    {
+        $deposit = WiseDeposit::where('amount_cents', $payment->amount_gbp_pence)
+            ->where('currency', $payment->currency)
+            ->whereBetween('occurred_at', [
+                $payment->datetime->copy()->subHours(24),
+                $payment->datetime->copy()->addHours(24),
+            ])
+            ->orderByRaw('ABS(JULIANDAY(occurred_at) - JULIANDAY(?))', [$payment->datetime])
+            ->first();
+
+        $deposit?->delete();
     }
 
     public function show(Request $request, Payment $payment): View

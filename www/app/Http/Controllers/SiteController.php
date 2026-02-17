@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\WiseDeposit;
 use App\Services\ProjectsService;
 use DateTime;
 use Illuminate\Http\Request;
@@ -111,9 +112,19 @@ class SiteController extends Controller
 
     public function wiseDeposit(Request $request): Response
     {
-        error_log('Received Wise deposit webhook v2');
-        error_log($request->getContent());
-        error_log(print_r($request->headers->all(), true));
+        if ($request->header('x-test-notification') === 'true') {
+            return response('', 200);
+        }
+
+        $data = $request->json('data');
+
+        if ($data) {
+            WiseDeposit::create([
+                'amount_cents' => (int) round($data['amount'] * 100),
+                'currency' => $data['currency'],
+                'occurred_at' => $data['occurred_at'],
+            ]);
+        }
 
         return response('', 200);
     }

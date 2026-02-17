@@ -6,6 +6,13 @@
 @section('content')
 <p>You're logged in as <strong>{{ $userEmail }}</strong>.</p>
 
+@if($wiseDepositCount > 0)
+  <div class="alert alert-info">
+    <strong>{{ $wiseDepositCount }}</strong> new Wise {{ Str::plural('deposit', $wiseDepositCount) }} received.
+    <a href="{{ route('portal.payments.index') }}">Import payments</a> to process.
+  </div>
+@endif
+
 @if($unmatchedPayments->isNotEmpty() || $pendingPayments->isNotEmpty())
   <h2 class="mt-4">Unmatched Payments</h2>
   @if($unmatchedPayments->isNotEmpty())

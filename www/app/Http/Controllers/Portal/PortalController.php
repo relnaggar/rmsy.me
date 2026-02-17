@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Models\Buyer;
 use App\Models\Payment;
+use App\Models\WiseDeposit;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -37,6 +38,7 @@ class PortalController extends Controller
             'unmatchedPayments' => $unmatchedPayments,
             'pendingPayments' => $pendingPayments,
             'buyersWithUnpaidLessons' => $buyersWithUnpaidLessons,
+            'wiseDepositCount' => WiseDeposit::count(),
         ]);
     }
 }
