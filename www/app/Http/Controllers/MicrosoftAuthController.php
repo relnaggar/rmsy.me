@@ -68,11 +68,15 @@ class MicrosoftAuthController extends Controller
         }
 
         $tokens = $response->json();
-        session([
+        $request->user()->update([
             'ms_access_token' => $tokens['access_token'],
             'ms_refresh_token' => $tokens['refresh_token'] ?? null,
             'ms_token_expires' => now()->addSeconds($tokens['expires_in']),
         ]);
+
+        if (session()->has('pending_calendar_import')) {
+            return redirect()->route('portal.lessons.importComplete');
+        }
 
         return redirect()->route('portal.lessons.index')
             ->with('success', 'Successfully connected to Microsoft Calendar.');

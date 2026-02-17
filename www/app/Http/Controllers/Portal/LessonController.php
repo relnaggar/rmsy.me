@@ -26,16 +26,47 @@ class LessonController extends Controller
             'lessons' => Lesson::with(['student', 'client', 'buyer', 'payments'])
                 ->orderBy('datetime', 'desc')
                 ->get(),
-            'calendarAuthorised' => $this->calendarService->isAuthorised(),
             'buyerOptions' => ['' => '- All -'] + Buyer::orderBy('name')->pluck('name', 'id')->toArray(),
             'studentOptions' => ['' => '- All -'] + Student::orderBy('name')->pluck('name', 'id')->toArray(),
             'clientOptions' => ['' => '- All -'] + Client::orderBy('name')->pluck('name', 'id')->toArray(),
         ]);
     }
 
+    public function completeImportAfterAuth(): RedirectResponse
+    {
+        $pendingImport = session()->pull('pending_calendar_import');
+        if (! $pendingImport || ! $this->calendarService->isAuthorised()) {
+            return redirect()->route('portal.lessons.index');
+        }
+
+        $filters = array_filter([
+            'buyer_id' => $pendingImport['buyer_id'] ?? null,
+            'student_id' => isset($pendingImport['student_id']) ? (int) $pendingImport['student_id'] : null,
+            'client_id' => isset($pendingImport['client_id']) ? (int) $pendingImport['client_id'] : null,
+        ]);
+
+        try {
+            $imported = $this->calendarService->importLessonsFromCalendar(
+                $pendingImport['start_date'],
+                $pendingImport['end_date'],
+                $filters,
+            );
+        } catch (RuntimeException $e) {
+            return redirect()->route('portal.lessons.index')
+                ->with('error', 'Calendar import failed: '.$e->getMessage());
+        }
+
+        return redirect()->route('portal.lessons.index')
+            ->with('success', "Imported {$imported} lesson(s) from calendar.");
+    }
+
     public function importFromCalendar(LessonFilterRequest $request): RedirectResponse
     {
         if (! $this->calendarService->isAuthorised()) {
+            session(['pending_calendar_import' => $request->only([
+                'start_date', 'end_date', 'buyer_id', 'student_id', 'client_id',
+            ])]);
+
             return redirect()->route('auth.microsoft');
         }
 

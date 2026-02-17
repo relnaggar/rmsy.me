@@ -64,13 +64,15 @@ Route::post(
     '/logout', [AuthController::class, 'logout']
 )->name('logout');
 
-// Microsoft OAuth
-Route::get(
-    '/auth/login', [MicrosoftAuthController::class, 'redirect']
-)->name('auth.microsoft');
-Route::get(
-    '/auth/callback', [MicrosoftAuthController::class, 'callback']
-)->name('auth.microsoft.callback');
+// Microsoft OAuth (authenticated)
+Route::middleware('auth')->group(function () {
+    Route::get(
+        '/auth/login', [MicrosoftAuthController::class, 'redirect']
+    )->name('auth.microsoft');
+    Route::get(
+        '/auth/callback', [MicrosoftAuthController::class, 'callback']
+    )->name('auth.microsoft.callback');
+});
 
 // Portal (authenticated)
 Route::middleware('auth')->prefix('portal')->name('portal.')->group(
@@ -122,6 +124,7 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
             ->name('lessons.')
             ->group(function () {
                 Route::get('/', 'index')->name('index');
+                Route::get('/import-complete', 'completeImportAfterAuth')->name('importComplete');
                 Route::post('/import', 'importFromCalendar')->name('import');
                 Route::post('/delete-filtered', 'deleteFiltered')->name('deleteFiltered');
                 Route::get('/{lesson}', 'show')->name('show');

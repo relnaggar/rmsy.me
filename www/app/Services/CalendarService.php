@@ -6,6 +6,7 @@ use App\Models\Buyer;
 use App\Models\Client;
 use App\Models\Lesson;
 use App\Models\Student;
+use App\Models\User;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
@@ -24,16 +25,18 @@ class CalendarService
 
     public function isAuthorised(): bool
     {
-        if (
-            empty(session('ms_access_token'))
-            || empty(session('ms_token_expires'))
-        ) {
+        $user = auth()->user();
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        if (empty($user->ms_access_token) || empty($user->ms_token_expires)) {
             return false;
         }
 
         if (
-            now()->gte(session('ms_token_expires')->subSeconds(60))
-            && empty(session('ms_refresh_token'))
+            now()->gte($user->ms_token_expires->copy()->subSeconds(60))
+            && empty($user->ms_refresh_token)
         ) {
             return false;
         }
@@ -180,20 +183,25 @@ class CalendarService
 
     private function ensureAccessToken(): string
     {
-        $accessToken = session('ms_access_token');
-        $expiresAt = session('ms_token_expires');
+        $user = auth()->user();
+        if (! $user instanceof User) {
+            throw new RuntimeException('No authenticated user.');
+        }
+
+        $accessToken = $user->ms_access_token;
+        $expiresAt = $user->ms_token_expires;
 
         if (empty($accessToken) || empty($expiresAt)) {
             throw new RuntimeException('No Microsoft access token available.');
         }
 
         // valid if more than 60 seconds until expiry
-        if (now()->lt($expiresAt->subSeconds(60))) {
+        if (now()->lt($expiresAt->copy()->subSeconds(60))) {
             return $accessToken;
         }
 
         // attempt refresh
-        $refreshToken = session('ms_refresh_token');
+        $refreshToken = $user->ms_refresh_token;
         if (empty($refreshToken)) {
             throw new RuntimeException('Microsoft access token expired and no refresh token available.');
         }
@@ -215,13 +223,11 @@ class CalendarService
         }
 
         $tokens = $response->json();
-        session([
+        $user->update([
             'ms_access_token' => $tokens['access_token'],
             'ms_token_expires' => now()->addSeconds($tokens['expires_in']),
+            'ms_refresh_token' => $tokens['refresh_token'] ?? $user->ms_refresh_token,
         ]);
-        if (! empty($tokens['refresh_token'])) {
-            session(['ms_refresh_token' => $tokens['refresh_token']]);
-        }
 
         return $tokens['access_token'];
     }

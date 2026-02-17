@@ -43,11 +43,7 @@
       </select>
     </div>
     <div class="col-auto">
-      @if($calendarAuthorised)
-        <button type="submit" formaction="{{ route('portal.lessons.import') }}" class="btn btn-primary">Import from Calendar</button>
-      @else
-        <a href="{{ route('auth.microsoft') }}" class="btn btn-primary">Authorise Calendar Access</a>
-      @endif
+      <button type="submit" formaction="{{ route('portal.lessons.import') }}" class="btn btn-primary">Import from Calendar</button>
       <button type="submit" class="btn btn-danger"
               data-confirm="Are you sure you want to delete lessons matching these filters?">Delete Lessons</button>
     </div>

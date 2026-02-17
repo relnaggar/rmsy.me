@@ -20,6 +20,9 @@ class User extends Authenticatable
     protected $fillable = [
         'email',
         'password',
+        'ms_access_token',
+        'ms_refresh_token',
+        'ms_token_expires',
     ];
 
     /**
@@ -30,6 +33,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'ms_access_token',
+        'ms_refresh_token',
     ];
 
     /**
@@ -41,6 +46,7 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'ms_token_expires' => 'datetime',
         ];
     }
 }
