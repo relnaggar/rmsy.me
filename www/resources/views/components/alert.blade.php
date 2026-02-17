@@ -5,7 +5,7 @@
         <h4 class="alert-heading">{{ $title }}</h4>
     @endif
     @if($message)
-        <p>{!! $message !!}</p>
+        <p>{{ $message }}</p>
     @endif
     {{ $slot }}
     @if($dismissible)

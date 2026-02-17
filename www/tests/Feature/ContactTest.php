@@ -145,6 +145,27 @@ class ContactTest extends TestCase
         $response->assertSessionHasErrors('cf-turnstile-response');
     }
 
+    public function test_submit_rate_limited_after_three_attempts(): void
+    {
+        $this->fakeTurnstileSuccess();
+        Mail::shouldReceive('html')->times(3);
+
+        $data = [
+            'name' => 'John',
+            'email' => 'john@gmail.com',
+            'message' => 'Hello',
+            'cf-turnstile-response' => 'fake-token',
+        ];
+
+        for ($i = 0; $i < 3; $i++) {
+            $this->post(route('contact.submit'), $data);
+        }
+
+        $response = $this->post(route('contact.submit'), $data);
+
+        $response->assertStatus(429);
+    }
+
     public function test_submit_handles_mail_failure(): void
     {
         $this->fakeTurnstileSuccess();

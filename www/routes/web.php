@@ -28,7 +28,7 @@ Route::get(
 )->name('contact.show');
 Route::post(
     '/contact', [ContactController::class, 'submit']
-)->name('contact.submit');
+)->name('contact.submit')->middleware('throttle:3,1');
 
 // Webhooks
 Route::post(
@@ -59,7 +59,7 @@ Route::redirect(
 Route::get(
     '/login', [AuthController::class, 'showLogin']
 )->name('login');
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
 Route::post(
     '/logout', [AuthController::class, 'logout']
 )->name('logout');

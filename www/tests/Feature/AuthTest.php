@@ -122,6 +122,52 @@ class AuthTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
+    public function test_login_rate_limited_after_five_attempts(): void
+    {
+        User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->post(route('login'), [
+                'email' => 'test@example.com',
+                'password' => 'wrong-password',
+            ]);
+        }
+
+        $response = $this->post(route('login'), [
+            'email' => 'test@example.com',
+            'password' => 'wrong-password',
+        ]);
+
+        $response->assertStatus(429);
+    }
+
+    public function test_login_rate_limit_is_per_email(): void
+    {
+        User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        // Exhaust rate limit for one email
+        for ($i = 0; $i < 5; $i++) {
+            $this->post(route('login'), [
+                'email' => 'test@example.com',
+                'password' => 'wrong-password',
+            ]);
+        }
+
+        // Different email should still work (not rate limited)
+        $response = $this->post(route('login'), [
+            'email' => 'other@example.com',
+            'password' => 'wrong-password',
+        ]);
+
+        $response->assertStatus(302);
+    }
+
     public function test_login_redirects_to_intended_url(): void
     {
         $user = User::factory()->create([
