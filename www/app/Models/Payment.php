@@ -69,6 +69,26 @@ class Payment extends Model
         return $this->belongsToMany(Lesson::class);
     }
 
+    public function getMatchedTotal(): int
+    {
+        return (int) $this->lessons->sum('price_gbp_pence');
+    }
+
+    public function getRemainingAmount(): int
+    {
+        return $this->amount_gbp_pence - $this->getMatchedTotal();
+    }
+
+    public function isFullyMatched(): bool
+    {
+        return $this->lessons->isNotEmpty() && $this->getMatchedTotal() === $this->amount_gbp_pence;
+    }
+
+    public function isPartiallyMatched(): bool
+    {
+        return $this->lessons->isNotEmpty() && $this->getMatchedTotal() < $this->amount_gbp_pence;
+    }
+
     public function previousForBuyer(): ?self
     {
         if (! $this->buyer_id) {

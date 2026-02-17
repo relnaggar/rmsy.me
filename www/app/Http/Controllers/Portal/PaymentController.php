@@ -150,7 +150,7 @@ class PaymentController extends Controller
 
     public function show(Request $request, Payment $payment): View
     {
-        $payment->load('buyer', 'lessons');
+        $payment->load('buyer', 'lessons.student', 'lessons.client');
         $buyers = ['' => '- None -'] + Buyer::orderBy('name')->pluck('name', 'id')->toArray();
 
         $matchedLessonIds = $payment->lessons->pluck('id')->toArray();
@@ -158,16 +158,14 @@ class PaymentController extends Controller
         $lessons = $payment->buyer_id
             ? Lesson::with('student', 'client')
                 ->where('buyer_id', $payment->buyer_id)
-                ->where(function ($query) use ($matchedLessonIds) {
-                    $query->where('paid', false)
-                        ->orWhereIn('id', $matchedLessonIds);
-                })
+                ->where('paid', false)
+                ->whereNotIn('id', $matchedLessonIds)
                 ->orderBy('datetime', 'asc')
                 ->get()
             : collect();
 
         $suggestedIds = $lessons
-            ->filter(fn ($lesson) => $lesson->datetime->lte($payment->datetime) || in_array($lesson->id, $matchedLessonIds))
+            ->filter(fn ($lesson) => $lesson->datetime->lte($payment->datetime))
             ->pluck('id')
             ->toArray();
 
@@ -175,8 +173,8 @@ class PaymentController extends Controller
             'payment' => $payment,
             'buyers' => $buyers,
             'lessons' => $lessons,
-            'matchedLessonIds' => $matchedLessonIds,
             'suggestedIds' => $suggestedIds,
+            'remainingAmount' => $payment->getRemainingAmount(),
             'next' => $request->has('next'),
             'prevByBuyer' => $payment->previousForBuyer(),
             'nextByBuyer' => $payment->nextForBuyer(),
@@ -197,6 +195,11 @@ class PaymentController extends Controller
 
     public function toggleLessonPending(Payment $payment): RedirectResponse
     {
+        if ($payment->lessons()->count() > 0) {
+            return redirect()->route('portal.payments.show', $payment)
+                ->with('error', 'Cannot manually toggle lesson pending when lessons are matched.');
+        }
+
         $payment->update(['lesson_pending' => ! $payment->lesson_pending]);
 
         $status = $payment->lesson_pending ? 'marked as lesson(s) pending' : 'no longer lesson(s) pending';
@@ -223,33 +226,37 @@ class PaymentController extends Controller
     public function storeMatches(Request $request, Payment $payment): RedirectResponse
     {
         $validated = $request->validate([
-            'lesson_ids' => ['nullable', 'array'],
+            'lesson_ids' => ['required', 'array', 'min:1'],
             'lesson_ids.*' => ['integer', 'exists:lessons,id'],
         ]);
 
-        $newIds = $validated['lesson_ids'] ?? [];
+        $newIds = array_diff($validated['lesson_ids'], $payment->lessons->pluck('id')->toArray());
 
-        $selectedTotal = (int) Lesson::whereIn('id', $newIds)->sum('price_gbp_pence');
-        if ($selectedTotal !== $payment->amount_gbp_pence) {
-            return back()->withErrors(['lesson_ids' => 'Selected lessons total (£'.penceToPounds($selectedTotal).') does not match payment amount (£'.penceToPounds($payment->amount_gbp_pence).').']);
+        if (empty($newIds)) {
+            return back()->withErrors(['lesson_ids' => 'No new lessons selected.']);
         }
 
-        $previousIds = $payment->lessons->pluck('id')->toArray();
+        $selectedTotal = (int) Lesson::whereIn('id', $newIds)->sum('price_gbp_pence');
+        $existingTotal = $payment->getMatchedTotal();
+        $combinedTotal = $selectedTotal + $existingTotal;
 
-        DB::transaction(function () use ($payment, $newIds, $previousIds) {
-            $payment->lessons()->sync($newIds);
+        if ($combinedTotal > $payment->amount_gbp_pence) {
+            return back()->withErrors(['lesson_ids' => 'Selected lessons total (£'.penceToPounds($selectedTotal).') plus already matched (£'.penceToPounds($existingTotal).') exceeds payment amount (£'.penceToPounds($payment->amount_gbp_pence).').']);
+        }
+
+        $isFullMatch = $combinedTotal === $payment->amount_gbp_pence;
+
+        DB::transaction(function () use ($payment, $newIds, $isFullMatch) {
+            $payment->lessons()->attach($newIds);
 
             Lesson::whereIn('id', $newIds)->update(['paid' => true]);
 
-            $removedIds = array_diff($previousIds, $newIds);
-            if ($removedIds) {
-                Lesson::whereIn('id', $removedIds)->update(['paid' => false]);
-            }
+            $payment->update(['lesson_pending' => ! $isFullMatch]);
         });
 
         $count = count($newIds);
 
-        if ($request->has('next')) {
+        if ($request->has('next') && $isFullMatch) {
             return redirect()->route('portal.payments.matchNext')
                 ->with('success', "Matched {$count} lesson(s) to payment.");
         }
@@ -268,6 +275,8 @@ class PaymentController extends Controller
             if ($lessonIds) {
                 Lesson::whereIn('id', $lessonIds)->update(['paid' => false]);
             }
+
+            $payment->update(['lesson_pending' => false]);
         });
 
         return redirect()->route('portal.payments.show', $payment)

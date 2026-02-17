@@ -90,6 +90,16 @@ class InvoiceController extends Controller
                 ])
                 ->values()
                 ->toArray();
+
+            $remainingAmount = $payment->getRemainingAmount();
+            if ($remainingAmount > 0) {
+                $items[] = [
+                    'date' => $issueDate,
+                    'service' => 'Clases online de informática',
+                    'qty' => 1,
+                    'unit_price' => $remainingAmount,
+                ];
+            }
         } else {
             $items = [
                 [

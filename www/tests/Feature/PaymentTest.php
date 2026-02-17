@@ -214,7 +214,7 @@ class PaymentTest extends TestCase
         $response->assertSee('checkbox', false);
     }
 
-    public function test_show_lesson_pending_payment_disables_confirm_matches(): void
+    public function test_show_lesson_pending_payment_still_shows_matching_form(): void
     {
         $buyer = $this->createBuyer('acme', 'Acme');
         $student = Student::create(['name' => 'Alice']);
@@ -234,7 +234,8 @@ class PaymentTest extends TestCase
             ->get(route('portal.payments.show', $payment));
 
         $response->assertStatus(200);
-        $response->assertSee('data-disabled', false);
+        $response->assertSee('Confirm Matches');
+        $response->assertSee('checkbox', false);
     }
 
     public function test_store_matches_succeeds_when_totals_match(): void
@@ -271,13 +272,13 @@ class PaymentTest extends TestCase
         $this->assertCount(2, $payment->fresh()->lessons);
     }
 
-    public function test_store_matches_fails_when_totals_do_not_match(): void
+    public function test_store_matches_fails_when_total_exceeds_payment_amount(): void
     {
         $buyer = $this->createBuyer('acme', 'Acme');
         $student = Student::create(['name' => 'Alice']);
         $lesson = Lesson::create([
             'datetime' => '2025-01-10 10:00',
-            'price_gbp_pence' => 3000,
+            'price_gbp_pence' => 6000,
             'student_id' => $student->id,
             'buyer_id' => 'acme',
         ]);
@@ -608,5 +609,222 @@ class PaymentTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Book a free');
+    }
+
+    public function test_store_matches_succeeds_with_partial_match(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $student = Student::create(['name' => 'Alice']);
+        $lesson = Lesson::create([
+            'datetime' => '2025-01-10 10:00',
+            'price_gbp_pence' => 3000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+        ]);
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'amount_gbp_pence' => 5000,
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('portal.payments.storeMatches', $payment), [
+                'lesson_ids' => [$lesson->id],
+            ]);
+
+        $response->assertRedirect(route('portal.payments.show', $payment));
+        $response->assertSessionHas('success');
+        $this->assertTrue($lesson->fresh()->paid);
+        $this->assertCount(1, $payment->fresh()->lessons);
+        $this->assertTrue($payment->fresh()->lesson_pending);
+    }
+
+    public function test_full_match_sets_lesson_pending_false(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $student = Student::create(['name' => 'Alice']);
+        $lesson1 = Lesson::create([
+            'datetime' => '2025-01-10 10:00',
+            'price_gbp_pence' => 3000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+        ]);
+        $lesson2 = Lesson::create([
+            'datetime' => '2025-01-12 10:00',
+            'price_gbp_pence' => 2000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+        ]);
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'amount_gbp_pence' => 5000,
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $this->actingAs($this->user)
+            ->post(route('portal.payments.storeMatches', $payment), [
+                'lesson_ids' => [$lesson1->id, $lesson2->id],
+            ]);
+
+        $this->assertFalse($payment->fresh()->lesson_pending);
+    }
+
+    public function test_second_partial_match_adds_to_existing(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $student = Student::create(['name' => 'Alice']);
+        $lesson1 = Lesson::create([
+            'datetime' => '2025-01-10 10:00',
+            'price_gbp_pence' => 3000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+        ]);
+        $lesson2 = Lesson::create([
+            'datetime' => '2025-01-12 10:00',
+            'price_gbp_pence' => 2000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+        ]);
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'amount_gbp_pence' => 5000,
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $this->actingAs($this->user)
+            ->post(route('portal.payments.storeMatches', $payment), [
+                'lesson_ids' => [$lesson1->id],
+            ]);
+
+        $this->assertCount(1, $payment->fresh()->lessons);
+        $this->assertTrue($payment->fresh()->lesson_pending);
+
+        $this->actingAs($this->user)
+            ->post(route('portal.payments.storeMatches', $payment), [
+                'lesson_ids' => [$lesson2->id],
+            ]);
+
+        $this->assertCount(2, $payment->fresh()->lessons);
+        $this->assertFalse($payment->fresh()->lesson_pending);
+    }
+
+    public function test_show_partially_matched_shows_both_tables(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $student = Student::create(['name' => 'Alice']);
+        $lesson1 = Lesson::create([
+            'datetime' => '2025-01-10 10:00',
+            'price_gbp_pence' => 3000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+            'paid' => true,
+        ]);
+        $lesson2 = Lesson::create([
+            'datetime' => '2025-01-12 10:00',
+            'price_gbp_pence' => 2000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+        ]);
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'amount_gbp_pence' => 5000,
+            'datetime' => '2025-01-20 10:00',
+            'lesson_pending' => true,
+        ]);
+        $payment->lessons()->attach($lesson1->id);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.show', $payment));
+
+        $response->assertStatus(200);
+        $response->assertSee('Matched Lessons');
+        $response->assertSee('Match More Lessons');
+        $response->assertSee('Confirm Matches');
+        $response->assertSee('Unmatch All');
+    }
+
+    public function test_unmatch_all_resets_lesson_pending(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $student = Student::create(['name' => 'Alice']);
+        $lesson = Lesson::create([
+            'datetime' => '2025-01-10 10:00',
+            'price_gbp_pence' => 3000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+            'paid' => true,
+        ]);
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'amount_gbp_pence' => 5000,
+            'datetime' => '2025-01-20 10:00',
+            'lesson_pending' => true,
+        ]);
+        $payment->lessons()->attach($lesson->id);
+
+        $this->actingAs($this->user)
+            ->delete(route('portal.payments.destroyMatches', $payment));
+
+        $this->assertFalse($payment->fresh()->lesson_pending);
+        $this->assertCount(0, $payment->fresh()->lessons);
+    }
+
+    public function test_match_next_skips_partially_matched_payments(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $student = Student::create(['name' => 'Alice']);
+        $lesson = Lesson::create([
+            'datetime' => '2025-01-10 10:00',
+            'price_gbp_pence' => 3000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+            'paid' => true,
+        ]);
+        $partialPayment = $this->createPayment('PAY-PARTIAL', [
+            'buyer_id' => 'acme',
+            'amount_gbp_pence' => 5000,
+            'datetime' => '2025-01-10 10:00',
+            'lesson_pending' => true,
+        ]);
+        $partialPayment->lessons()->attach($lesson->id);
+
+        $normalPayment = $this->createPayment('PAY-NORMAL', [
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.payments.matchNext'));
+
+        $response->assertRedirect(route('portal.payments.show', [
+            'payment' => $normalPayment,
+            'next' => 1,
+        ]));
+    }
+
+    public function test_toggle_lesson_pending_blocked_when_lessons_matched(): void
+    {
+        $buyer = $this->createBuyer('acme', 'Acme');
+        $student = Student::create(['name' => 'Alice']);
+        $lesson = Lesson::create([
+            'datetime' => '2025-01-10 10:00',
+            'price_gbp_pence' => 3000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+            'paid' => true,
+        ]);
+        $payment = $this->createPayment('PAY-1', [
+            'buyer_id' => 'acme',
+            'amount_gbp_pence' => 5000,
+            'datetime' => '2025-01-20 10:00',
+            'lesson_pending' => true,
+        ]);
+        $payment->lessons()->attach($lesson->id);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('portal.payments.toggleLessonPending', $payment));
+
+        $response->assertRedirect(route('portal.payments.show', $payment));
+        $this->assertTrue($payment->fresh()->lesson_pending);
     }
 }

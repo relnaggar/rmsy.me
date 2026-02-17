@@ -55,9 +55,9 @@
   <tr>
     <th class="text-nowrap">Status</th>
     <td>
-      @if($payment->lessons->count() > 0)
+      @if($payment->isFullyMatched())
         <span class="badge bg-success">Matched</span>
-      @elseif($payment->lesson_pending)
+      @elseif($payment->isPartiallyMatched() || $payment->lesson_pending)
         <span class="badge bg-warning text-dark">Lesson(s) Pending</span>
       @else
         <span class="badge bg-secondary">Unmatched</span>
@@ -106,6 +106,7 @@
 <h2>Lessons</h2>
 
 @if($payment->lessons->count() > 0)
+  <h5>Matched Lessons (&pound;{{ penceToPounds($payment->getMatchedTotal()) }} / &pound;{{ $payment->getFormattedAmount() }})</h5>
   <table class="table table-striped">
     <thead>
       <tr>
@@ -117,7 +118,7 @@
       </tr>
     </thead>
     <tbody>
-      @foreach($payment->lessons as $lesson)
+      @foreach($payment->lessons->sortBy('datetime') as $lesson)
         <tr>
           <td><a href="{{ route('portal.lessons.show', $lesson) }}">{{ $lesson->getFormattedDatetime() }}</a></td>
           <td>
@@ -140,8 +141,14 @@
       @endforeach
     </tbody>
   </table>
-@else
-  <form action="{{ route('portal.payments.storeMatches', $payment) }}{{ $next ? '?next=1' : '' }}" method="POST" data-match-payment="{{ $payment->amount_gbp_pence }}">
+@endif
+
+@if(!$payment->isFullyMatched())
+  @if($payment->lessons->count() > 0)
+    <h5>Match More Lessons (remaining: &pound;{{ penceToPounds($remainingAmount) }})</h5>
+  @endif
+
+  <form action="{{ route('portal.payments.storeMatches', $payment) }}{{ $next ? '?next=1' : '' }}" method="POST" data-match-payment="{{ $remainingAmount }}">
     @csrf
 
     <table class="table table-striped">
@@ -181,15 +188,15 @@
           </tr>
         @empty
           <tr>
-            <td colspan="6" class="text-center">No lessons found for this buyer.</td>
+            <td colspan="6" class="text-center">No unmatched lessons found for this buyer.</td>
           </tr>
         @endforelse
       </tbody>
     </table>
 
     <div class="mt-3 d-flex align-items-center gap-3">
-      <button type="submit" class="btn btn-primary" {{ $payment->lesson_pending ? 'disabled data-disabled' : '' }}>Confirm Matches</button>
-      <span>Selected total: <strong id="match-total"></strong> / &pound;{{ $payment->getFormattedAmount() }}</span>
+      <button type="submit" class="btn btn-primary">Confirm Matches</button>
+      <span>Selected total: <strong id="match-total"></strong> / &pound;{{ penceToPounds($remainingAmount) }}</span>
     </div>
   </form>
 @endif

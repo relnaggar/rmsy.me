@@ -57,10 +57,10 @@
           @endif
         </td>
         <td>
-          @if($payment->lessons_count > 0)
+          @if($payment->lessons_count > 0 && !$payment->lesson_pending)
             <span class="badge bg-success">Matched ({{ $payment->lessons_count }})</span>
           @elseif($payment->lesson_pending)
-            <span class="badge bg-warning text-dark">Lesson(s) Pending</span>
+            <span class="badge bg-warning text-dark">Lesson(s) Pending{{ $payment->lessons_count > 0 ? ' ('.$payment->lessons_count.')' : '' }}</span>
           @else
             <span class="badge bg-secondary">Unmatched</span>
           @endif

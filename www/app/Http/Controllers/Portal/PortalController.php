@@ -14,9 +14,7 @@ class PortalController extends Controller
         $unmatchedPaymentCount = Payment::doesntHave('lessons')
             ->where('lesson_pending', false)
             ->count();
-        $pendingPaymentCount = Payment::doesntHave('lessons')
-            ->where('lesson_pending', true)
-            ->count();
+        $pendingPaymentCount = Payment::where('lesson_pending', true)->count();
 
         return view('portal.dashboard', [
             'userEmail' => Auth::user()->email,
