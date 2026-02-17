@@ -310,6 +310,27 @@ class LessonTest extends TestCase
         $response->assertDontSee(route('portal.payments.show', 'PAY'), false);
     }
 
+    public function test_index_defaults_start_date_to_latest_lesson(): void
+    {
+        $this->createLesson(['datetime' => '2025-06-10 14:00']);
+        $this->createLesson(['datetime' => '2025-09-20 09:00']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('value="2025-09-20"', false);
+    }
+
+    public function test_index_defaults_start_date_when_no_lessons(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('value="'.now()->subDays(90)->format('Y-m-d').'"', false);
+    }
+
     public function test_index_shows_no_for_unpaid_lesson(): void
     {
         $lesson = $this->createLesson(['paid' => false]);

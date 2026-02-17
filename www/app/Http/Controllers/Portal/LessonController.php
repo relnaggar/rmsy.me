@@ -22,10 +22,15 @@ class LessonController extends Controller
 
     public function index(): View
     {
+        $latestLessonDate = Lesson::max('datetime');
+
         return view('portal.lessons.index', [
             'lessons' => Lesson::with(['student', 'client', 'buyer', 'payments'])
                 ->orderBy('datetime', 'desc')
                 ->get(),
+            'defaultStartDate' => $latestLessonDate
+                ? \Carbon\Carbon::parse($latestLessonDate)->format('Y-m-d')
+                : now()->subDays(90)->format('Y-m-d'),
             'buyerOptions' => ['' => '- All -'] + Buyer::orderBy('name')->pluck('name', 'id')->toArray(),
             'studentOptions' => ['' => '- All -'] + Student::orderBy('name')->pluck('name', 'id')->toArray(),
             'clientOptions' => ['' => '- All -'] + Client::orderBy('name')->pluck('name', 'id')->toArray(),

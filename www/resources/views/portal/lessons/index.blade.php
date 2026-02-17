@@ -9,7 +9,7 @@
     @csrf
     <div class="col-auto">
       <label for="start_date" class="form-label mb-0">From</label>
-      <input type="date" id="start_date" name="start_date" class="form-control" value="{{ now()->subDays(90)->format('Y-m-d') }}" required>
+      <input type="date" id="start_date" name="start_date" class="form-control" value="{{ $defaultStartDate }}" required>
     </div>
     <div class="col-auto d-flex align-items-end">
       <button type="button" class="btn btn-sm btn-outline-secondary" title="Copy From date to To date" data-copy-date-from="start_date" data-copy-date-to="end_date">&rarr;</button>
