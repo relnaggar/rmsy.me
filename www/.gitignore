@@ -13,6 +13,8 @@
 /public/build
 /public/hot
 /public/storage
+/playwright-report
+/test-results
 /resources/fonts/*.woff*
 /storage/*.key
 /storage/pail
