@@ -13,6 +13,7 @@ services:
       - ./cacana:/var/cacana
       - ./config/apache2:/etc/apache2
       - ./config/php:/etc/php
+      - ./config/supervisord.conf:/etc/supervisord.conf
       - ./db:/var/db
     secrets:
       - SMTP_HOST

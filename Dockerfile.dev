@@ -4,120 +4,30 @@ ENV DEBIAN_FRONTEND=noninteractive
 # install apache
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends \
-  # for docker-entrypoint.sh
-  gosu \
-  # apache
   apache2 \
   # cleanup
   && apt autoremove -y \
   && apt clean \
   && rm -rf /var/lib/apt/lists/*
 
-# make apache run as custom user for better permission control
-RUN groupadd -r -g 999 apache2 && useradd -r -m -g apache2 -u 999 apache2 \
-  && mkdir -p /var/run/apache2 \
-  && chown -R apache2:apache2 /var/run/apache2 /var/log/apache2 \
-  && sed -i 's/^User .*/User apache2/' /etc/apache2/apache2.conf \
-  && sed -i 's/^Group .*/Group apache2/' /etc/apache2/apache2.conf \
-  && sed -i 's/^export APACHE_RUN_USER=.*/export APACHE_RUN_USER=apache2/' \
-    /etc/apache2/envvars \
-  && sed -i 's/^export APACHE_RUN_GROUP=.*/export APACHE_RUN_GROUP=apache2/' \
-    /etc/apache2/envvars
+# create app user for worker process privilege dropping
+RUN groupadd -r -g 999 app && useradd -r -m -g app -u 999 app \
+  && mkdir -p /var/run/apache2
 
 # enable HTTPS
-RUN a2enmod ssl \
-  && a2ensite default-ssl \
-  # install ssl-cert for snakeoil cert
-  && apt-get update -y \
+RUN apt-get update -y \
   && apt-get install -y --no-install-recommends ssl-cert \
   # cleanup
   && apt autoremove -y \
   && apt clean \
   && rm -rf /var/lib/apt/lists/* \
   # fix permissions
-  && chown root:apache2 /etc/ssl/private \
+  && chown root:app /etc/ssl/private \
   && chmod 750 /etc/ssl/private \
-  && chown root:apache2 /etc/ssl/private/ssl-cert-snakeoil.key \
+  && chown root:app /etc/ssl/private/ssl-cert-snakeoil.key \
   && chmod 640 /etc/ssl/private/ssl-cert-snakeoil.key
 
-RUN a2enmod headers \
-  && cat <<EOF >> /etc/apache2/conf-available/security.conf
-
-# implement baseline permissive CSP globally
-Header always set Content-Security-Policy: "\\
-default-src 'none';\\
-form-action 'self';\\
-style-src 'self' https:;\\
-script-src 'self';\\
-img-src 'self' data: https:;\\
-font-src 'self' https: data:;\\
-frame-ancestors 'self';\\
-frame-src 'self';\\
-manifest-src 'self';\\
-connect-src 'self';\\
-worker-src 'self';\\
-"
-EOF
-
-RUN a2enmod headers \
-  && cat <<'EOF' >> /etc/apache2/conf-available/security.conf
-
-# make all cookies secure
-Header always edit Set-Cookie (.*) "$1; Secure"
-EOF
-
-RUN a2enmod rewrite \
-  && sed -i '/<\/VirtualHost>/d' /etc/apache2/sites-available/000-default.conf \
-  && cat <<'EOF' >> /etc/apache2/sites-available/000-default.conf
-
-  # start rewrite engine
-  RewriteEngine On
-
-	# redirect any www requests to the non‑www HTTPS URL
-	RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-	RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L,QSA]
-
-	# redirect HTTP requests (for non‑www) to HTTPS
-	RewriteCond %{HTTPS} off
-	RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,QSA]
-</VirtualHost>
-EOF
-
-RUN a2enmod headers \
-  && cat <<'EOF' >> /etc/apache2/conf-available/security.conf
-
-# implement permissive Referrer-Policy globally
-Header always set Referrer-Policy: "strict-origin-when-cross-origin"
-EOF
-
-RUN a2enmod headers \
-  && sed -i '/<\/VirtualHost>/d' /etc/apache2/sites-available/default-ssl.conf \
-  && cat <<EOF >> /etc/apache2/sites-available/default-ssl.conf
-  # implement HSTS in production mode
-  <IfDefine PRODUCTION>
-    Header always set Strict-Transport-Security "\\
-max-age=31536000;\\
-includeSubDomains\\
-"
-  </IfDefine>
-
-  # start rewrite engine
-  RewriteEngine On
-
-	# redirect any www requests to the non‑www HTTPS URL
-	RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-	RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L,QSA]
-</VirtualHost>
-EOF
-
-RUN a2enmod headers \
-  && cat <<'EOF' >> /etc/apache2/conf-available/security.conf
-
-# implement X-Content-Type-Options globally
-Header always set X-Content-Type-Options: "nosniff"
-EOF
-
-# install php fpm
+# install php-fpm
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends \
   # (8.4 with debian:13.3)
@@ -126,31 +36,33 @@ RUN apt-get update -y \
   php-xml \
   php-curl \
   php-zip \
-  # apache2 php module
-  libapache2-mod-php \
+  php-intl \
+  # php-fpm
+  php-fpm \
+  # process supervisor
+  supervisor \
   # cleanup
   && apt autoremove -y \
   && apt clean \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  # php-fpm runtime directory
+  && mkdir -p /run/php \
+  && chown app:app /run/php
 
-# set php config for development
-RUN PHP_VERSION=$(php -r "echo PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;") \
-  && sed -i \
-  "s/^auto_prepend_file.*/auto_prepend_file = \
-\/etc\/php\/${PHP_VERSION}\/apache2\/development_ini.php/" \
-  "/etc/php/${PHP_VERSION}/apache2/php.ini" \
-  && cat <<EOF > "/etc/php/${PHP_VERSION}/apache2/development_ini.php"
-<?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-ini_set('zend.exception_ignore_args', 0);
-ini_set('zend.exception_string_param_max_len', 15);
-EOF
+# install php-sqlite3
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends php-sqlite3 \
+  # cleanup
+  && apt autoremove -y \
+  && apt clean \
+  && rm -rf /var/lib/apt/lists/* \
+  # database directory
+  && mkdir -p /var/db \
+  && chown app:app /var/db
 
+# install composer dependencies
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends \
-  # install composer dependencies
   ca-certificates \
   git \
   unzip \
@@ -162,37 +74,15 @@ RUN apt-get update -y \
 # install composer
 COPY --from=composer/composer:2.2-bin /composer /usr/bin/composer
 
-RUN apt-get update -y \
-  && apt-get install -y --no-install-recommends \
-  # install sqlite3 for php
-  php-sqlite3 \
-  # cleanup
-  && apt autoremove -y \
-  && apt clean \
-  && rm -rf /var/lib/apt/lists/*
-
-# database setup
-RUN mkdir /var/db \
-  && chown -R apache2:apache2 /var/db
-
-RUN apt-get update -y \
-  && apt-get install -y --no-install-recommends \
-  # install php-intl
-  php-intl \
-  # cleanup
-  && apt autoremove -y \
-  && apt clean \
-  && rm -rf /var/lib/apt/lists/*
-
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"
 COPY docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["apache2"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
 
 # ports
 EXPOSE 80 443
 
 # volumes
-VOLUME ["/var/www", "/var/cacana", "/etc/apache2", "/etc/php", "/var/db"]
+VOLUME ["/var/www", "/var/cacana", "/etc/apache2", "/etc/php", "/var/db", "/etc/supervisord.conf"]

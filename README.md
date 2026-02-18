@@ -2,7 +2,7 @@
 [![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade-score/rmsy.me?publish)](https://observatory.mozilla.org/analyze/rmsy.me) [![30 day uptime ratio (Uptime Robot)](https://img.shields.io/uptimerobot/ratio/30/m784796051-da0b2757e43473b1f9d676b0)](https://stats.uptimerobot.com/KjJ317wYaG) [![Docker image size](https://img.shields.io/docker/image-size/relnaggar/rmsy.me)](https://hub.docker.com/r/relnaggar/rmsy.me) [![W3C Validation](https://img.shields.io/w3c-validation/html?targetUrl=https%3A%2F%2Frmsy.me)](https://validator.nu/?doc=https%3A%2F%2Frmsy.me) [![PageSpeed Insights](https://img.shields.io/badge/pagespeed_insights-99_100_100_100-43cc11)](https://pagespeed.web.dev/analysis/https-rmsy-me/xz200iqpci?form_factor=desktop)
 
 ## Project Overview
-rmsy.me is a personal portfolio website with an authenticated portal for managing Ramsey's freelance tutoring business. It runs with two Docker services: a PHP/Apache app server, and a Node.js Vite dev server for frontend asset hot-reloading.
+rmsy.me is a personal portfolio website with an authenticated portal for managing Ramsey's freelance tutoring business. It runs with two Docker services: an app server running Apache and PHP-FPM via Supervisord to serve the Laravel 12 application, and a Node.js Vite dev server for frontend asset hot-reloading.
 
 ## Quick Start
 Install git hooks (pre-commit lint, pre-push unit + E2E tests):
@@ -30,7 +30,7 @@ docker compose down
 ## Development Commands
 Seed the database with sample data:
 ```bash
-docker compose exec -u apache2 app bash -c "cd /var/www && php artisan db:seed"
+docker compose exec app bash -c "cd /var/www && php artisan db:seed"
 ```
 
 This includes a test user for the portal:
@@ -39,7 +39,7 @@ This includes a test user for the portal:
 
 Migrate the database:
 ```bash
-docker compose exec -u apache2 app bash -c "cd /var/www && php artisan migrate"
+docker compose exec app bash -c "cd /var/www && php artisan migrate"
 ```
 
 Run linting:
