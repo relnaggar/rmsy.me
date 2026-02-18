@@ -8,7 +8,7 @@ if [[ "${SKIP_PRE_PUSH_TESTS:-0}" == "1" ]]; then
   echo "[pre-push] Skipping Laravel tests (SKIP_PRE_PUSH_TESTS=1)."
 else
   echo "[pre-push] Running Laravel test suite in Docker..."
-  docker compose exec -T app bash -lc "cd /var/www && php artisan test"
+  docker compose exec -u app -T app bash -lc "cd /var/www && php artisan test"
 fi
 
 if [[ "${SKIP_PRE_PUSH_E2E:-0}" == "1" ]]; then

@@ -8,7 +8,7 @@
         "prebuild": "npm run build:fonts",
         "build": "vite build",
         "dev": "vite",
-        "e2e:seed": "cd .. && docker compose exec -T app bash -lc \"cd /var/www && php artisan e2e:seed\"",
+        "e2e:seed": "cd .. && docker compose exec -u app -T app bash -lc \"cd /var/www && php artisan e2e:seed\"",
         "e2e": "npm run e2e:seed && playwright test",
         "e2e:ui": "npm run e2e:seed && playwright test --ui"
     },

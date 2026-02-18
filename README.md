@@ -30,7 +30,7 @@ docker compose down
 ## Development Commands
 Seed the database with sample data:
 ```bash
-docker compose exec app bash -c "cd /var/www && php artisan db:seed"
+docker compose exec -u app app bash -c "cd /var/www && php artisan db:seed"
 ```
 
 This includes a test user for the portal:
@@ -39,7 +39,7 @@ This includes a test user for the portal:
 
 Migrate the database:
 ```bash
-docker compose exec app bash -c "cd /var/www && php artisan migrate"
+docker compose exec -u app app bash -c "cd /var/www && php artisan migrate"
 ```
 
 Run linting:
@@ -49,7 +49,7 @@ docker compose exec app bash -c "cd /var/www && vendor/bin/pint"
 
 Run unit tests:
 ```bash
-docker compose exec app bash -c "cd /var/www && php artisan test"
+docker compose exec -u app app bash -c "cd /var/www && php artisan test"
 ```
 
 Run E2E tests:
@@ -57,7 +57,7 @@ Run E2E tests:
 npm --prefix www run e2e
 ```
 
-Get a shell in the app container:
+Get a root shell in the app container:
 
 ```bash
 docker compose exec app bash
