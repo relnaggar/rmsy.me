@@ -16,6 +16,9 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Artisan::command('e2e:seed', function () {
+    // Keep reruns deterministic by clearing throttle/cache state between suites.
+    Artisan::call('cache:clear');
+
     $fixture = [
         'user_email' => 'q@q',
         'user_password' => 'q',
