@@ -36,6 +36,27 @@ class ProjectsService
         ));
 
         $this->addProject(new Project(
+            'webploy',
+            '🚀 WebPloy: From Docker To Production',
+            'Drama-free deployment for your Docker projects. '
+                .'Avoid the chaos and focus on the code!',
+            'Drama-free deployment for your Docker projects. '
+                .'Avoid the chaos and focus on the code!',
+            'thumbnail.webp',
+            sections: [
+                ['summary', 'Executive Summary'],
+            ],
+            sources: [
+                new Source(
+                    title: 'GitHub',
+                    icon: 'github',
+                    href: 'https://github.com/relnaggar/webploy',
+                    html: 'relnaggar/webploy',
+                ),
+            ]
+        ));
+
+        $this->addProject(new Project(
             'veloz',
             '⚡ Veloz: Yet Another PHP Mini-Framework',
             'Could this be the next big drop in the PHP ocean? Dive in and find out!',
@@ -56,35 +77,6 @@ class ProjectsService
                     icon: 'box-seam',
                     href: 'https://packagist.org/packages/relnaggar/veloz',
                     html: 'packages/relnaggar/veloz',
-                ),
-            ]
-        ));
-
-        $this->addProject(new Project(
-            'webploy',
-            '🚀 WebPloy: From Apache 2 Production',
-            'Drama-free deployment for your Apache 2 projects. '
-                .'Avoid the chaos and focus on the code!',
-            'Drama-free deployment for your Apache 2 projects. '
-                .'Avoid the chaos and focus on the code!',
-            'thumbnail.webp',
-            sections: [
-                ['summary', 'Executive Summary'],
-                ['template', 'Template'],
-                ['deploy', 'Deployment'],
-            ],
-            sources: [
-                new Source(
-                    title: 'Template GitHub',
-                    icon: 'github',
-                    href: 'https://github.com/relnaggar/apache2-template',
-                    html: 'relnaggar/apache2-template',
-                ),
-                new Source(
-                    title: 'Deployment GitHub',
-                    icon: 'github',
-                    href: 'https://github.com/relnaggar/apache2-deploy',
-                    html: 'relnaggar/apache2-deploy',
                 ),
             ]
         ));
