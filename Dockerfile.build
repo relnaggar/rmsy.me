@@ -56,7 +56,7 @@ CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
 EXPOSE 80 443
 
 # volumes
-VOLUME ["/etc/apache2/sites-available", "/etc/letsencrypt"]
+VOLUME ["/etc/letsencrypt"]
 
 # remove default files
 RUN rm -rf /etc/php/* \
