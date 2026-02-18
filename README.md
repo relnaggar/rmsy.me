@@ -5,6 +5,17 @@
 rmsy.me is a personal portfolio website with an authenticated portal for managing Ramsey's freelance tutoring business. It runs with two Docker services: a PHP/Apache app server, and a Node.js Vite dev server for frontend asset hot-reloading.
 
 ## Quick Start
+Install git hooks (pre-commit lint, pre-push unit + E2E tests):
+```bash
+./script/install-git-hooks.sh
+```
+Emergency pre-push toggles (use only when needed):
+```bash
+SKIP_PRE_PUSH_TESTS=1 git push
+SKIP_PRE_PUSH_E2E=1 git push
+SKIP_PRE_PUSH_TESTS=1 SKIP_PRE_PUSH_E2E=1 git push
+```
+
 Start the local development services:
 ```bash
 docker compose up

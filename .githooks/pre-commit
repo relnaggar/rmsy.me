@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+echo "[pre-commit] Running Pint lint checks in Docker..."
+docker compose exec -T -u apache2 app bash -lc "cd /var/www && vendor/bin/pint --test"

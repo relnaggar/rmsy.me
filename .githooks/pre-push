@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+if [[ "${SKIP_PRE_PUSH_TESTS:-0}" == "1" ]]; then
+  echo "[pre-push] Skipping Laravel tests (SKIP_PRE_PUSH_TESTS=1)."
+else
+  echo "[pre-push] Running Laravel test suite in Docker..."
+  docker compose exec -T -u apache2 app bash -lc "cd /var/www && php artisan test"
+fi
+
+if [[ "${SKIP_PRE_PUSH_E2E:-0}" == "1" ]]; then
+  echo "[pre-push] Skipping E2E tests (SKIP_PRE_PUSH_E2E=1)."
+else
+  echo "[pre-push] Running E2E tests locally..."
+  npm --prefix www run e2e
+fi
