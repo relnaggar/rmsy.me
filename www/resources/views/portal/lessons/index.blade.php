@@ -50,54 +50,80 @@
   </form>
 </div>
 
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Date/Time</th>
-      <th>Repeat (Weeks)</th>
-      <th>Student</th>
-      <th>Client</th>
-      <th>Buyer</th>
-      <th>Price</th>
-      <th>Paid</th>
-    </tr>
-  </thead>
-  <tbody>
-    @forelse($lessons as $lesson)
+<form method="GET" action="{{ route('portal.lessons.index') }}" class="row g-2 align-items-end mb-3">
+  <div class="col-auto">
+    <label for="complete_filter" class="form-label mb-0">Showing</label>
+    <select id="complete_filter" name="complete" class="form-select" data-auto-submit>
+      <option value="all" @selected($completeFilter === 'all')>All</option>
+      <option value="incomplete" @selected($completeFilter === 'incomplete')>Incomplete</option>
+      <option value="complete" @selected($completeFilter === 'complete')>Complete</option>
+    </select>
+  </div>
+</form>
+
+<form method="POST" action="{{ route('portal.lessons.markCompleteBulk') }}">
+  @csrf
+  <input type="hidden" name="complete_filter" value="{{ $completeFilter }}">
+  @if($lessons->isNotEmpty())
+    <div class="mb-2">
+      <button type="submit" class="btn btn-success btn-sm"
+              data-confirm="Mark selected lessons as complete?"
+              data-requires-selection>Mark as Complete</button>
+    </div>
+  @endif
+  <table class="table table-striped">
+    <thead>
       <tr>
-        <td><a href="{{ route('portal.lessons.show', $lesson) }}">{{ $lesson->id }}</a></td>
-        <td>{{ $lesson->getFormattedDatetime() }}-{{ $lesson->datetime->copy()->addMinutes($lesson->duration_minutes)->format('H:i') }}</td>
-        <td>{{ $lesson->repeat_weeks }}</td>
-        <td>
-          @if($lesson->student)
-            <a href="{{ route('portal.students.show', $lesson->student) }}">{{ $lesson->student->name }}</a>
-          @else
-            -
-          @endif
-        </td>
-        <td>
-          @if($lesson->client)
-            <a href="{{ route('portal.clients.show', $lesson->client) }}">{{ $lesson->client->name }}</a>
-          @else
-            -
-          @endif
-        </td>
-        <td>
-          @if($lesson->buyer)
-            <a href="{{ route('portal.buyers.show', $lesson->buyer) }}">{{ $lesson->buyer->name }}</a>
-          @else
-            -
-          @endif
-        </td>
-        <td>&pound;{{ $lesson->getFormattedPrice() }}</td>
-        <td><x-paid-status :lesson="$lesson" /></td>
+        <th><input type="checkbox" data-select-all></th>
+        <th>ID</th>
+        <th>Date/Time</th>
+        <th>Repeat (Weeks)</th>
+        <th>Student</th>
+        <th>Client</th>
+        <th>Buyer</th>
+        <th>Price</th>
+        <th>Paid</th>
+        <th>Complete</th>
       </tr>
-    @empty
-      <tr>
-        <td colspan="8" class="text-center">No lessons found.</td>
-      </tr>
-    @endforelse
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      @forelse($lessons as $lesson)
+        <tr>
+          <td><input type="checkbox" name="lesson_ids[]" value="{{ $lesson->id }}"></td>
+          <td><a href="{{ route('portal.lessons.show', $lesson) }}">{{ $lesson->id }}</a></td>
+          <td>{{ $lesson->getFormattedDatetime() }}-{{ $lesson->datetime->copy()->addMinutes($lesson->duration_minutes)->format('H:i') }}</td>
+          <td>{{ $lesson->repeat_weeks }}</td>
+          <td>
+            @if($lesson->student)
+              <a href="{{ route('portal.students.show', $lesson->student) }}">{{ $lesson->student->name }}</a>
+            @else
+              -
+            @endif
+          </td>
+          <td>
+            @if($lesson->client)
+              <a href="{{ route('portal.clients.show', $lesson->client) }}">{{ $lesson->client->name }}</a>
+            @else
+              -
+            @endif
+          </td>
+          <td>
+            @if($lesson->buyer)
+              <a href="{{ route('portal.buyers.show', $lesson->buyer) }}">{{ $lesson->buyer->name }}</a>
+            @else
+              -
+            @endif
+          </td>
+          <td>&pound;{{ $lesson->getFormattedPrice() }}</td>
+          <td><x-paid-status :lesson="$lesson" /></td>
+          <td>{{ $lesson->complete ? 'Yes' : 'No' }}</td>
+        </tr>
+      @empty
+        <tr>
+          <td colspan="10" class="text-center">No lessons found.</td>
+        </tr>
+      @endforelse
+    </tbody>
+  </table>
+</form>
 @endsection

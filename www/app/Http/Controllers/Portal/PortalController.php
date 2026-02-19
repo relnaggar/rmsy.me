@@ -27,7 +27,7 @@ class PortalController extends Controller
             ->orderByDesc('datetime')
             ->get();
 
-        $unpaidLessonConstraint = fn ($q) => $q->where('paid', false);
+        $unpaidLessonConstraint = fn ($q) => $q->where('paid', false)->where('complete', true);
 
         $buyersWithUnpaidLessons = Buyer::withCount(['lessons as unpaid_lesson_count' => $unpaidLessonConstraint])
             ->withSum(['lessons as unpaid_total_pence' => $unpaidLessonConstraint], 'price_gbp_pence')

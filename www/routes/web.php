@@ -139,6 +139,7 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
                 Route::get('/import-complete', 'completeImportAfterAuth')->name('importComplete');
                 Route::post('/import', 'importFromCalendar')->name('import');
                 Route::post('/delete-filtered', 'deleteFiltered')->name('deleteFiltered');
+                Route::post('/mark-complete-bulk', 'markCompleteBulk')->name('markCompleteBulk');
                 Route::get('/{lesson}', 'show')->name('show');
                 Route::put('/{lesson}', 'update')->name('update');
                 Route::post('/{lesson}/apply-to-student', 'applyToStudent')->name('applyToStudent');

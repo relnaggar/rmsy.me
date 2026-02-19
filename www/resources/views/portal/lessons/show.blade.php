@@ -71,6 +71,14 @@
     <td><x-paid-status :lesson="$lesson" /></td>
   </tr>
   <tr>
+    <th>Complete</th>
+    <td>
+      <x-inline-edit-select name="complete" :action="route('portal.lessons.update', $lesson)" :value="$lesson->complete ? '1' : '0'" :options="$completeOptions">
+        {{ $lesson->complete ? 'Yes' : 'No' }}
+      </x-inline-edit-select>
+    </td>
+  </tr>
+  <tr>
     <th>Actions</th>
     <td>
       <form action="{{ route('portal.lessons.destroy', $lesson) }}" method="POST" class="d-inline"

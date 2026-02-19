@@ -4,5 +4,7 @@ import "./confirmSubmit.js";
 import "./matchPayment.js";
 import "./syncDateRange.js";
 import "./inlineEdit.js";
+import "./selectAll.js";
+import "./autoSubmit.js";
 
 applyBootstrapValidation();

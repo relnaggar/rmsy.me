@@ -355,4 +355,66 @@ class LessonTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('No');
     }
+
+    public function test_index_defaults_to_all_lessons(): void
+    {
+        Lesson::factory()->create(['complete' => false, 'datetime' => '2025-01-10 10:00']);
+        Lesson::factory()->create(['complete' => true, 'datetime' => '2025-01-20 10:00']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index'));
+
+        $response->assertStatus(200);
+        $response->assertSeeInOrder(['Yes', 'No']);
+    }
+
+    public function test_index_filters_incomplete_lessons(): void
+    {
+        $incomplete = Lesson::factory()->create(['complete' => false]);
+        Lesson::factory()->create(['complete' => true, 'datetime' => '2025-01-20 10:00']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index', ['complete' => 'incomplete']));
+
+        $response->assertStatus(200);
+        $response->assertSee(route('portal.lessons.show', $incomplete), false);
+        $response->assertSeeInOrder(['No']);
+        $this->assertCount(1, $response->original->gatherData()['lessons']);
+    }
+
+    public function test_index_filters_complete_lessons(): void
+    {
+        Lesson::factory()->create(['complete' => false]);
+        $complete = Lesson::factory()->create(['complete' => true, 'datetime' => '2025-01-20 10:00']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index', ['complete' => 'complete']));
+
+        $response->assertStatus(200);
+        $response->assertSee(route('portal.lessons.show', $complete), false);
+        $this->assertCount(1, $response->original->gatherData()['lessons']);
+    }
+
+    public function test_show_displays_complete_field(): void
+    {
+        $lesson = Lesson::factory()->create(['complete' => false]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.show', $lesson));
+
+        $response->assertStatus(200);
+        $response->assertSee('Complete');
+    }
+
+    public function test_update_complete(): void
+    {
+        $lesson = Lesson::factory()->create(['complete' => false]);
+
+        $response = $this->actingAs($this->user)
+            ->put(route('portal.lessons.update', $lesson), ['complete' => '1']);
+
+        $response->assertRedirect(route('portal.lessons.show', $lesson));
+        $response->assertSessionHas('success');
+        $this->assertTrue($lesson->fresh()->complete);
+    }
 }

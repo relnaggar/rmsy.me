@@ -28,9 +28,13 @@ Artisan::command('e2e:seed', function () {
         'payment_id' => 'E2E-PAY-001',
         'payment_datetime' => '2099-12-31 12:00:00',
         'lesson_datetime' => '2099-12-31 09:00:00',
+        'lesson_datetime_2' => '2099-12-30 09:00:00',
+        'lesson_datetime_complete' => '2099-12-29 09:00:00',
         'payment_reference' => 'E2E fixture payment',
         'payer' => 'E2E Payer',
         'description' => 'E2E fixture lesson (local test data)',
+        'description_2' => 'E2E fixture lesson 2 (bulk complete test)',
+        'description_complete' => 'E2E fixture lesson (complete)',
     ];
 
     User::updateOrCreate(
@@ -70,7 +74,38 @@ Artisan::command('e2e:seed', function () {
             'repeat_weeks' => 0,
             'price_gbp_pence' => 5000,
             'paid' => false,
+            'complete' => false,
             'student_id' => $student->id,
+            'client_id' => null,
+            'buyer_id' => $fixture['buyer_id'],
+        ]
+    );
+
+    Lesson::updateOrCreate(
+        ['datetime' => $fixture['lesson_datetime_2']],
+        [
+            'description' => $fixture['description_2'],
+            'duration_minutes' => 55,
+            'repeat_weeks' => 0,
+            'price_gbp_pence' => 5000,
+            'paid' => false,
+            'complete' => false,
+            'student_id' => null,
+            'client_id' => null,
+            'buyer_id' => $fixture['buyer_id'],
+        ]
+    );
+
+    Lesson::updateOrCreate(
+        ['datetime' => $fixture['lesson_datetime_complete']],
+        [
+            'description' => $fixture['description_complete'],
+            'duration_minutes' => 55,
+            'repeat_weeks' => 0,
+            'price_gbp_pence' => 5000,
+            'paid' => false,
+            'complete' => true,
+            'student_id' => null,
             'client_id' => null,
             'buyer_id' => $fixture['buyer_id'],
         ]

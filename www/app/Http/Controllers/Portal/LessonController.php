@@ -23,14 +23,23 @@ class LessonController extends Controller
     ) {
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
+        $completeFilter = $request->query('complete', 'all');
         $latestLessonDate = Lesson::max('datetime');
 
+        $lessonsQuery = Lesson::with(['student', 'client', 'buyer', 'payments'])
+            ->orderBy('datetime', 'desc');
+
+        if ($completeFilter === 'incomplete') {
+            $lessonsQuery->where('complete', false);
+        } elseif ($completeFilter === 'complete') {
+            $lessonsQuery->where('complete', true);
+        }
+
         return view('portal.lessons.index', [
-            'lessons' => Lesson::with(['student', 'client', 'buyer', 'payments'])
-                ->orderBy('datetime', 'desc')
-                ->get(),
+            'lessons' => $lessonsQuery->get(),
+            'completeFilter' => $completeFilter,
             'defaultStartDate' => $latestLessonDate
                 ? \Carbon\Carbon::parse($latestLessonDate)->format('Y-m-d')
                 : now()->subDays(90)->format('Y-m-d'),
@@ -129,6 +138,7 @@ class LessonController extends Controller
             'students' => ['' => '- None -'] + Student::orderBy('name')->pluck('name', 'id')->toArray(),
             'clients' => ['' => '- None -'] + Client::orderBy('name')->pluck('name', 'id')->toArray(),
             'buyers' => ['' => '- None -'] + Buyer::orderBy('name')->pluck('name', 'id')->toArray(),
+            'completeOptions' => ['0' => 'No', '1' => 'Yes'],
         ]);
     }
 
@@ -139,6 +149,7 @@ class LessonController extends Controller
             'student_id' => ['sometimes', 'nullable', 'integer', 'exists:students,id'],
             'client_id' => ['sometimes', 'nullable', 'integer', 'exists:clients,id'],
             'buyer_id' => ['sometimes', 'nullable', 'string', 'max:100', 'exists:buyers,id'],
+            'complete' => ['sometimes', 'boolean'],
         ]);
 
         $data = [];
@@ -153,6 +164,9 @@ class LessonController extends Controller
         }
         if (array_key_exists('buyer_id', $validated)) {
             $data['buyer_id'] = $validated['buyer_id'] ?? null;
+        }
+        if (array_key_exists('complete', $validated)) {
+            $data['complete'] = $validated['complete'];
         }
 
         $lesson->update($data);
@@ -200,6 +214,23 @@ class LessonController extends Controller
         }
 
         return implode(', ', $parts).'.';
+    }
+
+    public function markCompleteBulk(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'lesson_ids' => ['required', 'array', 'min:1'],
+            'lesson_ids.*' => ['required', 'integer', 'exists:lessons,id'],
+            'complete_filter' => ['nullable', 'string', 'in:incomplete,complete,all'],
+        ]);
+
+        $count = Lesson::whereIn('id', $validated['lesson_ids'])
+            ->update(['complete' => true]);
+
+        $params = isset($validated['complete_filter']) ? ['complete' => $validated['complete_filter']] : [];
+
+        return redirect()->route('portal.lessons.index', $params)
+            ->with('success', "Marked {$count} lesson(s) as complete.");
     }
 
     public function destroy(Lesson $lesson): RedirectResponse

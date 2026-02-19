@@ -26,14 +26,14 @@ class DashboardTest extends TestCase
     public function test_dashboard_shows_unpaid_lessons_table(): void
     {
         Buyer::factory()->create(['id' => 'alice', 'name' => 'Alice Smith']);
-        Lesson::factory()->create(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'alice', 'price_gbp_pence' => 3000, 'paid' => false]);
-        Lesson::factory()->create(['datetime' => '2025-01-12 10:00', 'buyer_id' => 'alice', 'price_gbp_pence' => 2000, 'paid' => false]);
+        Lesson::factory()->create(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'alice', 'price_gbp_pence' => 3000, 'paid' => false, 'complete' => true]);
+        Lesson::factory()->create(['datetime' => '2025-01-12 10:00', 'buyer_id' => 'alice', 'price_gbp_pence' => 2000, 'paid' => false, 'complete' => true]);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.dashboard'));
 
         $response->assertStatus(200);
-        $response->assertSee('Unpaid Lessons');
+        $response->assertSee('Unpaid Complete Lessons');
         $response->assertSee('Alice Smith');
         $response->assertSee('2');
         $response->assertSee('50.00');
@@ -45,7 +45,7 @@ class DashboardTest extends TestCase
             ->get(route('portal.dashboard'));
 
         $response->assertStatus(200);
-        $response->assertDontSee('Unpaid Lessons');
+        $response->assertDontSee('Unpaid Complete Lessons');
     }
 
     public function test_dashboard_excludes_buyer_with_only_one_unpaid_lesson(): void
@@ -57,21 +57,35 @@ class DashboardTest extends TestCase
             ->get(route('portal.dashboard'));
 
         $response->assertStatus(200);
-        $response->assertDontSee('Unpaid Lessons');
+        $response->assertDontSee('Unpaid Complete Lessons');
     }
 
     public function test_dashboard_excludes_paid_lessons_from_count(): void
     {
         Buyer::factory()->create(['id' => 'carol', 'name' => 'Carol White']);
-        Lesson::factory()->create(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'carol', 'price_gbp_pence' => 3000, 'paid' => true]);
-        Lesson::factory()->create(['datetime' => '2025-01-12 10:00', 'buyer_id' => 'carol', 'price_gbp_pence' => 2000, 'paid' => true]);
-        Lesson::factory()->create(['datetime' => '2025-01-14 10:00', 'buyer_id' => 'carol', 'price_gbp_pence' => 1000, 'paid' => false]);
+        Lesson::factory()->create(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'carol', 'price_gbp_pence' => 3000, 'paid' => true, 'complete' => true]);
+        Lesson::factory()->create(['datetime' => '2025-01-12 10:00', 'buyer_id' => 'carol', 'price_gbp_pence' => 2000, 'paid' => true, 'complete' => true]);
+        Lesson::factory()->create(['datetime' => '2025-01-14 10:00', 'buyer_id' => 'carol', 'price_gbp_pence' => 1000, 'paid' => false, 'complete' => true]);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.dashboard'));
 
         $response->assertStatus(200);
-        $response->assertDontSee('Unpaid Lessons');
+        $response->assertDontSee('Unpaid Complete Lessons');
+    }
+
+    public function test_dashboard_excludes_incomplete_lessons_from_count(): void
+    {
+        Buyer::factory()->create(['id' => 'dave', 'name' => 'Dave Brown']);
+        Lesson::factory()->create(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'dave', 'price_gbp_pence' => 3000, 'paid' => false, 'complete' => false]);
+        Lesson::factory()->create(['datetime' => '2025-01-12 10:00', 'buyer_id' => 'dave', 'price_gbp_pence' => 2000, 'paid' => false, 'complete' => false]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertDontSee('Unpaid Complete Lessons');
+        $response->assertDontSee('Dave Brown');
     }
 
     public function test_dashboard_shows_unmatched_payments_table(): void

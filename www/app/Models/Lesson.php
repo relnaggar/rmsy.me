@@ -22,6 +22,7 @@ class Lesson extends Model
         'repeat_weeks',
         'price_gbp_pence',
         'paid',
+        'complete',
         'student_id',
         'client_id',
         'buyer_id',
@@ -35,6 +36,7 @@ class Lesson extends Model
             'repeat_weeks' => 'integer',
             'price_gbp_pence' => 'integer',
             'paid' => 'boolean',
+            'complete' => 'boolean',
         ];
     }
 

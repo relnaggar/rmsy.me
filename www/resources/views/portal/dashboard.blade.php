@@ -26,12 +26,12 @@
 @endif
 
 @if($buyersWithUnpaidLessons->isNotEmpty())
-  <h2 class="mt-4">Unpaid Lessons</h2>
+  <h2 class="mt-4">Unpaid Complete Lessons</h2>
   <table class="table table-striped">
     <thead>
       <tr>
         <th>Buyer</th>
-        <th>Unpaid Lessons</th>
+        <th>Unpaid Complete Lessons</th>
         <th>Total Due (GBP)</th>
       </tr>
     </thead>
