@@ -15,27 +15,29 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Artisan::command('e2e:seed', function () {
+$e2eFixture = [
+    'user_email' => 'q@q',
+    'user_password' => 'q',
+    'buyer_id' => 'e2e-acme',
+    'buyer_name' => 'E2E Acme',
+    'student_name' => 'E2E Student Fixture',
+    'payment_id' => 'E2E-PAY-001',
+    'payment_datetime' => '2099-12-31 12:00:00',
+    'lesson_datetime' => '2099-12-31 09:00:00',
+    'lesson_datetime_2' => '2099-12-30 09:00:00',
+    'lesson_datetime_complete' => '2099-12-29 09:00:00',
+    'payment_reference' => 'E2E fixture payment',
+    'payer' => 'E2E Payer',
+    'description' => 'E2E fixture lesson (local test data)',
+    'description_2' => 'E2E fixture lesson 2 (bulk complete test)',
+    'description_complete' => 'E2E fixture lesson (complete)',
+];
+
+Artisan::command('e2e:seed', function () use ($e2eFixture) {
     // Keep reruns deterministic by clearing throttle/cache state between suites.
     Artisan::call('cache:clear');
 
-    $fixture = [
-        'user_email' => 'q@q',
-        'user_password' => 'q',
-        'buyer_id' => 'e2e-acme',
-        'buyer_name' => 'E2E Acme',
-        'student_name' => 'E2E Student Fixture',
-        'payment_id' => 'E2E-PAY-001',
-        'payment_datetime' => '2099-12-31 12:00:00',
-        'lesson_datetime' => '2099-12-31 09:00:00',
-        'lesson_datetime_2' => '2099-12-30 09:00:00',
-        'lesson_datetime_complete' => '2099-12-29 09:00:00',
-        'payment_reference' => 'E2E fixture payment',
-        'payer' => 'E2E Payer',
-        'description' => 'E2E fixture lesson (local test data)',
-        'description_2' => 'E2E fixture lesson 2 (bulk complete test)',
-        'description_complete' => 'E2E fixture lesson (complete)',
-    ];
+    $fixture = $e2eFixture;
 
     User::updateOrCreate(
         ['email' => $fixture['user_email']],
@@ -121,3 +123,19 @@ Artisan::command('e2e:seed', function () {
 
     $this->info("E2E fixtures seeded: {$payment->id} and lesson {$lesson->id}.");
 })->purpose('Seed deterministic fixtures for local Playwright E2E tests');
+
+Artisan::command('e2e:teardown', function () use ($e2eFixture) {
+    $fixture = $e2eFixture;
+
+    // Delete lessons first — cascades lesson_payment pivot rows automatically.
+    Lesson::whereIn('datetime', [
+        $fixture['lesson_datetime'],
+        $fixture['lesson_datetime_2'],
+        $fixture['lesson_datetime_complete'],
+    ])->delete();
+    Payment::where('id', $fixture['payment_id'])->delete();
+    Student::where('name', $fixture['student_name'])->delete();
+    Buyer::where('id', $fixture['buyer_id'])->delete();
+
+    $this->info('E2E fixtures torn down.');
+})->purpose('Remove E2E fixture data from the database after Playwright tests');
