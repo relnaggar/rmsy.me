@@ -15,6 +15,7 @@
 /public/storage
 /playwright-report
 /test-results
+/tests/e2e/.auth/
 /resources/fonts/*.woff*
 /storage/*.key
 /storage/pail

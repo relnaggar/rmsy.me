@@ -1,14 +1,13 @@
 import { expect, test } from '@playwright/test';
-import { login } from './helpers/auth.js';
+import { AUTH_STATE_PATH } from './helpers/auth.js';
 
 test.describe.serial('lessons bulk complete UI', () => {
   let context;
   let page;
 
   test.beforeAll(async ({ browser }) => {
-    context = await browser.newContext();
+    context = await browser.newContext({ storageState: AUTH_STATE_PATH });
     page = await context.newPage();
-    await login(page);
   });
 
   test.afterAll(async () => {

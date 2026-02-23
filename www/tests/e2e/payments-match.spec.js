@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from './helpers/auth.js';
+import { AUTH_STATE_PATH } from './helpers/auth.js';
 import { E2E_FIXTURES } from './helpers/fixtures.js';
 
 async function openFixturePayment(page) {
@@ -32,9 +32,8 @@ test.describe.serial('payment matching workflow', () => {
   let page;
 
   test.beforeAll(async ({ browser }) => {
-    context = await browser.newContext();
+    context = await browser.newContext({ storageState: AUTH_STATE_PATH });
     page = await context.newPage();
-    await login(page);
   });
 
   test.afterAll(async () => {

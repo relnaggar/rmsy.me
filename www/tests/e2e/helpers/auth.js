@@ -1,5 +1,10 @@
 import { expect } from '@playwright/test';
+import { fileURLToPath } from 'url';
 import { E2E_FIXTURES } from './fixtures.js';
+
+export const AUTH_STATE_PATH = fileURLToPath(
+  new URL('../.auth/user.json', import.meta.url),
+);
 
 export async function visitLogin(page) {
   await page.goto('/login');
