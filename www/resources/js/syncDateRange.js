@@ -5,6 +5,7 @@ document.querySelectorAll('[data-copy-date-to]').forEach((button) => {
     const targetInput = document.getElementById(button.dataset.copyDateTo);
     if (sourceInput && targetInput) {
       targetInput.value = sourceInput.value;
+      targetInput.dispatchEvent(new Event('change'));
     }
   });
 });

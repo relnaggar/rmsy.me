@@ -93,6 +93,26 @@ test.describe.serial('lessons bulk complete UI', () => {
     await expect(selectAll).toHaveJSProperty('indeterminate', false);
   });
 
+  test('Delete button is disabled when no lessons are selected', async () => {
+    await expect(page.getByRole('button', { name: 'Delete' })).toBeDisabled();
+  });
+
+  test('Delete button enables when a lesson checkbox is checked', async () => {
+    await page.locator('input[name="lesson_ids[]"]').first().check();
+
+    await expect(page.getByRole('button', { name: 'Delete' })).toBeEnabled();
+  });
+
+  test('Delete button disables when lesson checkbox is unchecked', async () => {
+    const checkbox = page.locator('input[name="lesson_ids[]"]').first();
+
+    await checkbox.check();
+    await expect(page.getByRole('button', { name: 'Delete' })).toBeEnabled();
+
+    await checkbox.uncheck();
+    await expect(page.getByRole('button', { name: 'Delete' })).toBeDisabled();
+  });
+
   test('Showing dropdown auto-submits and filters to incomplete lessons', async () => {
     await page.locator('#complete_filter').selectOption('incomplete');
 

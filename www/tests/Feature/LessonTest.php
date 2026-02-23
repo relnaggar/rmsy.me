@@ -395,6 +395,77 @@ class LessonTest extends TestCase
         $this->assertCount(1, $response->original->gatherData()['lessons']);
     }
 
+    public function test_index_filters_by_buyer(): void
+    {
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme Corp']);
+        Buyer::factory()->create(['id' => 'other', 'name' => 'Other']);
+        $acmeLesson = Lesson::factory()->create(['buyer_id' => 'acme']);
+        Lesson::factory()->create(['buyer_id' => 'other', 'datetime' => '2025-01-20 10:00']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index', ['buyer_id' => 'acme']));
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->original->gatherData()['lessons']);
+        $response->assertSee(route('portal.lessons.show', $acmeLesson), false);
+    }
+
+    public function test_index_filters_by_student(): void
+    {
+        $alice = Student::factory()->create(['name' => 'Alice']);
+        $bob = Student::factory()->create(['name' => 'Bob']);
+        $aliceLesson = Lesson::factory()->create(['student_id' => $alice->id]);
+        Lesson::factory()->create(['student_id' => $bob->id, 'datetime' => '2025-01-20 10:00']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index', ['student_id' => $alice->id]));
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->original->gatherData()['lessons']);
+        $response->assertSee(route('portal.lessons.show', $aliceLesson), false);
+    }
+
+    public function test_index_filters_by_start_date(): void
+    {
+        $after = Lesson::factory()->create(['datetime' => '2025-06-01 10:00']);
+        Lesson::factory()->create(['datetime' => '2025-05-31 10:00']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index', ['start_date' => '2025-06-01']));
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->original->gatherData()['lessons']);
+        $response->assertSee(route('portal.lessons.show', $after), false);
+    }
+
+    public function test_index_filters_by_end_date(): void
+    {
+        $before = Lesson::factory()->create(['datetime' => '2025-05-31 10:00']);
+        Lesson::factory()->create(['datetime' => '2025-06-01 10:00']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index', ['end_date' => '2025-05-31']));
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->original->gatherData()['lessons']);
+        $response->assertSee(route('portal.lessons.show', $before), false);
+    }
+
+    public function test_index_filters_by_client(): void
+    {
+        $clientA = Client::factory()->create(['name' => 'ClientA']);
+        $clientB = Client::factory()->create(['name' => 'ClientB']);
+        $clientALesson = Lesson::factory()->create(['client_id' => $clientA->id]);
+        Lesson::factory()->create(['client_id' => $clientB->id, 'datetime' => '2025-01-20 10:00']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index', ['client_id' => $clientA->id]));
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->original->gatherData()['lessons']);
+        $response->assertSee(route('portal.lessons.show', $clientALesson), false);
+    }
+
     public function test_show_displays_complete_field(): void
     {
         $lesson = Lesson::factory()->create(['complete' => false]);
