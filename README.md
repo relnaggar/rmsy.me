@@ -9,6 +9,10 @@ Install git hooks (pre-commit lint, pre-push unit + E2E tests):
 ```bash
 ./script/install-git-hooks.sh
 ```
+Emergency pre-commit toggles (use only when needed):
+```bash
+SKIP_PRE_COMMIT_LINT=1 git commit
+```
 Emergency pre-push toggles (use only when needed):
 ```bash
 SKIP_PRE_PUSH_TESTS=1 git push
