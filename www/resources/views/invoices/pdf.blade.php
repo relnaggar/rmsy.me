@@ -100,7 +100,7 @@
           </td>
         </tr>
         <tr>
-          <td class="text-primary">IVA (Tipo de IVA 0%)</td>
+          <td class="text-primary">IVA (Exento de IVA)</td>
           <td class="text-end">{{ formatCurrency(0, 'EUR') }}</td>
         </tr>
         <tr class="fw-bold">
