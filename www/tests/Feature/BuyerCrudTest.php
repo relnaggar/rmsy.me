@@ -49,6 +49,29 @@ class BuyerCrudTest extends TestCase
         $response->assertSee('Globex Inc');
     }
 
+    public function test_index_highlights_buyer_with_no_lessons(): void
+    {
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme Corp']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.buyers.index'));
+
+        $response->assertSee('table-warning', false);
+        $response->assertSee('No lessons');
+    }
+
+    public function test_index_does_not_highlight_buyer_with_lessons(): void
+    {
+        $buyer = Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme Corp']);
+        Lesson::factory()->create(['buyer_id' => $buyer->id]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.buyers.index'));
+
+        $response->assertDontSee('table-warning', false);
+        $response->assertDontSee('No lessons');
+    }
+
     public function test_create_requires_authentication(): void
     {
         $this->get(route('portal.buyers.create'))

@@ -20,7 +20,7 @@ class BuyerController extends Controller
 {
     public function index(): View
     {
-        $buyers = Buyer::orderBy('name')->get();
+        $buyers = Buyer::withCount('lessons')->orderBy('name')->get();
         $students = Student::orderBy('name')->get();
         $clients = Client::orderBy('name')->get();
 

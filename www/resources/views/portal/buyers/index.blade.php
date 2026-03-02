@@ -72,9 +72,9 @@
   </thead>
   <tbody>
     @forelse($buyers as $buyer)
-      <tr>
+      <tr @if($buyer->lessons_count === 0) class="table-warning" @endif>
         <td><a href="{{ route('portal.buyers.show', $buyer) }}">{{ $buyer->id }}</a></td>
-        <td>{{ $buyer->name }}</td>
+        <td>{{ $buyer->name }} @if($buyer->lessons_count === 0)<span class="badge text-bg-warning ms-1">No lessons</span>@endif</td>
         <td>{{ $buyer->getCountryName() }}</td>
       </tr>
     @empty
