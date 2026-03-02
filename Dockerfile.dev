@@ -74,6 +74,15 @@ RUN apt-get update -y \
 # install composer
 COPY --from=composer/composer:2.2-bin /composer /usr/bin/composer
 
+# debug tools
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends \
+  sqlite3 \
+  # cleanup
+  && apt autoremove -y \
+  && apt clean \
+  && rm -rf /var/lib/apt/lists/*
+
 # entrypoint
 ENV APP_ENVIRONMENT_MODE="DEVELOPMENT"
 COPY docker-entrypoint.sh /
