@@ -106,6 +106,17 @@ class WiseDepositTest extends TestCase
         $response->assertDontSee('new Wise');
     }
 
+    public function test_clear_wise_deposits_deletes_all_and_redirects(): void
+    {
+        WiseDeposit::factory()->count(3)->create();
+
+        $response = $this->actingAs($this->user)
+            ->delete(route('portal.wiseDeposits.destroy'));
+
+        $response->assertRedirect(route('portal.dashboard'));
+        $this->assertDatabaseCount('wise_deposits', 0);
+    }
+
     public function test_import_clears_matching_wise_deposit(): void
     {
         WiseDeposit::factory()->create([

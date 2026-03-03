@@ -7,9 +7,17 @@
 <p>You're logged in as <strong>{{ $userEmail }}</strong>.</p>
 
 @if($wiseDepositCount > 0)
-  <div class="alert alert-info">
-    <strong>{{ $wiseDepositCount }}</strong> new Wise {{ Str::plural('deposit', $wiseDepositCount) }} received.
-    <a href="{{ route('portal.payments.index') }}">Import payments</a> to process.
+  <div class="alert alert-info d-flex align-items-center justify-content-between">
+    <span>
+      <strong>{{ $wiseDepositCount }}</strong> new Wise {{ Str::plural('deposit', $wiseDepositCount) }} received.
+      <a href="{{ route('portal.payments.index') }}">Import payments</a> to process.
+    </span>
+    <form action="{{ route('portal.wiseDeposits.destroy') }}" method="POST"
+          data-confirm="Are you sure you want to clear all Wise deposits?">
+      @csrf
+      @method('DELETE')
+      <button type="submit" class="btn btn-sm btn-outline-secondary ms-3">Clear</button>
+    </form>
   </div>
 @endif
 

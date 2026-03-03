@@ -90,6 +90,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->prefix('portal')->name('portal.')->group(
     function () {
         Route::get('/', [PortalController::class, 'index'])->name('dashboard');
+        Route::delete('/wise-deposits', [PortalController::class, 'destroyAllWiseDeposits'])->name('wiseDeposits.destroy');
 
         // Buyers
         Route::controller(BuyerController::class)

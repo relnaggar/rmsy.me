@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Buyer;
 use App\Models\Payment;
 use App\Models\WiseDeposit;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -42,5 +43,12 @@ class PortalController extends Controller
             'buyersWithUnpaidLessons' => $buyersWithUnpaidLessons,
             'wiseDepositCount' => WiseDeposit::count(),
         ]);
+    }
+
+    public function destroyAllWiseDeposits(): RedirectResponse
+    {
+        WiseDeposit::query()->delete();
+
+        return redirect()->route('portal.dashboard');
     }
 }
