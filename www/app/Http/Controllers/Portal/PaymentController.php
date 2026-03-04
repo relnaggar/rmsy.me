@@ -320,15 +320,9 @@ class PaymentController extends Controller
 
     public function destroyMatches(Payment $payment): RedirectResponse
     {
-        $lessonIds = $payment->lessons->pluck('id')->toArray();
-
-        DB::transaction(function () use ($payment, $lessonIds) {
+        DB::transaction(function () use ($payment) {
+            $this->unpayMatchedLessons($payment);
             $payment->lessons()->detach();
-
-            if ($lessonIds) {
-                Lesson::whereIn('id', $lessonIds)->update(['paid' => false]);
-            }
-
             $payment->update(['lesson_pending' => false]);
         });
 
@@ -339,10 +333,23 @@ class PaymentController extends Controller
     public function destroy(Payment $payment): RedirectResponse
     {
         $year = $payment->getYear();
-        $payment->delete();
+
+        DB::transaction(function () use ($payment) {
+            $this->unpayMatchedLessons($payment);
+            $payment->delete();
+        });
+
         $this->updateSequenceNumbers([$year]);
 
         return redirect()->route('portal.payments.index')
             ->with('success', 'Payment deleted successfully.');
+    }
+
+    private function unpayMatchedLessons(Payment $payment): void
+    {
+        $lessonIds = $payment->lessons->pluck('id')->toArray();
+        if ($lessonIds) {
+            Lesson::whereIn('id', $lessonIds)->update(['paid' => false]);
+        }
     }
 }

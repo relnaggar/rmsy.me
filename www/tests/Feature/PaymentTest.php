@@ -1018,4 +1018,63 @@ class PaymentTest extends TestCase
         $response->assertRedirect(route('portal.payments.show', $payment));
         $this->assertTrue($payment->fresh()->lesson_pending);
     }
+
+    public function test_delete_payment_marks_matched_lessons_as_unpaid(): void
+    {
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $lesson1 = Lesson::factory()->create([
+            'datetime' => '2025-01-10 10:00',
+            'price_gbp_pence' => 3000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+            'paid' => true,
+        ]);
+        $lesson2 = Lesson::factory()->create([
+            'datetime' => '2025-01-12 10:00',
+            'price_gbp_pence' => 2000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+            'paid' => true,
+        ]);
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
+            'buyer_id' => 'acme',
+            'amount_gbp_pence' => 5000,
+            'datetime' => '2025-01-20 10:00',
+        ]);
+        $payment->lessons()->attach([$lesson1->id, $lesson2->id]);
+
+        $this->actingAs($this->user)
+            ->delete(route('portal.payments.destroy', $payment));
+
+        $this->assertNull(Payment::find('PAY-1'));
+        $this->assertFalse($lesson1->fresh()->paid);
+        $this->assertFalse($lesson2->fresh()->paid);
+    }
+
+    public function test_delete_payment_with_no_matched_lessons_succeeds(): void
+    {
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        $student = Student::factory()->create(['name' => 'Alice']);
+        $unrelatedLesson = Lesson::factory()->create([
+            'datetime' => '2025-01-10 10:00',
+            'price_gbp_pence' => 3000,
+            'student_id' => $student->id,
+            'buyer_id' => 'acme',
+            'paid' => false,
+        ]);
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
+            'buyer_id' => 'acme',
+            'datetime' => '2025-01-20 10:00',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->delete(route('portal.payments.destroy', $payment));
+
+        $response->assertRedirect(route('portal.payments.index'));
+        $this->assertNull(Payment::find('PAY-1'));
+        $this->assertFalse($unrelatedLesson->fresh()->paid);
+    }
 }
