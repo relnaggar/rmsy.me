@@ -10,6 +10,7 @@ use App\Models\Payment;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class PaymentTest extends TestCase
@@ -109,6 +110,37 @@ class PaymentTest extends TestCase
         $this->assertNull(Payment::find('PAY-2'));
         $this->assertEquals('001', Payment::find('PAY-1')->sequence_number);
         $this->assertEquals('002', Payment::find('PAY-3')->sequence_number);
+    }
+
+    public function test_delete_payment_resequences_by_id_when_same_datetime(): void
+    {
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme']);
+        Payment::factory()->create([
+            'id' => 'TRANSFER-100',
+            'buyer_id' => 'acme',
+            'datetime' => '2025-03-02 10:00',
+            'sequence_number' => '001',
+        ]);
+        $p2 = Payment::factory()->create([
+            'id' => 'TRANSFER-200',
+            'buyer_id' => 'acme',
+            'datetime' => '2025-03-02 10:00',
+            'sequence_number' => '002',
+        ]);
+        Payment::factory()->create([
+            'id' => 'TRANSFER-300',
+            'buyer_id' => 'acme',
+            'datetime' => '2025-03-02 10:00',
+            'sequence_number' => '003',
+        ]);
+
+        $this->actingAs($this->user)
+            ->delete(route('portal.payments.destroy', $p2));
+
+        $this->assertNull(Payment::find('TRANSFER-200'));
+        // TRANSFER-100 stays 001, TRANSFER-300 becomes 002 (deterministic by id)
+        $this->assertEquals('001', Payment::find('TRANSFER-100')->sequence_number);
+        $this->assertEquals('002', Payment::find('TRANSFER-300')->sequence_number);
     }
 
     public function test_delete_payment_only_resequences_same_year(): void
@@ -844,6 +876,120 @@ class PaymentTest extends TestCase
             'payment' => $normalPayment,
             'next' => 1,
         ]));
+    }
+
+    // --- Import tests ---
+
+    private function makeCsvFile(array $rows): UploadedFile
+    {
+        $header = 'TransferWise ID,Date,Datetime,Amount,Currency,Description,Reference,col7,col8,col9,Payer,Payee';
+        $lines = array_map(fn ($r) => implode(',', $r), $rows);
+        $content = implode("\n", [$header, ...$lines]);
+
+        $path = tempnam(sys_get_temp_dir(), 'payments_test_').'.csv';
+        file_put_contents($path, $content);
+
+        return new UploadedFile($path, 'payments.csv', 'text/csv', null, true);
+    }
+
+    /**
+     * Build a CSV row matching the controller's column mapping:
+     * [0]=id, [2]=datetime, [3]=amount, [4]=currency, [6]=reference, [11]=buyerName
+     */
+    private function makeCsvRow(string $id, string $datetime, float $amount, string $buyerName, string $currency = 'GBP'): array
+    {
+        return [$id, '', $datetime, $amount, $currency, '', 'REF', '', '', '', '', $buyerName];
+    }
+
+    public function test_import_requires_authentication(): void
+    {
+        $file = $this->makeCsvFile([$this->makeCsvRow('TRANSFER-100', '2025-01-10 10:00', 50.00, 'Alice')]);
+
+        $this->post(route('portal.payments.import'), ['csv_file' => $file])
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_import_assigns_sequence_numbers_by_datetime(): void
+    {
+        $file = $this->makeCsvFile([
+            $this->makeCsvRow('TRANSFER-100', '2025-01-10 10:00', 50.00, 'Alice'),
+            $this->makeCsvRow('TRANSFER-200', '2025-01-20 10:00', 60.00, 'Bob'),
+            $this->makeCsvRow('TRANSFER-300', '2025-01-30 10:00', 70.00, 'Carol'),
+        ]);
+
+        $this->actingAs($this->user)
+            ->post(route('portal.payments.import'), ['csv_file' => $file])
+            ->assertRedirect(route('portal.payments.index'));
+
+        $this->assertEquals('001', Payment::find('TRANSFER-100')->sequence_number);
+        $this->assertEquals('002', Payment::find('TRANSFER-200')->sequence_number);
+        $this->assertEquals('003', Payment::find('TRANSFER-300')->sequence_number);
+    }
+
+    public function test_import_assigns_sequence_numbers_by_id_when_same_datetime(): void
+    {
+        $file = $this->makeCsvFile([
+            $this->makeCsvRow('TRANSFER-300', '2025-03-02 10:00', 78.00, 'Alice'),
+            $this->makeCsvRow('TRANSFER-100', '2025-03-02 10:00', 39.00, 'Bob'),
+            $this->makeCsvRow('TRANSFER-200', '2025-03-02 10:00', 41.00, 'Carol'),
+        ]);
+
+        $this->actingAs($this->user)
+            ->post(route('portal.payments.import'), ['csv_file' => $file]);
+
+        // Sequence numbers must be assigned in ID order, not import order
+        $this->assertEquals('001', Payment::find('TRANSFER-100')->sequence_number);
+        $this->assertEquals('002', Payment::find('TRANSFER-200')->sequence_number);
+        $this->assertEquals('003', Payment::find('TRANSFER-300')->sequence_number);
+    }
+
+    public function test_import_new_payment_resequences_existing_in_same_year(): void
+    {
+        // Existing payments: TRANSFER-200 (Jan 10) and TRANSFER-300 (Jan 20)
+        Payment::factory()->create([
+            'id' => 'TRANSFER-200',
+            'datetime' => '2025-01-10 10:00',
+            'sequence_number' => '001',
+        ]);
+        Payment::factory()->create([
+            'id' => 'TRANSFER-300',
+            'datetime' => '2025-01-20 10:00',
+            'sequence_number' => '002',
+        ]);
+
+        // Import TRANSFER-100 with the same date as TRANSFER-200 but a lower ID
+        // It should become 001, pushing TRANSFER-200 to 002 and TRANSFER-300 to 003
+        $file = $this->makeCsvFile([
+            $this->makeCsvRow('TRANSFER-100', '2025-01-10 10:00', 50.00, 'Alice'),
+        ]);
+
+        $this->actingAs($this->user)
+            ->post(route('portal.payments.import'), ['csv_file' => $file]);
+
+        $this->assertEquals('001', Payment::find('TRANSFER-100')->sequence_number);
+        $this->assertEquals('002', Payment::find('TRANSFER-200')->sequence_number);
+        $this->assertEquals('003', Payment::find('TRANSFER-300')->sequence_number);
+    }
+
+    public function test_import_skips_duplicate_ids(): void
+    {
+        Payment::factory()->create([
+            'id' => 'TRANSFER-100',
+            'datetime' => '2025-01-10 10:00',
+            'sequence_number' => '001',
+        ]);
+
+        $file = $this->makeCsvFile([
+            $this->makeCsvRow('TRANSFER-100', '2025-01-10 10:00', 50.00, 'Alice'),
+            $this->makeCsvRow('TRANSFER-200', '2025-01-20 10:00', 60.00, 'Bob'),
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('portal.payments.import'), ['csv_file' => $file]);
+
+        $response->assertRedirect(route('portal.payments.index'));
+        $response->assertSessionHas('success', fn ($msg) => str_contains($msg, '1 payments') && str_contains($msg, '1 duplicates'));
+        $this->assertCount(2, Payment::all());
     }
 
     public function test_toggle_lesson_pending_blocked_when_lessons_matched(): void

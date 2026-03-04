@@ -161,7 +161,7 @@ class PaymentController extends Controller
 
     private function updateSequenceNumbers(array $years): void
     {
-        $payments = Payment::orderBy('datetime', 'asc')->get();
+        $payments = Payment::orderBy('datetime', 'asc')->orderBy('id', 'asc')->get();
         $sequenceNumbers = [];
 
         foreach ($payments as $payment) {
