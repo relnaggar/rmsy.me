@@ -45,7 +45,7 @@
     </thead>
     <tbody>
       @foreach($buyersWithUnpaidLessons as $buyer)
-        <tr>
+        <tr @class(['table-warning' => $buyer->unpaid_lesson_count >= 2 && !$buyer->auto_pay])>
           <td><a href="{{ route('portal.buyers.show', $buyer) }}">{{ $buyer->name }}</a></td>
           <td>{{ $buyer->unpaid_lesson_count }}</td>
           <td>{{ penceToPounds($buyer->unpaid_total_pence) }}</td>

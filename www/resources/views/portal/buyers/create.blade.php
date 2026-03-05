@@ -18,6 +18,12 @@
   <x-form-input name="country" label="Country" type="select" value="GB" :options="$countries" required />
   <x-form-input name="extra" label="Extra Info" maxlength="255" />
 
+  <div class="mb-3 form-check">
+    <input type="hidden" name="auto_pay" value="0">
+    <input type="checkbox" class="form-check-input" id="auto_pay" name="auto_pay" value="1" {{ old('auto_pay') ? 'checked' : '' }}>
+    <label for="auto_pay" class="form-check-label">Automatic Payments</label>
+  </div>
+
   <button type="submit" class="btn btn-primary">Add Buyer</button>
   <a href="{{ route('portal.buyers.index') }}" class="btn btn-secondary">Cancel</a>
 </form>

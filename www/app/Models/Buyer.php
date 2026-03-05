@@ -31,6 +31,11 @@ class Buyer extends Model
         'zip_postal_code',
         'country',
         'extra',
+        'auto_pay',
+    ];
+
+    protected $casts = [
+        'auto_pay' => 'boolean',
     ];
 
     public function payments(): HasMany

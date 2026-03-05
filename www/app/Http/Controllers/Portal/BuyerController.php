@@ -66,6 +66,7 @@ class BuyerController extends Controller
             'zip_postal_code' => ['nullable', 'string', 'max:20'],
             'country' => ['required', 'string', 'size:2'],
             'extra' => ['nullable', 'string', 'max:255'],
+            'auto_pay' => ['boolean'],
         ]);
 
         Buyer::create($validated);
@@ -103,6 +104,7 @@ class BuyerController extends Controller
             'zip_postal_code' => ['sometimes', 'nullable', 'string', 'max:20'],
             'country' => ['sometimes', 'required', 'string', 'size:2'],
             'extra' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'auto_pay' => ['sometimes', 'boolean'],
         ]);
 
         $buyer->update($validated);

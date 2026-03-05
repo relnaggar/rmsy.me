@@ -48,16 +48,54 @@ class DashboardTest extends TestCase
         $response->assertDontSee('Unpaid Complete Lessons');
     }
 
-    public function test_dashboard_excludes_buyer_with_only_one_unpaid_lesson(): void
+    public function test_dashboard_excludes_buyer_with_only_unpaid_incomplete_lessons(): void
     {
         Buyer::factory()->create(['id' => 'bob', 'name' => 'Bob Jones']);
-        Lesson::factory()->create(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'bob', 'price_gbp_pence' => 3000, 'paid' => false]);
+        Lesson::factory()->create(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'bob', 'price_gbp_pence' => 3000, 'paid' => false, 'complete' => false]);
 
         $response = $this->actingAs($this->user)
             ->get(route('portal.dashboard'));
 
         $response->assertStatus(200);
         $response->assertDontSee('Unpaid Complete Lessons');
+    }
+
+    public function test_dashboard_flags_buyer_with_two_or_more_unpaid_lessons_and_no_auto_pay(): void
+    {
+        Buyer::factory()->create(['id' => 'eve', 'name' => 'Eve Green', 'auto_pay' => false]);
+        Lesson::factory()->create(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'eve', 'price_gbp_pence' => 3000, 'paid' => false, 'complete' => true]);
+        Lesson::factory()->create(['datetime' => '2025-01-12 10:00', 'buyer_id' => 'eve', 'price_gbp_pence' => 2000, 'paid' => false, 'complete' => true]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertSee('table-warning', false);
+    }
+
+    public function test_dashboard_does_not_flag_buyer_with_auto_pay(): void
+    {
+        Buyer::factory()->create(['id' => 'frank', 'name' => 'Frank Black', 'auto_pay' => true]);
+        Lesson::factory()->create(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'frank', 'price_gbp_pence' => 3000, 'paid' => false, 'complete' => true]);
+        Lesson::factory()->create(['datetime' => '2025-01-12 10:00', 'buyer_id' => 'frank', 'price_gbp_pence' => 2000, 'paid' => false, 'complete' => true]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertDontSee('table-warning', false);
+    }
+
+    public function test_dashboard_does_not_flag_buyer_with_only_one_unpaid_complete_lesson(): void
+    {
+        Buyer::factory()->create(['id' => 'grace', 'name' => 'Grace Hill', 'auto_pay' => false]);
+        Lesson::factory()->create(['datetime' => '2025-01-10 10:00', 'buyer_id' => 'grace', 'price_gbp_pence' => 3000, 'paid' => false, 'complete' => true]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertDontSee('table-warning', false);
     }
 
     public function test_dashboard_excludes_paid_lessons_from_count(): void
@@ -71,7 +109,10 @@ class DashboardTest extends TestCase
             ->get(route('portal.dashboard'));
 
         $response->assertStatus(200);
-        $response->assertDontSee('Unpaid Complete Lessons');
+        $response->assertSee('Unpaid Complete Lessons');
+        $response->assertSee('Carol White');
+        $response->assertSee('1');
+        $response->assertSee('10.00');
     }
 
     public function test_dashboard_excludes_incomplete_lessons_from_count(): void

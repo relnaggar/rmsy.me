@@ -32,7 +32,7 @@ class PortalController extends Controller
 
         $buyersWithUnpaidLessons = Buyer::withCount(['lessons as unpaid_lesson_count' => $unpaidLessonConstraint])
             ->withSum(['lessons as unpaid_total_pence' => $unpaidLessonConstraint], 'price_gbp_pence')
-            ->has('lessons', '>', 1, 'and', $unpaidLessonConstraint)
+            ->has('lessons', '>=', 1, 'and', $unpaidLessonConstraint)
             ->orderByDesc('unpaid_lesson_count')
             ->get();
 

@@ -83,6 +83,12 @@
     </td>
   </tr>
   <tr>
+    <th class="text-nowrap">Auto Pay</th>
+    <td>
+      <x-inline-edit-checkbox name="auto_pay" :action="route('portal.buyers.update', $buyer)" :value="$buyer->auto_pay" />
+    </td>
+  </tr>
+  <tr>
     <th>Actions</th>
     <td>
       <form action="{{ route('portal.buyers.destroy', $buyer) }}" method="POST" class="d-inline"
