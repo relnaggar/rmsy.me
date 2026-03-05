@@ -34,7 +34,7 @@
 @endif
 
 @if($buyersWithUnpaidLessons->isNotEmpty())
-  <h2 class="mt-4">Unpaid Complete Lessons</h2>
+  <h2 class="mt-4">Pending Payments</h2>
   <table class="table table-striped">
     <thead>
       <tr>

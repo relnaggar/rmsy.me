@@ -33,7 +33,7 @@ class DashboardTest extends TestCase
             ->get(route('portal.dashboard'));
 
         $response->assertStatus(200);
-        $response->assertSee('Unpaid Complete Lessons');
+        $response->assertSee('Pending Payments');
         $response->assertSee('Alice Smith');
         $response->assertSee('2');
         $response->assertSee('50.00');
@@ -45,7 +45,7 @@ class DashboardTest extends TestCase
             ->get(route('portal.dashboard'));
 
         $response->assertStatus(200);
-        $response->assertDontSee('Unpaid Complete Lessons');
+        $response->assertDontSee('Pending Payments');
     }
 
     public function test_dashboard_excludes_buyer_with_only_unpaid_incomplete_lessons(): void
@@ -57,7 +57,7 @@ class DashboardTest extends TestCase
             ->get(route('portal.dashboard'));
 
         $response->assertStatus(200);
-        $response->assertDontSee('Unpaid Complete Lessons');
+        $response->assertDontSee('Pending Payments');
     }
 
     public function test_dashboard_flags_buyer_with_two_or_more_unpaid_lessons_and_no_auto_pay(): void
@@ -109,7 +109,7 @@ class DashboardTest extends TestCase
             ->get(route('portal.dashboard'));
 
         $response->assertStatus(200);
-        $response->assertSee('Unpaid Complete Lessons');
+        $response->assertSee('Pending Payments');
         $response->assertSee('Carol White');
         $response->assertSee('1');
         $response->assertSee('10.00');
@@ -125,7 +125,7 @@ class DashboardTest extends TestCase
             ->get(route('portal.dashboard'));
 
         $response->assertStatus(200);
-        $response->assertDontSee('Unpaid Complete Lessons');
+        $response->assertDontSee('Pending Payments');
         $response->assertDontSee('Dave Brown');
     }
 
