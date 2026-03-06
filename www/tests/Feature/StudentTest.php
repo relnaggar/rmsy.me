@@ -107,6 +107,18 @@ class StudentTest extends TestCase
         $this->assertEquals('Alice Smith', $student->fresh()->name);
     }
 
+    public function test_update_changes_student_source(): void
+    {
+        $student = Student::factory()->create(['source' => 'direct']);
+
+        $response = $this->actingAs($this->user)
+            ->put(route('portal.students.update', $student), ['source' => 'mytutor']);
+
+        $response->assertRedirect(route('portal.students.show', $student));
+        $response->assertSessionHas('success');
+        $this->assertEquals('mytutor', $student->fresh()->source);
+    }
+
     public function test_update_validates_name_required(): void
     {
         $student = Student::factory()->create(['name' => 'Alice']);
@@ -125,6 +137,63 @@ class StudentTest extends TestCase
             ->put(route('portal.students.update', $student), ['name' => str_repeat('a', 256)]);
 
         $response->assertSessionHasErrors('name');
+    }
+
+    public function test_update_validates_source_required(): void
+    {
+        $student = Student::factory()->create(['source' => 'direct']);
+
+        $response = $this->actingAs($this->user)
+            ->put(route('portal.students.update', $student), ['source' => '']);
+
+        $response->assertSessionHasErrors('source');
+    }
+
+    public function test_update_validates_source_max_length(): void
+    {
+        $student = Student::factory()->create(['source' => 'direct']);
+
+        $response = $this->actingAs($this->user)
+            ->put(route('portal.students.update', $student), ['source' => str_repeat('a', 256)]);
+
+        $response->assertSessionHasErrors('source');
+    }
+
+    public function test_index_shows_source_column(): void
+    {
+        Student::factory()->create(['name' => 'Alice', 'source' => 'mytutor']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.students.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('mytutor');
+    }
+
+    public function test_show_displays_source(): void
+    {
+        $student = Student::factory()->create(['source' => 'referral']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.students.show', $student));
+
+        $response->assertStatus(200);
+        $response->assertSee('referral');
+    }
+
+    public function test_show_includes_datalist_with_all_existing_sources(): void
+    {
+        $student = Student::factory()->create(['source' => 'direct']);
+        Student::factory()->create(['source' => 'mytutor']);
+        Student::factory()->create(['source' => 'referral']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.students.show', $student));
+
+        $response->assertStatus(200);
+        $response->assertSee('<option value="direct">', false);
+        $response->assertSee('<option value="mytutor">', false);
+        $response->assertSee('<option value="referral">', false);
     }
 
     public function test_destroy_requires_authentication(): void

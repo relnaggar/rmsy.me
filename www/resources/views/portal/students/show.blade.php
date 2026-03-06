@@ -19,6 +19,14 @@
     </td>
   </tr>
   <tr>
+    <th>Source</th>
+    <td>
+      <x-inline-edit-text name="source" :action="route('portal.students.update', $student)" :value="$student->source" maxlength="255" required :datalist="$sources">
+        {{ $student->source ?: '-' }}
+      </x-inline-edit-text>
+    </td>
+  </tr>
+  <tr>
     <th>Actions</th>
     <td>
       <form action="{{ route('portal.students.destroy', $student) }}" method="POST" class="d-inline"

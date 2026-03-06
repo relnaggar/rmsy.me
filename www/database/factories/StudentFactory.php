@@ -14,6 +14,7 @@ class StudentFactory extends Factory
     {
         return [
             'name' => fake()->firstName(),
+            'source' => fake()->randomElement(['direct', 'mytutor', 'referral']),
         ];
     }
 }

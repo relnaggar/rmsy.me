@@ -4,6 +4,7 @@
     'value' => null,
     'maxlength' => null,
     'required' => false,
+    'datalist' => [],
 ])
 
 <span data-inline-edit-display>
@@ -21,7 +22,15 @@
     value="{{ old($name, $value) }}"
     @if($maxlength) maxlength="{{ $maxlength }}" @endif
     @if($required) required @endif
+    @if($datalist) list="{{ $name }}-list" @endif
   >
+  @if($datalist)
+    <datalist id="{{ $name }}-list">
+      @foreach($datalist as $option)
+        <option value="{{ $option }}">
+      @endforeach
+    </datalist>
+  @endif
   <button type="submit" class="btn btn-primary btn-sm">Update</button>
   <button type="button" class="btn btn-outline-secondary btn-sm" data-inline-edit-toggle>Cancel</button>
   @error($name)

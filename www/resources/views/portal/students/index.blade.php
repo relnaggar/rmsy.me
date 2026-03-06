@@ -9,6 +9,7 @@
     <tr>
       <th>ID</th>
       <th>Name</th>
+      <th>Source</th>
     </tr>
   </thead>
   <tbody>
@@ -16,10 +17,11 @@
       <tr>
         <td><a href="{{ route('portal.students.show', $student) }}">{{ $student->id }}</a></td>
         <td>{{ $student->name }}</td>
+        <td>{{ $student->source }}</td>
       </tr>
     @empty
       <tr>
-        <td colspan="2" class="text-center">No students found.</td>
+        <td colspan="3" class="text-center">No students found.</td>
       </tr>
     @endforelse
   </tbody>

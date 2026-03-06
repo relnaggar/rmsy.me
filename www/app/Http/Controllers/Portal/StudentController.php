@@ -23,8 +23,14 @@ class StudentController extends Controller
     {
         $student->load(['lessons' => fn ($q) => $q->with(['client', 'buyer', 'payments'])->orderBy('datetime')]);
 
+        $sources = Student::where('source', '!=', '')
+            ->distinct()
+            ->orderBy('source')
+            ->pluck('source');
+
         return view('portal.students.show', [
             'student' => $student,
+            'sources' => $sources,
         ]);
     }
 
@@ -32,6 +38,7 @@ class StudentController extends Controller
     {
         $validated = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'source' => ['sometimes', 'required', 'string', 'max:255'],
         ]);
 
         $student->update($validated);

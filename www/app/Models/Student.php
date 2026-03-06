@@ -16,6 +16,7 @@ class Student extends Model
 
     protected $fillable = [
         'name',
+        'source',
     ];
 
     public function lessons(): HasMany
