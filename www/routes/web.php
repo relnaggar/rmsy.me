@@ -7,6 +7,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MicrosoftAuthController;
 use App\Http\Controllers\Portal\BuyerController;
 use App\Http\Controllers\Portal\ClientController;
+use App\Http\Controllers\Portal\AnalyticsController;
 use App\Http\Controllers\Portal\InvoiceController;
 use App\Http\Controllers\Portal\LessonController;
 use App\Http\Controllers\Portal\PaymentController;
@@ -169,5 +170,7 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
             '/invoices/{invoiceNumber}',
             [InvoiceController::class, 'show']
         )->name('invoices.show');
+
+        Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
     }
 );

@@ -115,6 +115,9 @@ class NavService
             new NavItem(text: 'Invoices', path: route('portal.invoices.index'))
         );
         $portalItem->addDropdownItem(
+            new NavItem(text: 'Analytics', path: route('portal.analytics.index'))
+        );
+        $portalItem->addDropdownItem(
             new NavItem(text: 'Logout', path: route('logout'), method: 'POST')
         );
         $this->addNavItem($portalItem);
