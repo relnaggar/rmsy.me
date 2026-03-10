@@ -61,6 +61,16 @@ a:hover .card-body {
 //   background-color: lighten($ctaBackgroundColor, 30%);
 // }
 
+// flex items default to min-width: auto, preventing overflow-x: auto from working on children
+main {
+  min-width: 0;
+}
+
+// column-equivalent of Bootstrap's table-group-divider (thicker, darker left border)
+.col-group-divider {
+  border-left: calc(2 * var(--bs-border-width)) solid currentColor !important;
+}
+
 // honeypot field is the div parent of the input field with id "subject"
 .subject {
   height: 0;

@@ -16,7 +16,7 @@
             <th rowspan="2">Week of</th>
             <th colspan="3" class="text-center border-start">Total</th>
             @foreach($sources as $source)
-              <th colspan="3" class="text-center border-start">{{ $source }}</th>
+              <th colspan="3" class="text-center {{ $loop->first ? 'col-group-divider' : 'border-start' }}">{{ $source }}</th>
             @endforeach
           </tr>
           <tr>
@@ -24,25 +24,36 @@
             <th class="text-end">GBP</th>
             <th class="text-end">EUR</th>
             @foreach($sources as $source)
-              <th class="text-end border-start">Lessons</th>
+              <th class="text-end {{ $loop->first ? 'col-group-divider' : 'border-start' }}">Lessons</th>
               <th class="text-end">GBP</th>
               <th class="text-end">EUR</th>
             @endforeach
           </tr>
         </thead>
         <tbody>
+          <tr class="fw-bold">
+            <td>Total</td>
+            <td class="text-end border-start">{{ $quarter['total']['lesson_count'] }}</td>
+            <td class="text-end">{{ penceToPounds($quarter['total']['gbp_pence']) }}</td>
+            <td class="text-end">{{ penceToPounds($quarter['total']['eur_cents']) }}{{ $quarter['total']['eur_missing'] ? '*' : '' }}</td>
+            @include('portal._analytics_source_cells', ['rowData' => $quarter['total'], 'formatAsAvg' => false])
+          </tr>
+          <tr class="fst-italic">
+            <td>Avg/week</td>
+            <td class="text-end border-start">{{ number_format($quarter['avg']['lesson_count'], 1) }}</td>
+            <td class="text-end">{{ penceToPounds((int) round($quarter['avg']['gbp_pence'])) }}</td>
+            <td class="text-end">{{ penceToPounds((int) round($quarter['avg']['eur_cents'])) }}{{ $quarter['avg']['eur_missing'] ? '*' : '' }}</td>
+            @include('portal._analytics_source_cells', ['rowData' => $quarter['avg'], 'formatAsAvg' => true])
+          </tr>
+        </tbody>
+        <tbody class="table-group-divider">
           @foreach($quarter['weeks'] as $weekStart => $week)
             <tr>
               <td>{{ $weekStart }}</td>
               <td class="text-end border-start">{{ $week['lesson_count'] }}</td>
               <td class="text-end">{{ penceToPounds($week['gbp_pence']) }}</td>
               <td class="text-end">{{ penceToPounds($week['eur_cents']) }}{{ $week['eur_missing'] ? '*' : '' }}</td>
-              @foreach($sources as $source)
-                @php $data = $week['sources'][$source] ?? null; @endphp
-                <td class="text-end border-start">{{ $data ? $data['lesson_count'] : '' }}</td>
-                <td class="text-end">{{ $data ? penceToPounds($data['gbp_pence']) : '' }}</td>
-                <td class="text-end">{{ $data ? penceToPounds($data['eur_cents']).($data['eur_missing'] ? '*' : '') : '' }}</td>
-              @endforeach
+              @include('portal._analytics_source_cells', ['rowData' => $week, 'formatAsAvg' => false])
             </tr>
           @endforeach
         </tbody>

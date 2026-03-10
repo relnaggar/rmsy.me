@@ -9,6 +9,7 @@ use App\Models\Lesson;
 use App\Models\Payment;
 use App\Models\Student;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -212,5 +213,200 @@ class AnalyticsTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('2026 T1');
         $response->assertSee('2026 T2');
+    }
+
+    public function test_analytics_shows_all_weeks_in_quarter_up_to_last_full_week(): void
+    {
+        ExchangeRate::factory()->create(['date' => '2026-01-05', 'gbpeur' => 0.85000]);
+        Lesson::factory()->create([
+            'datetime' => '2026-01-07 10:00', // week of 2026-01-05 only
+            'complete' => true,
+            'price_gbp_pence' => 5000,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.analytics.index'));
+
+        $response->assertStatus(200);
+        // Empty weeks between the lesson week and today should appear
+        $response->assertSee('2026-01-12');
+        // The last full week as of 2026-03-10 (Tuesday) is the week starting 2026-03-02
+        $response->assertSee('2026-03-02');
+        // Future/current weeks should not appear
+        $response->assertDontSee('2026-03-09');
+        $response->assertDontSee('2026-03-30');
+    }
+
+    public function test_analytics_shows_total_and_average_rows(): void
+    {
+        ExchangeRate::factory()->create(['date' => '2026-01-05', 'gbpeur' => 0.85000]);
+        Lesson::factory()->create([
+            'datetime' => '2026-01-07 10:00',
+            'complete' => true,
+            'price_gbp_pence' => 5000,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.analytics.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Avg/week');
+        // Total row: 1 lesson, same GBP/EUR as the single lesson
+        $response->assertSee('50.00');
+        $response->assertSee('58.83');
+    }
+
+    public function test_analytics_excludes_current_week_data_from_totals(): void
+    {
+        ExchangeRate::factory()->create(['date' => '2026-01-05', 'gbpeur' => 0.85000]);
+        // Past week lesson
+        Lesson::factory()->create([
+            'datetime' => '2026-01-07 10:00',
+            'complete' => true,
+            'price_gbp_pence' => 5000,
+        ]);
+        // Current week lesson — should be excluded from display
+        $currentWeekStart = Carbon::now()->startOfWeek(Carbon::MONDAY);
+        ExchangeRate::factory()->create(['date' => $currentWeekStart->format('Y-m-d'), 'gbpeur' => 0.85000]);
+        Lesson::factory()->create([
+            'datetime' => $currentWeekStart->copy()->addDay()->setTime(10, 0)->toDateTimeString(),
+            'complete' => true,
+            'price_gbp_pence' => 9000,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.analytics.index'));
+
+        $response->assertStatus(200);
+        $response->assertDontSee($currentWeekStart->format('Y-m-d'));
+        // GBP from current week lesson (90.00) must not appear
+        $response->assertDontSee('90.00');
+    }
+
+    public function test_analytics_source_totals_and_averages(): void
+    {
+        Carbon::setTestNow('2026-03-10 10:00'); // freeze for deterministic week count
+
+        try {
+            // Use 1:1 rate for simpler arithmetic
+            ExchangeRate::factory()->create(['date' => '2026-01-05', 'gbpeur' => 1.00000]);
+            $student = Student::factory()->create(['source' => 'MyTutor']);
+            Lesson::factory()->create([
+                'datetime' => '2026-01-07 10:00', // week of 2026-01-05
+                'complete' => true,
+                'price_gbp_pence' => 5000,
+                'student_id' => $student->id,
+            ]);
+            Lesson::factory()->create([
+                'datetime' => '2026-01-08 10:00', // same week
+                'complete' => true,
+                'price_gbp_pence' => 3000,
+                'student_id' => $student->id,
+            ]);
+
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            // Source total GBP: 5000 + 3000 = 8000 pence = 80.00
+            $response->assertSee('80.00');
+            // Q1 2026 has 9 weeks (Jan 5 through Mar 2) as of Mar 10
+            // Source avg GBP: 8000 / 9 = 888.89 pence → round = 889 → 8.89
+            $response->assertSee('8.89');
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_analytics_assigns_cross_quarter_week_to_quarter_of_week_start(): void
+    {
+        // Week of 2026-03-30 (Monday) straddles Q1 (Mar 30-31) and Q2 (Apr 1-5)
+        Carbon::setTestNow('2026-04-07 10:00'); // Tuesday Apr 7 — week of Mar 30 is the last full week
+
+        try {
+            ExchangeRate::factory()->create(['date' => '2026-03-30', 'gbpeur' => 0.85000]);
+            // Lesson on March 31 (Q1 month)
+            Lesson::factory()->create([
+                'datetime' => '2026-03-31 10:00',
+                'complete' => true,
+                'price_gbp_pence' => 5000,
+            ]);
+            // Lesson on April 1 (Q2 month) — same week, should still appear under Q1
+            Lesson::factory()->create([
+                'datetime' => '2026-04-01 10:00',
+                'complete' => true,
+                'price_gbp_pence' => 3000,
+            ]);
+
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            // Both lessons belong to the week of Mar 30, which is in Q1
+            $response->assertSee('2026 T1');
+            $response->assertSee('2026-03-30');
+            // Combined GBP: 5000 + 3000 = 8000 pence = 80.00 — not split into 50.00 / 30.00
+            $response->assertSee('80.00');
+            $response->assertDontSee('50.00');
+            $response->assertDontSee('30.00');
+            // April lesson should NOT create a separate Q2 table
+            $response->assertDontSee('2026 T2');
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_analytics_assigns_cross_year_week_to_quarter_of_week_start(): void
+    {
+        // Jan 1 2027 is a Friday — the week of Mon Dec 28 2026 runs Dec 28–Jan 3 2027
+        // As of Jan 10 2027 (Sunday), lastFullWeekStart = Dec 28 2026
+        Carbon::setTestNow('2027-01-10 10:00');
+
+        try {
+            ExchangeRate::factory()->create(['date' => '2026-12-28', 'gbpeur' => 0.85000]);
+            // Lesson on Jan 2 2027 (Saturday) — week of Dec 28 2026, which is T4 2026
+            Lesson::factory()->create([
+                'datetime' => '2027-01-02 10:00',
+                'complete' => true,
+                'price_gbp_pence' => 5000,
+            ]);
+
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            // Week start is Dec 28 2026 (T4), so lesson belongs to 2026 T4
+            $response->assertSee('2026 T4');
+            $response->assertSee('2026-12-28');
+            // Should NOT create a 2027 T1 entry
+            $response->assertDontSee('2027 T1');
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_analytics_shows_quarter_heading_when_no_full_weeks_yet(): void
+    {
+        // Tuesday Apr 7 — Q2 started Apr 6 (Mon), first week not yet complete
+        Carbon::setTestNow('2026-04-07 10:00');
+
+        try {
+            ExchangeRate::factory()->create(['date' => '2026-04-06', 'gbpeur' => 0.85000]);
+            Lesson::factory()->create([
+                'datetime' => '2026-04-06 10:00', // first Monday of Q2 — current week
+                'complete' => true,
+                'price_gbp_pence' => 5000,
+            ]);
+
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            $response->assertSee('2026 T2');
+            // No week rows since no complete weeks in Q2 yet
+            $response->assertDontSee('2026-04-06');
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 }
