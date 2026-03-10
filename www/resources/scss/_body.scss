@@ -71,6 +71,11 @@ main {
   border-left: calc(2 * var(--bs-border-width)) solid currentColor !important;
 }
 
+// fixed-width input for short numeric values (e.g. target income)
+.input-w-sm {
+  width: 120px;
+}
+
 // honeypot field is the div parent of the input field with id "subject"
 .subject {
   height: 0;

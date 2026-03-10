@@ -409,4 +409,96 @@ class AnalyticsTest extends TestCase
             Carbon::setTestNow();
         }
     }
+
+    public function test_analytics_target_can_be_saved(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->post(route('portal.analytics.setTarget'), [
+                'target_monthly_income_eur' => 3000,
+            ]);
+
+        $response->assertRedirect(route('portal.analytics.index'));
+        $this->user->refresh();
+        $this->assertEquals(300000, $this->user->target_monthly_income_eur_cents);
+    }
+
+    public function test_analytics_target_form_shows_saved_value(): void
+    {
+        $this->user->update(['target_monthly_income_eur_cents' => 300000]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.analytics.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('value="3000"', false);
+    }
+
+    public function test_analytics_target_shows_lessons_per_week(): void
+    {
+        Carbon::setTestNow('2026-03-10 10:00');
+
+        try {
+            // 1:1 rate for simpler arithmetic
+            ExchangeRate::factory()->create(['date' => '2026-01-05', 'gbpeur' => 1.00000]);
+            // 2 lessons at 5000 pence each = 10000 pence total = 100 EUR total
+            // 9 weeks in Q1 as of Mar 10
+            // avg EUR per lesson = 10000 / 2 = 5000 cents = 50 EUR
+            // target 3000 EUR/month ÷ 50 EUR/lesson ÷ (52/12) weeks/month ≈ 13.8 lessons/week
+            Lesson::factory()->create([
+                'datetime' => '2026-01-07 10:00',
+                'complete' => true,
+                'price_gbp_pence' => 5000,
+            ]);
+            Lesson::factory()->create([
+                'datetime' => '2026-01-14 10:00',
+                'complete' => true,
+                'price_gbp_pence' => 5000,
+            ]);
+            $this->user->update(['target_monthly_income_eur_cents' => 300000]);
+
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            // 300000 / 5000 / (52/12) = 60 / 4.333... = 13.846... ≈ 13.8
+            $response->assertSee('13.8');
+            $response->assertSee('lessons/week needed');
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_analytics_target_not_shown_when_no_lessons(): void
+    {
+        $this->user->update(['target_monthly_income_eur_cents' => 300000]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.analytics.index'));
+
+        $response->assertStatus(200);
+        $response->assertDontSee('lessons/week needed');
+    }
+
+    public function test_analytics_target_not_shown_when_eur_missing(): void
+    {
+        Carbon::setTestNow('2026-03-10 10:00');
+
+        try {
+            // No exchange rate — EUR will be missing
+            Lesson::factory()->create([
+                'datetime' => '2026-01-07 10:00',
+                'complete' => true,
+                'price_gbp_pence' => 5000,
+            ]);
+            $this->user->update(['target_monthly_income_eur_cents' => 300000]);
+
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            $response->assertDontSee('lessons/week needed');
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
 }

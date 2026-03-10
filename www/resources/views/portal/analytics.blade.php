@@ -4,6 +4,19 @@
 @section('heading', 'Analytics')
 
 @section('content')
+<div class="mt-3 d-flex align-items-center gap-3 flex-wrap">
+  <form method="POST" action="{{ route('portal.analytics.setTarget') }}" class="d-flex align-items-center gap-2">
+    @csrf
+    <label for="target_monthly_income_eur" class="form-label mb-0">Target monthly income (EUR)</label>
+    <input type="number" id="target_monthly_income_eur" name="target_monthly_income_eur"
+      class="form-control form-control-sm input-w-sm" min="0"
+      value="{{ $targetMonthlyIncomeEurCents !== null ? (int) ($targetMonthlyIncomeEurCents / 100) : '' }}">
+    <button type="submit" class="btn btn-sm btn-primary">Save</button>
+  </form>
+  @if($targetLessonsPerWeek !== null)
+    <span class="text-muted">→ <strong>{{ number_format($targetLessonsPerWeek, 1) }}</strong> lessons/week needed (based on current quarter avg)</span>
+  @endif
+</div>
 @if(empty($quarters))
   <p class="mt-3">No complete lessons found.</p>
 @else

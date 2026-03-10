@@ -172,5 +172,6 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
         )->name('invoices.show');
 
         Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+        Route::post('/analytics/target', [AnalyticsController::class, 'setTarget'])->name('analytics.setTarget');
     }
 );

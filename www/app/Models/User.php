@@ -26,6 +26,7 @@ class User extends Authenticatable
         'ms_access_token',
         'ms_refresh_token',
         'ms_token_expires',
+        'target_monthly_income_eur_cents',
     ];
 
     /**
