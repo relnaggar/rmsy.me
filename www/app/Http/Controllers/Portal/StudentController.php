@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
+use App\Models\Buyer;
+use App\Models\Client;
 use App\Models\Student;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,9 +21,29 @@ class StudentController extends Controller
         ]);
     }
 
-    public function show(Student $student): View
+    public function show(Request $request, Student $student): View
     {
-        $student->load(['lessons' => fn ($q) => $q->with(['client', 'buyer', 'payments'])->orderBy('datetime')]);
+        [$startDate, $endDate] = $this->lessonDateDefaults(
+            $request,
+            $student->lessons()->min('datetime'),
+            $student->lessons()->max('datetime'),
+        );
+        $clientFilter = (string) $request->query('client_id', '');
+        $buyerFilter = (string) $request->query('buyer_id', '');
+        $completeFilter = (string) $request->query('complete', 'all');
+
+        $lessonsQuery = $student->lessons()
+            ->with(['client', 'buyer', 'payments'])
+            ->orderBy('datetime', 'desc');
+
+        if ($clientFilter !== '') {
+            $lessonsQuery->where('client_id', (int) $clientFilter);
+        }
+        if ($buyerFilter !== '') {
+            $lessonsQuery->where('buyer_id', $buyerFilter);
+        }
+        $this->applyLessonDateFilters($lessonsQuery, $startDate, $endDate);
+        $this->applyLessonCompleteFilter($lessonsQuery, $completeFilter);
 
         $sources = Student::where('source', '!=', '')
             ->distinct()
@@ -31,6 +53,22 @@ class StudentController extends Controller
         return view('portal.students.show', [
             'student' => $student,
             'sources' => $sources,
+            'lessons' => $lessonsQuery->get(),
+            'startDateFilter' => $startDate,
+            'endDateFilter' => $endDate,
+            'clientFilter' => $clientFilter,
+            'buyerFilter' => $buyerFilter,
+            'studentFilter' => (string) $student->id,
+            'completeFilter' => $completeFilter,
+            'clientOptions' => self::withAllOption(
+                Client::whereIn('id', $student->lessons()->whereNotNull('client_id')->distinct()->pluck('client_id'))
+                    ->orderBy('name')->pluck('name', 'id')->toArray()
+            ),
+            'buyerOptions' => self::withAllOption(
+                Buyer::whereIn('id', $student->lessons()->whereNotNull('buyer_id')->distinct()->pluck('buyer_id'))
+                    ->orderBy('name')->pluck('name', 'id')->toArray()
+            ),
+            'studentOptions' => [$student->id => $student->name],
         ]);
     }
 

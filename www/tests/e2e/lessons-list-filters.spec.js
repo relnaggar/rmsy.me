@@ -20,15 +20,15 @@ test.describe.serial('lessons list filters UI', () => {
   });
 
   test('buyer filter auto-submits and filters lessons', async () => {
-    await page.locator('#list_buyer_id').selectOption({ label: 'E2E Acme' });
+    await page.locator('#lesson_filter_buyer').selectOption({ label: 'E2E Acme' });
 
     await page.waitForURL(/[?&]buyer_id=e2e-acme/);
     await expect(page).toHaveURL(/[?&]buyer_id=e2e-acme/);
-    await expect(page.locator('#list_buyer_id')).toHaveValue('e2e-acme');
+    await expect(page.locator('#lesson_filter_buyer')).toHaveValue('e2e-acme');
   });
 
   test('student filter auto-submits and filters lessons', async () => {
-    await page.locator('#list_student_id').selectOption({ label: 'E2E Student Fixture' });
+    await page.locator('#lesson_filter_student').selectOption({ label: 'E2E Student Fixture' });
 
     await page.waitForURL(/[?&]student_id=/);
     await expect(page).toHaveURL(/[?&]student_id=/);
@@ -37,8 +37,8 @@ test.describe.serial('lessons list filters UI', () => {
   });
 
   test('start date filter auto-submits and filters lessons', async () => {
-    await page.locator('#list_start_date').fill('2099-12-31');
-    await page.locator('#list_start_date').dispatchEvent('change');
+    await page.locator('#lesson_filter_start').fill('2099-12-31');
+    await page.locator('#lesson_filter_start').dispatchEvent('change');
 
     await page.waitForURL(/[?&]start_date=2099-12-31/);
     await expect(page).toHaveURL(/[?&]start_date=2099-12-31/);
@@ -48,8 +48,8 @@ test.describe.serial('lessons list filters UI', () => {
   });
 
   test('end date filter auto-submits and filters lessons', async () => {
-    await page.locator('#list_end_date').fill('2099-12-29');
-    await page.locator('#list_end_date').dispatchEvent('change');
+    await page.locator('#lesson_filter_end').fill('2099-12-29');
+    await page.locator('#lesson_filter_end').dispatchEvent('change');
 
     await page.waitForURL(/[?&]end_date=2099-12-29/);
     await expect(page).toHaveURL(/[?&]end_date=2099-12-29/);
@@ -59,8 +59,8 @@ test.describe.serial('lessons list filters UI', () => {
   });
 
   test('copy button copies start date to end date and auto-submits', async () => {
-    await page.locator('#list_start_date').fill('2099-12-31');
-    await page.locator('#list_start_date').dispatchEvent('change');
+    await page.locator('#lesson_filter_start').fill('2099-12-31');
+    await page.locator('#lesson_filter_start').dispatchEvent('change');
     await page.waitForURL(/[?&]start_date=2099-12-31/);
 
     await page.getByTitle('Copy From date to To date').nth(1).click();

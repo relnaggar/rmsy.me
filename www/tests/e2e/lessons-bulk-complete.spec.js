@@ -113,19 +113,19 @@ test.describe.serial('lessons bulk complete UI', () => {
   });
 
   test('Showing dropdown auto-submits and filters to incomplete lessons', async () => {
-    await page.locator('#complete_filter').selectOption('incomplete');
+    await page.locator('#lesson_filter_complete').selectOption('incomplete');
 
     await page.waitForURL(/[?&]complete=incomplete/);
     await expect(page).toHaveURL(/[?&]complete=incomplete/);
-    await expect(page.locator('#complete_filter')).toHaveValue('incomplete');
+    await expect(page.locator('#lesson_filter_complete')).toHaveValue('incomplete');
   });
 
   test('Showing dropdown auto-submits and filters to complete lessons', async () => {
-    await page.locator('#complete_filter').selectOption('complete');
+    await page.locator('#lesson_filter_complete').selectOption('complete');
 
     await page.waitForURL(/[?&]complete=complete/);
     await expect(page).toHaveURL(/[?&]complete=complete/);
-    await expect(page.locator('#complete_filter')).toHaveValue('complete');
+    await expect(page.locator('#lesson_filter_complete')).toHaveValue('complete');
   });
 
   test('filtering to complete shows complete fixture lesson and hides incomplete ones', async () => {

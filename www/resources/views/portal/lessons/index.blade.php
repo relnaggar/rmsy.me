@@ -50,123 +50,17 @@
 </div>
 
 <h2 class="h5 mb-3">List</h2>
-<form method="GET" action="{{ route('portal.lessons.index') }}" class="row g-2 align-items-end mb-3">
-  <div class="col-auto">
-    <label for="list_start_date" class="form-label mb-0">From</label>
-    <input type="date" id="list_start_date" name="start_date" class="form-control" value="{{ $startDateFilter }}" data-auto-submit>
-  </div>
-  <div class="col-auto d-flex align-items-end">
-    <button type="button" class="btn btn-sm btn-outline-secondary" title="Copy From date to To date" data-copy-date-from="list_start_date" data-copy-date-to="list_end_date">&rarr;</button>
-  </div>
-  <div class="col-auto">
-    <label for="list_end_date" class="form-label mb-0">To</label>
-    <input type="date" id="list_end_date" name="end_date" class="form-control" value="{{ $endDateFilter }}" data-auto-submit>
-  </div>
-  <div class="col-auto">
-    <label for="list_buyer_id" class="form-label mb-0">Buyer</label>
-    <select id="list_buyer_id" name="buyer_id" class="form-select" data-auto-submit>
-      @foreach($buyerOptions as $value => $label)
-        <option value="{{ $value }}" @selected($buyerFilter === (string) $value)>{{ $label }}</option>
-      @endforeach
-    </select>
-  </div>
-  <div class="col-auto">
-    <label for="list_student_id" class="form-label mb-0">Student</label>
-    <select id="list_student_id" name="student_id" class="form-select" data-auto-submit>
-      @foreach($studentOptions as $value => $label)
-        <option value="{{ $value }}" @selected($studentFilter === (string) $value)>{{ $label }}</option>
-      @endforeach
-    </select>
-  </div>
-  <div class="col-auto">
-    <label for="list_client_id" class="form-label mb-0">Client</label>
-    <select id="list_client_id" name="client_id" class="form-select" data-auto-submit>
-      @foreach($clientOptions as $value => $label)
-        <option value="{{ $value }}" @selected($clientFilter === (string) $value)>{{ $label }}</option>
-      @endforeach
-    </select>
-  </div>
-  <div class="col-auto">
-    <label for="complete_filter" class="form-label mb-0">Showing</label>
-    <select id="complete_filter" name="complete" class="form-select" data-auto-submit>
-      <option value="all" @selected($completeFilter === 'all')>All</option>
-      <option value="incomplete" @selected($completeFilter === 'incomplete')>Incomplete</option>
-      <option value="complete" @selected($completeFilter === 'complete')>Complete</option>
-    </select>
-  </div>
-</form>
-
-<form method="POST" action="{{ route('portal.lessons.markCompleteBulk') }}">
-  @csrf
-  <input type="hidden" name="complete_filter" value="{{ $completeFilter }}">
-  <input type="hidden" name="buyer_id" value="{{ $buyerFilter }}">
-  <input type="hidden" name="student_id" value="{{ $studentFilter }}">
-  <input type="hidden" name="client_id" value="{{ $clientFilter }}">
-  <input type="hidden" name="start_date" value="{{ $startDateFilter }}">
-  <input type="hidden" name="end_date" value="{{ $endDateFilter }}">
-  @if($lessons->isNotEmpty())
-    <div class="mb-2">
-      <button type="submit" class="btn btn-success btn-sm"
-              data-confirm="Mark selected lessons as complete?"
-              data-requires-selection>Mark as Complete</button>
-      <button type="submit" formaction="{{ route('portal.lessons.deleteBulk') }}" class="btn btn-danger btn-sm"
-              data-confirm="Delete selected lessons?"
-              data-requires-selection>Delete</button>
-    </div>
-  @endif
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th><input type="checkbox" data-select-all></th>
-        <th>ID</th>
-        <th>Date/Time</th>
-        <th>Repeat (Weeks)</th>
-        <th>Student</th>
-        <th>Client</th>
-        <th>Buyer</th>
-        <th>Price</th>
-        <th>Paid</th>
-        <th>Complete</th>
-      </tr>
-    </thead>
-    <tbody>
-      @forelse($lessons as $lesson)
-        <tr>
-          <td><input type="checkbox" name="lesson_ids[]" value="{{ $lesson->id }}"></td>
-          <td><a href="{{ route('portal.lessons.show', $lesson) }}">{{ $lesson->id }}</a></td>
-          <td>{{ $lesson->getFormattedDatetime() }}-{{ $lesson->datetime->copy()->addMinutes($lesson->duration_minutes)->format('H:i') }}</td>
-          <td>{{ $lesson->repeat_weeks }}</td>
-          <td>
-            @if($lesson->student)
-              <a href="{{ route('portal.students.show', $lesson->student) }}">{{ $lesson->student->name }}</a>
-            @else
-              -
-            @endif
-          </td>
-          <td>
-            @if($lesson->client)
-              <a href="{{ route('portal.clients.show', $lesson->client) }}">{{ $lesson->client->name }}</a>
-            @else
-              -
-            @endif
-          </td>
-          <td>
-            @if($lesson->buyer)
-              <a href="{{ route('portal.buyers.show', $lesson->buyer) }}">{{ $lesson->buyer->name }}</a>
-            @else
-              -
-            @endif
-          </td>
-          <td>&pound;{{ $lesson->getFormattedPrice() }}</td>
-          <td><x-paid-status :lesson="$lesson" /></td>
-          <td>{{ $lesson->complete ? 'Yes' : 'No' }}</td>
-        </tr>
-      @empty
-        <tr>
-          <td colspan="10" class="text-center">No lessons found.</td>
-        </tr>
-      @endforelse
-    </tbody>
-  </table>
-</form>
+<x-lesson-table
+  :lessons="$lessons"
+  :filterAction="route('portal.lessons.index')"
+  :buyerOptions="$buyerOptions"
+  :studentOptions="$studentOptions"
+  :clientOptions="$clientOptions"
+  :completeFilter="$completeFilter"
+  :buyerFilter="$buyerFilter"
+  :studentFilter="$studentFilter"
+  :clientFilter="$clientFilter"
+  :startDateFilter="$startDateFilter"
+  :endDateFilter="$endDateFilter"
+/>
 @endsection

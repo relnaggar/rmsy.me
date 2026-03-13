@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Models\Buyer;
-use App\Models\Client;
 use App\Models\Lesson;
-use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -37,13 +34,12 @@ class LessonMarkCompleteBulkTest extends TestCase
         $lesson1 = Lesson::factory()->create(['complete' => false]);
         $lesson2 = Lesson::factory()->create(['complete' => false, 'datetime' => '2025-01-20 10:00']);
 
-        $response = $this->actingAs($this->user)
+        $this->actingAs($this->user)
             ->post(route('portal.lessons.markCompleteBulk'), [
                 'lesson_ids' => [$lesson1->id, $lesson2->id],
-            ]);
+            ])
+            ->assertSessionHas('success');
 
-        $response->assertRedirect(route('portal.lessons.index'));
-        $response->assertSessionHas('success');
         $this->assertTrue($lesson1->fresh()->complete);
         $this->assertTrue($lesson2->fresh()->complete);
     }
@@ -62,34 +58,17 @@ class LessonMarkCompleteBulkTest extends TestCase
         $this->assertFalse($lesson2->fresh()->complete);
     }
 
-    public function test_mark_complete_bulk_preserves_complete_filter_in_redirect(): void
+    public function test_mark_complete_bulk_redirects_to_referer(): void
     {
         $lesson = Lesson::factory()->create(['complete' => false]);
+        $referer = route('portal.lessons.index', ['complete' => 'incomplete']);
 
-        $response = $this->actingAs($this->user)
+        $this->actingAs($this->user)
+            ->withHeaders(['Referer' => $referer])
             ->post(route('portal.lessons.markCompleteBulk'), [
                 'lesson_ids' => [$lesson->id],
-                'complete_filter' => 'incomplete',
-            ]);
-
-        $response->assertRedirect(route('portal.lessons.index', ['complete' => 'incomplete']));
-    }
-
-    public function test_mark_complete_bulk_preserves_date_filters_in_redirect(): void
-    {
-        $lesson = Lesson::factory()->create(['complete' => false, 'datetime' => '2025-06-15 10:00']);
-
-        $response = $this->actingAs($this->user)
-            ->post(route('portal.lessons.markCompleteBulk'), [
-                'lesson_ids' => [$lesson->id],
-                'start_date' => '2025-06-01',
-                'end_date' => '2025-06-30',
-            ]);
-
-        $response->assertRedirect(route('portal.lessons.index', [
-            'start_date' => '2025-06-01',
-            'end_date' => '2025-06-30',
-        ]));
+            ])
+            ->assertRedirect($referer);
     }
 
     public function test_mark_complete_bulk_requires_lesson_ids(): void
@@ -114,47 +93,5 @@ class LessonMarkCompleteBulkTest extends TestCase
             ->post(route('portal.lessons.markCompleteBulk'), ['lesson_ids' => [99999]]);
 
         $response->assertSessionHasErrors('lesson_ids.0');
-    }
-
-    public function test_mark_complete_bulk_preserves_buyer_filter_in_redirect(): void
-    {
-        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme Corp']);
-        $lesson = Lesson::factory()->create(['complete' => false, 'buyer_id' => 'acme']);
-
-        $response = $this->actingAs($this->user)
-            ->post(route('portal.lessons.markCompleteBulk'), [
-                'lesson_ids' => [$lesson->id],
-                'buyer_id' => 'acme',
-            ]);
-
-        $response->assertRedirect(route('portal.lessons.index', ['buyer_id' => 'acme']));
-    }
-
-    public function test_mark_complete_bulk_preserves_student_filter_in_redirect(): void
-    {
-        $student = Student::factory()->create();
-        $lesson = Lesson::factory()->create(['complete' => false, 'student_id' => $student->id]);
-
-        $response = $this->actingAs($this->user)
-            ->post(route('portal.lessons.markCompleteBulk'), [
-                'lesson_ids' => [$lesson->id],
-                'student_id' => $student->id,
-            ]);
-
-        $response->assertRedirect(route('portal.lessons.index', ['student_id' => $student->id]));
-    }
-
-    public function test_mark_complete_bulk_preserves_client_filter_in_redirect(): void
-    {
-        $client = Client::factory()->create();
-        $lesson = Lesson::factory()->create(['complete' => false, 'client_id' => $client->id]);
-
-        $response = $this->actingAs($this->user)
-            ->post(route('portal.lessons.markCompleteBulk'), [
-                'lesson_ids' => [$lesson->id],
-                'client_id' => $client->id,
-            ]);
-
-        $response->assertRedirect(route('portal.lessons.index', ['client_id' => $client->id]));
     }
 }

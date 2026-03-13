@@ -41,44 +41,17 @@
 
 <h2>Lessons</h2>
 
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Client</th>
-      <th>Buyer</th>
-      <th>Duration</th>
-      <th>Price</th>
-      <th>Paid</th>
-    </tr>
-  </thead>
-  <tbody>
-    @forelse($student->lessons as $lesson)
-      <tr>
-        <td><a href="{{ route('portal.lessons.show', $lesson) }}">{{ $lesson->getFormattedDatetime() }}</a></td>
-        <td>
-          @if($lesson->client)
-            <a href="{{ route('portal.clients.show', $lesson->client) }}">{{ $lesson->client->name }}</a>
-          @else
-            -
-          @endif
-        </td>
-        <td>
-          @if($lesson->buyer)
-            <a href="{{ route('portal.buyers.show', $lesson->buyer) }}">{{ $lesson->buyer->name }}</a>
-          @else
-            -
-          @endif
-        </td>
-        <td>{{ $lesson->duration_minutes }} min</td>
-        <td>&pound;{{ $lesson->getFormattedPrice() }}</td>
-        <td><x-paid-status :lesson="$lesson" /></td>
-      </tr>
-    @empty
-      <tr>
-        <td colspan="6" class="text-center">No lessons found for this student.</td>
-      </tr>
-    @endforelse
-  </tbody>
-</table>
+<x-lesson-table
+  :lessons="$lessons"
+  :filterAction="route('portal.students.show', $student)"
+  :buyerOptions="$buyerOptions"
+  :studentOptions="$studentOptions"
+  :clientOptions="$clientOptions"
+  :completeFilter="$completeFilter"
+  :buyerFilter="$buyerFilter"
+  :studentFilter="$studentFilter"
+  :clientFilter="$clientFilter"
+  :startDateFilter="$startDateFilter"
+  :endDateFilter="$endDateFilter"
+/>
 @endsection

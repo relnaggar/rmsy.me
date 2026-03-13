@@ -75,9 +75,29 @@ class BuyerController extends Controller
             ->with('success', 'Buyer created successfully.');
     }
 
-    public function show(Buyer $buyer): View
+    public function show(Request $request, Buyer $buyer): View
     {
-        $buyer->load(['lessons' => fn ($q) => $q->with(['student', 'client', 'payments'])->orderBy('datetime')]);
+        [$startDate, $endDate] = $this->lessonDateDefaults(
+            $request,
+            $buyer->lessons()->min('datetime'),
+            $buyer->lessons()->max('datetime'),
+        );
+        $studentFilter = (string) $request->query('student_id', '');
+        $clientFilter = (string) $request->query('client_id', '');
+        $completeFilter = (string) $request->query('complete', 'all');
+
+        $lessonsQuery = $buyer->lessons()
+            ->with(['student', 'client', 'payments'])
+            ->orderBy('datetime', 'desc');
+
+        if ($studentFilter !== '') {
+            $lessonsQuery->where('student_id', (int) $studentFilter);
+        }
+        if ($clientFilter !== '') {
+            $lessonsQuery->where('client_id', (int) $clientFilter);
+        }
+        $this->applyLessonDateFilters($lessonsQuery, $startDate, $endDate);
+        $this->applyLessonCompleteFilter($lessonsQuery, $completeFilter);
 
         $countries = [];
         foreach (CountryAlpha2::cases() as $country) {
@@ -89,6 +109,22 @@ class BuyerController extends Controller
         return view('portal.buyers.show', [
             'buyer' => $buyer,
             'countries' => $countries,
+            'lessons' => $lessonsQuery->get(),
+            'startDateFilter' => $startDate,
+            'endDateFilter' => $endDate,
+            'studentFilter' => $studentFilter,
+            'clientFilter' => $clientFilter,
+            'buyerFilter' => (string) $buyer->id,
+            'completeFilter' => $completeFilter,
+            'studentOptions' => self::withAllOption(
+                Student::whereIn('id', $buyer->lessons()->whereNotNull('student_id')->distinct()->pluck('student_id'))
+                    ->orderBy('name')->pluck('name', 'id')->toArray()
+            ),
+            'clientOptions' => self::withAllOption(
+                Client::whereIn('id', $buyer->lessons()->whereNotNull('client_id')->distinct()->pluck('client_id'))
+                    ->orderBy('name')->pluck('name', 'id')->toArray()
+            ),
+            'buyerOptions' => [$buyer->id => $buyer->name],
         ]);
     }
 

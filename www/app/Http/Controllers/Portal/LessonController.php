@@ -25,8 +25,9 @@ class LessonController extends Controller
 
     public function index(Request $request): View
     {
-        $filters = $this->readIndexFilters($request);
+        $earliestLessonDate = Lesson::min('datetime');
         $latestLessonDate = Lesson::max('datetime');
+        $filters = $this->readIndexFilters($request, $earliestLessonDate, $latestLessonDate);
 
         $lessonsQuery = Lesson::with(['student', 'client', 'buyer', 'payments'])
             ->orderBy('datetime', 'desc');
@@ -53,15 +54,17 @@ class LessonController extends Controller
     /**
      * @return array{complete: string, buyer_id: string, student_id: string, client_id: string, start_date: string, end_date: string}
      */
-    private function readIndexFilters(Request $request): array
+    private function readIndexFilters(Request $request, ?string $earliestDate, ?string $latestDate): array
     {
+        [$startDate, $endDate] = $this->lessonDateDefaults($request, $earliestDate, $latestDate);
+
         return [
             'complete' => (string) $request->query('complete', 'all'),
             'buyer_id' => (string) $request->query('buyer_id', ''),
             'student_id' => (string) $request->query('student_id', ''),
             'client_id' => (string) $request->query('client_id', ''),
-            'start_date' => (string) $request->query('start_date', ''),
-            'end_date' => (string) $request->query('end_date', ''),
+            'start_date' => $startDate,
+            'end_date' => $endDate,
         ];
     }
 
@@ -71,11 +74,7 @@ class LessonController extends Controller
      */
     private function applyIndexFilters(\Illuminate\Database\Eloquent\Builder $query, array $filters): void
     {
-        if ($filters['complete'] === 'incomplete') {
-            $query->where('complete', false);
-        } elseif ($filters['complete'] === 'complete') {
-            $query->where('complete', true);
-        }
+        $this->applyLessonCompleteFilter($query, $filters['complete']);
 
         if ($filters['buyer_id'] !== '') {
             $query->where('buyer_id', $filters['buyer_id']);
@@ -86,12 +85,8 @@ class LessonController extends Controller
         if ($filters['client_id'] !== '') {
             $query->where('client_id', (int) $filters['client_id']);
         }
-        if ($filters['start_date'] !== '') {
-            $query->where('datetime', '>=', $filters['start_date'].' 00:00:00');
-        }
-        if ($filters['end_date'] !== '') {
-            $query->where('datetime', '<=', $filters['end_date'].' 23:59:59');
-        }
+
+        $this->applyLessonDateFilters($query, $filters['start_date'], $filters['end_date']);
     }
 
     public function completeImportAfterAuth(): RedirectResponse
@@ -243,19 +238,12 @@ class LessonController extends Controller
         $validated = $request->validate([
             'lesson_ids' => ['required', 'array', 'min:1'],
             'lesson_ids.*' => ['required', 'integer', 'exists:lessons,id'],
-            'complete_filter' => ['nullable', 'string', 'in:incomplete,complete,all'],
-            'buyer_id' => ['nullable', 'string', 'max:100'],
-            'student_id' => ['nullable', 'integer'],
-            'client_id' => ['nullable', 'integer'],
-            'start_date' => ['nullable', 'date'],
-            'end_date' => ['nullable', 'date'],
         ]);
 
         $count = Lesson::whereIn('id', $validated['lesson_ids'])
             ->update(['complete' => true]);
 
-        return redirect()->route('portal.lessons.index', $this->buildFilterParams($validated))
-            ->with('success', "Marked {$count} lesson(s) as complete.");
+        return back()->with('success', "Marked {$count} lesson(s) as complete.");
     }
 
     public function deleteBulk(Request $request): RedirectResponse
@@ -263,34 +251,11 @@ class LessonController extends Controller
         $validated = $request->validate([
             'lesson_ids' => ['required', 'array', 'min:1'],
             'lesson_ids.*' => ['required', 'integer', 'exists:lessons,id'],
-            'complete_filter' => ['nullable', 'string', 'in:incomplete,complete,all'],
-            'buyer_id' => ['nullable', 'string', 'max:100'],
-            'student_id' => ['nullable', 'integer'],
-            'client_id' => ['nullable', 'integer'],
-            'start_date' => ['nullable', 'date'],
-            'end_date' => ['nullable', 'date'],
         ]);
 
         $count = Lesson::whereIn('id', $validated['lesson_ids'])->delete();
 
-        return redirect()->route('portal.lessons.index', $this->buildFilterParams($validated))
-            ->with('success', "Deleted {$count} lesson(s).");
-    }
-
-    /**
-     * @param  array<string, mixed>  $validated
-     * @return array<string, mixed>
-     */
-    private function buildFilterParams(array $validated): array
-    {
-        return array_filter([
-            'complete' => $validated['complete_filter'] ?? null,
-            'buyer_id' => $validated['buyer_id'] ?? null,
-            'student_id' => $validated['student_id'] ?? null,
-            'client_id' => $validated['client_id'] ?? null,
-            'start_date' => $validated['start_date'] ?? null,
-            'end_date' => $validated['end_date'] ?? null,
-        ], fn ($v) => $v !== null);
+        return back()->with('success', "Deleted {$count} lesson(s).");
     }
 
     public function destroy(Lesson $lesson): RedirectResponse
