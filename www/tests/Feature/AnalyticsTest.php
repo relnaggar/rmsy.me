@@ -215,26 +215,33 @@ class AnalyticsTest extends TestCase
         $response->assertSee('2026 T2');
     }
 
-    public function test_analytics_shows_all_weeks_in_quarter_up_to_last_full_week(): void
+    public function test_analytics_shows_all_weeks_in_quarter_up_to_current_week(): void
     {
-        ExchangeRate::factory()->create(['date' => '2026-01-05', 'gbpeur' => 0.85000]);
-        Lesson::factory()->create([
-            'datetime' => '2026-01-07 10:00', // week of 2026-01-05 only
-            'complete' => true,
-            'price_gbp_pence' => 5000,
-        ]);
+        Carbon::setTestNow('2026-03-14 10:00');
 
-        $response = $this->actingAs($this->user)
-            ->get(route('portal.analytics.index'));
+        try {
+            ExchangeRate::factory()->create(['date' => '2026-01-05', 'gbpeur' => 0.85000]);
+            Lesson::factory()->create([
+                'datetime' => '2026-01-07 10:00', // week of 2026-01-05 only
+                'complete' => true,
+                'price_gbp_pence' => 5000,
+            ]);
 
-        $response->assertStatus(200);
-        // Empty weeks between the lesson week and today should appear
-        $response->assertSee('2026-01-12');
-        // The last full week as of 2026-03-10 (Tuesday) is the week starting 2026-03-02
-        $response->assertSee('2026-03-02');
-        // Future/current weeks should not appear
-        $response->assertDontSee('2026-03-09');
-        $response->assertDontSee('2026-03-30');
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            // Empty weeks between the lesson week and today should appear
+            $response->assertSee('2026-01-12');
+            // The last full week (2026-03-02) and current week (2026-03-09) should appear
+            $response->assertSee('2026-03-02');
+            $response->assertSee('2026-03-09');
+            // Future weeks should not appear
+            $response->assertDontSee('2026-03-16');
+            $response->assertDontSee('2026-03-30');
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
     public function test_analytics_shows_total_and_average_rows(): void
@@ -256,31 +263,72 @@ class AnalyticsTest extends TestCase
         $response->assertSee('58.83');
     }
 
-    public function test_analytics_excludes_current_week_data_from_totals(): void
+    public function test_analytics_shows_current_week_highlighted(): void
     {
-        ExchangeRate::factory()->create(['date' => '2026-01-05', 'gbpeur' => 0.85000]);
-        // Past week lesson
-        Lesson::factory()->create([
-            'datetime' => '2026-01-07 10:00',
-            'complete' => true,
-            'price_gbp_pence' => 5000,
-        ]);
-        // Current week lesson — should be excluded from display
-        $currentWeekStart = Carbon::now()->startOfWeek(Carbon::MONDAY);
-        ExchangeRate::factory()->create(['date' => $currentWeekStart->format('Y-m-d'), 'gbpeur' => 0.85000]);
-        Lesson::factory()->create([
-            'datetime' => $currentWeekStart->copy()->addDay()->setTime(10, 0)->toDateTimeString(),
-            'complete' => true,
-            'price_gbp_pence' => 9000,
-        ]);
+        Carbon::setTestNow('2026-03-14 10:00');
 
-        $response = $this->actingAs($this->user)
-            ->get(route('portal.analytics.index'));
+        try {
+            ExchangeRate::factory()->create(['date' => '2026-01-05', 'gbpeur' => 0.85000]);
+            // Past week lesson
+            Lesson::factory()->create([
+                'datetime' => '2026-01-07 10:00',
+                'complete' => true,
+                'price_gbp_pence' => 5000,
+            ]);
+            // Current week lesson — should appear highlighted
+            ExchangeRate::factory()->create(['date' => '2026-03-09', 'gbpeur' => 0.85000]);
+            Lesson::factory()->create([
+                'datetime' => '2026-03-10 10:00', // Tuesday of current week
+                'complete' => true,
+                'price_gbp_pence' => 9000,
+            ]);
 
-        $response->assertStatus(200);
-        $response->assertDontSee($currentWeekStart->format('Y-m-d'));
-        // GBP from current week lesson (90.00) must not appear
-        $response->assertDontSee('90.00');
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            // Current week IS shown with date and lesson data
+            $response->assertSee('2026-03-09');
+            $response->assertSee('90.00');
+            // Current week row has table-warning class; past week rows do not
+            $content = $response->getContent();
+            $this->assertStringContainsString('<tr class="table-warning">', $content);
+            $this->assertSame(1, substr_count($content, 'class="table-warning"'));
+            // "current" badge and avg footnote are present
+            $response->assertSee('current');
+            $response->assertSee('Avg/week†');
+            $response->assertSee('Avg/week excludes the current');
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_analytics_avg_excludes_current_week(): void
+    {
+        // Tuesday Apr 7 — Q2 started Apr 6 (Mon), only lesson is in the current week
+        Carbon::setTestNow('2026-04-07 10:00');
+
+        try {
+            ExchangeRate::factory()->create(['date' => '2026-04-06', 'gbpeur' => 1.00000]);
+            Lesson::factory()->create([
+                'datetime' => '2026-04-06 10:00',
+                'complete' => true,
+                'price_gbp_pence' => 5000,
+            ]);
+
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            // Total row includes the current week lesson
+            $response->assertSee('2026-04-06');
+            $response->assertSee('50.00');
+            // Avg is 0 — no completed weeks to average over
+            $content = $response->getContent();
+            $this->assertStringContainsString('>0.0<', $content); // avg lesson count cell
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
     public function test_analytics_source_totals_and_averages(): void
@@ -385,7 +433,7 @@ class AnalyticsTest extends TestCase
         }
     }
 
-    public function test_analytics_shows_quarter_heading_when_no_full_weeks_yet(): void
+    public function test_analytics_shows_quarter_heading_with_current_week_when_no_full_weeks_yet(): void
     {
         // Tuesday Apr 7 — Q2 started Apr 6 (Mon), first week not yet complete
         Carbon::setTestNow('2026-04-07 10:00');
@@ -403,8 +451,9 @@ class AnalyticsTest extends TestCase
 
             $response->assertStatus(200);
             $response->assertSee('2026 T2');
-            // No week rows since no complete weeks in Q2 yet
-            $response->assertDontSee('2026-04-06');
+            // Current week IS shown (highlighted), even though it's not yet complete
+            $response->assertSee('2026-04-06');
+            $this->assertStringContainsString('<tr class="table-warning">', $response->getContent());
         } finally {
             Carbon::setTestNow();
         }

@@ -13,11 +13,11 @@ class AnalyticsService
     /**
      * @return array{quarters: array, sources: list<string>}
      */
-    public function getData(Carbon $lastFullWeekStart): array
+    public function getData(Carbon $currentWeekStart, Carbon $lastFullWeekStart): array
     {
         [$weeks, $sources] = $this->processLessons();
         $quarters = $this->buildQuarters($weeks);
-        $quarters = $this->expandAndAggregate($quarters, $lastFullWeekStart);
+        $quarters = $this->expandAndAggregate($quarters, $currentWeekStart, $lastFullWeekStart);
 
         $sources = array_keys($sources);
         sort($sources);
@@ -121,8 +121,10 @@ class AnalyticsService
         return $quarters;
     }
 
-    private function expandAndAggregate(array $quarters, Carbon $lastFullWeekStart): array
+    private function expandAndAggregate(array $quarters, Carbon $currentWeekStart, Carbon $lastFullWeekStart): array
     {
+        $lastFullWeekKey = $lastFullWeekStart->format('Y-m-d');
+
         foreach ($quarters as &$quarter) {
             $quarterStart = Carbon::create($quarter['year'], ($quarter['trimestre'] - 1) * 3 + 1, 1);
             $quarterEnd = Carbon::create($quarter['year'], $quarter['trimestre'] * 3, 1)->endOfMonth();
@@ -132,7 +134,7 @@ class AnalyticsService
                 $firstMonday->addWeek();
             }
 
-            $effectiveEnd = $quarterEnd->lte($lastFullWeekStart) ? $quarterEnd : $lastFullWeekStart;
+            $effectiveEnd = $quarterEnd->lte($currentWeekStart) ? $quarterEnd : $currentWeekStart;
 
             $allWeeks = [];
             $current = $firstMonday->copy();
@@ -152,7 +154,9 @@ class AnalyticsService
             krsort($allWeeks);
             $quarter['weeks'] = $allWeeks;
 
-            ['total' => $quarter['total'], 'avg' => $quarter['avg']] = $this->aggregateWeeks($allWeeks);
+            $completedWeeks = array_filter($allWeeks, fn ($key) => $key <= $lastFullWeekKey, ARRAY_FILTER_USE_KEY);
+            $quarter['total'] = $this->sumWeeks($allWeeks);
+            ['avg' => $quarter['avg']] = $this->aggregateWeeks($completedWeeks);
         }
         unset($quarter);
 
@@ -170,29 +174,36 @@ class AnalyticsService
         ];
     }
 
-    private function aggregateWeeks(array $weeks): array
+    private function sumWeeks(array $weeks): array
     {
-        $total = $this->emptyWeek();
+        $sum = $this->emptyWeek();
 
         foreach ($weeks as $week) {
-            $total['lesson_count'] += $week['lesson_count'];
-            $total['gbp_pence'] += $week['gbp_pence'];
-            $total['eur_cents'] += $week['eur_cents'];
+            $sum['lesson_count'] += $week['lesson_count'];
+            $sum['gbp_pence'] += $week['gbp_pence'];
+            $sum['eur_cents'] += $week['eur_cents'];
             if ($week['eur_missing']) {
-                $total['eur_missing'] = true;
+                $sum['eur_missing'] = true;
             }
             foreach ($week['sources'] as $source => $srcData) {
-                if (! isset($total['sources'][$source])) {
-                    $total['sources'][$source] = ['lesson_count' => 0, 'gbp_pence' => 0, 'eur_cents' => 0, 'eur_missing' => false];
+                if (! isset($sum['sources'][$source])) {
+                    $sum['sources'][$source] = ['lesson_count' => 0, 'gbp_pence' => 0, 'eur_cents' => 0, 'eur_missing' => false];
                 }
-                $total['sources'][$source]['lesson_count'] += $srcData['lesson_count'];
-                $total['sources'][$source]['gbp_pence'] += $srcData['gbp_pence'];
-                $total['sources'][$source]['eur_cents'] += $srcData['eur_cents'];
+                $sum['sources'][$source]['lesson_count'] += $srcData['lesson_count'];
+                $sum['sources'][$source]['gbp_pence'] += $srcData['gbp_pence'];
+                $sum['sources'][$source]['eur_cents'] += $srcData['eur_cents'];
                 if ($srcData['eur_missing']) {
-                    $total['sources'][$source]['eur_missing'] = true;
+                    $sum['sources'][$source]['eur_missing'] = true;
                 }
             }
         }
+
+        return $sum;
+    }
+
+    private function aggregateWeeks(array $weeks): array
+    {
+        $total = $this->sumWeeks($weeks);
 
         $weekCount = count($weeks);
         $avg = [

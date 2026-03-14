@@ -21,6 +21,7 @@
   <p class="mt-3">No complete lessons found.</p>
 @else
   @foreach($quarters as $quarter)
+    @php $quarterHasCurrentWeek = isset($quarter['weeks'][$currentWeekKey]); @endphp
     <h2 class="mt-4">{{ $quarter['year'] }} T{{ $quarter['trimestre'] }}</h2>
     <div class="table-responsive">
       <table class="table table-striped">
@@ -52,7 +53,7 @@
             @include('portal._analytics_source_cells', ['rowData' => $quarter['total'], 'formatAsAvg' => false])
           </tr>
           <tr class="fst-italic">
-            <td>Avg/week</td>
+            <td>Avg/week{{ $quarterHasCurrentWeek ? '†' : '' }}</td>
             <td class="text-end border-start">{{ number_format($quarter['avg']['lesson_count'], 1) }}</td>
             <td class="text-end">{{ penceToPounds((int) round($quarter['avg']['gbp_pence'])) }}</td>
             <td class="text-end">{{ penceToPounds((int) round($quarter['avg']['eur_cents'])) }}{{ $quarter['avg']['eur_missing'] ? '*' : '' }}</td>
@@ -61,8 +62,8 @@
         </tbody>
         <tbody class="table-group-divider">
           @foreach($quarter['weeks'] as $weekStart => $week)
-            <tr>
-              <td>{{ $weekStart }}</td>
+            <tr @class(['table-warning' => $weekStart === $currentWeekKey])>
+              <td>{{ $weekStart }}@if($weekStart === $currentWeekKey) <span class="badge text-bg-warning ms-1">current</span>@endif</td>
               <td class="text-end border-start">{{ $week['lesson_count'] }}</td>
               <td class="text-end">{{ penceToPounds($week['gbp_pence']) }}</td>
               <td class="text-end">{{ penceToPounds($week['eur_cents']) }}{{ $week['eur_missing'] ? '*' : '' }}</td>
@@ -74,6 +75,9 @@
     </div>
     @if($quarter['eur_missing'])
       <p class="text-muted small">* Some exchange rates unavailable.</p>
+    @endif
+    @if($quarterHasCurrentWeek)
+      <p class="text-muted small">† Avg/week excludes the current (in-progress) week.</p>
     @endif
   @endforeach
 @endif

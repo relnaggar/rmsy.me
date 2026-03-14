@@ -15,9 +15,10 @@ class AnalyticsController extends Controller
 {
     public function index(AnalyticsService $service): View
     {
-        $lastFullWeekStart = Carbon::now()->startOfWeek(Carbon::MONDAY)->subWeek();
+        $currentWeekStart = Carbon::now()->startOfWeek(Carbon::MONDAY);
+        $lastFullWeekStart = $currentWeekStart->copy()->subWeek();
 
-        ['quarters' => $quarters, 'sources' => $sources] = $service->getData($lastFullWeekStart);
+        ['quarters' => $quarters, 'sources' => $sources] = $service->getData($currentWeekStart, $lastFullWeekStart);
 
         $user = auth()->user();
         $targetMonthlyIncomeEurCents = $user->target_monthly_income_eur_cents;
@@ -35,7 +36,9 @@ class AnalyticsController extends Controller
             }
         }
 
-        return view('portal.analytics', compact('quarters', 'sources', 'targetMonthlyIncomeEurCents', 'targetLessonsPerWeek'));
+        $currentWeekKey = $currentWeekStart->format('Y-m-d');
+
+        return view('portal.analytics', compact('quarters', 'sources', 'targetMonthlyIncomeEurCents', 'targetLessonsPerWeek', 'currentWeekKey'));
     }
 
     public function setTarget(Request $request): RedirectResponse
