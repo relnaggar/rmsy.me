@@ -5,6 +5,7 @@
     'studentOptions' => [],
     'clientOptions' => [],
     'completeFilter' => 'all',
+    'paidFilter' => 'all',
     'buyerFilter' => '',
     'studentFilter' => '',
     'clientFilter' => '',
@@ -25,9 +26,9 @@
     <input type="date" id="lesson_filter_end" name="end_date" class="form-control" value="{{ $endDateFilter }}" data-auto-submit>
   </div>
   @foreach([
-      ['id' => 'lesson_filter_buyer',   'name' => 'buyer_id',   'label' => 'Buyer',   'options' => $buyerOptions,   'filter' => $buyerFilter],
       ['id' => 'lesson_filter_student', 'name' => 'student_id', 'label' => 'Student', 'options' => $studentOptions, 'filter' => $studentFilter],
       ['id' => 'lesson_filter_client',  'name' => 'client_id',  'label' => 'Client',  'options' => $clientOptions,  'filter' => $clientFilter],
+      ['id' => 'lesson_filter_buyer',   'name' => 'buyer_id',   'label' => 'Buyer',   'options' => $buyerOptions,   'filter' => $buyerFilter],
   ] as $dropdown)
     <div class="col-auto">
       <label for="{{ $dropdown['id'] }}" class="form-label mb-0">{{ $dropdown['label'] }}</label>
@@ -46,7 +47,15 @@
     </div>
   @endforeach
   <div class="col-auto">
-    <label for="lesson_filter_complete" class="form-label mb-0">Showing</label>
+    <label for="lesson_filter_paid" class="form-label mb-0">Paid</label>
+    <select id="lesson_filter_paid" name="paid" class="form-select" data-auto-submit>
+      <option value="all" @selected($paidFilter === 'all')>- All -</option>
+      <option value="unpaid" @selected($paidFilter === 'unpaid')>Unpaid</option>
+      <option value="paid" @selected($paidFilter === 'paid')>Paid</option>
+    </select>
+  </div>
+  <div class="col-auto">
+    <label for="lesson_filter_complete" class="form-label mb-0">Complete</label>
     <select id="lesson_filter_complete" name="complete" class="form-select" data-auto-submit>
       <option value="all" @selected($completeFilter === 'all')>- All -</option>
       <option value="incomplete" @selected($completeFilter === 'incomplete')>Incomplete</option>

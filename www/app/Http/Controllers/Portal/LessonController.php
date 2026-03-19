@@ -37,6 +37,7 @@ class LessonController extends Controller
         return view('portal.lessons.index', [
             'lessons' => $lessonsQuery->get(),
             'completeFilter' => $filters['complete'],
+            'paidFilter' => $filters['paid'],
             'buyerFilter' => $filters['buyer_id'],
             'studentFilter' => $filters['student_id'],
             'clientFilter' => $filters['client_id'],
@@ -52,14 +53,13 @@ class LessonController extends Controller
     }
 
     /**
-     * @return array{complete: string, buyer_id: string, student_id: string, client_id: string, start_date: string, end_date: string}
+     * @return array{complete: string, paid: string, buyer_id: string, student_id: string, client_id: string, start_date: string, end_date: string}
      */
     private function readIndexFilters(Request $request, ?string $earliestDate, ?string $latestDate): array
     {
         [$startDate, $endDate] = $this->lessonDateDefaults($request, $earliestDate, $latestDate);
 
-        return [
-            'complete' => (string) $request->query('complete', 'all'),
+        return $this->readLessonStatusFilters($request) + [
             'buyer_id' => (string) $request->query('buyer_id', ''),
             'student_id' => (string) $request->query('student_id', ''),
             'client_id' => (string) $request->query('client_id', ''),
@@ -70,11 +70,11 @@ class LessonController extends Controller
 
     /**
      * @param  \Illuminate\Database\Eloquent\Builder<Lesson>  $query
-     * @param  array{complete: string, buyer_id: string, student_id: string, client_id: string, start_date: string, end_date: string}  $filters
+     * @param  array{complete: string, paid: string, buyer_id: string, student_id: string, client_id: string, start_date: string, end_date: string}  $filters
      */
     private function applyIndexFilters(\Illuminate\Database\Eloquent\Builder $query, array $filters): void
     {
-        $this->applyLessonCompleteFilter($query, $filters['complete']);
+        $this->applyLessonStatusFilters($query, $filters);
 
         if ($filters['buyer_id'] !== '') {
             $query->where('buyer_id', $filters['buyer_id']);

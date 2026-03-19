@@ -99,6 +99,18 @@ class BuyerShowLessonFilterTest extends TestCase
         $response->assertSee(route('portal.lessons.show', $incomplete), false);
     }
 
+    public function test_show_filters_lessons_by_paid(): void
+    {
+        $unpaid = Lesson::factory()->create(['buyer_id' => 'acme', 'paid' => false]);
+        Lesson::factory()->create(['buyer_id' => 'acme', 'paid' => true, 'datetime' => '2025-01-20 10:00']);
+
+        $response = $this->show(['paid' => 'unpaid']);
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->original->gatherData()['lessons']);
+        $response->assertSee(route('portal.lessons.show', $unpaid), false);
+    }
+
     public function test_show_only_shows_lessons_for_this_buyer(): void
     {
         $other = Buyer::factory()->create(['id' => 'other', 'name' => 'Other']);

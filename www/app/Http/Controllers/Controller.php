@@ -55,16 +55,36 @@ abstract class Controller
     }
 
     /**
-     * Apply complete status WHERE clause to a lesson query.
+     * Read paid/complete status filter values from the request.
+     *
+     * @return array{complete: string, paid: string}
+     */
+    protected function readLessonStatusFilters(Request $request): array
+    {
+        return [
+            'complete' => (string) $request->query('complete', 'all'),
+            'paid' => (string) $request->query('paid', 'all'),
+        ];
+    }
+
+    /**
+     * Apply paid and complete status WHERE clauses to a lesson query.
      *
      * @param  Builder<\App\Models\Lesson>  $query
+     * @param  array{complete: string, paid: string}  $filters
      */
-    protected function applyLessonCompleteFilter(Builder|Relation $query, string $completeFilter): void
+    protected function applyLessonStatusFilters(Builder|Relation $query, array $filters): void
     {
-        if ($completeFilter === 'incomplete') {
+        if ($filters['complete'] === 'incomplete') {
             $query->where('complete', false);
-        } elseif ($completeFilter === 'complete') {
+        } elseif ($filters['complete'] === 'complete') {
             $query->where('complete', true);
+        }
+
+        if ($filters['paid'] === 'unpaid') {
+            $query->where('paid', false);
+        } elseif ($filters['paid'] === 'paid') {
+            $query->where('paid', true);
         }
     }
 }

@@ -84,7 +84,7 @@ class BuyerController extends Controller
         );
         $studentFilter = (string) $request->query('student_id', '');
         $clientFilter = (string) $request->query('client_id', '');
-        $completeFilter = (string) $request->query('complete', 'all');
+        $statusFilters = $this->readLessonStatusFilters($request);
 
         $lessonsQuery = $buyer->lessons()
             ->with(['student', 'client', 'payments'])
@@ -97,7 +97,7 @@ class BuyerController extends Controller
             $lessonsQuery->where('client_id', (int) $clientFilter);
         }
         $this->applyLessonDateFilters($lessonsQuery, $startDate, $endDate);
-        $this->applyLessonCompleteFilter($lessonsQuery, $completeFilter);
+        $this->applyLessonStatusFilters($lessonsQuery, $statusFilters);
 
         $countries = [];
         foreach (CountryAlpha2::cases() as $country) {
@@ -115,7 +115,8 @@ class BuyerController extends Controller
             'studentFilter' => $studentFilter,
             'clientFilter' => $clientFilter,
             'buyerFilter' => (string) $buyer->id,
-            'completeFilter' => $completeFilter,
+            'completeFilter' => $statusFilters['complete'],
+            'paidFilter' => $statusFilters['paid'],
             'studentOptions' => self::withAllOption(
                 Student::whereIn('id', $buyer->lessons()->whereNotNull('student_id')->distinct()->pluck('student_id'))
                     ->orderBy('name')->pluck('name', 'id')->toArray()

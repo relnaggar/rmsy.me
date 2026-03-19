@@ -48,6 +48,7 @@
   :studentOptions="$studentOptions"
   :clientOptions="$clientOptions"
   :completeFilter="$completeFilter"
+  :paidFilter="$paidFilter"
   :buyerFilter="$buyerFilter"
   :studentFilter="$studentFilter"
   :clientFilter="$clientFilter"

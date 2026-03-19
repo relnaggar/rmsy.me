@@ -395,6 +395,32 @@ class LessonTest extends TestCase
         $this->assertCount(1, $response->original->gatherData()['lessons']);
     }
 
+    public function test_index_filters_paid_lessons(): void
+    {
+        $paid = Lesson::factory()->create(['paid' => true]);
+        Lesson::factory()->create(['paid' => false, 'datetime' => '2025-01-20 10:00']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index', ['paid' => 'paid']));
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->original->gatherData()['lessons']);
+        $response->assertSee(route('portal.lessons.show', $paid), false);
+    }
+
+    public function test_index_filters_unpaid_lessons(): void
+    {
+        Lesson::factory()->create(['paid' => true]);
+        $unpaid = Lesson::factory()->create(['paid' => false, 'datetime' => '2025-01-20 10:00']);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.index', ['paid' => 'unpaid']));
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->original->gatherData()['lessons']);
+        $response->assertSee(route('portal.lessons.show', $unpaid), false);
+    }
+
     public function test_index_filters_by_buyer(): void
     {
         Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme Corp']);
