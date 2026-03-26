@@ -11,6 +11,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
 use PrinsFrank\Standards\Country\CountryAlpha2;
+use PrinsFrank\Standards\Country\Groups\EU;
 use PrinsFrank\Standards\Language\LanguageAlpha2;
 
 class InvoiceController extends Controller
@@ -134,39 +135,16 @@ class InvoiceController extends Controller
             'notes' => 'Factura exenta de IVA según artículo 20. Uno. 10º - Ley 37/1992',
         ];
 
-        if ($payment->lessons->isNotEmpty()) {
-            $items = $payment->lessons
-                ->sortBy('datetime')
-                ->map(fn ($lesson) => [
-                    'date' => $lesson->datetime->format('Y-m-d H:i').' (GMT)',
-                    'service' => $lesson->getSpanishDescription(),
-                    'qty' => 1,
-                    'unit_price' => $lesson->price_gbp_pence,
-                    'student' => $lesson->student?->name,
-                    'client' => $lesson->client?->name,
-                ])
-                ->values()
-                ->toArray();
-
-            $remainingAmount = $payment->getRemainingAmount();
-            if ($remainingAmount > 0) {
-                $items[] = [
-                    'date' => $issueDate,
-                    'service' => 'Clases online de informática',
-                    'qty' => 1,
-                    'unit_price' => $remainingAmount,
-                ];
-            }
-        } else {
-            $items = [
-                [
-                    'date' => $issueDate,
-                    'service' => 'Clases online de informática',
-                    'qty' => 1,
-                    'unit_price' => $payment->amount_gbp_pence,
-                ],
-            ];
-        }
+        $items = array_map(fn ($item) => [
+            'date' => $item['lesson']
+                ? $item['lesson']->datetime->format('Y-m-d H:i').' (GMT)'
+                : $issueDate,
+            'service' => $item['description'],
+            'qty' => 1,
+            'unit_price' => $item['price_gbp_pence'],
+            'student' => $item['lesson']?->student?->name,
+            'client' => $item['lesson']?->client?->name,
+        ], $this->buildLineItems($payment));
 
         $manifest = json_decode(file_get_contents(public_path('build/manifest.json')), true);
         $cssFile = $manifest['resources/scss/invoice.scss']['file'];
@@ -186,5 +164,137 @@ class InvoiceController extends Controller
         $pdf->setOption('chroot', public_path('build'));
 
         return $pdf->stream("invoice-{$invoiceNumber}.pdf");
+    }
+
+    public function exportCsv(string $invoiceNumber): Response
+    {
+        if (! preg_match('/^(\d{4})-(\d{3})$/', $invoiceNumber, $matches)) {
+            abort(404, 'Invalid invoice number format.');
+        }
+
+        $year = $matches[1];
+        $sequenceNumber = $matches[2];
+
+        $payment = Payment::where('sequence_number', $sequenceNumber)
+            ->whereYear('datetime', $year)
+            ->with('buyer', 'lessons')
+            ->first();
+
+        if (! $payment || ! $payment->buyer) {
+            abort(404, 'Invoice not found.');
+        }
+
+        $issueDate = $payment->getDate();
+        $exchangeRate = $this->exchangeRateService->getRateForDate($issueDate);
+        $externalId = 'invoice_'.$year.'_'.$sequenceNumber;
+        $reference = $payment->payment_reference;
+
+        $columns = [
+            'External ID',
+            'Number',
+            'Partner',
+            'Invoice Bill Date',
+            'Due Date',
+            'Date',
+            'Currency',
+            'Currency Rate',
+            'Payment Reference',
+            'Reference',
+            'Journal',
+            'Payment Terms',
+            'Invoice Lines/Label',
+            'Invoice Lines/Product',
+            'Invoice Lines/Account',
+            'Invoice Lines/Quantity',
+            'Invoice Lines/Unit Price',
+            'Invoice Lines/Taxes',
+        ];
+
+        $rows = array_map(fn ($item) => [
+            'External ID' => $externalId,
+            'Number' => $payment->getInvoiceNumber(),
+            'Partner' => $payment->buyer->name,
+            'Invoice Bill Date' => $issueDate,
+            'Due Date' => $issueDate,
+            'Date' => $issueDate,
+            'Currency' => $payment->currency,
+            'Currency Rate' => number_format($exchangeRate / 100000, 5),
+            'Payment Reference' => $reference,
+            'Reference' => $reference,
+            'Journal' => 'Sales',
+            'Payment Terms' => '',
+            'Invoice Lines/Label' => $item['description'],
+            'Invoice Lines/Product' => '',
+            'Invoice Lines/Account' => $this->revenueAccount($payment->buyer->country),
+            'Invoice Lines/Quantity' => 1,
+            'Invoice Lines/Unit Price' => number_format($item['price_gbp_pence'] / 100, 2),
+            'Invoice Lines/Taxes' => '',
+        ], $this->buildLineItems($payment));
+
+        $handle = fopen('php://memory', 'r+');
+        fputcsv($handle, $columns);
+        foreach ($rows as $row) {
+            fputcsv($handle, array_map(fn ($col) => $row[$col], $columns));
+        }
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"invoice-{$invoiceNumber}.csv\"",
+        ]);
+    }
+
+    private function revenueAccount(?string $countryAlpha2): string
+    {
+        if ($countryAlpha2 === null) {
+            return '705200';
+        }
+
+        $country = CountryAlpha2::tryFrom($countryAlpha2);
+
+        if ($country === CountryAlpha2::Spain) {
+            return '705000';
+        }
+
+        if ($country?->isMemberOf(EU::class)) {
+            return '705100';
+        }
+
+        return '705200';
+    }
+
+    /** @return list<array{description: string, price_gbp_pence: int, lesson: ?\App\Models\Lesson}> */
+    private function buildLineItems(Payment $payment): array
+    {
+        if ($payment->lessons->isNotEmpty()) {
+            $items = $payment->lessons
+                ->sortBy('datetime')
+                ->map(fn ($lesson) => [
+                    'description' => $lesson->getSpanishDescription(),
+                    'price_gbp_pence' => $lesson->price_gbp_pence,
+                    'lesson' => $lesson,
+                ])
+                ->values()
+                ->toArray();
+
+            $remainingAmount = $payment->getRemainingAmount();
+            if ($remainingAmount > 0) {
+                $items[] = [
+                    'description' => 'Clases online de informática',
+                    'price_gbp_pence' => $remainingAmount,
+                    'lesson' => null,
+                ];
+            }
+
+            return $items;
+        }
+
+        return [[
+            'description' => 'Clases online de informática',
+            'price_gbp_pence' => $payment->amount_gbp_pence,
+            'lesson' => null,
+        ]];
     }
 }

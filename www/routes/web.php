@@ -170,6 +170,10 @@ Route::middleware('auth')->prefix('portal')->name('portal.')->group(
             '/invoices/{invoiceNumber}',
             [InvoiceController::class, 'show']
         )->name('invoices.show');
+        Route::get(
+            '/invoices/{invoiceNumber}/csv',
+            [InvoiceController::class, 'exportCsv']
+        )->name('invoices.csv');
 
         Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
         Route::post('/analytics/target', [AnalyticsController::class, 'setTarget'])->name('analytics.setTarget');

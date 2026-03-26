@@ -49,6 +49,7 @@
         <th class="text-end">GBP</th>
         <th class="text-end">EUR</th>
         <th class="text-end">GBP/EUR</th>
+        <th>Export</th>
       </tr>
     </thead>
     <tbody>
@@ -65,6 +66,7 @@
           <td class="text-end">{{ penceToPounds($invoice['gbp_pence']) }}</td>
           <td class="text-end">{{ penceToPounds($invoice['eur_cents']) }}</td>
           <td class="text-end">{{ $invoice['exchange_rate'] }}</td>
+          <td><a href="{{ route('portal.invoices.csv', $invoice['number']) }}">CSV</a></td>
         </tr>
       @endforeach
     </tbody>
