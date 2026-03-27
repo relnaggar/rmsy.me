@@ -10,12 +10,13 @@ use Carbon\Carbon;
 
 class AnalyticsService
 {
+    private const SYSTEM_START_DATE = '2026-01-01';
     /**
      * @return array{quarters: array, sources: list<string>}
      */
     public function getData(Carbon $currentWeekStart, Carbon $lastFullWeekStart): array
     {
-        [$weeks, $sources] = $this->processLessons();
+        [$weeks, $sources] = $this->processLessons($currentWeekStart);
         $quarters = $this->buildQuarters($weeks);
         $quarters = $this->expandAndAggregate($quarters, $currentWeekStart, $lastFullWeekStart);
 
@@ -25,12 +26,19 @@ class AnalyticsService
         return compact('quarters', 'sources');
     }
 
-    private function processLessons(): array
+    private function processLessons(Carbon $currentWeekStart): array
     {
         $allRates = ExchangeRate::orderBy('date')->get();
+        $currentWeekEnd = $currentWeekStart->copy()->endOfWeek();
 
-        $lessons = Lesson::where('complete', true)
-            ->where('datetime', '>=', '2026-01-01')
+        $lessons = Lesson::where('datetime', '>=', self::SYSTEM_START_DATE)
+            ->where(function ($query) use ($currentWeekStart, $currentWeekEnd) {
+                $query->where('complete', true)
+                    ->orWhere(function ($q) use ($currentWeekStart, $currentWeekEnd) {
+                        $q->where('complete', false)
+                            ->whereBetween('datetime', [$currentWeekStart, $currentWeekEnd]);
+                    });
+            })
             ->with(['student', 'payments'])
             ->get();
 
@@ -54,7 +62,7 @@ class AnalyticsService
             $weekStart = $lesson->datetime->copy()->startOfWeek();
             $weekKey = $weekStart->format('Y-m-d');
 
-            if ($weekKey < '2026-01-01') {
+            if ($weekKey < self::SYSTEM_START_DATE) {
                 continue;
             }
 

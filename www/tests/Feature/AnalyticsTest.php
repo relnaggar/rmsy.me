@@ -41,20 +41,105 @@ class AnalyticsTest extends TestCase
         $response->assertSee('No complete lessons found.');
     }
 
-    public function test_analytics_excludes_incomplete_lessons(): void
+    public function test_analytics_excludes_incomplete_lessons_in_past_week(): void
     {
-        ExchangeRate::factory()->create(['date' => '2026-01-05', 'gbpeur' => 0.85000]);
-        Lesson::factory()->create([
-            'datetime' => '2026-01-07 10:00',
-            'complete' => false,
-            'price_gbp_pence' => 5000,
-        ]);
+        Carbon::setTestNow('2026-03-27 10:00'); // current week starts 2026-03-23
 
-        $response = $this->actingAs($this->user)
-            ->get(route('portal.analytics.index'));
+        try {
+            ExchangeRate::factory()->create(['date' => '2026-01-05', 'gbpeur' => 0.85000]);
+            Lesson::factory()->create([
+                'datetime' => '2026-01-07 10:00', // past week, incomplete
+                'complete' => false,
+                'price_gbp_pence' => 5000,
+            ]);
 
-        $response->assertStatus(200);
-        $response->assertSee('No complete lessons found.');
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            $response->assertSee('No complete lessons found.');
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_analytics_includes_incomplete_lessons_in_current_week(): void
+    {
+        Carbon::setTestNow('2026-03-25 10:00'); // Wednesday, current week starts 2026-03-23
+
+        try {
+            ExchangeRate::factory()->create(['date' => '2026-03-23', 'gbpeur' => 0.85000]);
+            Lesson::factory()->create([
+                'datetime' => '2026-03-25 14:00', // Wednesday of current week
+                'complete' => false,
+                'price_gbp_pence' => 5000,
+            ]);
+
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            $response->assertSee('2026-03-23');
+            $response->assertSee('50.00');
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_analytics_incomplete_current_week_lessons_excluded_from_avg(): void
+    {
+        // current week 2026-01-12, last full week 2026-01-05 (only 1 completed week in Q1 so far)
+        Carbon::setTestNow('2026-01-14 10:00');
+
+        try {
+            ExchangeRate::factory()->create(['date' => '2026-01-05', 'gbpeur' => 1.00000]);
+            // Complete lesson in last full week
+            Lesson::factory()->create([
+                'datetime' => '2026-01-07 10:00', // week of 2026-01-05
+                'complete' => true,
+                'price_gbp_pence' => 5000,
+            ]);
+            // Incomplete lesson in current week — should appear in data but not in avg
+            Lesson::factory()->create([
+                'datetime' => '2026-01-12 10:00', // week of 2026-01-12
+                'complete' => false,
+                'price_gbp_pence' => 9900,
+            ]);
+
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            // Incomplete lesson visible in current week row
+            $response->assertSee('99.00');
+            // Avg lesson count = 1/1 completed week = 1.0 (not 2.0 if incomplete were counted)
+            $this->assertStringContainsString('>1.0<', $response->getContent());
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_analytics_includes_incomplete_lesson_on_last_day_of_current_week(): void
+    {
+        Carbon::setTestNow('2026-03-25 10:00'); // Wednesday, current week ends Sunday 2026-03-29
+
+        try {
+            ExchangeRate::factory()->create(['date' => '2026-03-23', 'gbpeur' => 0.85000]);
+            Lesson::factory()->create([
+                'datetime' => '2026-03-29 18:00', // Sunday = last day of current week
+                'complete' => false,
+                'price_gbp_pence' => 5000,
+            ]);
+
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            $response->assertSee('2026-03-23');
+            $response->assertSee('50.00');
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
     public function test_analytics_excludes_lessons_before_2026(): void
