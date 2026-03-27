@@ -177,7 +177,7 @@ class InvoiceController extends Controller
 
         $payment = Payment::where('sequence_number', $sequenceNumber)
             ->whereYear('datetime', $year)
-            ->with('buyer', 'lessons')
+            ->with('buyer', 'lessons.student', 'lessons.client')
             ->first();
 
         if (! $payment || ! $payment->buyer) {
@@ -202,6 +202,7 @@ class InvoiceController extends Controller
             'Reference',
             'Journal',
             'Payment Terms',
+            'Narration',
             'Invoice Lines/Label',
             'Invoice Lines/Product',
             'Invoice Lines/Account',
@@ -223,7 +224,8 @@ class InvoiceController extends Controller
             'Reference' => $reference,
             'Journal' => 'Sales',
             'Payment Terms' => '',
-            'Invoice Lines/Label' => $item['description'],
+            'Narration' => 'Factura exenta de IVA según artículo 20. Uno. 10º - Ley 37/1992',
+            'Invoice Lines/Label' => $this->buildCsvLabel($item),
             'Invoice Lines/Product' => '',
             'Invoice Lines/Account' => $this->revenueAccount($payment->buyer->country),
             'Invoice Lines/Quantity' => 1,
@@ -263,6 +265,29 @@ class InvoiceController extends Controller
         }
 
         return '705200';
+    }
+
+    /** @param array{description: string, price_gbp_pence: int, lesson: ?\App\Models\Lesson} $item */
+    private function buildCsvLabel(array $item): string
+    {
+        if ($item['lesson'] === null) {
+            return $item['description'];
+        }
+
+        $parts = [
+            $item['description'],
+            $item['lesson']->datetime->format('Y-m-d H:i').' (GMT)',
+        ];
+
+        if ($item['lesson']->student !== null) {
+            $parts[] = 'Estudiante: '.$item['lesson']->student->name;
+        }
+
+        if ($item['lesson']->client !== null) {
+            $parts[] = 'Cliente: '.$item['lesson']->client->name;
+        }
+
+        return implode("\n", $parts);
     }
 
     /** @return list<array{description: string, price_gbp_pence: int, lesson: ?\App\Models\Lesson}> */

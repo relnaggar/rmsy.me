@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\Buyer;
+use App\Models\Client;
 use App\Models\ExchangeRate;
 use App\Models\Lesson;
 use App\Models\Payment;
+use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -17,6 +19,21 @@ class InvoiceCsvTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
+    /** @return list<list<string>> */
+    private function parseCsvRows(string $content): array
+    {
+        $handle = fopen('php://memory', 'r+');
+        fwrite($handle, $content);
+        rewind($handle);
+        $rows = [];
+        while (($row = fgetcsv($handle)) !== false) {
+            $rows[] = $row;
+        }
+        fclose($handle);
+
+        return $rows;
+    }
 
     protected function setUp(): void
     {
@@ -111,6 +128,7 @@ class InvoiceCsvTest extends TestCase
         $this->assertSame('REF-123', $indexed['Payment Reference']);
         $this->assertSame('1.18000', $indexed['Currency Rate']);
         $this->assertSame('705200', $indexed['Invoice Lines/Account']); // null country → export
+        $this->assertSame('Factura exenta de IVA según artículo 20. Uno. 10º - Ley 37/1992', $indexed['Narration']);
         $this->assertSame('Clases online de informática', $indexed['Invoice Lines/Label']);
         $this->assertSame('1', $indexed['Invoice Lines/Quantity']);
         $this->assertSame('50.00', $indexed['Invoice Lines/Unit Price']);
@@ -239,16 +257,16 @@ class InvoiceCsvTest extends TestCase
 
         $response->assertStatus(200);
 
-        $lines = array_filter(explode("\n", $response->getContent()));
-        $this->assertCount(3, $lines); // header + 2 lesson rows
+        $rows = $this->parseCsvRows($response->getContent());
+        $this->assertCount(3, $rows); // header + 2 lesson rows
 
-        $header = str_getcsv(array_values($lines)[0]);
-        $row1 = array_combine($header, str_getcsv(array_values($lines)[1]));
-        $row2 = array_combine($header, str_getcsv(array_values($lines)[2]));
+        $header = $rows[0];
+        $row1 = array_combine($header, $rows[1]);
+        $row2 = array_combine($header, $rows[2]);
 
-        $this->assertSame('Clases online de informática', $row1['Invoice Lines/Label']);
+        $this->assertSame("Clases online de informática\n2025-01-08 10:00 (GMT)", $row1['Invoice Lines/Label']);
         $this->assertSame('50.00', $row1['Invoice Lines/Unit Price']);
-        $this->assertSame('Clases online de informática', $row2['Invoice Lines/Label']);
+        $this->assertSame("Clases online de informática\n2025-01-09 10:00 (GMT)", $row2['Invoice Lines/Label']);
         $this->assertSame('50.00', $row2['Invoice Lines/Unit Price']);
     }
 
@@ -280,12 +298,53 @@ class InvoiceCsvTest extends TestCase
 
         $response->assertStatus(200);
 
-        $lines = array_filter(explode("\n", $response->getContent()));
-        $this->assertCount(3, $lines); // header + lesson row + remaining row
+        $rows = $this->parseCsvRows($response->getContent());
+        $this->assertCount(3, $rows); // header + lesson row + remaining row
 
-        $header = str_getcsv(array_values($lines)[0]);
-        $row2 = array_combine($header, str_getcsv(array_values($lines)[2]));
+        $header = $rows[0];
+        $row1 = array_combine($header, $rows[1]);
+        $row2 = array_combine($header, $rows[2]);
+        $this->assertSame("Clases online de informática\n2025-01-08 10:00 (GMT)", $row1['Invoice Lines/Label']);
+        $this->assertSame('50.00', $row1['Invoice Lines/Unit Price']);
         $this->assertSame('Clases online de informática', $row2['Invoice Lines/Label']);
         $this->assertSame('25.00', $row2['Invoice Lines/Unit Price']);
+    }
+
+    public function test_invoice_csv_label_includes_student_and_client(): void
+    {
+        Buyer::factory()->create([
+            'id' => 'acme',
+            'name' => 'Acme Corp',
+        ]);
+
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
+            'datetime' => '2025-01-10 10:00',
+            'amount_gbp_pence' => 5000,
+            'currency' => 'GBP',
+            'buyer_id' => 'acme',
+            'sequence_number' => '001',
+        ]);
+
+        $student = Student::factory()->create(['name' => 'Alice Smith']);
+        $client = Client::factory()->create(['name' => 'Big Corp']);
+
+        $lesson = Lesson::factory()->create([
+            'datetime' => '2025-01-08 10:00',
+            'price_gbp_pence' => 5000,
+            'description' => 'Online computer science classes',
+            'student_id' => $student->id,
+            'client_id' => $client->id,
+        ]);
+        $payment->lessons()->attach($lesson->id);
+
+        $rows = $this->parseCsvRows($this->actingAs($this->user)
+            ->get(route('portal.invoices.csv', '2025-001'))
+            ->getContent());
+        $header = $rows[0];
+        $row = array_combine($header, $rows[1]);
+
+        $expectedLabel = "Clases online de informática\n2025-01-08 10:00 (GMT)\nEstudiante: Alice Smith\nCliente: Big Corp";
+        $this->assertSame($expectedLabel, $row['Invoice Lines/Label']);
     }
 }
