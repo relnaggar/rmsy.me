@@ -132,6 +132,7 @@ class InvoiceCsvTest extends TestCase
         $this->assertSame('Clases online de informática', $indexed['Invoice Lines/Label']);
         $this->assertSame('1', $indexed['Invoice Lines/Quantity']);
         $this->assertSame('50.00', $indexed['Invoice Lines/Unit Price']);
+        $this->assertSame('0% EXEMPT Art.20', $indexed['Invoice Lines/Taxes']);
     }
 
     public function test_invoice_csv_uses_705000_for_spain(): void
@@ -308,6 +309,33 @@ class InvoiceCsvTest extends TestCase
         $this->assertSame('50.00', $row1['Invoice Lines/Unit Price']);
         $this->assertSame('Clases online de informática', $row2['Invoice Lines/Label']);
         $this->assertSame('25.00', $row2['Invoice Lines/Unit Price']);
+    }
+
+    public function test_invoice_csv_includes_iva_exempt_tax_on_every_row(): void
+    {
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme Corp']);
+
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
+            'datetime' => '2025-01-10 10:00',
+            'amount_gbp_pence' => 10000,
+            'buyer_id' => 'acme',
+            'sequence_number' => '001',
+        ]);
+
+        $lesson1 = Lesson::factory()->create(['datetime' => '2025-01-08 10:00', 'price_gbp_pence' => 5000]);
+        $lesson2 = Lesson::factory()->create(['datetime' => '2025-01-09 10:00', 'price_gbp_pence' => 5000]);
+        $payment->lessons()->attach([$lesson1->id, $lesson2->id]);
+
+        $rows = $this->parseCsvRows($this->actingAs($this->user)
+            ->get(route('portal.invoices.csv', '2025-001'))
+            ->getContent());
+
+        $header = $rows[0];
+        foreach (array_slice($rows, 1) as $row) {
+            $indexed = array_combine($header, $row);
+            $this->assertSame('0% EXEMPT Art.20', $indexed['Invoice Lines/Taxes']);
+        }
     }
 
     public function test_invoice_csv_label_includes_student_and_client(): void

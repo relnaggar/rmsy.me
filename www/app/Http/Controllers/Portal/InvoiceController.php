@@ -230,7 +230,7 @@ class InvoiceController extends Controller
             'Invoice Lines/Account' => $this->revenueAccount($payment->buyer->country),
             'Invoice Lines/Quantity' => 1,
             'Invoice Lines/Unit Price' => number_format($item['price_gbp_pence'] / 100, 2),
-            'Invoice Lines/Taxes' => '',
+            'Invoice Lines/Taxes' => '0% EXEMPT Art.20',
         ], $this->buildLineItems($payment));
 
         $handle = fopen('php://memory', 'r+');
