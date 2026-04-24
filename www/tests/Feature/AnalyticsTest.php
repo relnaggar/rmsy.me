@@ -613,6 +613,51 @@ class AnalyticsTest extends TestCase
         $response->assertDontSee('lessons/week needed');
     }
 
+    public function test_analytics_total_tutoring_hours_shows_base_when_no_lessons(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.analytics.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('completed tutoring hours');
+        $response->assertSee('4,024');
+    }
+
+    public function test_analytics_total_tutoring_hours_counts_completed_lessons_from_cutoff(): void
+    {
+        // 55 min rounds to 60 min (1 hour)
+        Lesson::factory()->create([
+            'datetime' => '2026-01-07 10:00',
+            'complete' => true,
+            'duration_minutes' => 55,
+        ]);
+        // 30 min stays 30 min (0.5 hour)
+        Lesson::factory()->create([
+            'datetime' => '2026-01-08 10:00',
+            'complete' => true,
+            'duration_minutes' => 30,
+        ]);
+        // Incomplete — must not be counted
+        Lesson::factory()->create([
+            'datetime' => '2026-01-09 10:00',
+            'complete' => false,
+            'duration_minutes' => 60,
+        ]);
+        // Before cutoff (2026-01-05) — must not be counted
+        Lesson::factory()->create([
+            'datetime' => '2026-01-04 10:00',
+            'complete' => true,
+            'duration_minutes' => 60,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.analytics.index'));
+
+        $response->assertStatus(200);
+        // base 4024h + 60 min + 30 min = 4024*60 + 90 = 241530 min → floor(241530/60) = 4025
+        $response->assertSee('4,025');
+    }
+
     public function test_analytics_target_not_shown_when_eur_missing(): void
     {
         Carbon::setTestNow('2026-03-10 10:00');

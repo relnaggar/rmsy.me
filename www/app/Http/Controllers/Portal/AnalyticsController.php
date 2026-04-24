@@ -37,8 +37,9 @@ class AnalyticsController extends Controller
         }
 
         $currentWeekKey = $currentWeekStart->format('Y-m-d');
+        $totalTutoringHours = $service->getTotalTutoringHours();
 
-        return view('portal.analytics', compact('quarters', 'sources', 'targetMonthlyIncomeEurCents', 'targetLessonsPerWeek', 'currentWeekKey'));
+        return view('portal.analytics', compact('quarters', 'sources', 'targetMonthlyIncomeEurCents', 'targetLessonsPerWeek', 'currentWeekKey', 'totalTutoringHours'));
     }
 
     public function setTarget(Request $request): RedirectResponse

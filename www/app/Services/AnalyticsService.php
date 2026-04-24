@@ -11,6 +11,8 @@ use Carbon\Carbon;
 class AnalyticsService
 {
     private const SYSTEM_START_DATE = '2026-01-01';
+    private const TUTORING_HOURS_BASE = 4024;
+    private const TUTORING_HOURS_CUTOFF_DATE = '2026-01-05';
     /**
      * @return array{quarters: array, sources: list<string>}
      */
@@ -207,6 +209,16 @@ class AnalyticsService
         }
 
         return $sum;
+    }
+
+    public function getTotalTutoringHours(): int
+    {
+        $additionalMinutes = Lesson::where('complete', true)
+            ->where('datetime', '>=', self::TUTORING_HOURS_CUTOFF_DATE)
+            ->get(['duration_minutes'])
+            ->sum(fn ($lesson) => (int) round($lesson->duration_minutes / 30) * 30);
+
+        return (int) floor((self::TUTORING_HOURS_BASE * 60 + $additionalMinutes) / 60);
     }
 
     private function aggregateWeeks(array $weeks): array

@@ -4,6 +4,10 @@
 @section('heading', 'Analytics')
 
 @section('content')
+<div class="mt-3 d-inline-flex align-items-baseline gap-2 border rounded px-3 py-2">
+  <span class="fs-4 fw-bold">{{ number_format($totalTutoringHours) }}</span>
+  <span class="text-muted">completed tutoring hours</span>
+</div>
 <div class="mt-3 d-flex align-items-center gap-3 flex-wrap">
   <form method="POST" action="{{ route('portal.analytics.setTarget') }}" class="d-flex align-items-center gap-2">
     @csrf
