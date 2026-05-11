@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
+use App\Models\Lesson;
 use App\Models\Payment;
 use App\Services\ExchangeRateService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -137,7 +138,7 @@ class InvoiceController extends Controller
 
         $items = array_map(fn ($item) => [
             'date' => $item['lesson']
-                ? $item['lesson']->datetime->format('Y-m-d H:i').' (GMT)'
+                ? $this->formatLessonDate($item['lesson'])
                 : $issueDate,
             'service' => $item['description'],
             'qty' => 1,
@@ -267,6 +268,11 @@ class InvoiceController extends Controller
         return '705200';
     }
 
+    private function formatLessonDate(Lesson $lesson): string
+    {
+        return $lesson->datetime->format('Y-m-d H:i').' (UK time)';
+    }
+
     /** @param array{description: string, price_gbp_pence: int, lesson: ?\App\Models\Lesson} $item */
     private function buildCsvLabel(array $item): string
     {
@@ -276,7 +282,7 @@ class InvoiceController extends Controller
 
         $parts = [
             $item['description'],
-            $item['lesson']->datetime->format('Y-m-d H:i').' (GMT)',
+            $this->formatLessonDate($item['lesson']),
         ];
 
         if ($item['lesson']->student !== null) {

@@ -129,6 +129,49 @@ class CalendarImportFilterTest extends TestCase
         $this->assertEquals(3, Lesson::count());
     }
 
+    public function test_import_converts_utc_graph_event_to_uk_time(): void
+    {
+        // Microsoft Graph default: 'UTC' timezone, 13:00 UTC = 14:00 London BST in June.
+        $events = [
+            [
+                'subject' => 'MyTutor 55: Alice/ClientA, Sun 2pm £25',
+                'start' => ['dateTime' => '2025-06-15T13:00:00', 'timeZone' => 'UTC'],
+                'end' => ['dateTime' => '2025-06-15T13:55:00', 'timeZone' => 'UTC'],
+                'type' => 'singleInstance',
+            ],
+        ];
+
+        $service = $this->createServiceWithFakeEvents($events);
+        $result = $service->importLessonsFromCalendar('2025-06-01', '2025-06-30');
+
+        $this->assertSame(1, $result['imported']);
+
+        $lesson = Lesson::first();
+        $this->assertSame('2025-06-15 14:00', $lesson->datetime->format('Y-m-d H:i'));
+        $this->assertSame('Europe/London', $lesson->datetime->getTimezone()->getName());
+
+        // Stored value on disk is naive London wallclock.
+        $raw = \DB::table('lessons')->where('id', $lesson->id)->value('datetime');
+        $this->assertSame('2025-06-15 14:00:00', $raw);
+    }
+
+    public function test_import_winter_event_keeps_same_hour_as_utc(): void
+    {
+        $events = [
+            [
+                'subject' => 'MyTutor 55: Alice/ClientA, Wed 2pm £25',
+                'start' => ['dateTime' => '2025-01-15T14:00:00', 'timeZone' => 'UTC'],
+                'end' => ['dateTime' => '2025-01-15T14:55:00', 'timeZone' => 'UTC'],
+                'type' => 'singleInstance',
+            ],
+        ];
+
+        $service = $this->createServiceWithFakeEvents($events);
+        $service->importLessonsFromCalendar('2025-01-01', '2025-01-31');
+
+        $this->assertSame('2025-01-15 14:00', Lesson::first()->datetime->format('Y-m-d H:i'));
+    }
+
     public function test_import_filter_by_multiple_criteria(): void
     {
         // First import all to create records

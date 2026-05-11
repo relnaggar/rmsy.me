@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Casts\LessonDateTime;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Lesson extends Model
 {
     use HasFactory;
+
+    public const TIMEZONE = 'Europe/London';
 
     public $timestamps = false;
 
@@ -31,7 +35,7 @@ class Lesson extends Model
     protected function casts(): array
     {
         return [
-            'datetime' => 'datetime',
+            'datetime' => LessonDateTime::class,
             'duration_minutes' => 'integer',
             'repeat_weeks' => 'integer',
             'price_gbp_pence' => 'integer',
@@ -70,12 +74,22 @@ class Lesson extends Model
         return $this->datetime->format('Y-m-d D H:i');
     }
 
-    private const SPANISH_DESCRIPTIONS = [
-        'Online computer science classes' => 'Clases online de informática',
-    ];
+    public function getFormattedTimeRange(): string
+    {
+        $end = $this->datetime->copy()->addMinutes($this->duration_minutes);
+
+        return $this->getFormattedDatetime().'-'.$end->format('H:i');
+    }
+
+    public function getEndDatetime(): Carbon
+    {
+        return $this->datetime->copy()->addMinutes($this->duration_minutes);
+    }
 
     public function getSpanishDescription(): string
     {
-        return self::SPANISH_DESCRIPTIONS[$this->description] ?? $this->description;
+        $descriptions = config('lessons.spanish_descriptions', []);
+
+        return $descriptions[$this->description] ?? $this->description;
     }
 }

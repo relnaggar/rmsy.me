@@ -96,7 +96,7 @@
         <tr>
           <td><input type="checkbox" name="lesson_ids[]" value="{{ $lesson->id }}"></td>
           <td><a href="{{ route('portal.lessons.show', $lesson) }}">{{ $lesson->id }}</a></td>
-          <td>{{ $lesson->getFormattedDatetime() }}-{{ $lesson->datetime->copy()->addMinutes($lesson->duration_minutes)->format('H:i') }}</td>
+          <td>{{ $lesson->getFormattedTimeRange() }}</td>
           <td>{{ $lesson->repeat_weeks }}</td>
           <td>
             @if($lesson->student)

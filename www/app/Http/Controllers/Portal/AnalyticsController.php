@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
+use App\Models\Lesson;
 use App\Services\AnalyticsService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +16,7 @@ class AnalyticsController extends Controller
 {
     public function index(AnalyticsService $service): View
     {
-        $currentWeekStart = Carbon::now()->startOfWeek(Carbon::MONDAY);
+        $currentWeekStart = Carbon::now(Lesson::TIMEZONE)->startOfWeek(Carbon::MONDAY);
         $lastFullWeekStart = $currentWeekStart->copy()->subWeek();
 
         ['quarters' => $quarters, 'sources' => $sources] = $service->getData($currentWeekStart, $lastFullWeekStart);

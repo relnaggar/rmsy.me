@@ -12,7 +12,7 @@
   </tr>
   <tr>
     <th class="text-nowrap">Date/Time</th>
-    <td>{{ $lesson->getFormattedDatetime() }}-{{ $lesson->datetime->copy()->addMinutes($lesson->duration_minutes)->format('H:i') }}</td>
+    <td>{{ $lesson->getFormattedTimeRange() }}</td>
   </tr>
   <tr>
     <th>Duration</th>

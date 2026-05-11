@@ -265,9 +265,9 @@ class InvoiceCsvTest extends TestCase
         $row1 = array_combine($header, $rows[1]);
         $row2 = array_combine($header, $rows[2]);
 
-        $this->assertSame("Clases online de informática\n2025-01-08 10:00 (GMT)", $row1['Invoice Lines/Label']);
+        $this->assertSame("Clases online de informática\n2025-01-08 10:00 (UK time)", $row1['Invoice Lines/Label']);
         $this->assertSame('50.00', $row1['Invoice Lines/Unit Price']);
-        $this->assertSame("Clases online de informática\n2025-01-09 10:00 (GMT)", $row2['Invoice Lines/Label']);
+        $this->assertSame("Clases online de informática\n2025-01-09 10:00 (UK time)", $row2['Invoice Lines/Label']);
         $this->assertSame('50.00', $row2['Invoice Lines/Unit Price']);
     }
 
@@ -305,7 +305,7 @@ class InvoiceCsvTest extends TestCase
         $header = $rows[0];
         $row1 = array_combine($header, $rows[1]);
         $row2 = array_combine($header, $rows[2]);
-        $this->assertSame("Clases online de informática\n2025-01-08 10:00 (GMT)", $row1['Invoice Lines/Label']);
+        $this->assertSame("Clases online de informática\n2025-01-08 10:00 (UK time)", $row1['Invoice Lines/Label']);
         $this->assertSame('50.00', $row1['Invoice Lines/Unit Price']);
         $this->assertSame('Clases online de informática', $row2['Invoice Lines/Label']);
         $this->assertSame('25.00', $row2['Invoice Lines/Unit Price']);
@@ -372,7 +372,38 @@ class InvoiceCsvTest extends TestCase
         $header = $rows[0];
         $row = array_combine($header, $rows[1]);
 
-        $expectedLabel = "Clases online de informática\n2025-01-08 10:00 (GMT)\nEstudiante: Alice Smith\nCliente: Big Corp";
+        $expectedLabel = "Clases online de informática\n2025-01-08 10:00 (UK time)\nEstudiante: Alice Smith\nCliente: Big Corp";
         $this->assertSame($expectedLabel, $row['Invoice Lines/Label']);
+    }
+
+    public function test_invoice_csv_label_renders_bst_lesson_in_uk_local_time(): void
+    {
+        Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme Corp']);
+
+        $payment = Payment::factory()->create([
+            'id' => 'PAY-1',
+            'datetime' => '2025-06-12 10:00',
+            'amount_gbp_pence' => 5000,
+            'currency' => 'GBP',
+            'buyer_id' => 'acme',
+            'sequence_number' => '001',
+        ]);
+
+        $lesson = Lesson::factory()->create([
+            'datetime' => '2025-06-10 14:00',
+            'price_gbp_pence' => 5000,
+            'description' => 'Online computer science classes',
+        ]);
+        $payment->lessons()->attach($lesson->id);
+
+        $rows = $this->parseCsvRows($this->actingAs($this->user)
+            ->get(route('portal.invoices.csv', '2025-001'))
+            ->getContent());
+
+        $row = array_combine($rows[0], $rows[1]);
+        $this->assertSame(
+            "Clases online de informática\n2025-06-10 14:00 (UK time)",
+            $row['Invoice Lines/Label'],
+        );
     }
 }

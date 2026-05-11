@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Data\CalendarEvent;
 use App\Models\Buyer;
 use App\Models\Client;
 use App\Models\Lesson;
 use App\Models\Student;
 use App\Models\User;
+use Carbon\Carbon;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
@@ -52,117 +54,139 @@ class CalendarService
      */
     public function importLessonsFromCalendar(string $startDate, string $endDate, array $filters = []): array
     {
-        $events = $this->getCalendarEvents($startDate, $endDate);
+        $rawEvents = $this->getCalendarEvents($startDate, $endDate);
         $imported = 0;
         $skipped = 0;
 
-        foreach ($events as $event) {
-            $subject = $event['subject'];
-
-            // skip events without price (unless it's a meeting)
-            if (! str_contains($subject, '£')) {
+        foreach ($rawEvents as $raw) {
+            $event = $this->parseEvent($raw);
+            if ($event === null) {
                 continue;
             }
 
-            // extract source (first word before colon)
-            $parts = explode(':', $subject);
-            if (count($parts) < 2) {
+            $result = $this->persistEvent($event, $filters);
+            if ($result === self::PERSIST_FILTERED) {
                 continue;
             }
-            $firstPart = trim($parts[0]);
-            $firstSubparts = explode(' ', $firstPart);
-            if (count($firstSubparts) < 2) {
-                continue;
-            }
-            $source = trim($firstSubparts[0]);
 
-            // extract price
-            if (! preg_match('/£([0-9]+(\.[0-9]{1,2})?)/', $subject, $matches)) {
-                continue;
-            }
-            $priceGbpPence = poundsToPence(floatval($matches[1]));
-
-            // determine student/client
-            $secondPart = trim($parts[1]);
-            $secondSubparts = explode(',', $secondPart);
-            $studentClient = trim($secondSubparts[0]);
-            $studentClientParts = explode('/', $studentClient);
-
-            if (count($studentClientParts) < 2) {
-                $name = trim($studentClientParts[0]);
-                $clientName = $name;
-                $studentId = $this->findOrCreateStudent($name);
-                $clientId = $this->findOrCreateClient($name);
-            } elseif (count($studentClientParts) === 2) {
-                $studentName = trim($studentClientParts[0]);
-                $clientName = trim($studentClientParts[1]);
-                $studentId = $this->findOrCreateStudent($studentName);
-                $clientId = $this->findOrCreateClient($clientName);
+            if ($result === self::PERSIST_CREATED) {
+                $imported++;
             } else {
-                continue;
-            }
-
-            // determine buyer
-            if ($source === 'private') {
-                $buyerId = $this->findOrCreateBuyer($clientName);
-            } else {
-                $buyerId = self::SOURCE_TO_BUYER[$source] ?? null;
-                if ($buyerId === null) {
-                    continue;
-                }
-                Buyer::firstOrCreate(['id' => $buyerId], ['name' => $buyerId]);
-            }
-
-            // apply filters
-            if (isset($filters['buyer_id']) && $buyerId !== $filters['buyer_id']) {
-                continue;
-            }
-            if (isset($filters['student_id']) && $studentId !== $filters['student_id']) {
-                continue;
-            }
-            if (isset($filters['client_id']) && $clientId !== $filters['client_id']) {
-                continue;
-            }
-
-            // extract start time and calculate duration
-            $startDateTime = $event['start']['dateTime'];
-            $startDt = new DateTimeImmutable($startDateTime);
-            $endDt = new DateTimeImmutable($event['end']['dateTime']);
-            $durationMinutes = (int) round(
-                ($endDt->getTimestamp() - $startDt->getTimestamp()) / 60
-            );
-            if ($durationMinutes === 60) {
-                $durationMinutes = 55;
-            }
-
-            // determine if recurring
-            $repeatWeeks = strtolower($event['type'] ?? '') === 'occurrence' ? 1 : 0;
-
-            // insert lesson (skip if datetime already exists)
-            try {
-                $lesson = Lesson::firstOrCreate(
-                    ['datetime' => $startDateTime],
-                    [
-                        'duration_minutes' => $durationMinutes,
-                        'repeat_weeks' => $repeatWeeks,
-                        'price_gbp_pence' => $priceGbpPence,
-                        'student_id' => $studentId,
-                        'client_id' => $clientId,
-                        'buyer_id' => $buyerId,
-                    ]
-                );
-
-                if ($lesson->wasRecentlyCreated) {
-                    $imported++;
-                } else {
-                    $skipped++;
-                }
-            } catch (UniqueConstraintViolationException) {
                 $skipped++;
             }
         }
 
         return ['imported' => $imported, 'skipped' => $skipped];
+    }
+
+    private const PERSIST_CREATED = 1;
+    private const PERSIST_SKIPPED = 2;
+    private const PERSIST_FILTERED = 3;
+
+    private function parseEvent(array $raw): ?CalendarEvent
+    {
+        $subject = $raw['subject'] ?? '';
+
+        if (! str_contains($subject, '£')) {
+            return null;
+        }
+
+        $parts = explode(':', $subject);
+        if (count($parts) < 2) {
+            return null;
+        }
+        $firstPart = trim($parts[0]);
+        $firstSubparts = explode(' ', $firstPart);
+        if (count($firstSubparts) < 2) {
+            return null;
+        }
+        $source = trim($firstSubparts[0]);
+
+        if (! preg_match('/£([0-9]+(\.[0-9]{1,2})?)/', $subject, $matches)) {
+            return null;
+        }
+        $priceGbpPence = poundsToPence(floatval($matches[1]));
+
+        $secondPart = trim($parts[1]);
+        $secondSubparts = explode(',', $secondPart);
+        $studentClient = trim($secondSubparts[0]);
+        $studentClientParts = explode('/', $studentClient);
+
+        if (count($studentClientParts) === 1) {
+            $studentName = trim($studentClientParts[0]);
+            $clientName = $studentName;
+        } elseif (count($studentClientParts) === 2) {
+            $studentName = trim($studentClientParts[0]);
+            $clientName = trim($studentClientParts[1]);
+        } else {
+            return null;
+        }
+
+        $startTz = $raw['start']['timeZone'] ?? 'UTC';
+        $endTz = $raw['end']['timeZone'] ?? 'UTC';
+        $startDt = Carbon::parse($raw['start']['dateTime'], $startTz)->setTimezone(Lesson::TIMEZONE);
+        $endDt = Carbon::parse($raw['end']['dateTime'], $endTz);
+
+        $durationMinutes = (int) round(($endDt->getTimestamp() - $startDt->getTimestamp()) / 60);
+        if ($durationMinutes === 60) {
+            $durationMinutes = 55;
+        }
+
+        $repeatWeeks = strtolower($raw['type'] ?? '') === 'occurrence' ? 1 : 0;
+
+        return new CalendarEvent(
+            startDatetime: $startDt,
+            durationMinutes: $durationMinutes,
+            repeatWeeks: $repeatWeeks,
+            priceGbpPence: $priceGbpPence,
+            source: $source,
+            studentName: $studentName,
+            clientName: $clientName,
+        );
+    }
+
+    private function persistEvent(CalendarEvent $event, array $filters): int
+    {
+        $studentId = $this->findOrCreateStudent($event->studentName);
+        $clientId = $this->findOrCreateClient($event->clientName);
+
+        if ($event->source === 'private') {
+            $buyerId = $this->findOrCreateBuyer($event->clientName);
+        } else {
+            $buyerId = self::SOURCE_TO_BUYER[$event->source] ?? null;
+            if ($buyerId === null) {
+                return self::PERSIST_FILTERED;
+            }
+            Buyer::firstOrCreate(['id' => $buyerId], ['name' => $buyerId]);
+        }
+
+        if (isset($filters['buyer_id']) && $buyerId !== $filters['buyer_id']) {
+            return self::PERSIST_FILTERED;
+        }
+        if (isset($filters['student_id']) && $studentId !== $filters['student_id']) {
+            return self::PERSIST_FILTERED;
+        }
+        if (isset($filters['client_id']) && $clientId !== $filters['client_id']) {
+            return self::PERSIST_FILTERED;
+        }
+
+        try {
+            $lesson = Lesson::firstOrCreate(
+                ['datetime' => $event->startDatetime],
+                [
+                    'duration_minutes' => $event->durationMinutes,
+                    'repeat_weeks' => $event->repeatWeeks,
+                    'price_gbp_pence' => $event->priceGbpPence,
+                    'student_id' => $studentId,
+                    'client_id' => $clientId,
+                    'buyer_id' => $buyerId,
+                ]
+            );
+
+            return $lesson->wasRecentlyCreated ? self::PERSIST_CREATED : self::PERSIST_SKIPPED;
+        } catch (UniqueConstraintViolationException) {
+            return self::PERSIST_SKIPPED;
+        }
     }
 
     private function findOrCreateStudent(string $name): int

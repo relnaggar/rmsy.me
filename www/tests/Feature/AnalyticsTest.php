@@ -680,4 +680,29 @@ class AnalyticsTest extends TestCase
             Carbon::setTestNow();
         }
     }
+
+    public function test_dst_boundary_lesson_groups_into_correct_uk_week(): void
+    {
+        // Late Sunday lesson in BST — must group with the week starting Mon 2026-06-22,
+        // not the week starting Mon 2026-06-29 (which would happen if interpreted as UTC).
+        Carbon::setTestNow('2026-07-01 10:00');
+
+        try {
+            ExchangeRate::factory()->create(['date' => '2026-06-22', 'gbpeur' => 0.85000]);
+            Lesson::factory()->create([
+                'datetime' => '2026-06-28 23:30', // Sun 23:30 BST
+                'complete' => true,
+                'price_gbp_pence' => 5000,
+            ]);
+
+            $response = $this->actingAs($this->user)
+                ->get(route('portal.analytics.index'));
+
+            $response->assertStatus(200);
+            // Week label = ISO week start (Monday).
+            $response->assertSee('2026-06-22');
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
 }

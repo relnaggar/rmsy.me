@@ -514,4 +514,44 @@ class LessonTest extends TestCase
         $response->assertSessionHas('success');
         $this->assertTrue($lesson->fresh()->complete);
     }
+
+    public function test_datetime_stored_and_read_in_uk_time(): void
+    {
+        $lesson = Lesson::factory()->create([
+            'datetime' => '2025-06-15 14:00:00',
+            'duration_minutes' => 55,
+        ]);
+
+        $this->assertSame(Lesson::TIMEZONE, $lesson->datetime->getTimezone()->getName());
+        $this->assertSame('Europe/London', $lesson->fresh()->datetime->getTimezone()->getName());
+        $this->assertSame('2025-06-15 14:00', $lesson->datetime->format('Y-m-d H:i'));
+        $this->assertSame('2025-06-15 Sun 14:00', $lesson->getFormattedDatetime());
+        $this->assertSame('2025-06-15 Sun 14:00-14:55', $lesson->getFormattedTimeRange());
+
+        // Stored value on disk is the same naive wallclock — no UTC shift.
+        $raw = \DB::table('lessons')->where('id', $lesson->id)->value('datetime');
+        $this->assertSame('2025-06-15 14:00:00', $raw);
+    }
+
+    public function test_datetime_set_from_utc_carbon_converts_to_uk(): void
+    {
+        $utc = \Carbon\Carbon::parse('2025-06-15 14:00:00', 'UTC');
+        $lesson = Lesson::factory()->create(['datetime' => $utc]);
+
+        $this->assertSame('2025-06-15 15:00', $lesson->fresh()->datetime->format('Y-m-d H:i'));
+    }
+
+    public function test_show_displays_bst_lesson_time_in_uk_time(): void
+    {
+        $lesson = Lesson::factory()->create([
+            'datetime' => '2025-06-15 14:00:00',
+            'duration_minutes' => 55,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('portal.lessons.show', $lesson));
+
+        $response->assertStatus(200);
+        $response->assertSee('2025-06-15 Sun 14:00-14:55');
+    }
 }
