@@ -10,6 +10,8 @@ use App\Models\Client;
 use App\Models\Lesson;
 use App\Models\Payment;
 use App\Models\Student;
+use App\Services\CalendarService;
+use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -67,6 +69,7 @@ class BuyerController extends Controller
             'country' => ['required', 'string', 'size:2'],
             'extra' => ['nullable', 'string', 'max:255'],
             'auto_pay' => ['boolean'],
+            'calendar_prefix' => ['nullable', ...$this->calendarPrefixRules()],
         ]);
 
         Buyer::create($validated);
@@ -142,6 +145,7 @@ class BuyerController extends Controller
             'country' => ['sometimes', 'required', 'string', 'size:2'],
             'extra' => ['sometimes', 'nullable', 'string', 'max:255'],
             'auto_pay' => ['sometimes', 'boolean'],
+            'calendar_prefix' => ['sometimes', 'nullable', ...$this->calendarPrefixRules($buyer)],
         ]);
 
         $buyer->update($validated);
@@ -211,5 +215,31 @@ class BuyerController extends Controller
 
         return redirect()->route('portal.buyers.index')
             ->with('success', 'Buyer deleted successfully.');
+    }
+
+    /**
+     * The prefix is the first word of a calendar event subject, matched case-insensitively.
+     */
+    private function calendarPrefixRules(?Buyer $ignore = null): array
+    {
+        return [
+            'string',
+            'max:50',
+            'regex:/^[^\s:]+$/u',
+            function (string $attribute, mixed $value, Closure $fail) use ($ignore) {
+                $prefix = mb_strtolower((string) $value);
+                if ($prefix === CalendarService::PRIVATE_SOURCE) {
+                    $fail('The calendar prefix "private" is reserved for private lessons.');
+
+                    return;
+                }
+                $taken = Buyer::whereRaw('LOWER(calendar_prefix) = ?', [$prefix])
+                    ->when($ignore, fn ($query) => $query->where('id', '!=', $ignore->id))
+                    ->exists();
+                if ($taken) {
+                    $fail('The calendar prefix is already used by another buyer.');
+                }
+            },
+        ];
     }
 }

@@ -84,6 +84,41 @@ class CalendarAuthFlowTest extends TestCase
         $response->assertSessionHas('success', 'Imported 0 lesson(s).');
     }
 
+    public function test_import_reports_unknown_platforms(): void
+    {
+        $this->user->update([
+            'ms_access_token' => 'valid-token',
+            'ms_refresh_token' => 'refresh-token',
+            'ms_token_expires' => now()->addHour(),
+        ]);
+
+        $fakeService = new class () extends CalendarService {
+            protected function getCalendarEvents(string $startDate, string $endDate): array
+            {
+                return [
+                    [
+                        'subject' => 'Preply 55: Dana/ClientD, Mon 10am £28',
+                        'start' => ['dateTime' => '2025-03-01T10:00:00'],
+                        'end' => ['dateTime' => '2025-03-01T10:55:00'],
+                        'type' => 'singleInstance',
+                    ],
+                ];
+            }
+        };
+        $this->app->instance(CalendarService::class, $fakeService);
+
+        $response = $this->actingAs($this->user)->post(route('portal.lessons.import'), [
+            'start_date' => '2025-03-01',
+            'end_date' => '2025-03-31',
+        ]);
+
+        $response->assertRedirectToRoute('portal.lessons.index');
+        $response->assertSessionHas(
+            'success',
+            'Imported 0 lesson(s), ignored 1 event(s) with unknown platform (Preply); set a calendar prefix on the buyer to import them.'
+        );
+    }
+
     public function test_complete_import_after_auth_performs_import(): void
     {
         $this->user->update([
@@ -91,6 +126,8 @@ class CalendarAuthFlowTest extends TestCase
             'ms_refresh_token' => 'refresh-token',
             'ms_token_expires' => now()->addHour(),
         ]);
+
+        Buyer::factory()->platform('MyTutor')->create(['id' => 'MYTUTORWEB LIMITED']);
 
         $fakeService = new class () extends CalendarService {
             protected function getCalendarEvents(string $startDate, string $endDate): array

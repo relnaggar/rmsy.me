@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\Buyer;
 use App\Models\Client;
 use App\Models\Lesson;
 use App\Models\Student;
@@ -14,6 +15,13 @@ use Tests\TestCase;
 class CalendarImportFilterTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Buyer::factory()->platform('MyTutor')->create(['id' => 'MYTUTORWEB LIMITED']);
+        Buyer::factory()->platform('Tutorful')->create(['id' => 'TUTORA LTD']);
+    }
 
     private function makeEvents(): array
     {
@@ -190,5 +198,78 @@ class CalendarImportFilterTest extends TestCase
 
         $this->assertEquals(1, $imported['imported']);
         $this->assertEquals(1, Lesson::count());
+    }
+
+    private function makeEvent(string $subject, string $date = '2025-03-01'): array
+    {
+        return [
+            'subject' => $subject,
+            'start' => ['dateTime' => "{$date}T10:00:00"],
+            'end' => ['dateTime' => "{$date}T10:55:00"],
+            'type' => 'singleInstance',
+        ];
+    }
+
+    public function test_import_matches_newly_added_platform(): void
+    {
+        Buyer::factory()->platform('Preply')->create(['id' => 'PREPLY INC']);
+
+        $service = $this->createServiceWithFakeEvents([
+            $this->makeEvent('Preply 55: Dana/ClientD, Mon 10am £28'),
+        ]);
+        $result = $service->importLessonsFromCalendar('2025-03-01', '2025-03-31');
+
+        $this->assertSame(1, $result['imported']);
+        $this->assertSame([], $result['unknown_platforms']);
+        $this->assertSame('PREPLY INC', Lesson::first()->buyer_id);
+    }
+
+    public function test_import_matches_platform_prefix_case_insensitively(): void
+    {
+        $service = $this->createServiceWithFakeEvents([
+            $this->makeEvent('mytutor 55: Alice/ClientA, Mon 10am £25'),
+        ]);
+        $service->importLessonsFromCalendar('2025-03-01', '2025-03-31');
+
+        $this->assertSame('MYTUTORWEB LIMITED', Lesson::first()->buyer_id);
+    }
+
+    public function test_import_reports_unknown_platforms_without_creating_records(): void
+    {
+        $service = $this->createServiceWithFakeEvents([
+            $this->makeEvent('Preply 55: Dana/ClientD, Mon 10am £28', '2025-03-01'),
+            $this->makeEvent('Preply 55: Dana/ClientD, Mon 10am £28', '2025-03-08'),
+            $this->makeEvent('Cambly 55: Eve/ClientE, Mon 10am £20', '2025-03-09'),
+        ]);
+        $result = $service->importLessonsFromCalendar('2025-03-01', '2025-03-31');
+
+        $this->assertSame(0, $result['imported']);
+        $this->assertSame(['Preply' => 2, 'Cambly' => 1], $result['unknown_platforms']);
+        $this->assertSame(0, Lesson::count());
+        $this->assertSame(0, Student::count());
+        $this->assertSame(0, Client::count());
+    }
+
+    public function test_import_with_buyer_filter_does_not_report_unknown_platforms(): void
+    {
+        $service = $this->createServiceWithFakeEvents([
+            $this->makeEvent('Preply 55: Dana/ClientD, Mon 10am £28'),
+        ]);
+        $result = $service->importLessonsFromCalendar('2025-03-01', '2025-03-31', [
+            'buyer_id' => 'MYTUTORWEB LIMITED',
+        ]);
+
+        $this->assertSame([], $result['unknown_platforms']);
+    }
+
+    public function test_import_private_lesson_creates_buyer_from_client(): void
+    {
+        $service = $this->createServiceWithFakeEvents([
+            $this->makeEvent('private 55: Charlie/ClientC, Wed 2pm £20'),
+        ]);
+        $service->importLessonsFromCalendar('2025-03-01', '2025-03-31');
+
+        $this->assertSame('ClientC', Lesson::first()->buyer_id);
+        $this->assertNull(Buyer::find('ClientC')->calendar_prefix);
     }
 }

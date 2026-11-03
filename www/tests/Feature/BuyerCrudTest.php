@@ -232,4 +232,94 @@ class BuyerCrudTest extends TestCase
         $response->assertSessionHas('success');
         $this->assertNull(Buyer::find('acme'));
     }
+
+    public function test_store_saves_calendar_prefix(): void
+    {
+        $this->actingAs($this->user)
+            ->post(route('portal.buyers.store'), [
+                'id' => 'PREPLY INC',
+                'name' => 'Preply Inc',
+                'country' => 'US',
+                'calendar_prefix' => 'Preply',
+            ])
+            ->assertRedirect(route('portal.buyers.index'));
+
+        $this->assertEquals('Preply', Buyer::find('PREPLY INC')->calendar_prefix);
+    }
+
+    public function test_store_rejects_calendar_prefix_used_by_another_buyer_case_insensitively(): void
+    {
+        Buyer::factory()->platform('MyTutor')->create(['id' => 'MYTUTORWEB LIMITED']);
+
+        $this->actingAs($this->user)
+            ->post(route('portal.buyers.store'), [
+                'id' => 'acme',
+                'name' => 'Acme Corp',
+                'country' => 'GB',
+                'calendar_prefix' => 'mytutor',
+            ])
+            ->assertSessionHasErrors('calendar_prefix');
+
+        $this->assertNull(Buyer::find('acme'));
+    }
+
+    public function test_store_rejects_reserved_private_calendar_prefix(): void
+    {
+        $this->actingAs($this->user)
+            ->post(route('portal.buyers.store'), [
+                'id' => 'acme',
+                'name' => 'Acme Corp',
+                'country' => 'GB',
+                'calendar_prefix' => 'Private',
+            ])
+            ->assertSessionHasErrors('calendar_prefix');
+    }
+
+    public function test_store_rejects_calendar_prefix_with_space_or_colon(): void
+    {
+        foreach (['My Tutor', 'MyTutor:'] as $prefix) {
+            $this->actingAs($this->user)
+                ->post(route('portal.buyers.store'), [
+                    'id' => 'acme',
+                    'name' => 'Acme Corp',
+                    'country' => 'GB',
+                    'calendar_prefix' => $prefix,
+                ])
+                ->assertSessionHasErrors('calendar_prefix');
+        }
+    }
+
+    public function test_update_sets_and_clears_calendar_prefix(): void
+    {
+        $buyer = Buyer::factory()->create(['id' => 'acme', 'name' => 'Acme Corp']);
+
+        $this->actingAs($this->user)
+            ->put(route('portal.buyers.update', $buyer), ['calendar_prefix' => 'Acme'])
+            ->assertRedirect(route('portal.buyers.show', $buyer));
+        $this->assertEquals('Acme', $buyer->fresh()->calendar_prefix);
+
+        $this->actingAs($this->user)
+            ->put(route('portal.buyers.update', $buyer), ['calendar_prefix' => ''])
+            ->assertRedirect(route('portal.buyers.show', $buyer));
+        $this->assertNull($buyer->fresh()->calendar_prefix);
+    }
+
+    public function test_update_allows_buyer_to_keep_its_own_calendar_prefix(): void
+    {
+        $buyer = Buyer::factory()->platform('Acme')->create(['id' => 'acme', 'name' => 'Acme Corp']);
+
+        $this->actingAs($this->user)
+            ->put(route('portal.buyers.update', $buyer), ['calendar_prefix' => 'ACME'])
+            ->assertSessionHasNoErrors();
+
+        $this->assertEquals('ACME', $buyer->fresh()->calendar_prefix);
+    }
+
+    public function test_index_and_show_display_calendar_prefix(): void
+    {
+        $buyer = Buyer::factory()->platform('Preply')->create(['id' => 'PREPLY INC']);
+
+        $this->actingAs($this->user)->get(route('portal.buyers.index'))->assertSee('Preply');
+        $this->actingAs($this->user)->get(route('portal.buyers.show', $buyer))->assertSee('Calendar Prefix');
+    }
 }

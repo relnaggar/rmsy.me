@@ -20,13 +20,7 @@ use RuntimeException;
 
 class CalendarService
 {
-    private const SOURCE_TO_BUYER = [
-        'MyTutor' => 'MYTUTORWEB LIMITED',
-        'Tutorful' => 'TUTORA LTD',
-        'Spires' => 'SOTC LTD',
-        'TutorRecruiter' => 'TUTORCRUNCHER LTD',
-        'Superprof' => 'PAYPAL',
-    ];
+    public const PRIVATE_SOURCE = 'private';
 
     public function isAuthorised(): bool
     {
@@ -50,13 +44,15 @@ class CalendarService
     }
 
     /**
-     * @return array{imported: int, skipped: int}
+     * @return array{imported: int, skipped: int, unknown_platforms: array<string, int>}
      */
     public function importLessonsFromCalendar(string $startDate, string $endDate, array $filters = []): array
     {
         $rawEvents = $this->getCalendarEvents($startDate, $endDate);
+        $platformBuyers = $this->getPlatformBuyers();
         $imported = 0;
         $skipped = 0;
+        $unknownPlatforms = [];
 
         foreach ($rawEvents as $raw) {
             $event = $this->parseEvent($raw);
@@ -64,8 +60,13 @@ class CalendarService
                 continue;
             }
 
-            $result = $this->persistEvent($event, $filters);
+            $result = $this->persistEvent($event, $filters, $platformBuyers);
             if ($result === self::PERSIST_FILTERED) {
+                continue;
+            }
+            if ($result === self::PERSIST_UNKNOWN_PLATFORM) {
+                $unknownPlatforms[$event->source] = ($unknownPlatforms[$event->source] ?? 0) + 1;
+
                 continue;
             }
 
@@ -76,12 +77,24 @@ class CalendarService
             }
         }
 
-        return ['imported' => $imported, 'skipped' => $skipped];
+        return ['imported' => $imported, 'skipped' => $skipped, 'unknown_platforms' => $unknownPlatforms];
     }
 
     private const PERSIST_CREATED = 1;
     private const PERSIST_SKIPPED = 2;
     private const PERSIST_FILTERED = 3;
+    private const PERSIST_UNKNOWN_PLATFORM = 4;
+
+    /**
+     * @return array<string, string> lowercased calendar prefix => buyer ID
+     */
+    private function getPlatformBuyers(): array
+    {
+        return Buyer::whereNotNull('calendar_prefix')
+            ->pluck('id', 'calendar_prefix')
+            ->mapWithKeys(fn ($id, $prefix) => [mb_strtolower($prefix) => $id])
+            ->all();
+    }
 
     private function parseEvent(array $raw): ?CalendarEvent
     {
@@ -145,20 +158,22 @@ class CalendarService
         );
     }
 
-    private function persistEvent(CalendarEvent $event, array $filters): int
+    /**
+     * @param  array<string, string>  $platformBuyers
+     */
+    private function persistEvent(CalendarEvent $event, array $filters, array $platformBuyers): int
     {
-        $studentId = $this->findOrCreateStudent($event->studentName);
-        $clientId = $this->findOrCreateClient($event->clientName);
-
-        if ($event->source === 'private') {
+        if (mb_strtolower($event->source) === self::PRIVATE_SOURCE) {
             $buyerId = $this->findOrCreateBuyer($event->clientName);
         } else {
-            $buyerId = self::SOURCE_TO_BUYER[$event->source] ?? null;
+            $buyerId = $platformBuyers[mb_strtolower($event->source)] ?? null;
             if ($buyerId === null) {
-                return self::PERSIST_FILTERED;
+                return isset($filters['buyer_id']) ? self::PERSIST_FILTERED : self::PERSIST_UNKNOWN_PLATFORM;
             }
-            Buyer::firstOrCreate(['id' => $buyerId], ['name' => $buyerId]);
         }
+
+        $studentId = $this->findOrCreateStudent($event->studentName);
+        $clientId = $this->findOrCreateClient($event->clientName);
 
         if (isset($filters['buyer_id']) && $buyerId !== $filters['buyer_id']) {
             return self::PERSIST_FILTERED;

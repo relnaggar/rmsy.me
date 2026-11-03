@@ -68,6 +68,7 @@
       <th>ID</th>
       <th>Name</th>
       <th>Country</th>
+      <th>Calendar Prefix</th>
     </tr>
   </thead>
   <tbody>
@@ -76,10 +77,11 @@
         <td><a href="{{ route('portal.buyers.show', $buyer) }}">{{ $buyer->id }}</a></td>
         <td>{{ $buyer->name }} @if($buyer->lessons_count === 0)<span class="badge text-bg-warning ms-1">No lessons</span>@endif</td>
         <td>{{ $buyer->getCountryName() }}</td>
+        <td>{{ $buyer->calendar_prefix ?? '-' }}</td>
       </tr>
     @empty
       <tr>
-        <td colspan="3" class="text-center">No buyers found.</td>
+        <td colspan="4" class="text-center">No buyers found.</td>
       </tr>
     @endforelse
   </tbody>

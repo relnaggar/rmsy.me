@@ -83,6 +83,14 @@
     </td>
   </tr>
   <tr>
+    <th class="text-nowrap">Calendar Prefix</th>
+    <td>
+      <x-inline-edit-text name="calendar_prefix" :action="route('portal.buyers.update', $buyer)" :value="$buyer->calendar_prefix" maxlength="50">
+        {{ $buyer->calendar_prefix ?? '-' }}
+      </x-inline-edit-text>
+    </td>
+  </tr>
+  <tr>
     <th class="text-nowrap">Auto Pay</th>
     <td>
       <x-inline-edit-checkbox name="auto_pay" :action="route('portal.buyers.update', $buyer)" :value="$buyer->auto_pay" />

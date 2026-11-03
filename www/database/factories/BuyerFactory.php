@@ -17,4 +17,9 @@ class BuyerFactory extends Factory
             'name' => fake()->company(),
         ];
     }
+
+    public function platform(string $calendarPrefix): static
+    {
+        return $this->state(['calendar_prefix' => $calendarPrefix]);
+    }
 }

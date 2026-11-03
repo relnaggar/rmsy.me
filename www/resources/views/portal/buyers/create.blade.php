@@ -17,6 +17,7 @@
   <x-form-input name="zip_postal_code" label="Postal Code" maxlength="20" />
   <x-form-input name="country" label="Country" type="select" value="GB" :options="$countries" required />
   <x-form-input name="extra" label="Extra Info" maxlength="255" />
+  <x-form-input name="calendar_prefix" label="Calendar Prefix" maxlength="50" placeholder="e.g. MyTutor" formText="For tutoring platforms: the first word of calendar events for this buyer (case-insensitive). Leave blank for private clients." />
 
   <div class="mb-3 form-check">
     <input type="hidden" name="auto_pay" value="0">

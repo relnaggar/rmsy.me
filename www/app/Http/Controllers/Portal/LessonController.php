@@ -220,7 +220,7 @@ class LessonController extends Controller
     }
 
     /**
-     * @param  array{imported: int, skipped: int}  $result
+     * @param  array{imported: int, skipped: int, unknown_platforms: array<string, int>}  $result
      */
     private function importSuccessMessage(array $result): string
     {
@@ -228,6 +228,11 @@ class LessonController extends Controller
         $parts[] = "Imported {$result['imported']} lesson(s)";
         if ($result['skipped'] > 0) {
             $parts[] = "skipped {$result['skipped']} duplicate(s)";
+        }
+        if (! empty($result['unknown_platforms'])) {
+            $unknownCount = array_sum($result['unknown_platforms']);
+            $unknownNames = implode(', ', array_keys($result['unknown_platforms']));
+            $parts[] = "ignored {$unknownCount} event(s) with unknown platform ({$unknownNames}); set a calendar prefix on the buyer to import them";
         }
 
         return implode(', ', $parts).'.';

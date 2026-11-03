@@ -32,6 +32,7 @@ class Buyer extends Model
         'country',
         'extra',
         'auto_pay',
+        'calendar_prefix',
     ];
 
     protected $casts = [
